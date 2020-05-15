@@ -150,6 +150,7 @@ if __name__ == "__main__":
     [m_by_clicks, tot_clicks] = monsters_by_clicks(move_counts)
     move_seq = calc_move_sequence(m_by_clicks, tot_clicks)
     print(move_seq)
+
     # change keys to clicks per move = total clicks / move count
     # make a new dictionary and move each key across.
 
