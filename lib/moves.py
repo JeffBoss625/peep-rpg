@@ -33,7 +33,7 @@ def elapse_time(peeps):
 # 4 5 6      -1, 0     0, 0     1, 0
 # 1 2 3      -1, 1     0, 1     1,-1
 
-x_modifiers = {
+X_MODIFIERS = {
     7: -1,
     4: -1,
     1: -1,
@@ -45,7 +45,7 @@ x_modifiers = {
     3: 1,
 }
 
-y_modifiers = {
+Y_MODIFIERS = {
     1: 1,
     2: 1,
     3: 1,
@@ -56,6 +56,23 @@ y_modifiers = {
     8: -1,
     9: -1,
 }
+
+DIRECTION = {
+    'DL': 1,
+    'D': 2,
+    'DR': 3,
+    'L': 4,
+    'C': 5,
+    'R': 6,
+    'UL': 7,
+    'U': 8,
+    'UR': 9
+}
+
+
+def movexy(direction):
+    return X_MODIFIERS[direction], Y_MODIFIERS[direction]
+
 
 # def handle_moves(model, moves)
 #    # check if monsters collide with monsters
