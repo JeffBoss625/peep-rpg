@@ -2,7 +2,7 @@
 
 from curses import wrapper
 from lib.moves import Direction
-from lib.moves import movexy
+from lib.moves import calc_dx_dy
 
 maze = [
     '.....###############',
@@ -101,7 +101,7 @@ def main(scr):
 
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
-        dx, dy = movexy(dir)
+        dx, dy = calc_dx_dy(dir)
         player['x'] += dx
         player['y'] += dy
 

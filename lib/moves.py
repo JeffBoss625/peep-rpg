@@ -63,7 +63,7 @@ Y_MODIFIERS = {
 }
 
 
-def movexy(direction):
+def calc_dx_dy(direction):
     return X_MODIFIERS[direction], Y_MODIFIERS[direction]
 
 
