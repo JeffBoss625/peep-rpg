@@ -29,44 +29,37 @@ def elapse_time(peeps):
 
 # x and y modifiers for each directions on keypad
 
-# 7 8 9      -1,-1     0,-1     1,-1
-# 4 5 6      -1, 0     0, 0     1, 0
-# 1 2 3      -1, 1     0, 1     1,-1
+# Direction constants match keypad layout
+#       7 8 9
+#       4 5 6
+#       1 2 3
+
+
+class Direction: DOWN_LEFT, DOWN, DOWN_RIGHT, LEFT, CENTER, RIGHT, UP_LEFT, UP, UP_RIGHT = range(1,10)
+
 
 X_MODIFIERS = {
-    7: -1,
-    4: -1,
-    1: -1,
-    8: 0,
-    5: 0,
-    2: 0,
-    9: 1,
-    6: 1,
-    3: 1,
+    Direction.UP_LEFT: -1,
+    Direction.LEFT: -1,
+    Direction.DOWN_LEFT: -1,
+    Direction.UP: 0,
+    Direction.CENTER: 0,
+    Direction.DOWN: 0,
+    Direction.UP_RIGHT: 1,
+    Direction.RIGHT: 1,
+    Direction.DOWN_RIGHT: 1,
 }
 
 Y_MODIFIERS = {
-    1: 1,
-    2: 1,
-    3: 1,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: -1,
-    8: -1,
-    9: -1,
-}
-
-DIRECTION = {
-    'DL': 1,
-    'D': 2,
-    'DR': 3,
-    'L': 4,
-    'C': 5,
-    'R': 6,
-    'UL': 7,
-    'U': 8,
-    'UR': 9
+    Direction.UP_LEFT: -1,
+    Direction.UP: -1,
+    Direction.UP_RIGHT: -1,
+    Direction.LEFT: 0,
+    Direction.CENTER: 0,
+    Direction.RIGHT: 0,
+    Direction.DOWN_LEFT: 1,
+    Direction.DOWN: 1,
+    Direction.DOWN_RIGHT: 1,
 }
 
 

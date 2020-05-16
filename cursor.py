@@ -1,25 +1,31 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
 
 from curses import wrapper
-from lib.moves import DIRECTION as DIR
+from lib.moves import Direction
 from lib.moves import movexy
 
 maze = [
-    '.....xxxxxxxxxxxxxxx',
-    '.....xxxx....xxxxxxx',
-    '.....xxxx....xxxxxxx',
-    '.....xxxx....xxxx..x',
-    '.....xxxx....xxxx..x',
-    '.....xxxx....xxxx..x',
-    '.....xxxx..........x',
-    '.....xxxx....xxxxxxx',
-    '.....xxxx....xxxxxxx',
-    '.....xxxxxxxxxxxxxxx',
+    '.....###############',
+    '.....####....#######',
+    '.....####....#######',
+    '.....####....####..#',
+    '.....####....####..#',
+    '.....####....####..#',
+    '.....####..........#',
+    '.....####....#######',
+    '.....####....#######',
+    '.....###############',
 ]
+
+goblin = {
+    'type': 'goblin',
+    'char': 'g',
+}
 
 player = {
     'name': 'Bo Bo the Destroyer',
     'type': 'player',
+    'char': '@',
     'hp': 5,
     'thaco': 19,
     'speed': 11,
@@ -37,8 +43,11 @@ player = {
         },
     },
 }
-player = {'peep': player, 'x': 0, 'y': 2, 'hp': 3}
 
+peeps = [
+    {'peep': player, 'x': 0, 'y': 2, 'hp': 3},
+    {'peep': goblin, 'x': 2, 'y': 2}
+]
 
 def draw_stats(scr, player):
     y, x = scr.getyx()
@@ -60,18 +69,21 @@ def draw_maze(scr, maze):
 
 
 def draw_peep(scr, p):
-    scr.move(p['y'], p['x'])
-    scr.addch('@')
+    y, x = scr.getyx()
+    scr.move(p['y'] + y, p['x'] + x)
+    scr.addch(p['peep']['char'])
 
 KEY_DIR = {
-    'j': DIR['D'],
-    'k': DIR['U'],
-    'l': DIR['R'],
-    'h': DIR['L']
+    'j': Direction.DOWN,
+    'k': Direction.UP,
+    'l': Direction.RIGHT,
+    'h': Direction.LEFT
 }
+
 
 def main(scr):
     scr.clear()
+    player = peeps[0]
 
     scr.move(2, 10)
     draw_stats(scr, player['peep'])
@@ -79,12 +91,12 @@ def main(scr):
     input_key = 0
     xoff = 10
     yoff = 10
-    player['x'] += xoff
-    player['y'] += yoff
     while input_key != 'Q':
         scr.move(yoff, xoff)
         draw_maze(scr, maze)
-        draw_peep(scr, player)
+        for p in peeps:
+            scr.move(yoff,xoff)
+            draw_peep(scr, p)
         scr.move(0,0)
 
         input_key = scr.getkey()
@@ -92,5 +104,6 @@ def main(scr):
         dx, dy = movexy(dir)
         player['x'] += dx
         player['y'] += dy
+
 
 wrapper(main)
