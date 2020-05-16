@@ -4,7 +4,7 @@ from curses import wrapper
 from lib.moves import Direction
 from lib.moves import calc_dx_dy
 
-maze = [
+MAZE = [
     '.....###############',
     '.....####....#######',
     '.....####....#######',
@@ -17,12 +17,12 @@ maze = [
     '.....###############',
 ]
 
-goblin = {
+GOBLIN = {
     'type': 'goblin',
     'char': 'g',
 }
 
-player = {
+PLAYER = {
     'name': 'Bo Bo the Destroyer',
     'type': 'player',
     'char': '@',
@@ -44,9 +44,9 @@ player = {
     },
 }
 
-peeps = [
-    {'peep': player, 'x': 0, 'y': 2, 'hp': 3},
-    {'peep': goblin, 'x': 2, 'y': 2}
+PEEPS = [
+    {'peep': PLAYER, 'x': 0, 'y': 2, 'hp': 3},
+    {'peep': GOBLIN, 'x': 2, 'y': 2}
 ]
 
 def draw_stats(scr, player):
@@ -65,8 +65,6 @@ def draw_maze(scr, maze):
         scr.addstr(line)
         # for c in line:
         #     scr.addch(c)
-    scr.refresh()
-
 
 def draw_peep(scr, p):
     y, x = scr.getyx()
@@ -83,7 +81,7 @@ KEY_DIR = {
 
 def main(scr):
     scr.clear()
-    player = peeps[0]
+    player = PEEPS[0]
 
     scr.move(2, 10)
     draw_stats(scr, player['peep'])
@@ -93,11 +91,12 @@ def main(scr):
     yoff = 10
     while input_key != 'Q':
         scr.move(yoff, xoff)
-        draw_maze(scr, maze)
-        for p in peeps:
+        draw_maze(scr, MAZE)
+        for p in PEEPS:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
         scr.move(0,0)
+        scr.refresh()
 
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
