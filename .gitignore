@@ -1,2 +1,6 @@
 game.iml
 idea
+inspectionProfiles
+*.xml
+*.iml
+venv
