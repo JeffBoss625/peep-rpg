@@ -1,6 +1,7 @@
 player = {
     'name': 'Bo Bo the Destroyer',
     'type': 'player',
+    'char': '@',
     'hp': 5,
     'thaco': 19,
     'speed': 11,
@@ -22,6 +23,7 @@ player = {
 goblin = {
     'name': 'Thark the Goblin',
     'type': 'goblin',
+    'char': 'g',
     'hp': 7,
     'speed': 10,
     'tics': 0,
