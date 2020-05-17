@@ -1,5 +1,5 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
-
+import lib.moves as mlib
 from curses import wrapper
 from lib.moves import Direction
 from lib.moves import calc_dx_dy
@@ -102,7 +102,8 @@ def main(scr):
         scr.refresh()
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
-        handle_player_move(player, dir)
+
+        mlib.handle_player_move(MAZE, player, dir)
 
 
 
