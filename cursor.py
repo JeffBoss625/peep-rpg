@@ -9,7 +9,7 @@ MAZE = [
     '.....####....#######',
     '.....####....#######',
     '.....####....####..#',
-    '.....####....####..#',
+    '.............####..#',
     '.....####....####..#',
     '.....####..........#',
     '.....####....#######',
@@ -73,11 +73,20 @@ def draw_peep(scr, p):
 
 KEY_DIR = {
     'j': Direction.DOWN,
+    'y': Direction.UP_LEFT,
     'k': Direction.UP,
+    'u': Direction.UP_RIGHT,
     'l': Direction.RIGHT,
-    'h': Direction.LEFT
+    'n': Direction.DOWN_RIGHT,
+    'h': Direction.LEFT,
+    'b': Direction.DOWN_LEFT,
 }
 
+
+def handle_player_move(player, dir):
+    dx, dy = calc_dx_dy(dir)
+    player['x'] += dx
+    player['y'] += dy
 
 def main(scr):
     scr.clear()
@@ -97,12 +106,12 @@ def main(scr):
             draw_peep(scr, p)
         scr.move(0,0)
         scr.refresh()
-
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
-        dx, dy = calc_dx_dy(dir)
-        player['x'] += dx
-        player['y'] += dy
+        handle_player_move(player, dir)
 
+def wall_collide(player_x, player_y):
+    if MAZE[player_x][player_y] == '#':
+        raise Exception('RAN INTO WALL')
 
 wrapper(main)
