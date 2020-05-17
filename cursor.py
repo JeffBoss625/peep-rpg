@@ -82,12 +82,6 @@ KEY_DIR = {
     'b': Direction.DOWN_LEFT,
 }
 
-
-def handle_player_move(player, dir):
-    dx, dy = calc_dx_dy(dir)
-    player['x'] += dx
-    player['y'] += dy
-
 def main(scr):
     scr.clear()
     player = PEEPS[0]
@@ -110,8 +104,6 @@ def main(scr):
         dir = KEY_DIR[input_key]
         handle_player_move(player, dir)
 
-def wall_collide(player_x, player_y):
-    if MAZE[player_x][player_y] == '#':
-        raise Exception('RAN INTO WALL')
+
 
 wrapper(main)
