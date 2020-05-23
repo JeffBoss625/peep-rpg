@@ -1,5 +1,5 @@
 
-
+import lib.attack as attacklib
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of
 #   { number-of-moves: monster-list (indexes) }
@@ -153,6 +153,11 @@ def handle_player_move(peeps, maze, player, dir):
         if check_peep_at(peeps, player['x']+dx, player['y']+dy) is None:
             player['x'] += dx
             player['y'] += dy
+        else:
+            dst = check_peep_at(peeps, player['x']+dx, player['y']+dy)
+            attacklib.attack(player, dst, 'teeth')
+            if dst['hp'] <= 0:
+                peeps.remove(dst)
     # else: do nothing
 
 def check_peep_at(peeps, player_x, player_y):

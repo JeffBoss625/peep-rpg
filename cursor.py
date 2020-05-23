@@ -18,6 +18,7 @@ MAZE = [
 ]
 
 GOBLIN = {
+    'name': 'Thark',
     'type': 'goblin',
     'char': 'g',
 }
@@ -35,18 +36,18 @@ PLAYER = {
         'teeth': {
             'damage': '1d5'
         },
-        'scratch': {
+        'tail': {
             'damage': '3d1'
         },
-        'tail': {
+        'scratch': {
             'damage': '2d3'
         },
     },
 }
 
 PEEPS = [
-    {'peep': PLAYER, 'x': 0, 'y': 2, 'hp': 3},
-    {'peep': GOBLIN, 'x': 2, 'y': 2}
+    {'peep': PLAYER, 'x': 0, 'y': 2, 'hp': 10},
+    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 100}
 ]
 
 def draw_stats(scr, player):
