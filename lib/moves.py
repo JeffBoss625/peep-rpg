@@ -147,21 +147,28 @@ def calc_move_sequence(monstersbyclicks, tot_clicks):
 
     return ret
 
-def handle_player_move(maze, player, dir):
+def handle_player_move(peeps, maze, player, dir):
     dx, dy = calc_dx_dy(dir)
-    msg = check_wall_collide(maze, player['x']+dx, player['y']+dy)
-    if len(msg) == 0:
-        player['x'] += dx
-        player['y'] += dy
+    if check_wall_collide(maze, player['x']+dx, player['y']+dy) is None:
+        if check_peep_at(peeps, player['x']+dx, player['y']+dy) is None:
+            player['x'] += dx
+            player['y'] += dy
     # else: do nothing
+
+def check_peep_at(peeps, player_x, player_y):
+    for p in peeps:
+        if player_x == p['x']:
+            if player_y == p['y']:
+                return p
+    return None
 
 def check_wall_collide(maze, player_x, player_y):
     line = maze[player_y]
     cell = line[player_x]
     if cell == '#':
-        return 'RAN INTO WALL'
+        return {'type': 'wall', 'x': str(player_x), 'y': str(player_y)}
     else:
-        return ''
+        return None
 
 if __name__ == "__main__":
     from pprint import pprint

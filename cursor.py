@@ -103,7 +103,7 @@ def main(scr):
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
 
-        mlib.handle_player_move(MAZE, player, dir)
+        mlib.handle_player_move(PEEPS, MAZE, player, dir)
 
 
 
