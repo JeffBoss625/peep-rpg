@@ -8,28 +8,32 @@ def parse_dice(dstring):
         'num_sides': int(parts[1])
     }
 
+def choose_melee_weapon(src):
+    weapons = src['weapons']
+    keys = iter(weapons.keys())
+    return next(keys)
 
 def attack(src, dst, weapon_name, seed=0):
-    src_orig = src['peep']      # src original state (name, weapons, original hit points...)
-    dst_orig = dst['peep']      # dst original state (name, weapons, original hit points...)
-    dst_cur = dst               # dst current rapidly-changing state (current hit points, position...)
+    src_info = src['peep']      # src original info (name, weapons, original hit points...)
+    dst_info = dst['peep']      # dst original info (name, weapons, original hit points...)
+    dst_state = dst             # dst current rapidly-changing state (current hit points, position...)
     ret = []
     if seed > 0:
         random.seed(seed)
-    ret.append("The " + src_orig['name'] + " attacks with " + weapon_name + "!")
+    ret.append("The " + src_info['name'] + " attacks with " + weapon_name + "!")
 
-    src_weapon = src_orig['weapons'][weapon_name]
-    if not src_weapon: raise ReferenceError(src_orig['name'] + ' has no weapon called' + weapon_name)
+    src_weapon = src_info['weapons'][weapon_name]
+    if not src_weapon: raise ReferenceError(src_info['name'] + ' has no weapon called' + weapon_name)
     dice_info = parse_dice(src_weapon['damage'])
     tot_hp_loss = 0
     for i in range(1, dice_info['num_dice'] + 1):
         hp_loss = random.randint(1, dice_info['num_sides'])
         # print("i:" + str(i) + " hp_loss:" + str(hp_loss))
         tot_hp_loss += hp_loss
-    dst_cur['hp'] = dst_cur['hp'] - tot_hp_loss
-    ret.append('the ' + dst_orig['name'] + ' has ' + str(dst_cur['hp']) + 'hp left!')
-    if dst_cur['hp'] <= 0:
-        ret.append('the ' + dst_orig['name'] + ' has died to the ' + src_orig['name'] + "'s " + weapon_name + '!')
+    dst_state['hp'] = dst_state['hp'] - tot_hp_loss
+    ret.append('the ' + dst_info['name'] + ' has ' + str(dst_state['hp']) + 'hp left!')
+    if dst_state['hp'] <= 0:
+        ret.append('the ' + dst_info['name'] + ' has died to the ' + src_info['name'] + "'s " + weapon_name + '!')
     return ret
 
 
