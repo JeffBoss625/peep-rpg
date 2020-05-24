@@ -161,7 +161,8 @@ def handle_enemy_move(peeps, maze, enemy, dir):
                     peeps.remove(dst)
 
 def direction_from_vector(dx, dy):
-    ret = 0
+    ret = Direction.CENTER
+
     if dx < 0 and dy < 0:
         ret = Direction.UP_LEFT
     if dx == 0 and dy < 0:
@@ -178,9 +179,7 @@ def direction_from_vector(dx, dy):
         ret = Direction.DOWN_LEFT
     if dx < 0 and dy == 0:
         ret = Direction.LEFT
-    if dx == 0 and dy == 0:
-        ret == Direction.CENTER
-
+    return ret
 
 def handle_player_move(peeps, maze, player, dir):
     dx, dy = calc_dx_dy(dir)
