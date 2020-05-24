@@ -63,7 +63,7 @@ PLAYER = {
 
 PEEPS = [
     {'peep': PLAYER, 'x': 1, 'y': 2, 'hp': 10},
-    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 100}
+    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 10}
 ]
 
 def draw_stats(scr, player):
@@ -122,7 +122,10 @@ def main(scr):
         mlib.handle_player_move(PEEPS, MAZE, player, dir)
         for i in range(1, len(PEEPS)):
             enemy = PEEPS[i]
-            mlib.handle_enemy_move(PEEPS, MAZE, enemy, dir)
+            dx = player['x'] - enemy['x']
+            dy = player['y'] - enemy['y']
+            edir = mlib.direction_from_vector(dx, dy)
+            mlib.handle_enemy_move(PEEPS, MAZE, enemy, edir)
 
 
 
