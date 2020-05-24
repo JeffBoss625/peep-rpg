@@ -119,13 +119,13 @@ def main(scr):
         scr.refresh()
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
-        mlib.handle_player_move(PEEPS, MAZE, player, dir)
+        mlib.move_peep(PEEPS, MAZE, player, dir)
         for i in range(1, len(PEEPS)):
             enemy = PEEPS[i]
             dx = player['x'] - enemy['x']
             dy = player['y'] - enemy['y']
             edir = mlib.direction_from_vector(dx, dy)
-            mlib.handle_enemy_move(PEEPS, MAZE, enemy, edir)
+            mlib.move_peep(PEEPS, MAZE, enemy, edir)
 
 
 

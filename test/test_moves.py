@@ -35,24 +35,24 @@ def test_handle_player_move():
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.RIGHT)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.RIGHT)
     assert player['x'] == 1 # x changed!
     assert player['y'] == 0
 
     # Run into wall (right)
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.RIGHT)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.RIGHT)
     assert player['x'] == 1
     assert player['y'] == 0
     # Run into wall diagnally-right
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN_RIGHT)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.DOWN_RIGHT)
     assert player['x'] == 1
     assert player['y'] == 0
     # Run into wall down
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.DOWN)
     assert player['x'] == 1
     assert player['y'] == 0
     # Move down left without collision
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN_LEFT)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.DOWN_LEFT)
     assert player['x'] == 0
     assert player['y'] == 1
 
@@ -72,7 +72,7 @@ def test_player_move_attack():
         '......',        # monster here at [4,3]
     ]
     # Run into monster at [0,2]
-    movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN)
+    movelib.move_peep(peeps, maze, player, movelib.Direction.DOWN)
     assert player['x'] == 0
     assert player['y'] == 1
 
@@ -97,10 +97,10 @@ def test_handle_enemy_move():
     dy = player['y'] - enemy['y']
     edir = movelib.direction_from_vector(dx, dy)
 
-    movelib.handle_enemy_move(peeps, maze, enemy, edir)
+    movelib.move_peep(peeps, maze, enemy, edir)
     assert enemy['x'] == 0
     assert enemy['y'] == 1
-    movelib.handle_enemy_move(peeps, maze, enemy, edir)
+    movelib.move_peep(peeps, maze, enemy, edir)
     assert enemy['x'] == 0
     assert enemy['y'] == 1
 # def test_move_player():

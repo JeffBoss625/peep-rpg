@@ -147,19 +147,6 @@ def calc_move_sequence(monstersbyclicks, tot_clicks):
 
     return ret
 
-def handle_enemy_move(peeps, maze, enemy, dir):
-    dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(maze, enemy['x']+dx, enemy['y']+dy) is None:
-        if check_unbreakable_collide(maze, enemy['x']+dx, enemy['y']+dy) is None:
-            if check_peep_at(peeps, enemy['x']+dx, enemy['y']+dy) is None:
-                enemy['x'] += dx
-                enemy['y'] += dy
-            else:
-                dst = check_peep_at(peeps, enemy['x']+dx, enemy['y']+dy)
-                attacklib.attack(enemy, dst, 'bite')
-                if dst['hp'] <= 0:
-                    peeps.remove(dst)
-
 def direction_from_vector(dx, dy):
     ret = Direction.CENTER
 
@@ -181,9 +168,9 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
-def handle_player_move(peeps, maze, player, dir):
-    ps = player                     # player state (current position, hit points...)
-    player_info = player['peep']    # other player reference data (weapons, original hit points...)
+def move_peep(peeps, maze, peep, dir):
+    ps = peep                   # peep state (current position, hit points...)
+    peep_info = peep['peep']    # other peep reference data (weapons, original hit points...)
     dx, dy = calc_dx_dy(dir)
     if check_wall_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
         if check_unbreakable_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
@@ -192,16 +179,16 @@ def handle_player_move(peeps, maze, player, dir):
                 ps['y'] += dy
             else:
                 dst = check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy)
-                weapon = attacklib.choose_melee_weapon(player_info)
+                weapon = attacklib.choose_melee_weapon(peep_info)
                 attacklib.attack(ps, dst, weapon)
                 if dst['hp'] <= 0:
                     peeps.remove(dst)
     # else: do nothing
 
-def check_peep_at(peeps, player_x, player_y):
+def check_peep_at(peeps, x, y):
     for p in peeps:
-        if player_x == p['x']:
-            if player_y == p['y']:
+        if x == p['x']:
+            if y == p['y']:
                 return p
     return None
 
