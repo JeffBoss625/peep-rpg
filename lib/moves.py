@@ -147,17 +147,53 @@ def calc_move_sequence(monstersbyclicks, tot_clicks):
 
     return ret
 
+def handle_enemy_move(peeps, maze, enemy, dir):
+    dx, dy = calc_dx_dy(dir)
+    if check_wall_collide(maze, enemy['x']+dx, enemy['y']+dy) is None:
+        if check_unbreakable_collide(maze, enemy['x']+dx, enemy['y']+dy) is None:
+            if check_peep_at(peeps, enemy['x']+dx, enemy['y']+dy) is None:
+                enemy['x'] += dx
+                enemy['y'] += dy
+            else:
+                dst = check_peep_at(peeps, enemy['x']+dx, enemy['y']+dy)
+                attacklib.attack(enemy, dst, 'bite')
+                if dst['hp'] <= 0:
+                    peeps.remove(dst)
+
+def direction_from_vector(dx, dy):
+    ret = 0
+    if dx < 0 and dy < 0:
+        ret = Direction.UP_LEFT
+    if dx == 0 and dy < 0:
+        ret = Direction.UP
+    if dx > 0 and dy < 0:
+        ret = Direction.UP_RIGHT
+    if dx > 0 and dy == 0:
+        ret = Direction.RIGHT
+    if dx > 0 and dy > 0:
+        ret = Direction.DOWN_RIGHT
+    if dx == 0 and dy > 0:
+        ret = Direction.DOWN
+    if dx < 0 and dy > 0:
+        ret = Direction.DOWN_LEFT
+    if dx < 0 and dy == 0:
+        ret = Direction.LEFT
+    if dx == 0 and dy == 0:
+        ret == Direction.CENTER
+
+
 def handle_player_move(peeps, maze, player, dir):
     dx, dy = calc_dx_dy(dir)
     if check_wall_collide(maze, player['x']+dx, player['y']+dy) is None:
-        if check_peep_at(peeps, player['x']+dx, player['y']+dy) is None:
-            player['x'] += dx
-            player['y'] += dy
-        else:
-            dst = check_peep_at(peeps, player['x']+dx, player['y']+dy)
-            attacklib.attack(player, dst, 'teeth')
-            if dst['hp'] <= 0:
-                peeps.remove(dst)
+        if check_unbreakable_collide(maze, player['x']+dx, player['y']+dy) is None:
+            if check_peep_at(peeps, player['x']+dx, player['y']+dy) is None:
+                player['x'] += dx
+                player['y'] += dy
+            else:
+                dst = check_peep_at(peeps, player['x']+dx, player['y']+dy)
+                attacklib.attack(player, dst, 'teeth')
+                if dst['hp'] <= 0:
+                    peeps.remove(dst)
     # else: do nothing
 
 def check_peep_at(peeps, player_x, player_y):
@@ -172,6 +208,13 @@ def check_wall_collide(maze, player_x, player_y):
     cell = line[player_x]
     if cell == '#':
         return {'type': 'wall', 'x': str(player_x), 'y': str(player_y)}
+    else:
+        return None
+def check_unbreakable_collide(maze, player_x, player_y):
+    line = maze[player_y]
+    cell = line[player_x]
+    if cell == '%':
+        return {'type': 'unbreakable', 'x': str(player_x), 'y': str(player_y)}
     else:
         return None
 

@@ -5,22 +5,38 @@ from lib.moves import Direction
 from lib.moves import calc_dx_dy
 
 MAZE = [
-    '.....###############',
-    '.....####....#######',
-    '.....####....#######',
-    '.....####....####..#',
-    '.............####..#',
-    '.....####....####..#',
-    '.....####..........#',
-    '.....####....#######',
-    '.....####....#######',
-    '.....###############',
+    '%%%%%%%%%%%%%%%%%%%%',
+    '%....####....######%',
+    '%....####....######%',
+    '%....####....####..%',
+    '%............####..%',
+    '%....####....####..%',
+    '%....####..........%',
+    '%....####....######%',
+    '%....####....######%',
+    '%%%%%%%%%%%%%%%%%%%%',
 ]
 
 GOBLIN = {
     'name': 'Thark',
     'type': 'goblin',
     'char': 'g',
+    'hp': 10,
+    'thaco': 18,
+    'speed': 13,
+    'tics': 0,
+    'ac': 19,
+    'weapons': {
+        'bite': {
+            'damage': '1d3'
+        },
+        'scratch': {
+            'damage': '2d2'
+        },
+        'punch': {
+            'damage': '2d1'
+        }
+    }
 }
 
 PLAYER = {
@@ -46,7 +62,7 @@ PLAYER = {
 }
 
 PEEPS = [
-    {'peep': PLAYER, 'x': 0, 'y': 2, 'hp': 10},
+    {'peep': PLAYER, 'x': 1, 'y': 2, 'hp': 10},
     {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 100}
 ]
 
@@ -103,8 +119,10 @@ def main(scr):
         scr.refresh()
         input_key = scr.getkey()
         dir = KEY_DIR[input_key]
-
         mlib.handle_player_move(PEEPS, MAZE, player, dir)
+        for i in range(1, len(PEEPS)):
+            enemy = PEEPS[i]
+            mlib.handle_enemy_move(PEEPS, MAZE, enemy, dir)
 
 
 
