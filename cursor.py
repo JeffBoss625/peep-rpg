@@ -109,7 +109,7 @@ def main(scr):
     input_key = 0
     xoff = 10
     yoff = 10
-    while input_key != 'Q':
+    while input_key != 'q':
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
         for p in PEEPS:
@@ -118,18 +118,18 @@ def main(scr):
         scr.move(0,0)
         scr.refresh()
         input_key = scr.getkey()
-        dir = KEY_DIR[input_key]
-        mlib.move_peep(PEEPS, MAZE, player, dir)
-        for i in range(1, len(PEEPS)):
-            enemy = PEEPS[i]
-            dx = player['x'] - enemy['x']
-            dy = player['y'] - enemy['y']
-            if enemy['hp']/enemy['peep']['hp'] < 0.5:
-                edir = mlib.direction_from_vector(-dx, -dy)
-            else:
-                edir = mlib.direction_from_vector(dx, dy)
-            mlib.move_peep(PEEPS, MAZE, enemy, edir)
-
+        if input_key in KEY_DIR:
+            dir = KEY_DIR[input_key]
+            mlib.move_peep(PEEPS, MAZE, player, dir)
+            for i in range(1, len(PEEPS)):
+                enemy = PEEPS[i]
+                dx = player['x'] - enemy['x']
+                dy = player['y'] - enemy['y']
+                if enemy['hp']/enemy['peep']['hp'] < 0.5:
+                    edir = mlib.direction_from_vector(-dx, -dy)
+                else:
+                    edir = mlib.direction_from_vector(dx, dy)
+                mlib.move_peep(PEEPS, MAZE, enemy, edir)
 
 
 wrapper(main)
