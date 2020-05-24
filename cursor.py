@@ -124,7 +124,10 @@ def main(scr):
             enemy = PEEPS[i]
             dx = player['x'] - enemy['x']
             dy = player['y'] - enemy['y']
-            edir = mlib.direction_from_vector(dx, dy)
+            if enemy['hp']/enemy['peep']['hp'] < 0.5:
+                edir = mlib.direction_from_vector(-dx, -dy)
+            else:
+                edir = mlib.direction_from_vector(dx, dy)
             mlib.move_peep(PEEPS, MAZE, enemy, edir)
 
 
