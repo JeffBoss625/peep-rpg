@@ -88,6 +88,12 @@ def draw_peep(scr, p):
     scr.move(p['y'] + y, p['x'] + x)
     scr.addch(p['peep']['char'])
 
+def draw_messages(scr, messages):
+    y, x = scr.getyx()
+    for i, m in enumerate(messages):
+        scr.move(y+i, x)
+        scr.addstr(m)
+
 KEY_DIR = {
     'j': Direction.DOWN,
     'y': Direction.UP_LEFT,
@@ -99,7 +105,10 @@ KEY_DIR = {
     'b': Direction.DOWN_LEFT,
 }
 
+MARGIN_SIZE = 3
+
 def main(scr):
+    MESSAGES = []
     scr.clear()
     player = PEEPS[0]
 
@@ -109,12 +118,19 @@ def main(scr):
     input_key = 0
     xoff = 10
     yoff = 10
+    turn = 0
     while input_key != 'q':
+        turn += 1
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
         for p in PEEPS:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
+        MESSAGES.append('turn ' + str(turn) + ': hi there')
+        if len(MESSAGES) > 8:
+            MESSAGES = MESSAGES[-8:]
+        scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
+        draw_messages(scr, MESSAGES)
         scr.move(0,0)
         scr.refresh()
         input_key = scr.getkey()
