@@ -14,13 +14,18 @@ def test_check_wall_collide():
         '..####',
         '.#####',
     ]
-    assert movelib.check_wall_collide(maze, 0, 1) == ''
-    assert movelib.check_wall_collide(maze, 0, 2) == 'RAN INTO WALL'
+    assert movelib.check_wall_collide(maze, 0, 0) is None
+    assert movelib.check_wall_collide(maze, 1, 0) is None
+    wall = movelib.check_wall_collide(maze, 2, 0)
+    assert wall['type'] == 'wall'
+    assert movelib.check_wall_collide(maze, 0, 1) is None
 
 def test_handle_player_move():
+    player_info = {'name': 'p1'}
+    player = {'peep': player_info, 'x': 0, 'y': 0}     # player information and state
     peeps = [
-        {'peep': {'name': 'p1'}, 'x': 0, 'y': 0},
-        {'peep': {'name': 'm1'}, 'x': 0, 'y': 2},
+        player,
+        {'peep': {'name': 'm1'}, 'x': 0, 'y': 2, 'hp': 5},
         {'peep': {'name': 'm1'}, 'x': 4, 'y': 3},
     ]
 
@@ -30,7 +35,6 @@ def test_handle_player_move():
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    player = {'x': 0, 'y': 0}
     movelib.handle_player_move(peeps, maze, player, movelib.Direction.RIGHT)
     assert player['x'] == 1 # x changed!
     assert player['y'] == 0
