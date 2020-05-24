@@ -58,6 +58,31 @@ def test_handle_player_move():
 
 
 
+def test_handle_enemy_move():
+    peeps = [
+        {'peep': {'name': 'p1'}, 'x': 0, 'y': 0},
+        {'peep': {'name': 'm1'}, 'x': 1, 'y': 2},
+        {'peep': {'name': 'm1'}, 'x': 4, 'y': 3},
+    ]
+
+    maze = [
+        '..####',
+        '..####',
+        '......',        # monster here on the left at [0,2].
+        '......',        # monster here at [4,3]
+    ]
+    enemy = peeps[1]
+    player = peeps[0]
+    dx = player['x'] - enemy['x']
+    dy = player['y'] - enemy['y']
+    edir = movelib.direction_from_vector(dx, dy)
+
+    movelib.handle_enemy_move(peeps, maze, enemy, edir)
+    assert enemy['x'] == 0
+    assert enemy['y'] == 1
+    movelib.handle_enemy_move(peeps, maze, enemy, edir)
+    assert enemy['x'] == 0
+    assert enemy['y'] == 1
 # def test_move_player():
 #     maze = [
 #         '..####'
