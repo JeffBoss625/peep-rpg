@@ -182,15 +182,18 @@ def direction_from_vector(dx, dy):
     return ret
 
 def handle_player_move(peeps, maze, player, dir):
+    ps = player                     # player state (current position, hit points...)
+    player_info = player['peep']    # other player reference data (weapons, original hit points...)
     dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(maze, player['x']+dx, player['y']+dy) is None:
-        if check_unbreakable_collide(maze, player['x']+dx, player['y']+dy) is None:
-            if check_peep_at(peeps, player['x']+dx, player['y']+dy) is None:
-                player['x'] += dx
-                player['y'] += dy
+    if check_wall_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
+        if check_unbreakable_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
+            if check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy) is None:
+                ps['x'] += dx
+                ps['y'] += dy
             else:
-                dst = check_peep_at(peeps, player['x']+dx, player['y']+dy)
-                attacklib.attack(player, dst, 'teeth')
+                dst = check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy)
+                weapon = attacklib.choose_melee_weapon(player_info)
+                attacklib.attack(ps, dst, weapon)
                 if dst['hp'] <= 0:
                     peeps.remove(dst)
     # else: do nothing

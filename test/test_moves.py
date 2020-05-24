@@ -51,6 +51,22 @@ def test_handle_player_move():
     movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN_LEFT)
     assert player['x'] == 0
     assert player['y'] == 1
+
+def test_player_move_attack():
+    player_info = {'name': 'p1', 'weapons': {'sword': {'damage': '1d6'}}}
+    player = {'peep': player_info, 'x': 0, 'y': 1}     # player information and state
+    peeps = [
+        player,
+        {'peep': {'name': 'm1'}, 'x': 0, 'y': 2, 'hp': 5},
+        {'peep': {'name': 'm1'}, 'x': 4, 'y': 3},
+    ]
+
+    maze = [
+        '..####',
+        '.#####',
+        '.#....',        # monster here on the left at [0,2].
+        '......',        # monster here at [4,3]
+    ]
     # Run into monster at [0,2]
     movelib.handle_player_move(peeps, maze, player, movelib.Direction.DOWN)
     assert player['x'] == 0
