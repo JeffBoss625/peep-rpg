@@ -1,9 +1,9 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
-import lib.moves as mlib
+import lib.move as mlib
 from curses import wrapper
-from lib.moves import Direction
-from lib.moves import calc_dx_dy
-import lib.attack as attacklib
+from lib.move import Direction
+from lib.monsters import monster_by_name
+from lib.peeps import peep_by_name
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -103,64 +103,6 @@ def main(scr):
     MESSAGES = []
     scr.clear()
     player = PEEPS[0]
-    input_key = 0
-    xoff = 10
-    yoff = 10
-    turn = 0
-    while input_key != 'q':
-        turn += 1
-        scr.move(2, 10)
-        draw_stats(scr, player)
-        scr.move(yoff, xoff)
-        draw_maze(scr, MAZE)
-        for p in PEEPS:
-            scr.move(yoff,xoff)
-            draw_peep(scr, p)
-        if len(MESSAGES) > 8:
-            MESSAGES = MESSAGES[-12:]
-        scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
-        draw_messages(scr, MESSAGES)
-        scr.move(0,0)
-        scr.refresh()
-        turns(model, screen)
-
-def turns(player, model, control):
-    move_counts = mlib.elapse_time(PEEPS)
-    [m_by_clicks, tot_clicks] = mlib.monsters_by_clicks(move_counts)
-    move_seq = mlib.calc_move_sequence(m_by_clicks, tot_clicks)
-    for i in range(0, len(move_seq) - 1):
-        peep_moving = move_seq[i]
-        if peep_moving['type'] == 'player':
-            player_turn(PEEPS, MAZE, player, scr)
-        else:
-            enemy = peep_moving
-            msg = enemy_turn(PEEPS, MAZE, player, enemy)
-            messages.extend(msg)
-
-def player_turn(model, player, screen):
-    input_key = scr.getkey()
-    msg = []
-    if input_key in KEY_DIR:
-        msg = mlib.move_peep(peeps, maze, player, input_key)
-        messages.extend(msg)
-
-        return msg
-    return input_key
-
-def enemy_turn(peeps, maze, player, enemy):
-    dx = player['x'] - enemy['x']
-    dy = player['y'] - enemy['y']
-    if enemy['hp']/enemy['peep']['hp'] < 0.2:
-        edir = mlib.direction_from_vector(-dx, -dy)
-    else:
-        edir = mlib.direction_from_vector(dx, dy)
-    return mlib.move_peep(peeps, maze, enemy, edir)
-
-
-def old_main(scr):
-    MESSAGES = []
-    scr.clear()
-    player = PEEPS[0]
 
     scr.move(2, 10)
     draw_stats(scr, player)
@@ -236,7 +178,6 @@ def old_main(scr):
 #                   else if it's quit (q), stop program
 #                   else... add message, "action not handled"
 #               DRAW SCREEN CONTENTS
-
 
 
 wrapper(main)
