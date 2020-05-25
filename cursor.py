@@ -5,17 +5,42 @@ from lib.moves import Direction
 from lib.moves import calc_dx_dy
 
 MAZE = [
-    '%%%%%%%%%%%%%%%%%%%%',
-    '%....####....######%',
-    '%....####....######%',
-    '%....####....####..%',
-    '%............####..%',
-    '%....####....####..%',
-    '%....####..........%',
-    '%....####....######%',
-    '%....####....######%',
-    '%%%%%%%%%%%%%%%%%%%%',
+    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+    '%....####....######%.........%',
+    '%....####....######%.........%',
+    '%....####....####..#.........%',
+    '%............####..#.........%',
+    '%....####....####............%',
+    '%....####..........#.........%',
+    '%....####....#######.........%',
+    '%....####....#######.........%',
+    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
+
+DRAGON = {
+    'name': 'Spark',
+    'type': 'dragon',
+    'char': 'D',
+    'hp': 50,
+    'thaco': 10,
+    'speed': 16,
+    'tics': 0,
+    'ac': 10,
+    'weapons': {
+        'bite': {
+            'damage': '1d10'
+        },
+        'fire breath': {
+            'damage': '2d10'
+        },
+        'claws': {
+            'damage': '2d7'
+        },
+        'tail': {
+            'damage': '7d1'
+        },
+    },
+}
 
 GOBLIN = {
     'name': 'Thark',
@@ -43,7 +68,7 @@ PLAYER = {
     'name': 'Bo Bo the Destroyer',
     'type': 'player',
     'char': '@',
-    'hp': 10,
+    'hp': 50,
     'thaco': 19,
     'speed': 11,
     'tics': 0,
@@ -62,8 +87,9 @@ PLAYER = {
 }
 
 PEEPS = [
-    {'peep': PLAYER, 'x': 1, 'y': 2, 'hp': 10},
-    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 10}
+    {'peep': PLAYER, 'x': 1, 'y': 2, 'hp': 50},
+    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 10},
+    {'peep': DRAGON, 'x': 24, 'y': 4, 'hp': 50},
 ]
 
 def draw_stats(scr, player):
@@ -146,7 +172,7 @@ def main(scr):
                 enemy = PEEPS[i]
                 dx = player['x'] - enemy['x']
                 dy = player['y'] - enemy['y']
-                if enemy['hp']/enemy['peep']['hp'] < 0.5:
+                if enemy['hp']/enemy['peep']['hp'] < 0.2:
                     edir = mlib.direction_from_vector(-dx, -dy)
                 else:
                     edir = mlib.direction_from_vector(dx, dy)

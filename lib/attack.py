@@ -20,7 +20,7 @@ def attack(src, dst, weapon_name, seed=0):
     ret = []
     if seed > 0:
         random.seed(seed)
-    ret.append("The " + src_info['name'] + " attacks with " + weapon_name + "!")
+    ret.append(src_info['name'] + " attacks with " + weapon_name + "!")
 
     src_weapon = src_info['weapons'][weapon_name]
     if not src_weapon: raise ReferenceError(src_info['name'] + ' has no weapon called' + weapon_name)
