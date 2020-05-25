@@ -31,7 +31,6 @@ def attack(src, dst, weapon_name, seed=0):
         # print("i:" + str(i) + " hp_loss:" + str(hp_loss))
         tot_hp_loss += hp_loss
     dst_state['hp'] = dst_state['hp'] - tot_hp_loss
-    ret.append('the ' + dst_info['name'] + ' has ' + str(dst_state['hp']) + 'hp left!')
     if dst_state['hp'] <= 0:
         ret.append('the ' + dst_info['name'] + ' has died to the ' + src_info['name'] + "'s " + weapon_name + '!')
     return ret

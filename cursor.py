@@ -43,7 +43,7 @@ PLAYER = {
     'name': 'Bo Bo the Destroyer',
     'type': 'player',
     'char': '@',
-    'hp': 5,
+    'hp': 10,
     'thaco': 19,
     'speed': 11,
     'tics': 0,
@@ -68,11 +68,18 @@ PEEPS = [
 
 def draw_stats(scr, player):
     y, x = scr.getyx()
-    scr.addstr(player['name'])
+    blank = '                                  '
+    scr.addstr(blank)
+    scr.move(y, x)
+    scr.addstr(str(player['peep']['name']))
     scr.move(y+1, x)
-    scr.addstr('hp:    ' + str(player['hp']))
+    scr.addstr(blank)
+    scr.move(y+1, x)
+    scr.addstr('hp:    ' + str(player['hp']) + '/' + str(player['peep']['hp']))
     scr.move(y+2, x)
-    scr.addstr('speed: ' + str(player['speed']))
+    scr.addstr(blank)
+    scr.move(y+2, x)
+    scr.addstr('speed: ' + str(player['peep']['speed']))
 
 
 def draw_maze(scr, maze):
@@ -111,24 +118,21 @@ def main(scr):
     MESSAGES = []
     scr.clear()
     player = PEEPS[0]
-
-    scr.move(2, 10)
-    draw_stats(scr, player['peep'])
-
     input_key = 0
     xoff = 10
     yoff = 10
     turn = 0
     while input_key != 'q':
         turn += 1
+        scr.move(2, 10)
+        draw_stats(scr, player)
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
         for p in PEEPS:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
-        MESSAGES.append('turn ' + str(turn) + ': hi there')
         if len(MESSAGES) > 8:
-            MESSAGES = MESSAGES[-8:]
+            MESSAGES = MESSAGES[-12:]
         scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
         draw_messages(scr, MESSAGES)
         scr.move(0,0)
@@ -136,7 +140,8 @@ def main(scr):
         input_key = scr.getkey()
         if input_key in KEY_DIR:
             dir = KEY_DIR[input_key]
-            mlib.move_peep(PEEPS, MAZE, player, dir)
+            msg = mlib.move_peep(PEEPS, MAZE, player, dir)
+            MESSAGES.extend(msg)
             for i in range(1, len(PEEPS)):
                 enemy = PEEPS[i]
                 dx = player['x'] - enemy['x']
@@ -145,7 +150,8 @@ def main(scr):
                     edir = mlib.direction_from_vector(-dx, -dy)
                 else:
                     edir = mlib.direction_from_vector(dx, dy)
-                mlib.move_peep(PEEPS, MAZE, enemy, edir)
+                msg = mlib.move_peep(PEEPS, MAZE, enemy, edir)
+                MESSAGES.extend(msg)
 
 
 wrapper(main)

@@ -169,6 +169,7 @@ def direction_from_vector(dx, dy):
     return ret
 
 def move_peep(peeps, maze, peep, dir):
+    ret = []
     ps = peep                   # peep state (current position, hit points...)
     peep_info = peep['peep']    # other peep reference data (weapons, original hit points...)
     dx, dy = calc_dx_dy(dir)
@@ -180,10 +181,13 @@ def move_peep(peeps, maze, peep, dir):
             else:
                 dst = check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy)
                 weapon = attacklib.choose_melee_weapon(peep_info)
-                attacklib.attack(ps, dst, weapon)
+                msg = attacklib.attack(ps, dst, weapon)
                 if dst['hp'] <= 0:
                     peeps.remove(dst)
+                ret.extend(msg)
     # else: do nothing
+    return ret
+
 
 def check_peep_at(peeps, x, y):
     for p in peeps:
