@@ -219,7 +219,6 @@ if __name__ == "__main__":
     peeps = model['peeps'][1:3]
 
     move_counts = elapse_time(peeps)
-    move_counts = [1,2,1,3]
     [m_by_clicks, tot_clicks] = monsters_by_clicks(move_counts)
     move_seq = calc_move_sequence(m_by_clicks, tot_clicks)
     print(move_seq)
