@@ -179,8 +179,6 @@ def move_peep(peeps, maze, p, dir):
                 dst = check_peep_at(peeps, p.x + dx, p.y + dy)
                 weapon = attacklib.choose_melee_attack(p)
                 msg = attacklib.attack(p, dst, weapon)
-                if dst.hp <= 0:
-                    peeps.remove(dst)
                 ret.extend(msg)
     # else: do nothing
     return ret

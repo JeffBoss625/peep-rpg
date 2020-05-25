@@ -16,6 +16,21 @@ MONSTERS = [
             'punch': Attack('2d1'),
         }
     ),
+    Peep(
+        name='Spark',
+        type='dragon',
+        char='D',
+        maxhp=50,
+        thaco=10,
+        speed=20,
+        ac=10,
+        attacks={
+            'bite': Attack('1d10'),
+            'scratch': Attack('2d7'),
+            'tail': Attack('3d5'),
+            'fire_breath': Attack('2d10'),
+        }
+    )
 
 
 ]

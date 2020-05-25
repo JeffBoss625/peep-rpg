@@ -46,6 +46,7 @@ DRAGON = {
 PEEPS = [
     peep_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
     monster_by_name('Thark', x=2, y=2, hp=10),
+    monster_by_name('Spark', x=24, y=7, hp=50),
 ]
 
 def draw_stats(scr, player):
@@ -100,9 +101,10 @@ KEY_DIR = {
 MARGIN_SIZE = 3
 
 def main(scr):
+    peeps = PEEPS
     MESSAGES = []
     scr.clear()
-    player = PEEPS[0]
+    player = peeps[0]
 
     scr.move(2, 10)
     draw_stats(scr, player)
@@ -122,7 +124,7 @@ def main(scr):
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
 
-        for p in PEEPS:
+        for p in peeps:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
 
@@ -140,21 +142,14 @@ def main(scr):
             dir = KEY_DIR[input_key]
 
             # MOVE PLAYER
-            msg = mlib.move_peep(PEEPS, MAZE, player, dir)
+            msg = mlib.move_peep(peeps, MAZE, player, dir)
             MESSAGES.extend(msg)
 
             # MOVE MONSTERS
-            for i in range(1, len(PEEPS)):
-                enemy = PEEPS[i]
-                # MOVE MONSTER
-                dx = player.x - enemy.x
-                dy = player.y - enemy.y
-                if enemy.hp/enemy.hp < 0.2:
-                    edir = mlib.direction_from_vector(-dx, -dy)
-                else:
-                    edir = mlib.direction_from_vector(dx, dy)
-                msg = mlib.move_peep(PEEPS, MAZE, enemy, edir)
-                MESSAGES.extend(msg)
+            for i in range(1, len(peeps)):
+                monster_turn(peeps, peeps[i], player, MESSAGES, MAZE)
+            peeps = [p for p in peeps if p.hp > 0]
+            # Before Drawing, peeps = peeps-without-dead-guys (new list)
 
     # while input_key != 'q':
         # DRAW SCREEN CONTENTS...
@@ -166,6 +161,15 @@ def main(scr):
             # MOVE PLAYER
             # MOVE MONSTERS
 
+def monster_turn(peeps, monster, player, messages, maze):
+    dx = player.x - monster.x
+    dy = player.y - monster.y
+    if monster.hp/monster.hp < 0.2:
+        edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
+    else:
+        edir = mlib.direction_from_vector(dx, dy)
+    msg = mlib.move_peep(peeps, maze, monster, edir)
+    messages.extend(msg)
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER MOVES (move_sequence)
