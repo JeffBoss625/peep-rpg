@@ -167,20 +167,18 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
-def move_peep(peeps, maze, peep, dir):
+def move_peep(peeps, maze, p, dir):
     ret = []
-    ps = peep                   # peep state (current position, hit points...)
-    peep_info = peep['peep']    # other peep reference data (weapons, original hit points...)
     dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(maze, peep.x + dx, peep.y + dy) is None:
-        if check_unbreakable_collide(maze, peep.x + dx, peep.y + dy) is None:
-            if check_peep_at(peeps, peep.x + dx, peep.y + dy) is None:
-                peep.x += dx
-                peep.y += dy
+    if check_wall_collide(maze, p.x + dx, p.y + dy) is None:
+        if check_unbreakable_collide(maze, p.x + dx, p.y + dy) is None:
+            if check_peep_at(peeps, p.x + dx, p.y + dy) is None:
+                p.x += dx
+                p.y += dy
             else:
-                dst = check_peep_at(peeps, peep.x + dx, peep.y + dy)
-                weapon = attacklib.choose_melee_attack(peep)
-                msg = attacklib.attack(peep, dst, weapon)
+                dst = check_peep_at(peeps, p.x + dx, p.y + dy)
+                weapon = attacklib.choose_melee_attack(p)
+                msg = attacklib.attack(p, dst, weapon)
                 if dst.hp <= 0:
                     peeps.remove(dst)
                 ret.extend(msg)

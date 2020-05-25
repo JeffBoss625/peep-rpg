@@ -6,10 +6,9 @@ MONSTERS = [
         name='Thark',
         type='goblin',
         char='g',
-        hp=10,
+        maxhp=10,
         thaco=18,
         speed=13,
-        tics=0,
         ac=19,
         attacks={
             'bite': Attack('1d3'),

@@ -16,7 +16,7 @@ class Peep:
     ac: int = 10
 
     # temp state
-    hp: int = maxhp
+    hp: int = 0
     tics: int = 0
     x: int = 0
     y: int = 0
