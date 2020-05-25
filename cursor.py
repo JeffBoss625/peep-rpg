@@ -6,17 +6,42 @@ from curses import wrapper
 from lib.move import Direction
 
 MAZE = [
-    '%%%%%%%%%%%%%%%%%%%%',
-    '%....####....######%',
-    '%....####....######%',
-    '%....####....####..%',
-    '%............####..%',
-    '%....####....####..%',
-    '%....####..........%',
-    '%....####....######%',
-    '%....####....######%',
-    '%%%%%%%%%%%%%%%%%%%%',
+    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+    '%....####....######%.........%',
+    '%....####....######%.........%',
+    '%....####....####..#.........%',
+    '%............####..#.........%',
+    '%....####....####............%',
+    '%....####..........#.........%',
+    '%....####....#######.........%',
+    '%....####....#######.........%',
+    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
+
+DRAGON = {
+    'name': 'Spark',
+    'type': 'dragon',
+    'char': 'D',
+    'hp': 50,
+    'thaco': 10,
+    'speed': 16,
+    'tics': 0,
+    'ac': 10,
+    'weapons': {
+        'bite': {
+            'damage': '1d10'
+        },
+        'fire breath': {
+            'damage': '2d10'
+        },
+        'claws': {
+            'damage': '2d7'
+        },
+        'tail': {
+            'damage': '7d1'
+        },
+    },
+}
 
 PEEPS = [
     peep_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
@@ -25,9 +50,19 @@ PEEPS = [
 
 def draw_stats(scr, player):
     y, x = scr.getyx()
+    blank = '                                  '
+    scr.move(y, x)
+    scr.addstr(blank)
+    scr.move(y, x)
     scr.addstr(player.name)
+
     scr.move(y+1, x)
-    scr.addstr('hp:    ' + str(player.hp))
+    scr.addstr(blank)
+    scr.move(y+1, x)
+    scr.addstr('hp:    ' + str(player.hp) + '/' + str(player.maxhp))
+
+    scr.move(y+2, x)
+    scr.addstr(blank)
     scr.move(y+2, x)
     scr.addstr('speed: ' + str(player.speed))
 
@@ -78,14 +113,15 @@ def main(scr):
     turn = 0
     while input_key != 'q':
         turn += 1
+        scr.move(2, 10)
+        draw_stats(scr, player)
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
         for p in PEEPS:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
-        MESSAGES.append('turn ' + str(turn) + ': hi there')
-        if len(MESSAGES) > 8:
-            MESSAGES = MESSAGES[-8:]
+        if len(MESSAGES) > 12:
+            MESSAGES = MESSAGES[-12:]
         scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
         draw_messages(scr, MESSAGES)
         scr.move(0,0)
@@ -93,16 +129,18 @@ def main(scr):
         input_key = scr.getkey()
         if input_key in KEY_DIR:
             dir = KEY_DIR[input_key]
-            mlib.move_peep(PEEPS, MAZE, player, dir)
+            msg = mlib.move_peep(PEEPS, MAZE, player, dir)
+            MESSAGES.extend(msg)
             for i in range(1, len(PEEPS)):
                 enemy = PEEPS[i]
                 dx = player.x - enemy.x
                 dy = player.y - enemy.y
-                if enemy.hp/enemy.hp < 0.5:
+                if enemy.hp/enemy.hp < 0.2:
                     edir = mlib.direction_from_vector(-dx, -dy)
                 else:
                     edir = mlib.direction_from_vector(dx, dy)
-                mlib.move_peep(PEEPS, MAZE, enemy, edir)
+                msg = mlib.move_peep(PEEPS, MAZE, enemy, edir)
+                MESSAGES.extend(msg)
 
 
 wrapper(main)
