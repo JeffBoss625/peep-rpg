@@ -50,19 +50,10 @@ PEEPS = [
 
 def draw_stats(scr, player):
     y, x = scr.getyx()
-    blank = '                                  '
-    scr.move(y, x)
-    scr.addstr(blank)
     scr.move(y, x)
     scr.addstr(player.name)
-
-    scr.move(y+1, x)
-    scr.addstr(blank)
     scr.move(y+1, x)
     scr.addstr('hp:    ' + str(player.hp) + '/' + str(player.maxhp))
-
-    scr.move(y+2, x)
-    scr.addstr(blank)
     scr.move(y+2, x)
     scr.addstr('speed: ' + str(player.speed))
 
@@ -72,8 +63,6 @@ def draw_maze(scr, maze):
     for i, line in enumerate(maze):
         scr.move(y+i, x)
         scr.addstr(line)
-        # for c in line:
-        #     scr.addch(c)
 
 def draw_peep(scr, p):
     y, x = scr.getyx()
@@ -115,6 +104,7 @@ def main(scr):
         turn += 1
 
         # DRAW SCREEN CONTENTS...
+        scr.clear()
 
         scr.move(2, 10)
         draw_stats(scr, player)
