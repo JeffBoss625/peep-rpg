@@ -1,4 +1,4 @@
-
+from lib.peep import Peep
 import lib.attack as attacklib
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of
@@ -6,11 +6,10 @@ import lib.attack as attacklib
 # put remainder ticks into monster state
 def elapse_time(peeps):
     move_counts = []
-    for pinfo in peeps:
-        p = pinfo['peep']
-        tics = p['speed'] + p['tics']
+    for p in peeps:
+        tics = p.speed + p.tics
         move_counts.append(tics // 10)  # Special division operator (python 3+)
-        p['tics'] = tics % 10  # MOD operator
+        p.tics = tics % 10  # MOD operator
 
     return move_counts
 
@@ -168,21 +167,19 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
-def move_peep(peeps, maze, peep, dir):
+def move_peep(peeps, maze, p, dir):
     ret = []
-    ps = peep                   # peep state (current position, hit points...)
-    peep_info = peep['peep']    # other peep reference data (weapons, original hit points...)
     dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
-        if check_unbreakable_collide(maze, ps['x'] + dx, ps['y'] + dy) is None:
-            if check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy) is None:
-                ps['x'] += dx
-                ps['y'] += dy
+    if check_wall_collide(maze, p.x + dx, p.y + dy) is None:
+        if check_unbreakable_collide(maze, p.x + dx, p.y + dy) is None:
+            if check_peep_at(peeps, p.x + dx, p.y + dy) is None:
+                p.x += dx
+                p.y += dy
             else:
-                dst = check_peep_at(peeps, ps['x'] + dx, ps['y'] + dy)
-                weapon = attacklib.choose_melee_weapon(peep_info)
-                msg = attacklib.attack(ps, dst, weapon)
-                if dst['hp'] <= 0:
+                dst = check_peep_at(peeps, p.x + dx, p.y + dy)
+                weapon = attacklib.choose_melee_attack(p)
+                msg = attacklib.attack(p, dst, weapon)
+                if dst.hp <= 0:
                     peeps.remove(dst)
                 ret.extend(msg)
     # else: do nothing
@@ -191,16 +188,16 @@ def move_peep(peeps, maze, peep, dir):
 
 def check_peep_at(peeps, x, y):
     for p in peeps:
-        if x == p['x']:
-            if y == p['y']:
+        if x == p.x:
+            if y == p.y:
                 return p
     return None
 
-def check_wall_collide(maze, player_x, player_y):
-    line = maze[player_y]
-    cell = line[player_x]
+def check_wall_collide(maze, x, y):
+    line = maze[y]
+    cell = line[x]
     if cell == '#':
-        return {'type': 'wall', 'x': str(player_x), 'y': str(player_y)}
+        return Peep(name='Wally', type='wall', x=x, y=y)
     else:
         return None
 def check_unbreakable_collide(maze, player_x, player_y):

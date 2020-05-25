@@ -8,31 +8,28 @@ def parse_dice(dstring):
         'num_sides': int(parts[1])
     }
 
-def choose_melee_weapon(src):
-    weapons = src['weapons']
-    keys = iter(weapons.keys())
+def choose_melee_attack(src):
+    keys = iter(src.attacks.keys())
     return next(keys)
 
-def attack(src, dst, weapon_name, seed=0):
-    src_info = src['peep']      # src original info (name, weapons, original hit points...)
-    dst_info = dst['peep']      # dst original info (name, weapons, original hit points...)
-    dst_state = dst             # dst current rapidly-changing state (current hit points, position...)
+def attack(src, dst, attack_name, seed=0):
     ret = []
     if seed > 0:
         random.seed(seed)
-    ret.append(src_info['name'] + " attacks with " + weapon_name + "!")
+    ret.append("The " + src.name + " attacks with " + attack_name + "!")
 
-    src_weapon = src_info['weapons'][weapon_name]
-    if not src_weapon: raise ReferenceError(src_info['name'] + ' has no weapon called' + weapon_name)
-    dice_info = parse_dice(src_weapon['damage'])
+    src_attack = src.attacks[attack_name]
+    if not src_attack: raise ReferenceError(src.name + ' has no attack called' + attack_name)
+    dice_info = parse_dice(src_attack.damage)
     tot_hp_loss = 0
     for i in range(1, dice_info['num_dice'] + 1):
         hp_loss = random.randint(1, dice_info['num_sides'])
         # print("i:" + str(i) + " hp_loss:" + str(hp_loss))
         tot_hp_loss += hp_loss
-    dst_state['hp'] = dst_state['hp'] - tot_hp_loss
-    if dst_state['hp'] <= 0:
-        ret.append('the ' + dst_info['name'] + ' has died to the ' + src_info['name'] + "'s " + weapon_name + '!')
+    dst.hp = dst.hp - tot_hp_loss
+    ret.append('the ' + dst.name + ' has ' + str(dst.hp) + 'hp left!')
+    if dst.hp <= 0:
+        ret.append('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
     return ret
 
 
