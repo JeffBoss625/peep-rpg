@@ -1,8 +1,9 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
-import lib.moves as mlib
+import lib.move as mlib
+from lib.monsters import monster_by_name
+from lib.peeps import peep_by_name
 from curses import wrapper
-from lib.moves import Direction
-from lib.moves import calc_dx_dy
+from lib.move import Direction
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%',
@@ -17,62 +18,18 @@ MAZE = [
     '%%%%%%%%%%%%%%%%%%%%',
 ]
 
-GOBLIN = {
-    'name': 'Thark',
-    'type': 'goblin',
-    'char': 'g',
-    'hp': 10,
-    'thaco': 18,
-    'speed': 13,
-    'tics': 0,
-    'ac': 19,
-    'weapons': {
-        'bite': {
-            'damage': '1d3'
-        },
-        'scratch': {
-            'damage': '2d2'
-        },
-        'punch': {
-            'damage': '2d1'
-        }
-    }
-}
-
-PLAYER = {
-    'name': 'Bo Bo the Destroyer',
-    'type': 'player',
-    'char': '@',
-    'hp': 5,
-    'thaco': 19,
-    'speed': 11,
-    'tics': 0,
-    'ac': 10,
-    'weapons': {
-        'teeth': {
-            'damage': '1d5'
-        },
-        'tail': {
-            'damage': '3d1'
-        },
-        'scratch': {
-            'damage': '2d3'
-        },
-    },
-}
-
 PEEPS = [
-    {'peep': PLAYER, 'x': 1, 'y': 2, 'hp': 10},
-    {'peep': GOBLIN, 'x': 2, 'y': 2, 'hp': 10}
+    peep_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
+    monster_by_name('Thark', x=2, y=2, hp=10),
 ]
 
 def draw_stats(scr, player):
     y, x = scr.getyx()
-    scr.addstr(player['name'])
+    scr.addstr(player.name)
     scr.move(y+1, x)
-    scr.addstr('hp:    ' + str(player['hp']))
+    scr.addstr('hp:    ' + str(player.hp))
     scr.move(y+2, x)
-    scr.addstr('speed: ' + str(player['speed']))
+    scr.addstr('speed: ' + str(player.speed))
 
 
 def draw_maze(scr, maze):
@@ -85,8 +42,8 @@ def draw_maze(scr, maze):
 
 def draw_peep(scr, p):
     y, x = scr.getyx()
-    scr.move(p['y'] + y, p['x'] + x)
-    scr.addch(p['peep']['char'])
+    scr.move(p.y + y, p.x + x)
+    scr.addch(p.char)
 
 def draw_messages(scr, messages):
     y, x = scr.getyx()
@@ -113,7 +70,7 @@ def main(scr):
     player = PEEPS[0]
 
     scr.move(2, 10)
-    draw_stats(scr, player['peep'])
+    draw_stats(scr, player)
 
     input_key = 0
     xoff = 10
@@ -139,9 +96,9 @@ def main(scr):
             mlib.move_peep(PEEPS, MAZE, player, dir)
             for i in range(1, len(PEEPS)):
                 enemy = PEEPS[i]
-                dx = player['x'] - enemy['x']
-                dy = player['y'] - enemy['y']
-                if enemy['hp']/enemy['peep']['hp'] < 0.5:
+                dx = player.x - enemy.x
+                dy = player.y - enemy.y
+                if enemy.hp/enemy.hp < 0.5:
                     edir = mlib.direction_from_vector(-dx, -dy)
                 else:
                     edir = mlib.direction_from_vector(dx, dy)
