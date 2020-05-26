@@ -122,21 +122,19 @@ def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
     if maze_at_xy(model.maze, p.x + dx, p.y + dy):
         # hit wall
-        model.message(p.name + ' says OOF!')
+        model.print(p.name + ' says OOF!')
         return False
 
     if peep_at_xy(model.peeps, p.x + dx, p.y + dy):
         dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
         weapon = attacklib.choose_melee_attack(p)
-        msg = attacklib.attack(p, dst, weapon)
-        model.message(msg)
+        attacklib.attack(p, dst, weapon, model)
         return True
 
     # all clear. just move
     p.x += dx
     p.y += dy
     return True
-
 
 
 def peep_at_xy(peeps, x, y):

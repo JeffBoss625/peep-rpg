@@ -17,11 +17,10 @@ def choose_melee_attack(src):
     keys = iter(src.attacks.keys())
     return next(keys)
 
-def attack(src, dst, attack_name, seed=0):
-    ret = []
+def attack(src, dst, attack_name, out, seed=0):
     if seed > 0:
         random.seed(seed)
-    ret.append(src.name + " attacks with " + attack_name + "!")
+    out.print(src.name + " attacks with " + attack_name + "!")
 
     src_attack = src.attacks[attack_name]
     if not src_attack: raise ReferenceError(src.name + ' has no attack called' + attack_name)
@@ -29,13 +28,10 @@ def attack(src, dst, attack_name, seed=0):
     tot_hp_loss = 0
     for i in range(1, dice_info['num_dice'] + 1):
         hp_loss = random.randint(1, dice_info['num_sides'])
-        # print("i:" + str(i) + " hp_loss:" + str(hp_loss))
         tot_hp_loss += hp_loss
     dst.hp = dst.hp - tot_hp_loss
     if dst.hp <= 0:
-        ret.append('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
-    return ret
-
+        out.print('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
 
 if __name__ == '__main__':
     print("HERE")
