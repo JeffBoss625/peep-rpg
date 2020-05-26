@@ -48,10 +48,10 @@ MONSTERS = [
         }
     ),
 
-    # Dragons
+    # Red Dragons
     Peep(
         name='Spark',
-        type='dragon',
+        type='red dragon',
         char='D',
         maxhp=50,
         thaco=10,
@@ -63,9 +63,23 @@ MONSTERS = [
             'tail': Attack('3d5'),
             'fire_breath': Attack('2d10', range=5),
         }
+    ),
+    # The Black Dragon
+    Peep(
+        name='Brog',
+        type='black dragon',
+        char='B',
+        maxhp=200,
+        thaco=3,
+        speed=75,
+        ac=3,
+        attacks={
+            'bite': Attack('1d30'),
+            'scratch': Attack('2d21'),
+            'tail': Attack('3d15'),
+            'death_breath': Attack('2d30', range=15),
+        }
     )
-
-
 ]
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}

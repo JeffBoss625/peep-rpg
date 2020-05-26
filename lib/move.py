@@ -138,7 +138,6 @@ def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
     if maze_at_xy(model.maze, p.x + dx, p.y + dy):
         # hit wall
-        model.print(p.name + ' says OOF!')
         return False
 
     dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
@@ -147,15 +146,14 @@ def move_peep(model, p, direct):
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
-        elif dst.type == 'player':
-            model.print(p.name, 'says "DIE ' + dst.name + '!"')
+        elif dst == model.player:
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
         else:
-            # monsters are polite to each other... for now
-            model.print(p.name, 'says "Oh, excuse me', dst.name + '"')
-            return False
+            weapon = attacklib.choose_melee_attack(p)
+            attacklib.attack(p, dst, weapon, model)
+            return True
 
     # all clear. just move
     p.x += dx

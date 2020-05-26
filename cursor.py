@@ -17,14 +17,27 @@ MAZE = [
     '%....####..........#.........%',
     '%....####....#######.........%',
     '%....####....#######.........%',
+    '%###########################.%',
+    '%###########################.%',
+    '%#############...............%',
+    '%#############.##############%',
+    '%#############.##############%',
+    '%#########.........##########%',
+    '%#####..................#####%',
+    '%####....................####%',
+    '%####....................####%',
+    '%#####..................#####%',
+    '%#########.........##########%',
+    '%#############.##############%',
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
 
 
 PEEPS = [
-    player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10, speed=33),
+    player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=100, speed=33),
     monster_by_name('Thark', x=2, y=2, hp=10),
     monster_by_name('Spark', x=24, y=7, hp=50),
+    monster_by_name('Brog', x=14, y=20, hp=200,)
 ]
 
 DIRECTION_KEYS = {
@@ -108,7 +121,7 @@ class Screen:
         self._draw_maze_area()
 
         term.move(0, y_margin)
-        term.move_to(3, 20)
+        term.move_to(3, 30)
         term.write_lines(model.messages[-12:])
 
         term.move_to(0, 0)
@@ -162,34 +175,38 @@ def main(scr):
 
 
 def player_turn(screen):
-    model = screen.model
     while True:
-        screen.repaint()
+        model = screen.model
+        screen.repaint()  # update messages
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key == 'q':
+        elif input_key in ('\x11', '\x03', 'q'):
             return 'q'
-        elif input_key == 's':
-            if len(model.peeps) >= 2:
-                random_peep = random.randint(1, len(model.peeps) - 1)
-                model.player = model.peeps[random_peep]
-                model.message("You are now " + model.player.name)
+        elif input_key == 'm':
+            if len(model.peeps) > 1:
+                random_peep = random.randint(0, len(model.peeps) - 1)
+                if model.player == model.peeps[random_peep]:
+                    random_peep = random.randint(0, len(model.peeps) - 1)
+                else:
+                    model.player = model.peeps[random_peep]
+                    model.message("You are now " + model.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
         else:
-            model.print('unknown command: "' + input_key + '"')
+            model.message('unknown command: "' + input_key + '"')
 
         screen.repaint()  # update messages
         # continue with loop to get more input
 
+
 def monster_turn(model, monster):
     dx = model.player.x - monster.x
     dy = model.player.y - monster.y
-    if monster.hp/monster.maxhp < 0.2:
+    if monster.hp/monster.maxhp < 0.3:
         direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
         direct = mlib.direction_from_vector(dx, dy)
@@ -201,11 +218,11 @@ def monster_turn(model, monster):
     rotation = 1
     while rotation <= 4:
         d2 = mlib.direction_relative(direct, rotation)
-        model.print(monster.name, 'trying direction', d2)
+        # model.print(monster.name, 'trying direction', d2)
         if mlib.move_peep(model, monster, d2):
             return
         d2 = mlib.direction_relative(direct, -rotation)
-        model.print(monster.name, 'trying direction', d2)
+        # model.print(monster.name, 'trying direction', d2)
         if mlib.move_peep(model, monster, d2):
             return
         rotation += 1

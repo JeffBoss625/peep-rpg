@@ -5,15 +5,15 @@ _PEEPS = [
         name='Bo Bo the Destroyer',
         type='player',
         char='@',
-        maxhp=10,
+        maxhp=100,
         thaco=19,
         speed=33,
         tics=0,
         ac=10,
         attacks={
-            'teeth': Attack('1d5'),
-            'tail': Attack('3d1'),
-            'scratch': Attack('2d3'),
+            'teeth': Attack('1d10'),
+            'tail': Attack('3d5'),
+            'scratch': Attack('2d7'),
         }
     ),
 
