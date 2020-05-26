@@ -180,10 +180,16 @@ def monster_turn(model, monster):
     dx = model.player.x - monster.x
     dy = model.player.y - monster.y
     if monster.hp/monster.maxhp < 0.2:
-        edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
+        direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
-        edir = mlib.direction_from_vector(dx, dy)
-    mlib.move_peep(model, monster, edir)
+        direct = mlib.direction_from_vector(dx, dy)
+    attempts = 0
+    while attempts < 8:
+        if mlib.move_peep(model, monster, direct):
+            return
+        attempts += 1
+        direct = mlib.next_direction(dir, attempts)
+
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER TURNS (turn_sequence)

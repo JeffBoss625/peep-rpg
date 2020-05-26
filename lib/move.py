@@ -56,13 +56,10 @@ def calc_turn_sequence(peeps):
     return _calc_turn_sequence(p_by_clicks, tot_clicks)
 
 # x and y modifiers for each directions on keypad
-
 # Direction constants match keypad layout
 #       7 8 9
 #       4 5 6
 #       1 2 3
-
-
 class Direction: DOWN_LEFT, DOWN, DOWN_RIGHT, LEFT, CENTER, RIGHT, UP_LEFT, UP, UP_RIGHT = range(1,10)
 
 
@@ -116,6 +113,25 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
+# Direction constants match keypad layout
+#       7 8 9
+#       4 5 6
+#       1 2 3
+
+# Direction constants in clockwise order for finding closest, second closest, third closest... direction from
+# a given direction
+DIRECT_ROTATION = [
+    Direction.UP, Direction.UP_RIGHT,
+    Direction.RIGHT, Direction.DOWN_RIGHT,
+    Direction.DOWN, Direction.DOWN_LEFT,
+    Direction.LEFT, Direction.UP_LEFT,
+]
+
+def direction_relative(direct, rotation):
+    si = DIRECT_ROTATION.index(direct)
+    i = (si + rotation) % len(DIRECT_ROTATION)
+    return DIRECT_ROTATION[i]
+
 # Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
 # failed (hit a wall)
 def move_peep(model, p, direct):
@@ -125,11 +141,21 @@ def move_peep(model, p, direct):
         model.print(p.name + ' says OOF!')
         return False
 
-    if peep_at_xy(model.peeps, p.x + dx, p.y + dy):
-        dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
-        weapon = attacklib.choose_melee_attack(p)
-        attacklib.attack(p, dst, weapon, model)
-        return True
+    dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
+    if dst:
+        if p.type == 'player':
+            weapon = attacklib.choose_melee_attack(p)
+            attacklib.attack(p, dst, weapon, model)
+            return True
+        elif dst.type == 'player':
+            model.print(p.name, 'says "DIE ' + dst.name + '!"')
+            weapon = attacklib.choose_melee_attack(p)
+            attacklib.attack(p, dst, weapon, model)
+            return True
+        else:
+            # monsters are polite to each other... for now
+            model.print(p.name, 'says "Oh, excuse me', dst.name + '"')
+            return False
 
     # all clear. just move
     p.x += dx
