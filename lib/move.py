@@ -13,18 +13,47 @@ def elapse_time(peeps):
 
     return move_counts
 
-# divide tot_clicks by each key
-# take the new numbers and check for mod by dividing new number by click it is going through currently
-# If mod is = 0 then add the whole key group to a new list inside a list
+def peeps_by_clicks(move_counts):
+    monsters_by_mc = {}
+    for i, mc in enumerate(move_counts):
+        if mc not in monsters_by_mc:
+            monsters_by_mc[mc] = []
+        monsters_by_mc[mc].append(i)
+
+    # monstersbymoves is something like {1:[0,2,3], 2:[4], 3:[1]}
+    # monstersbymoves.keys would be [1,2,3]
+    # monstersbymoves.keys[1] would be [0,2,3]
+
+    # calculate total clicks (= 1 * 2 * 3, in the example)
+    tot_clicks = 1
+    for moves in monsters_by_mc.keys():
+        tot_clicks = tot_clicks * moves
+
+    # create a new structured keyed by CLICKS per move, not moves (clicks = tot_clicks/moves)
+    # = {6:[0,2,3], 3:[4], 2:[1]} for this example
+    monstersbyclicks = {}
+    for moves in monsters_by_mc.keys():
+        monstersbyclicks[int(tot_clicks / moves)] = monsters_by_mc[moves]
+
+    return [monstersbyclicks, tot_clicks]
 
 
-# convert move counts into number of clicks (total clicks is a number divisible by all moster clicks-per-move
+def _calc_turn_sequence(monstersbyclicks, tot_clicks):
+    # walk through tot_clicks and sequence monster moves for every click
+    ret = [[] for _ in range(tot_clicks)]
+    for click_count in range(1, tot_clicks + 1):
+        for clicks in monstersbyclicks.keys():
+            if click_count % clicks == 0:
+                monsters = monstersbyclicks[clicks]
+                for m in monsters:
+                    ret[click_count - 1].append(m)
 
-# walk through ALL clicks "i" and check for each i
-#   for each clicks-per-move "j" check that divides "i" without remainder
-#      if so, put "j" in that move list (for that click) - j is the monster index
-#   add move list to total moves list (return list). perhaps only add lists with length > 0
+    return ret
 
+def calc_turn_sequence(peeps):
+    turn_counts = elapse_time(peeps)
+    p_by_clicks, tot_clicks = peeps_by_clicks(turn_counts)
+    return _calc_turn_sequence(p_by_clicks, tot_clicks)
 
 # x and y modifiers for each directions on keypad
 
@@ -65,86 +94,6 @@ Y_MODIFIERS = {
 def direction_to_dxdy(direction):
     return X_MODIFIERS[direction], Y_MODIFIERS[direction]
 
-
-# def handle_moves(model, moves)
-#    # check if monsters collide with monsters
-#    # go through every monster move. handle collided monsters and capture non-colliding in a 'remaining' list
-#    monsters = model['monsters']
-#    collided = []
-#    remaining = []
-#    num_monsters = len(monsters)
-#    for i in range(0, num_monsters):
-#        print('check collission ' + str(i))
-#        d = moves[i]['direction']
-#        if (d == 0):
-#            continue
-#        # d is 1 through 9
-#        m = monsters[i]
-#        new_position = { 'x': m['x'] + x_modifiers[d] , 'y': m['y'] + y_modifiers[d] }
-#        print('checking new_position ' + str(new_position))
-#        
-#        
-#            
-#    monsters = remaining
-#    
-#    # check if remaining (non-colliding) monsters collide with walls
-#    
-#
-#    # update remaining monsters location
-#    moving_monsters = remaining
-#   
-#    # check monsters again land on an item with their new location (e.g. pick up)
-
-
-def monsters_by_clicks(move_counts):
-    monsters_by_mc = {}
-    for i, mc in enumerate(move_counts):
-        if mc not in monsters_by_mc:
-            monsters_by_mc[mc] = []
-        monsters_by_mc[mc].append(i)
-
-    print('monsters_by_mc:', monsters_by_mc)
-    # monstersbymoves is something like {1:[0,2,3], 2:[4], 3:[1]}
-    # monstersbymoves.keys would be [1,2,3]
-    # monstersbymoves.keys[1] would be [0,2,3]
-
-    # calculate total clicks (= 1 * 2 * 3, in the example)
-    tot_clicks = 1
-    for moves in monsters_by_mc.keys():
-        tot_clicks = tot_clicks * moves
-
-    print('tot_clicks:', tot_clicks)
-
-    # create a new structured keyed by CLICKS per move, not moves (clicks = tot_clicks/moves)
-    # = {6:[0,2,3], 3:[4], 2:[1]} for this example
-    monstersbyclicks = {}
-    for moves in monsters_by_mc.keys():
-        monstersbyclicks[int(tot_clicks / moves)] = monsters_by_mc[moves]
-
-    print('monstersbyclicks', monstersbyclicks)
-
-    return [monstersbyclicks, tot_clicks]
-
-
-#
-def calc_move_sequence(monstersbyclicks, tot_clicks):
-    print('calc_move_sequence(', monstersbyclicks, ',', tot_clicks, ')')
-    # walk through tot_clicks and sequence monster moves for every click
-    ret = [[] for _ in range(tot_clicks)]
-    for click_count in range(1, tot_clicks + 1):
-        print('  click_count:', click_count)
-        for clicks in monstersbyclicks.keys():
-            # if ret[click_count-1] is None:
-            #     ret[click_count-1] = []
-            print('    monster clicks:', clicks)
-            if click_count % clicks == 0:
-                monsters = monstersbyclicks[clicks]
-                print('    monsters:', monsters)
-                for m in monsters:
-                    ret[click_count - 1].append(m)
-            print('    moves_by_click_count', ret)
-
-    return ret
 
 def direction_from_vector(dx, dy):
     ret = Direction.CENTER
