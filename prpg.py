@@ -121,7 +121,7 @@ class Screen:
         self._draw_maze_area()
 
         term.move(0, y_margin)
-        term.move_to(3, 30)
+        term.move_to(len(model.maze[0]) + x_margin * 2, y_margin)
         term.write_lines(model.messages[-12:])
 
         term.move_to(0, 0)
@@ -184,16 +184,16 @@ def player_turn(screen):
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key in ('\x11', '\x03', 'q'):
+        elif input_key in ('\x11', '\x03'):
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
+                player = model.player
                 random_peep = random.randint(0, len(model.peeps) - 1)
-                if model.player == model.peeps[random_peep]:
+                while model.player == model.peeps[random_peep]:
                     random_peep = random.randint(0, len(model.peeps) - 1)
-                else:
-                    model.player = model.peeps[random_peep]
-                    model.message("You are now " + model.player.name)
+                model.player = model.peeps[random_peep]
+                model.message("You are now " + model.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
         else:
