@@ -5,6 +5,7 @@ from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
 from lib.model import Model
+import random
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -148,7 +149,7 @@ def main(scr):
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
                 peep = peeps[peep_index]
-                if peep.type == 'player':
+                if peep == model.player:
                     if player_turn(screen) == 'q':
                         return      # QUIT GAME
                 else:
@@ -171,6 +172,15 @@ def player_turn(screen):
             # else didn't spend turn
         elif input_key == 'q':
             return 'q'
+        elif input_key == 'm':
+            if len(model.peeps) > 1:
+                random_peep = random.randint(0, len(model.peeps) - 1)
+                while model.peeps[random_peep] == model.player:
+                    random_peep = random.randint(0, len(model.peeps) - 1)
+                model.player = model.peeps[random_peep]
+                model.print('You are now ' + model.player.name)
+            else:
+                model.print('No one in range to mind-swap')
         else:
             model.print('unknown command: "' + input_key + '"')
 
