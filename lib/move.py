@@ -167,9 +167,9 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
-def move_peep(model, p, dir):
+def move_peep(model, p, direct):
     ret = []
-    dx, dy = calc_dx_dy(dir)
+    dx, dy = calc_dx_dy(direct)
     if maze_at_xy(model.maze, p.x + dx, p.y + dy) is None:
         if peep_at_xy(model.peeps, p.x + dx, p.y + dy) is None:
             p.x += dx
