@@ -1,6 +1,6 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
 import lib.move as mlib
-from curses import wrapper
+import curses as clib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
@@ -184,7 +184,7 @@ def player_turn(screen):
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key in ('\x11', '\x03', 'q'):
+        elif input_key in ('\x03', 'q'):
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
@@ -240,4 +240,4 @@ def monster_turn(model, monster):
 #               DRAW SCREEN CONTENTS
 
 
-wrapper(main)
+clib.wrapper(main)
