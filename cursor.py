@@ -151,7 +151,7 @@ def main(scr):
                 peep = peeps[peep_index]
                 if peep == model.player:
                     if player_turn(screen) == 'q':
-                        return      # QUIT GAME
+                        return 0     # QUIT GAME
                 else:
                     monster_turn(model, peep)
 
@@ -164,6 +164,7 @@ def main(scr):
 def player_turn(screen):
     model = screen.model
     while True:
+        screen.repaint()
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
@@ -172,18 +173,17 @@ def player_turn(screen):
             # else didn't spend turn
         elif input_key == 'q':
             return 'q'
-        elif input_key == 'm':
-            if len(model.peeps) > 1:
-                random_peep = random.randint(0, len(model.peeps) - 1)
-                while model.peeps[random_peep] == model.player:
-                    random_peep = random.randint(0, len(model.peeps) - 1)
+        elif input_key == 's':
+            if len(model.peeps) >= 2:
+                random_peep = random.randint(1, len(model.peeps) - 1)
                 model.player = model.peeps[random_peep]
-                model.print('You are now ' + model.player.name)
+                model.message("You are now " + model.player.name)
             else:
-                model.print('No one in range to mind-swap')
+                model.message("You have nothing in range to brain-swap with")
         else:
             model.print('unknown command: "' + input_key + '"')
 
+        screen.repaint()  # update messages
         # continue with loop to get more input
 
 def monster_turn(model, monster):
