@@ -53,7 +53,7 @@ def draw_messages(scr, messages):
         scr.move(y+i, x)
         scr.addstr(m)
 
-KEY_DIR = {
+DIRECTION_KEYS = {
     'j': Direction.DOWN,
     'y': Direction.UP_LEFT,
     'k': Direction.UP,
@@ -100,14 +100,13 @@ def main(scr):
 
         # GET AND HANDLE PLAYER MOVE
         input_key = scr.getkey()
-        if input_key in KEY_DIR:
-            dir = KEY_DIR[input_key]
-
-            # MOVE PLAYER
-            msg = mlib.move_peep(model, model.player, dir)
+        if input_key in DIRECTION_KEYS:
+            direct = DIRECTION_KEYS[input_key]
+            # PLAYER TURN
+            msg = mlib.move_peep(model, model.player, direct)
             model.message(msg)
 
-            # MOVE MONSTERS
+            # MONSTER TURNS
             for i in range(1, len(model.peeps)):
                 monster_turn(model, model.peeps[i])
             model.peeps = [p for p in model.peeps if p.hp > 0]
