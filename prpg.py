@@ -184,7 +184,7 @@ def player_turn(screen):
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key in ('\x03', 'q'):
+        elif input_key in ('\x11', '\x03', 'q'):
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
