@@ -183,13 +183,22 @@ def monster_turn(model, monster):
         direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
         direct = mlib.direction_from_vector(dx, dy)
-    attempts = 0
-    while attempts < 8:
-        if mlib.move_peep(model, monster, direct):
-            return
-        attempts += 1
-        direct = mlib.next_direction(dir, attempts)
 
+    if mlib.move_peep(model, monster, direct):
+        return
+
+    # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
+    rotation = 1
+    while rotation <= 4:
+        d2 = mlib.direction_relative(direct, rotation)
+        model.print(monster.name, 'trying direction', d2)
+        if mlib.move_peep(model, monster, d2):
+            return
+        d2 = mlib.direction_relative(direct, -rotation)
+        model.print(monster.name, 'trying direction', d2)
+        if mlib.move_peep(model, monster, d2):
+            return
+        rotation += 1
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER TURNS (turn_sequence)
