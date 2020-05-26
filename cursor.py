@@ -144,15 +144,16 @@ def player_turn(model, screen):
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
-            msg = mlib.move_peep(model, model.player, direct)
-            model.message(msg)
-            return input_key
+            if mlib.move_peep(model, model.player, direct):
+                return input_key
+            # else didn't spend turn
         elif input_key == 'q':
             return 'q'
         else:
             model.message('unknown command: "' + input_key + '"')
             draw_screen(screen, model)
 
+            draw_screen(screen, model)  # update messages
             # continue with loop to get more input
 
 def monster_turn(model, monster):
@@ -162,8 +163,7 @@ def monster_turn(model, monster):
         edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
         edir = mlib.direction_from_vector(dx, dy)
-    msg = mlib.move_peep(model, monster, edir)
-    model.message(msg)
+    mlib.move_peep(model, monster, edir)
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER TURNS (turn_sequence)

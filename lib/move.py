@@ -116,20 +116,27 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
+# Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
+# failed (hit a wall)
 def move_peep(model, p, direct):
-    ret = []
     dx, dy = direction_to_dxdy(direct)
-    if maze_at_xy(model.maze, p.x + dx, p.y + dy) is None:
-        if peep_at_xy(model.peeps, p.x + dx, p.y + dy) is None:
-            p.x += dx
-            p.y += dy
-        else:
-            dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
-            weapon = attacklib.choose_melee_attack(p)
-            msg = attacklib.attack(p, dst, weapon)
-            ret.extend(msg)
-    # else: do nothing
-    return ret
+    if maze_at_xy(model.maze, p.x + dx, p.y + dy):
+        # hit wall
+        model.message('oof!')
+        return False
+
+    if peep_at_xy(model.peeps, p.x + dx, p.y + dy):
+        dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
+        weapon = attacklib.choose_melee_attack(p)
+        msg = attacklib.attack(p, dst, weapon)
+        model.message(msg)
+        return True
+
+    # all clear. just move
+    p.x += dx
+    p.y += dy
+    return True
+
 
 
 def peep_at_xy(peeps, x, y):
