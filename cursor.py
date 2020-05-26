@@ -123,21 +123,23 @@ def main(scr):
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
-        turns = iter(mlib.calc_turn_sequence(model.peeps))
+        peeps = [p for p in model.peeps]
+        turns = mlib.calc_turn_sequence(peeps)
 
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
-                peep = model.peeps[peep_index]
+                peep = peeps[peep_index]
                 if peep.type == 'player':
                     if player_turn(model, screen) == 'q':
                         return      # QUIT GAME
                 else:
                     monster_turn(model, peep)
 
-            # update peeps list to living peeps
-            model.peeps = [p for p in model.peeps if p.hp > 0]
+                # update peeps list to living peeps
+                model.peeps = [p for p in model.peeps if p.hp > 0]
 
-            draw_screen(screen, model)
+                draw_screen(screen, model)
+
 
 def player_turn(model, screen):
     while True:

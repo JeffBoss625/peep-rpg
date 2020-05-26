@@ -122,7 +122,7 @@ def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
     if maze_at_xy(model.maze, p.x + dx, p.y + dy):
         # hit wall
-        model.message('oof!')
+        model.message(p.name + ' says OOF!')
         return False
 
     if peep_at_xy(model.peeps, p.x + dx, p.y + dy):
