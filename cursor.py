@@ -157,10 +157,9 @@ def player_turn(model, screen):
             player = random_peep
         else:
             model.message('unknown command: "' + input_key + '"')
-            draw_screen(screen, model)
 
-            draw_screen(screen, model)  # update messages
-            # continue with loop to get more input
+        draw_screen(screen, model)  # update messages
+        # continue with loop to get more input
 
 def monster_turn(model, monster):
     dx = model.player.x - monster.x
