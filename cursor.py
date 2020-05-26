@@ -5,6 +5,7 @@ from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
 from lib.model import Model
+import random
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -151,6 +152,9 @@ def player_turn(model, screen):
             # else didn't spend turn
         elif input_key == 'q':
             return 'q'
+        elif input_key == 'm':
+            random_peep = random.randint(1,model.peeps)
+            player = random_peep
         else:
             model.message('unknown command: "' + input_key + '"')
             draw_screen(screen, model)
