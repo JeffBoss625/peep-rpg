@@ -194,6 +194,11 @@ def player_turn(screen):
                     random_peep = random.randint(0, len(model.peeps) - 1)
                 model.player = model.peeps[random_peep]
                 model.message("You are now " + model.player.name)
+                player = model.player
+                while model.player == player:
+                    player = model.peeps[random.randint(0, len(model.peeps) - 1)]
+                model.player = player
+                model.message("You are now " + model.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
         else:
