@@ -62,7 +62,7 @@ Y_MODIFIERS = {
 }
 
 
-def calc_dx_dy(direction):
+def direction_to_dxdy(direction):
     return X_MODIFIERS[direction], Y_MODIFIERS[direction]
 
 
@@ -169,7 +169,7 @@ def direction_from_vector(dx, dy):
 
 def move_peep(model, p, direct):
     ret = []
-    dx, dy = calc_dx_dy(direct)
+    dx, dy = direction_to_dxdy(direct)
     if maze_at_xy(model.maze, p.x + dx, p.y + dy) is None:
         if peep_at_xy(model.peeps, p.x + dx, p.y + dy) is None:
             p.x += dx
