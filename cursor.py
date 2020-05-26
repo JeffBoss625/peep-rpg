@@ -91,13 +91,11 @@ KEY_DIR = {
 MARGIN_SIZE = 3
 
 def main(scr):
-    peeps = PEEPS
-    MESSAGES = []
+    model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     scr.clear()
-    player = peeps[0]
 
     scr.move(2, 10)
-    draw_stats(scr, player)
+    draw_stats(scr, model.player)
 
     input_key = 0
     xoff = 10
@@ -110,19 +108,17 @@ def main(scr):
         scr.clear()
 
         scr.move(2, 10)
-        draw_stats(scr, player)
+        draw_stats(scr, model.player)
 
         scr.move(yoff, xoff)
         draw_maze(scr, MAZE)
 
-        for p in peeps:
+        for p in model.peeps:
             scr.move(yoff,xoff)
             draw_peep(scr, p)
 
-        if len(MESSAGES) > 12:
-            MESSAGES = MESSAGES[-12:]
         scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
-        draw_messages(scr, MESSAGES)
+        draw_messages(scr, model.messages[-12:])
 
         scr.move(0,0)
         scr.refresh()
@@ -133,14 +129,13 @@ def main(scr):
             dir = KEY_DIR[input_key]
 
             # MOVE PLAYER
-            msg = mlib.move_peep(peeps, MAZE, player, dir)
-            MESSAGES.extend(msg)
+            msg = mlib.move_peep(model.peeps, MAZE, model.player, dir)
+            model.message(msg)
 
             # MOVE MONSTERS
-            model = Model(peeps=peeps, maze=MAZE, player=player, messages=MESSAGES)
-            for i in range(1, len(peeps)):
+            for i in range(1, len(model.peeps)):
                 monster_turn(model, model.peeps[i])
-            peeps = [p for p in peeps if p.hp > 0]
+            model.peeps = [p for p in model.peeps if p.hp > 0]
             # Before Drawing, peeps = peeps-without-dead-guys (new list)
 
     # while input_key != 'q':
