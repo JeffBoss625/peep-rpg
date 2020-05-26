@@ -167,16 +167,16 @@ def direction_from_vector(dx, dy):
         ret = Direction.LEFT
     return ret
 
-def move_peep(peeps, maze, p, dir):
+def move_peep(model, p, dir):
     ret = []
     dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(maze, p.x + dx, p.y + dy) is None:
-        if check_unbreakable_collide(maze, p.x + dx, p.y + dy) is None:
-            if check_peep_at(peeps, p.x + dx, p.y + dy) is None:
+    if check_wall_collide(model.maze, p.x + dx, p.y + dy) is None:
+        if check_unbreakable_collide(model.maze, p.x + dx, p.y + dy) is None:
+            if check_peep_at(model.peeps, p.x + dx, p.y + dy) is None:
                 p.x += dx
                 p.y += dy
             else:
-                dst = check_peep_at(peeps, p.x + dx, p.y + dy)
+                dst = check_peep_at(model.peeps, p.x + dx, p.y + dy)
                 weapon = attacklib.choose_melee_attack(p)
                 msg = attacklib.attack(p, dst, weapon)
                 ret.extend(msg)
@@ -206,17 +206,17 @@ def check_unbreakable_collide(maze, player_x, player_y):
     else:
         return None
 
-if __name__ == "__main__":
-    from pprint import pprint
-    from lib.model import *
-
-    model = get_model()
-    peeps = model['peeps'][1:3]
-
-    move_counts = elapse_time(peeps)
-    [m_by_clicks, tot_clicks] = monsters_by_clicks(move_counts)
-    move_seq = calc_move_sequence(m_by_clicks, tot_clicks)
-    print(move_seq)
+# if __name__ == "__main__":
+    # from pprint import pprint
+    # from lib.model import *
+    #
+    # model = get_model()
+    # peeps = model['peeps'][1:3]
+    #
+    # move_counts = elapse_time(peeps)
+    # [m_by_clicks, tot_clicks] = monsters_by_clicks(move_counts)
+    # move_seq = calc_move_sequence(m_by_clicks, tot_clicks)
+    # print(move_seq)
 
     # change keys to clicks per move = total clicks / move count
     # make a new dictionary and move each key across.

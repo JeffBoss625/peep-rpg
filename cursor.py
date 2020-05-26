@@ -129,7 +129,7 @@ def main(scr):
             dir = KEY_DIR[input_key]
 
             # MOVE PLAYER
-            msg = mlib.move_peep(model.peeps, MAZE, model.player, dir)
+            msg = mlib.move_peep(model, model.player, dir)
             model.message(msg)
 
             # MOVE MONSTERS
@@ -155,7 +155,7 @@ def monster_turn(model, monster):
         edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
         edir = mlib.direction_from_vector(dx, dy)
-    msg = mlib.move_peep(model.peeps, model.maze, monster, edir)
+    msg = mlib.move_peep(model, monster, edir)
     model.message(msg)
 
 #   while input_key != 'q':
