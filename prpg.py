@@ -6,6 +6,7 @@ from lib.monsters import monster_by_name
 from lib.players import player_by_name
 from lib.model import Model
 import random
+from lib.constants import Color
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -51,10 +52,23 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
+CURSES_COLORS = {
+    Color.BLACK: clib.COLOR_BLACK,
+    Color.WHITE: clib.COLOR_WHITE,
+    Color.BLUE: clib.COLOR_BLUE,
+    Color.CYAN: clib.COLOR_CYAN,
+    Color.MAGENTA: clib.COLOR_MAGENTA,
+    Color.GREEN: clib.COLOR_GREEN,
+    Color.YELLOW: clib.COLOR_YELLOW,
+    Color.RED: clib.COLOR_RED,
+}
+
 # Term simplifies the interface with curses terminal. It narrows usage to only what is needed
 class Term:
     def __init__(self, scr):
         self.scr = scr
+        self.color_pairs = {} # color pair codes by (fg, bg) tuple
+        self.color_pair_count = 0
 
     def clear(self):
         self.scr.clear()
@@ -87,8 +101,18 @@ class Term:
 
         scr.move(y + len(lines), x)
 
-    def write_char(self, char):
-        self.scr.addch(char)
+    def write_char(self, char, fg=Color.WHITE, bg=Color.BLACK):
+        cpair = self.color_pair(fg, bg)
+        self.scr.addstr(char, cpair)
+
+    def color_pair(self, fg, bg):
+        key = (fg, bg)
+        if key not in self.color_pairs:
+            self.color_pair_count += 1
+            clib.init_pair(self.color_pair_count, CURSES_COLORS[fg], CURSES_COLORS[bg])
+            self.color_pairs[key] = clib.color_pair(self.color_pair_count)
+
+        return self.color_pairs[key]
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class Screen:
@@ -144,7 +168,7 @@ class Screen:
 
         for p in model.peeps:
             term.move_to(x + p.x, y + p.y)
-            term.write_char(p.char)
+            term.write_char(p.char,  p.fgcolor, p.bgcolor)
 
         term.move_to(x, y + len(model.maze))  # move cursor to end of maze
 
@@ -188,12 +212,6 @@ def player_turn(screen):
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
-                player = model.player
-                random_peep = random.randint(0, len(model.peeps) - 1)
-                while model.player == model.peeps[random_peep]:
-                    random_peep = random.randint(0, len(model.peeps) - 1)
-                model.player = model.peeps[random_peep]
-                model.message("You are now " + model.player.name)
                 player = model.player
                 while model.player == player:
                     player = model.peeps[random.randint(0, len(model.peeps) - 1)]

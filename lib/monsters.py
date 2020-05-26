@@ -1,4 +1,7 @@
-from lib.peep import Peep, Attack
+from lib.peep import Peep
+from lib.attack import Attack
+from lib.constants import Color
+
 
 MONSTERS = [
     # GOBLINS
@@ -53,6 +56,8 @@ MONSTERS = [
         name='Spark',
         type='red dragon',
         char='D',
+        fgcolor= Color.RED,
+        bgcolor= Color.BLACK,
         maxhp=50,
         thaco=10,
         speed=20,

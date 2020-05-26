@@ -1,4 +1,5 @@
 import dataclasses as dclib
+from lib.constants import Color
 from lib.attack import Attack
 
 @dclib.dataclass
@@ -6,6 +7,8 @@ class Peep:
     name: str = ''
     type: str = ''
     char: str = '?'
+    fgcolor: Color = Color.WHITE
+    bgcolor: Color = Color.BLACK
     maxhp: int = 0
     thaco: int = 20
     speed: int = 10
