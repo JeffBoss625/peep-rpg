@@ -67,8 +67,8 @@ CURSES_COLORS = {
 class Term:
     def __init__(self, scr):
         self.scr = scr
-        self.color_pairs = {} # color pair codes by (fg, bg) tuple
-        self.color_pair_count = 0
+        self.color_pairs = {}       # color pair codes by (fg, bg) tuple
+        self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
 
     def clear(self):
         self.scr.clear()
@@ -172,32 +172,6 @@ class Screen:
 
         term.move_to(x, y + len(model.maze))  # move cursor to end of maze
 
-def main(scr):
-    model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-    screen = Screen(Term(scr), model)
-
-    screen.repaint()
-
-    # GET PLAYER AND MONSTER TURNS (move_sequence)
-    while True:
-        peeps = [p for p in model.peeps]
-        turns = mlib.calc_turn_sequence(peeps)
-
-        for ti, peep_indexes in enumerate(turns):
-            for pi, peep_index in enumerate(peep_indexes):
-                peep = peeps[peep_index]
-                if peep == model.player:
-                    if player_turn(screen) == 'q':
-                        return 0     # QUIT GAME
-                else:
-                    monster_turn(model, peep)
-
-                # update peeps list to living peeps
-                model.peeps = [p for p in model.peeps if p.hp > 0]
-
-                screen.repaint()
-
-
 def player_turn(screen):
     while True:
         model = screen.model
@@ -208,7 +182,7 @@ def player_turn(screen):
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key in ('\x11', '\x03'):
+        elif input_key == '\x11':               # ^Q
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
@@ -249,6 +223,33 @@ def monster_turn(model, monster):
         if mlib.move_peep(model, monster, d2):
             return
         rotation += 1
+
+def main(scr):
+    clib.raw()
+    model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
+    screen = Screen(Term(scr), model)
+
+    screen.repaint()
+
+    # GET PLAYER AND MONSTER TURNS (move_sequence)
+    while True:
+        peeps = [p for p in model.peeps]
+        turns = mlib.calc_turn_sequence(peeps)
+
+        for ti, peep_indexes in enumerate(turns):
+            for pi, peep_index in enumerate(peep_indexes):
+                peep = peeps[peep_index]
+                if peep == model.player:
+                    if player_turn(screen) == 'q':
+                        return 0     # QUIT GAME
+                else:
+                    monster_turn(model, peep)
+
+                # update peeps list to living peeps
+                model.peeps = [p for p in model.peeps if p.hp > 0]
+
+                screen.repaint()
+
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER TURNS (turn_sequence)
