@@ -11,7 +11,7 @@ def test_elapse_time():
     assert peeps[0].tics == 0
     assert peeps[1].tics == 7
 
-def test_check_wall_collide():
+def test_maze_at_xy():
     maze = [
         '..####',
         '.#####',
@@ -22,7 +22,7 @@ def test_check_wall_collide():
     assert wall.type == 'wall'
     assert movelib.maze_at_xy(maze, 0, 1) is None
 
-def test_handle_player_move():
+def test_move_peep():
     peeps = [
         Peep(name='p1', x=0, y=0),     # player information and state
         Peep(name='p1', x=0, y=2),
@@ -58,7 +58,7 @@ def test_handle_player_move():
     assert player.x == 0
     assert player.y == 1
 
-def test_player_move_attack():
+def test_move_attack():
     peeps = [
         Peep(name='p1', x=0, y=1, attacks={'sword': Attack(damage='1d6')}),
         Peep(name='m1', x=0, y=2, hp=5),
