@@ -3,7 +3,8 @@ import lib.move as mlib
 from curses import wrapper
 from lib.move import Direction
 from lib.monsters import monster_by_name
-from lib.peeps import peep_by_name
+from lib.players import player_by_name
+from lib.model import Model
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -44,7 +45,7 @@ DRAGON = {
 }
 
 PEEPS = [
-    peep_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
+    player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
     monster_by_name('Thark', x=2, y=2, hp=10),
     monster_by_name('Spark', x=24, y=7, hp=50),
 ]
@@ -136,8 +137,9 @@ def main(scr):
             MESSAGES.extend(msg)
 
             # MOVE MONSTERS
+            model = Model(peeps=peeps, maze=MAZE, player=player, messages=MESSAGES)
             for i in range(1, len(peeps)):
-                monster_turn(peeps, peeps[i], player, MESSAGES, MAZE)
+                monster_turn(model, model.peeps[i])
             peeps = [p for p in peeps if p.hp > 0]
             # Before Drawing, peeps = peeps-without-dead-guys (new list)
 
@@ -151,15 +153,15 @@ def main(scr):
             # MOVE PLAYER
             # MOVE MONSTERS
 
-def monster_turn(peeps, monster, player, messages, maze):
-    dx = player.x - monster.x
-    dy = player.y - monster.y
-    if monster.hp/monster.hp < 0.2:
+def monster_turn(model, monster):
+    dx = model.player.x - monster.x
+    dy = model.player.y - monster.y
+    if monster.hp/monster.maxhp < 0.2:
         edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
         edir = mlib.direction_from_vector(dx, dy)
-    msg = mlib.move_peep(peeps, maze, monster, edir)
-    messages.extend(msg)
+    msg = mlib.move_peep(model.peeps, model.maze, monster, edir)
+    model.message(msg)
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER MOVES (move_sequence)

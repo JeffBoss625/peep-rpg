@@ -16,6 +16,39 @@ MONSTERS = [
             'punch': Attack('2d1'),
         }
     ),
+
+    # Animals
+    Peep(
+        name='Giant Rat',
+        type='rat',
+        char='g',
+        maxhp=5,
+        thaco=19,
+        speed=13,
+        ac=10,
+        attacks={
+            'bite': Attack('1d3'),
+            'scratch': Attack('1d3'),
+            'tail': Attack('2d1'),
+        }
+    ),
+
+    Peep(
+        name='Big Bird',
+        type='bird',
+        char='g',
+        maxhp=15,
+        thaco=17,
+        speed=19,
+        ac=8,
+        attacks={
+            'beak': Attack('1d10'),
+            'talons': Attack('2d7'),
+            'wing_blow': Attack('6d1'),
+        }
+    ),
+
+    # Dragons
     Peep(
         name='Spark',
         type='dragon',
@@ -28,7 +61,7 @@ MONSTERS = [
             'bite': Attack('1d10'),
             'scratch': Attack('2d7'),
             'tail': Attack('3d5'),
-            'fire_breath': Attack('2d10'),
+            'fire_breath': Attack('2d10', range=5),
         }
     )
 

@@ -1,5 +1,10 @@
 import random
+import dataclasses as dclib
 
+@dclib.dataclass
+class Attack:
+    damage: str = '1d1'
+    range: int = 0
 
 def parse_dice(dstring):
     parts = dstring.split("d")
