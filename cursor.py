@@ -26,32 +26,24 @@ PEEPS = [
     monster_by_name('Spark', x=24, y=7, hp=50),
 ]
 
-def draw_stats(scr, player):
-    y, x = scr.getyx()
-    scr.move(y, x)
-    scr.addstr(player.name)
-    scr.move(y+1, x)
-    scr.addstr('hp:    ' + str(player.hp) + '/' + str(player.maxhp))
-    scr.move(y+2, x)
-    scr.addstr('speed: ' + str(player.speed))
+def draw_stats(screen, player):
+    screen.write_lines([
+        player.name,
+        'hp:    ' + str(player.hp) + '/' + str(player.maxhp),
+        'speed: ' + str(player.speed),
+    ])
 
+def draw_maze_area(screen, model):
+    x, y = screen.get_xy()
 
-def draw_maze(scr, maze):
-    y, x = scr.getyx()
-    for i, line in enumerate(maze):
-        scr.move(y+i, x)
-        scr.addstr(line)
+    screen.write_lines(model.maze)
 
-def draw_peep(scr, p):
-    y, x = scr.getyx()
-    scr.move(p.y + y, p.x + x)
-    scr.addch(p.char)
+    for p in model.peeps:
+        screen.move_to(x + p.x, y + p.y)
+        screen.write_char(p.char)
 
-def draw_messages(scr, messages):
-    y, x = scr.getyx()
-    for i, m in enumerate(messages):
-        scr.move(y+i, x)
-        scr.addstr(m)
+    screen.move_to(x, y + len(model.maze))  # move cursor to end of maze
+
 
 DIRECTION_KEYS = {
     'j': Direction.DOWN,
@@ -64,39 +56,69 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-MARGIN_SIZE = 3
+# Screen simplifies the interface with curses. It narrows usage to only what is needed
+class Screen:
+    def __init__(self, scr):
+        self.scr = scr
 
-def draw_screen(scr, model, xoff, yoff):
-    scr.clear()
+    def clear(self):
+        self.scr.clear()
 
-    scr.move(yoff, xoff)
-    draw_stats(scr, model.player)
-    yoff += 8       # stats height
+    def refresh(self):
+        self.scr.refresh()
 
-    scr.move(yoff, xoff)
-    draw_maze(scr, MAZE)
+    def get_xy(self):
+        y, x = self.scr.getyx()
+        return x, y
 
-    for p in model.peeps:
-        scr.move(yoff,xoff)
-        draw_peep(scr, p)
+    # Relative move of cursor
+    def move(self, dx, dy):
+        y, x = self.scr.getyx()
+        self.scr.move(y + dy, x + dx)
 
-    yoff += len(MAZE) + MARGIN_SIZE
-    scr.move(yoff, xoff)
-    draw_messages(scr, model.messages[-12:])
+    # Absolute move of cursor
+    def move_to(self, x, y):
+        self.scr.move(y, x)
 
-    scr.move(0,0)
-    scr.refresh()
+    def write_lines(self, lines):
+        scr = self.scr
+        y, x = scr.getyx()
+        for i, line in enumerate(lines):
+            scr.move(y+i, x)
+            scr.addstr(line)
+
+        scr.move(y + len(lines), x)
+
+    def write_char(self, char):
+        self.scr.addch(char)
+
+
+def draw_screen(screen, model, x_margin, y_margin):
+    screen.clear()
+
+    screen.move_to(x_margin, y_margin)
+    draw_stats(screen, model.player)
+
+    screen.move(0, y_margin)
+    draw_maze_area(screen, model)
+
+    screen.move(0, y_margin)
+    screen.write_lines(model.messages[-12:])
+
+    screen.move_to(0, 0)
+
+    screen.refresh()
 
 
 def main(scr):
+    screen = Screen(scr)
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-    scr.clear()
 
     input_key = 0
     turn = 0
     while input_key != 'q':
         turn += 1
-        draw_screen(scr, model, 10, 2)
+        draw_screen(screen, model, 3, 3)
 
         # GET AND HANDLE PLAYER MOVE
         input_key = scr.getkey()
