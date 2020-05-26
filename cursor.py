@@ -20,30 +20,12 @@ MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
 
+
 PEEPS = [
     player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10, speed=33),
     monster_by_name('Thark', x=2, y=2, hp=10),
     monster_by_name('Spark', x=24, y=7, hp=50),
 ]
-
-def draw_stats(screen, player):
-    screen.write_lines([
-        player.name,
-        'hp:    ' + str(player.hp) + '/' + str(player.maxhp),
-        'speed: ' + str(player.speed),
-    ])
-
-def draw_maze_area(screen, model):
-    x, y = screen.get_xy()
-
-    screen.write_lines(model.maze)
-
-    for p in model.peeps:
-        screen.move_to(x + p.x, y + p.y)
-        screen.write_char(p.char)
-
-    screen.move_to(x, y + len(model.maze))  # move cursor to end of maze
-
 
 DIRECTION_KEYS = {
     'j': Direction.DOWN,
@@ -56,8 +38,8 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-# Screen simplifies the interface with curses. It narrows usage to only what is needed
-class Screen:
+# Term simplifies the interface with curses terminal. It narrows usage to only what is needed
+class Term:
     def __init__(self, scr):
         self.scr = scr
 
@@ -95,29 +77,69 @@ class Screen:
     def write_char(self, char):
         self.scr.addch(char)
 
+# An abstraction of a terminal game screen with controls to refresh and update what is shown
+class Screen:
+    def __init__(self, term, model):
+        self._term = term
+        self.model = model
+        self.model.out = self  # allow the model itself to be used for term printed output
 
-def draw_screen(screen, model):
-    x_margin = 3
-    y_margin = 3
-    screen.clear()
+    # print messages and standard output
+    def print(self, *args):
+        line = ' '.join([str(a) for a in args])
+        self.model.message(line)
+        self.repaint()
 
-    screen.move_to(x_margin, y_margin)
-    draw_stats(screen, model.player)
+    def get_key(self):
+        return self._term.get_key()
 
-    screen.move(0, y_margin)
-    draw_maze_area(screen, model)
+    # repaint the entire screen - all that is visible
+    def repaint(self):
+        term = self._term
+        model = self.model
+        x_margin = 3
+        y_margin = 3
+        term.clear()
 
-    screen.move(0, y_margin)
-    screen.write_lines(model.messages[-12:])
+        term.move_to(x_margin, y_margin)
+        self._draw_stats()
 
-    screen.move_to(0, 0)
+        term.move(0, y_margin)
+        self._draw_maze_area()
 
-    screen.refresh()
+        term.move(0, y_margin)
+        term.move_to(3, 20)
+        term.write_lines(model.messages[-12:])
 
+        term.move_to(0, 0)
+        term.refresh()
+
+    def _draw_stats(self):
+        p = self.model.player
+        self._term.write_lines([
+            p.name,
+            'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
+            'speed: ' + str(p.speed),
+            ])
+
+    def _draw_maze_area(self):
+        term = self._term
+        model = self.model
+        x, y = term.get_xy()
+
+        term.write_lines(model.maze)
+
+        for p in model.peeps:
+            term.move_to(x + p.x, y + p.y)
+            term.write_char(p.char)
+
+        term.move_to(x, y + len(model.maze))  # move cursor to end of maze
 
 def main(scr):
-    screen = Screen(scr)
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
+    screen = Screen(Term(scr), model)
+
+    screen.repaint()
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
@@ -136,12 +158,13 @@ def main(scr):
                 # update peeps list to living peeps
                 model.peeps = [p for p in model.peeps if p.hp > 0]
 
-                draw_screen(screen, model)
+                screen.repaint()
 
 
-def player_turn(model, screen):
+def player_turn(screen):
+    model = screen.model
     while True:
-        draw_screen(screen, model)
+        screen.repaint()
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
@@ -158,19 +181,34 @@ def player_turn(model, screen):
             else:
                 model.message("You have nothing in range to brain-swap with")
         else:
-            model.message('unknown command: "' + input_key + '"')
+            model.print('unknown command: "' + input_key + '"')
 
-        draw_screen(screen, model)  # update messages
+        screen.repaint()  # update messages
         # continue with loop to get more input
 
 def monster_turn(model, monster):
     dx = model.player.x - monster.x
     dy = model.player.y - monster.y
     if monster.hp/monster.maxhp < 0.2:
-        edir = mlib.direction_from_vector(-dx, -dy) #If low health, run away
+        direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
     else:
-        edir = mlib.direction_from_vector(dx, dy)
-    mlib.move_peep(model, monster, edir)
+        direct = mlib.direction_from_vector(dx, dy)
+
+    if mlib.move_peep(model, monster, direct):
+        return
+
+    # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
+    rotation = 1
+    while rotation <= 4:
+        d2 = mlib.direction_relative(direct, rotation)
+        model.print(monster.name, 'trying direction', d2)
+        if mlib.move_peep(model, monster, d2):
+            return
+        d2 = mlib.direction_relative(direct, -rotation)
+        model.print(monster.name, 'trying direction', d2)
+        if mlib.move_peep(model, monster, d2):
+            return
+        rotation += 1
 
 #   while input_key != 'q':
 #       GET PLAYER AND MONSTER TURNS (turn_sequence)

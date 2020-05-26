@@ -9,15 +9,17 @@
 # that will be costly to change, but easier to work with and understand.
 
 import dataclasses as dclib
-from lib.peep import Peep
+from lib.output import Out
 
 @dclib.dataclass
 class Model:
-    player: Peep = None
-    maze: list = dclib.field(default_factory=list)
-    peeps: list = dclib.field(default_factory=list)
-    messages: list = dclib.field(default_factory=list)
-    seed: int = 0   # random number seed. non-zero will keep game consistent (pseudo-random)
+    def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0, out=Out()):
+        self.player = player
+        self.maze = maze if maze else []
+        self.peeps = peeps if peeps else []
+        self.messages = messages if messages else []
+        self.seed = seed
+        self.out = out
 
     # add a message or all messages in an interable to the messages array
     def message(self, msg):
@@ -26,5 +28,11 @@ class Model:
         else:
             self.messages.extend(msg)
 
-def create_model():
-    return Model()
+    # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
+    # alternative for stdout. When using terminal curses library, output is switched to the messages area
+    def print(self, *msg):
+        if self.out is None:
+            print(*msg)
+        else:
+            self.out.print(*msg)
+
