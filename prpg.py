@@ -188,12 +188,11 @@ def player_turn(screen):
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:
-                random_peep = random.randint(0, len(model.peeps) - 1)
-                if model.player == model.peeps[random_peep]:
-                    random_peep = random.randint(0, len(model.peeps) - 1)
-                else:
-                    model.player = model.peeps[random_peep]
-                    model.message("You are now " + model.player.name)
+                player = model.player
+                while model.player == player:
+                    player = model.peeps[random.randint(0, len(model.peeps) - 1)]
+                model.player = player
+                model.message("You are now " + model.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
         else:
