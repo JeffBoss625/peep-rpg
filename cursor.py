@@ -19,30 +19,6 @@ MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
 
-DRAGON = {
-    'name': 'Spark',
-    'type': 'dragon',
-    'char': 'D',
-    'hp': 50,
-    'thaco': 10,
-    'speed': 16,
-    'tics': 0,
-    'ac': 10,
-    'weapons': {
-        'bite': {
-            'damage': '1d10'
-        },
-        'fire breath': {
-            'damage': '2d10'
-        },
-        'claws': {
-            'damage': '2d7'
-        },
-        'tail': {
-            'damage': '7d1'
-        },
-    },
-}
 
 PEEPS = [
     player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10),
@@ -90,38 +66,37 @@ KEY_DIR = {
 
 MARGIN_SIZE = 3
 
+def draw_screen(scr, model, xoff, yoff):
+    scr.clear()
+
+    scr.move(yoff, xoff)
+    draw_stats(scr, model.player)
+    yoff += 8       # stats height
+
+    scr.move(yoff, xoff)
+    draw_maze(scr, MAZE)
+
+    for p in model.peeps:
+        scr.move(yoff,xoff)
+        draw_peep(scr, p)
+
+    yoff += len(MAZE) + MARGIN_SIZE
+    scr.move(yoff, xoff)
+    draw_messages(scr, model.messages[-12:])
+
+    scr.move(0,0)
+    scr.refresh()
+
+
 def main(scr):
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     scr.clear()
 
-    scr.move(2, 10)
-    draw_stats(scr, model.player)
-
     input_key = 0
-    xoff = 10
-    yoff = 10
     turn = 0
     while input_key != 'q':
         turn += 1
-
-        # DRAW SCREEN CONTENTS...
-        scr.clear()
-
-        scr.move(2, 10)
-        draw_stats(scr, model.player)
-
-        scr.move(yoff, xoff)
-        draw_maze(scr, MAZE)
-
-        for p in model.peeps:
-            scr.move(yoff,xoff)
-            draw_peep(scr, p)
-
-        scr.move(yoff + len(MAZE) + MARGIN_SIZE, xoff)
-        draw_messages(scr, model.messages[-12:])
-
-        scr.move(0,0)
-        scr.refresh()
+        draw_screen(scr, model, 10, 2)
 
         # GET AND HANDLE PLAYER MOVE
         input_key = scr.getkey()
@@ -137,16 +112,6 @@ def main(scr):
                 monster_turn(model, model.peeps[i])
             model.peeps = [p for p in model.peeps if p.hp > 0]
             # Before Drawing, peeps = peeps-without-dead-guys (new list)
-
-    # while input_key != 'q':
-        # DRAW SCREEN CONTENTS...
-        # GET AND HANDLE PLAYER MOVE
-
-        # input_key = scr.getkey()
-
-        # if input_key in KEY_DIR:
-            # MOVE PLAYER
-            # MOVE MONSTERS
 
 def monster_turn(model, monster):
     dx = model.player.x - monster.x
