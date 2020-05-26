@@ -20,7 +20,6 @@ MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
 ]
 
-
 PEEPS = [
     player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=10, speed=33),
     monster_by_name('Thark', x=2, y=2, hp=10),
@@ -120,8 +119,6 @@ def main(scr):
     screen = Screen(scr)
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
 
-    draw_screen(screen, model)
-
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
         peeps = [p for p in model.peeps]
@@ -130,9 +127,9 @@ def main(scr):
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
                 peep = peeps[peep_index]
-                if peep.type == 'player':
+                if peep == model.player:
                     if player_turn(model, screen) == 'q':
-                        return      # QUIT GAME
+                        return 0     # QUIT GAME
                 else:
                     monster_turn(model, peep)
 
@@ -144,6 +141,7 @@ def main(scr):
 
 def player_turn(model, screen):
     while True:
+        draw_screen(screen, model)
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
@@ -152,9 +150,13 @@ def player_turn(model, screen):
             # else didn't spend turn
         elif input_key == 'q':
             return 'q'
-        elif input_key == 'm':
-            random_peep = random.randint(1,model.peeps)
-            player = random_peep
+        elif input_key == 's':
+            if len(model.peeps) >= 2:
+                random_peep = random.randint(1, len(model.peeps) - 1)
+                model.player = model.peeps[random_peep]
+                model.message("You are now " + model.player.name)
+            else:
+                model.message("You have nothing in range to brain-swap with")
         else:
             model.message('unknown command: "' + input_key + '"')
 
