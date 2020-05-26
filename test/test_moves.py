@@ -15,11 +15,11 @@ def test_check_wall_collide():
         '..####',
         '.#####',
     ]
-    assert movelib.check_wall_collide(maze, 0, 0) is None
-    assert movelib.check_wall_collide(maze, 1, 0) is None
-    wall = movelib.check_wall_collide(maze, 2, 0)
+    assert movelib.maze_at_xy(maze, 0, 0) is None
+    assert movelib.maze_at_xy(maze, 1, 0) is None
+    wall = movelib.maze_at_xy(maze, 2, 0)
     assert wall.type == 'wall'
-    assert movelib.check_wall_collide(maze, 0, 1) is None
+    assert movelib.maze_at_xy(maze, 0, 1) is None
 
 def test_handle_player_move():
     player = Peep(name='p1', x=0, y=0)     # player information and state

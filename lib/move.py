@@ -170,41 +170,34 @@ def direction_from_vector(dx, dy):
 def move_peep(model, p, dir):
     ret = []
     dx, dy = calc_dx_dy(dir)
-    if check_wall_collide(model.maze, p.x + dx, p.y + dy) is None:
-        if check_unbreakable_collide(model.maze, p.x + dx, p.y + dy) is None:
-            if check_peep_at(model.peeps, p.x + dx, p.y + dy) is None:
-                p.x += dx
-                p.y += dy
-            else:
-                dst = check_peep_at(model.peeps, p.x + dx, p.y + dy)
-                weapon = attacklib.choose_melee_attack(p)
-                msg = attacklib.attack(p, dst, weapon)
-                ret.extend(msg)
+    if maze_at_xy(model.maze, p.x + dx, p.y + dy) is None:
+        if peep_at_xy(model.peeps, p.x + dx, p.y + dy) is None:
+            p.x += dx
+            p.y += dy
+        else:
+            dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
+            weapon = attacklib.choose_melee_attack(p)
+            msg = attacklib.attack(p, dst, weapon)
+            ret.extend(msg)
     # else: do nothing
     return ret
 
 
-def check_peep_at(peeps, x, y):
+def peep_at_xy(peeps, x, y):
     for p in peeps:
         if x == p.x:
             if y == p.y:
                 return p
     return None
 
-def check_wall_collide(maze, x, y):
+def maze_at_xy(maze, x, y):
     line = maze[y]
-    cell = line[x]
-    if cell == '#':
-        return Peep(name='Wally', type='wall', x=x, y=y)
+    char = line[x]
+    if char == '#' or char == '%':
+        return Peep(name='Wally', type='wall', char=char, x=x, y=y)
     else:
         return None
-def check_unbreakable_collide(maze, player_x, player_y):
-    line = maze[player_y]
-    cell = line[player_x]
-    if cell == '%':
-        return {'type': 'unbreakable', 'x': str(player_x), 'y': str(player_y)}
-    else:
-        return None
+
 
 # if __name__ == "__main__":
     # from pprint import pprint
