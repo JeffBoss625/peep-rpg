@@ -1,6 +1,6 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
 import lib.move as mlib
-import curses as clib
+import curses as curselib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
@@ -52,17 +52,6 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-CURSES_COLORS = {
-    Color.BLACK: clib.COLOR_BLACK,
-    Color.WHITE: clib.COLOR_WHITE,
-    Color.BLUE: clib.COLOR_BLUE,
-    Color.CYAN: clib.COLOR_CYAN,
-    Color.MAGENTA: clib.COLOR_MAGENTA,
-    Color.GREEN: clib.COLOR_GREEN,
-    Color.YELLOW: clib.COLOR_YELLOW,
-    Color.RED: clib.COLOR_RED,
-}
-
 # Term simplifies the interface with curses terminal. It narrows usage to only what is needed
 class Term:
     def __init__(self, scr):
@@ -109,8 +98,10 @@ class Term:
         key = (fg, bg)
         if key not in self.color_pairs:
             self.color_pair_count += 1
-            clib.init_pair(self.color_pair_count, CURSES_COLORS[fg], CURSES_COLORS[bg])
-            self.color_pairs[key] = clib.color_pair(self.color_pair_count)
+            fgc = getattr(curselib, 'COLOR_' + fg.name)
+            bgc = getattr(curselib, 'COLOR_' + bg.name)
+            curselib.init_pair(self.color_pair_count, fgc, bgc)
+            self.color_pairs[key] = curselib.color_pair(self.color_pair_count)
 
         return self.color_pairs[key]
 
@@ -225,7 +216,7 @@ def monster_turn(model, monster):
         rotation += 1
 
 def main(scr):
-    clib.raw()
+    curselib.raw()
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = Screen(Term(scr), model)
 
@@ -264,4 +255,4 @@ def main(scr):
 #               DRAW SCREEN CONTENTS
 
 
-clib.wrapper(main)
+curselib.wrapper(main)
