@@ -1,38 +1,65 @@
-# Model is a master model containing all the game state: messages, player and monster locations and state, equipment,
-# current dungeon etc.
-# State is mutable/changing.
-# Model will also be responsible for exposing simple serial view of state for saving the game as well as methods
-# that may update state from loaded or generated sources (new levels, mazes etc).
-#
-# Model is designed to be open and simple - an understandable collection of simple data structures that reflects
-# the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
-# that will be costly to change, but easier to work with and understand.
+# Data model for
 
 import dataclasses as dclib
-from lib.output import Out
+from lib.constants import Color
 
 @dclib.dataclass
-class Model:
-    def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0, out=Out()):
-        self.player = player
-        self.maze = maze if maze else []
-        self.peeps = peeps if peeps else []
-        self.messages = messages if messages else []
-        self.seed = seed
-        self.out = out
+class Attack:
+    damage: str = '1d1'
+    range: int = 0
 
-    # add a message or all messages in an interable to the messages array
-    def message(self, msg):
-        if isinstance(msg, str):
-            self.messages.append(msg)
-        else:
-            self.messages.extend(msg)
+@dclib.dataclass
+class Ammo:
+    name: str = ''
+    char: str = '?'
+    fgcolor: Color = Color.WHITE
+    bgcolor: Color = Color.BLACK
+    speed: int = 10
 
-    # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
-    # alternative for stdout. When using terminal curses library, output is switched to the messages area
-    def print(self, *msg):
-        if self.out is None:
-            print(*msg)
-        else:
-            self.out.print(*msg)
+    # temp state
+    tics: int = 0
+    x: int = 0
+    y: int = 0
+    attacks: dict = dclib.field(default_factory=dict)
+    move_tactic: str = 'straight'
+    direct: int = 0
 
+@dclib.dataclass
+class Peep:
+    name: str = ''
+    type: str = ''
+    char: str = '?'
+    fgcolor: Color = Color.WHITE
+    bgcolor: Color = Color.BLACK
+    maxhp: int = 0
+    thaco: int = 20
+    speed: int = 10
+    ac: int = 10
+    move_tactic: str = 'seek'
+    # temp state
+    hp: int = 0
+    tics: int = 0
+    x: int = 0
+    y: int = 0
+    attacks: dict = dclib.field(default_factory=dict)
+
+# CONSTRUCTION FROM DICTIONARY LOGIC - ignore
+CLASS_FIELDS = {}
+
+def _class_fields(klass):
+    if klass not in CLASS_FIELDS:
+        CLASS_FIELDS[klass] = {f.name: f.type for f in dclib.fields(klass)}
+    return CLASS_FIELDS[klass]
+
+def from_dict(klass, d):
+    if not dclib.is_dataclass(klass):
+        return d
+    fields = _class_fields(klass)
+    args = {}
+    for f in d:
+        if f not in fields:
+            raise KeyError(str(klass.__name__) + ' has no property "' + f + '"')
+        args[f] = from_dict(fields[f], d[f])
+
+    ret = klass(**args)
+    return ret

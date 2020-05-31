@@ -1,4 +1,4 @@
-from lib.peep import Peep, Attack
+from lib.model import Peep, Attack
 
 _PEEPS = [
     Peep(

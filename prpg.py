@@ -1,12 +1,14 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
 import lib.move as mlib
 import curses as curselib
+import lib.attack as alib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
-from lib.model import Model
+from lib.model_game import Model
 from lib.screen import Screen
 import random
+import time
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -72,7 +74,17 @@ def player_turn(screen):
                 model.player = player
                 model.message("You are now " + model.player.name)
             else:
-                model.message("You have nothing in range to brain-swap with")
+               model.message("You have nothing in range to brain-swap with")
+        elif input_key == 'a':
+            while input_key not in DIRECTION_KEYS:
+                model.message('Where do you want to shoot?')
+                input_key = screen.get_key()
+                if input_key in DIRECTION_KEYS:
+                    direct = DIRECTION_KEYS[input_key]
+                    alib.create_projectile(direct, model)
+                else:
+                    model.message('That is not a valid direction to shoot')
+
         else:
             model.message('unknown command: "' + input_key + '"')
 
@@ -81,28 +93,34 @@ def player_turn(screen):
 
 
 def monster_turn(model, monster):
-    dx = model.player.x - monster.x
-    dy = model.player.y - monster.y
-    if monster.hp/monster.maxhp < 0.3:
-        direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
-    else:
-        direct = mlib.direction_from_vector(dx, dy)
+    if monster.move_tactic == 'straight':
+        direct = monster.direction
+        mlib.move_peep(model, monster, direct)
+    elif monster.move_tactic == 'seek':
+        dx = model.player.x - monster.x
+        dy = model.player.y - monster.y
+        if model.player.hp <= 0:
+            return 'q'
+        if monster.hp/monster.maxhp < 0.3:
+            direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
+        else:
+            direct = mlib.direction_from_vector(dx, dy)
 
-    if mlib.move_peep(model, monster, direct):
-        return
+        if mlib.move_peep(model, monster, direct):
+            return
 
-    # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
-    rotation = 1
-    while rotation <= 4:
-        d2 = mlib.direction_relative(direct, rotation)
-        # model.print(monster.name, 'trying direction', d2)
-        if mlib.move_peep(model, monster, d2):
-            return
-        d2 = mlib.direction_relative(direct, -rotation)
-        # model.print(monster.name, 'trying direction', d2)
-        if mlib.move_peep(model, monster, d2):
-            return
-        rotation += 1
+        # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
+        rotation = 1
+        while rotation <= 4:
+            d2 = mlib.direction_relative(direct, rotation)
+            # model.print(monster.name, 'trying direction', d2)
+            if mlib.move_peep(model, monster, d2):
+                return
+            d2 = mlib.direction_relative(direct, -rotation)
+            # model.print(monster.name, 'trying direction', d2)
+            if mlib.move_peep(model, monster, d2):
+                return
+            rotation += 1
 
 def main(scr):
     curselib.raw()
@@ -123,7 +141,11 @@ def main(scr):
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                 else:
-                    monster_turn(model, peep)
+                    if monster_turn(model, peep):
+                        model.message('YOU DIED')
+                        time.sleep(3)
+                        return 0
+
 
                 # update peeps list to living peeps
                 model.peeps = [p for p in model.peeps if p.hp > 0]

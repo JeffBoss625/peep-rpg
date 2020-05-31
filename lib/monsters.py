@@ -1,5 +1,4 @@
-from lib.peep import Peep
-from lib.attack import Attack
+from lib.model import Peep, Attack
 from lib.constants import Color
 
 
@@ -9,6 +8,7 @@ MONSTERS = [
         name='Thark',
         type='goblin',
         char='g',
+        fgcolor=Color.GREEN,
         maxhp=10,
         thaco=18,
         speed=13,
@@ -25,6 +25,7 @@ MONSTERS = [
         name='Giant Rat',
         type='rat',
         char='g',
+        fgcolor=Color.YELLOW,
         maxhp=5,
         thaco=19,
         speed=13,
@@ -40,6 +41,8 @@ MONSTERS = [
         name='Big Bird',
         type='bird',
         char='g',
+        fgcolor=Color.WHITE,
+        bgcolor=Color.BLACK,
         maxhp=15,
         thaco=17,
         speed=19,
@@ -73,7 +76,9 @@ MONSTERS = [
     Peep(
         name='Brog',
         type='black dragon',
-        char='B',
+        char='D',
+        fgcolor=Color.BLUE,
+        bgcolor=Color.BLACK,
         maxhp=200,
         thaco=3,
         speed=75,
@@ -82,9 +87,9 @@ MONSTERS = [
             'bite': Attack('1d30'),
             'scratch': Attack('2d21'),
             'tail': Attack('3d15'),
-            'death_breath': Attack('2d30', range=15),
+            'acid_breath': Attack('2d30', range=15),
         }
-    )
+    ),
 ]
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}

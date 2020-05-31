@@ -1,5 +1,5 @@
 import lib.attack as attacklib
-from lib.peep import Peep, Attack
+from lib.model import Peep, Attack
 from lib.output import Hector
 
 def test_attack():

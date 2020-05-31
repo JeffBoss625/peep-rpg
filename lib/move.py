@@ -1,4 +1,4 @@
-from lib.peep import Peep
+from lib.model import Peep
 import lib.attack as attacklib
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of

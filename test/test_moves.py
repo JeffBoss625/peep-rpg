@@ -1,7 +1,7 @@
 import lib.move as mlib
 from lib.move import Direction
-from lib.peep import Peep, Attack
-from lib.model import Model
+from lib.model import Peep, Attack
+from lib.model_game import Model
 from lib.output import Hector
 
 def test_elapse_time():
