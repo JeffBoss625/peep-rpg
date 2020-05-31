@@ -76,14 +76,18 @@ def player_turn(screen):
             else:
                model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
-            while input_key not in DIRECTION_KEYS:
+            model.message('Where do you want to shoot?')
+            screen.repaint()
+            sec_input_key = screen.get_key()
+            while sec_input_key not in DIRECTION_KEYS:
+                sec_input_key = screen.get_key()
+                model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
-                input_key = screen.get_key()
-                if input_key in DIRECTION_KEYS:
-                    direct = DIRECTION_KEYS[input_key]
-                    alib.create_projectile(direct, model)
-                else:
-                    model.message('That is not a valid direction to shoot')
+                screen.repaint()
+            direct = DIRECTION_KEYS[sec_input_key]
+            alib.create_projectile(direct, model)
+            model.message('Projectile shot')
+            screen.repaint()
 
         else:
             model.message('unknown command: "' + input_key + '"')
@@ -94,7 +98,7 @@ def player_turn(screen):
 
 def monster_turn(model, monster):
     if monster.move_tactic == 'straight':
-        direct = monster.direction
+        direct = monster.direct
         mlib.move_peep(model, monster, direct)
     elif monster.move_tactic == 'seek':
         dx = model.player.x - monster.x
@@ -132,12 +136,12 @@ def main(scr):
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
         peeps = [p for p in model.peeps]
-        turns = mlib.calc_turn_sequence(peeps)
+        turns = mlib.calc_turn_sequence(model.peeps)
 
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
                 peep = peeps[peep_index]
-                if peep == model.player:
+                if model.is_player(peep):
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                 else:

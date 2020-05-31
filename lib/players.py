@@ -3,8 +3,8 @@ from lib.model import Peep, Attack
 _PEEPS = [
     Peep(
         name='Bo Bo the Destroyer',
-        type='player',
-        char='@',
+        type='dog',
+        char='d',
         maxhp=100,
         thaco=19,
         speed=33,

@@ -15,6 +15,7 @@ class Ammo:
     fgcolor: Color = Color.WHITE
     bgcolor: Color = Color.BLACK
     speed: int = 10
+    maxhp: int = 1
 
     # temp state
     tics: int = 0

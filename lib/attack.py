@@ -5,8 +5,8 @@ import lib.projectile as ammolib
 
 def create_projectile(direction, model):
     dx, dy = mlib.direction_to_dxdy(direction)
-    ammolib.ammo_by_name('arrow', x=model.player.x + dx,
-                         y=model.player.y +dy, hp=1, direct=direction)
+    model.peeps.append(ammolib.create_projectile('arrow', x=model.player.x + dx,
+                         y=model.player.y +dy, hp=1, direct=direction))
 
 def parse_dice(dstring):
     parts = dstring.split("d")
