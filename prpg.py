@@ -5,7 +5,7 @@ import lib.attack as alib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
-from lib.prpg_screen import Screen
+from lib.game_screen import Screen
 from lib.model_game import Model
 import random
 import time
