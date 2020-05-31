@@ -5,8 +5,8 @@ import lib.attack as alib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
+from lib.game_screen import Screen
 from lib.model_game import Model
-from lib.screen import Screen
 import random
 import time
 
@@ -57,7 +57,7 @@ DIRECTION_KEYS = {
 def player_turn(screen):
     while True:
         model = screen.model
-        screen.repaint()  # update messages
+        screen.paint()  # update messages
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
@@ -92,7 +92,7 @@ def player_turn(screen):
         else:
             model.message('unknown command: "' + input_key + '"')
 
-        screen.repaint()  # update messages
+        screen.paint()  # update messages
         # continue with loop to get more input
 
 
@@ -131,7 +131,7 @@ def main(scr):
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = Screen(scr, model)
 
-    screen.repaint()
+    screen.paint()
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
@@ -155,7 +155,7 @@ def main(scr):
                 # update peeps list to living peeps
                 model.peeps = [p for p in model.peeps if p.hp > 0]
 
-                screen.repaint()
+                screen.paint()
 
 
 #   while input_key != 'q':
