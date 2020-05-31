@@ -7,6 +7,7 @@ from lib.constants import Color
 class Attack:
     damage: str = '1d1'
     range: int = 0
+    blowback: int = 0
 
 @dclib.dataclass
 class Ammo:

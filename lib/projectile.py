@@ -15,7 +15,7 @@ def create_projectile(name, x=0, y=0, hp=0, direct=0):
         speed= 200,
         tics= 0,
         attacks= {
-            'hit': Attack('1d15'),
+            'hit': Attack(damage='1d15', blowback=100),
         }
     )
     ret.hp = ret.maxhp if hp == 0 else hp

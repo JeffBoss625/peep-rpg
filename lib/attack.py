@@ -34,6 +34,9 @@ def attack(src, dst, attack_name, out, seed=0):
     dst.hp = dst.hp - tot_hp_loss
     if dst.hp <= 0:
         out.print('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
+    if src_attack.blowback != 0:
+        bb = src_attack.blowback * tot_hp_loss / 100
+        src.hp = src.hp - bb
 
 if __name__ == '__main__':
     print("HERE")

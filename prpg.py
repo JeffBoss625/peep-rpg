@@ -44,6 +44,7 @@ PEEPS = [
 ]
 
 DIRECTION_KEYS = {
+    '.': Direction.CENTER,
     'j': Direction.DOWN,
     'y': Direction.UP_LEFT,
     'k': Direction.UP,
@@ -140,7 +141,12 @@ def main(scr):
 
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
+                # if there are new peeps in the new_peeps list, break out of loop.
+                # When broken out of loop take remaining clicks to go through from the turns variable
+                # Add those remaining turns into a function that adds the new peeps's turns to it
                 peep = peeps[peep_index]
+                if peep.hp <= 0:
+                    continue
                 if model.is_player(peep):
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
@@ -150,7 +156,6 @@ def main(scr):
                         screen.paint()
                         time.sleep(3)
                         return 0
-
 
                 # update peeps list to living peeps
                 model.peeps = [p for p in model.peeps if p.hp > 0]
