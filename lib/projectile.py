@@ -12,7 +12,7 @@ def create_projectile(name, x=0, y=0, hp=0, direct=0):
         name= 'arrow',
         char = '-',
         fgcolor= Color.YELLOW,
-        speed= 100,
+        speed= 200,
         tics= 0,
         attacks= {
             'hit': Attack('1d15'),

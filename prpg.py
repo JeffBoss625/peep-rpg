@@ -77,17 +77,17 @@ def player_turn(screen):
                model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
             model.message('Where do you want to shoot?')
-            screen.repaint()
+            screen.paint()
             sec_input_key = screen.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 sec_input_key = screen.get_key()
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
-                screen.repaint()
+                screen.paint()
             direct = DIRECTION_KEYS[sec_input_key]
             alib.create_projectile(direct, model)
             model.message('Projectile shot')
-            screen.repaint()
+            screen.paint()
 
         else:
             model.message('unknown command: "' + input_key + '"')
@@ -147,7 +147,7 @@ def main(scr):
                 else:
                     if monster_turn(model, peep):
                         model.message('YOU DIED')
-                        screen.repaint()
+                        screen.paint()
                         time.sleep(3)
                         return 0
 
