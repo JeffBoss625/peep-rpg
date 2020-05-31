@@ -147,6 +147,7 @@ def main(scr):
                 else:
                     if monster_turn(model, peep):
                         model.message('YOU DIED')
+                        screen.repaint()
                         time.sleep(3)
                         return 0
 
