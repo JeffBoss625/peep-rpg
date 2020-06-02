@@ -36,3 +36,5 @@ class Model:
         else:
             self.out.print(*msg)
 
+    def is_player(self, peep):
+        return peep == self.player

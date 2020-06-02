@@ -7,6 +7,7 @@ from lib.constants import Color
 class Attack:
     damage: str = '1d1'
     range: int = 0
+    blowback: int = 0
 
 @dclib.dataclass
 class Ammo:
@@ -15,6 +16,7 @@ class Ammo:
     fgcolor: Color = Color.WHITE
     bgcolor: Color = Color.BLACK
     speed: int = 10
+    maxhp: int = 1
 
     # temp state
     tics: int = 0

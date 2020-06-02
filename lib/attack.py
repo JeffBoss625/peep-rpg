@@ -5,8 +5,8 @@ import lib.projectile as ammolib
 
 def create_projectile(direction, model):
     dx, dy = mlib.direction_to_dxdy(direction)
-    ammolib.ammo_by_name('arrow', x=model.player.x + dx,
-                         y=model.player.y +dy, hp=1, direct=direction)
+    model.peeps.append(ammolib.create_projectile('arrow', x=model.player.x + dx,
+                         y=model.player.y +dy, hp=1, direct=direction))
 
 def parse_dice(dstring):
     parts = dstring.split("d")
@@ -34,6 +34,9 @@ def attack(src, dst, attack_name, out, seed=0):
     dst.hp = dst.hp - tot_hp_loss
     if dst.hp <= 0:
         out.print('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
+    if src_attack.blowback != 0:
+        bb = src_attack.blowback * tot_hp_loss / 100
+        src.hp = src.hp - bb
 
 if __name__ == '__main__':
     print("HERE")

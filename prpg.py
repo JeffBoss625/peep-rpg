@@ -44,6 +44,7 @@ PEEPS = [
 ]
 
 DIRECTION_KEYS = {
+    '.': Direction.CENTER,
     'j': Direction.DOWN,
     'y': Direction.UP_LEFT,
     'k': Direction.UP,
@@ -76,14 +77,18 @@ def player_turn(screen):
             else:
                model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
-            while input_key not in DIRECTION_KEYS:
+            model.message('Where do you want to shoot?')
+            screen.paint()
+            sec_input_key = screen.get_key()
+            while sec_input_key not in DIRECTION_KEYS:
+                sec_input_key = screen.get_key()
+                model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
-                input_key = screen.get_key()
-                if input_key in DIRECTION_KEYS:
-                    direct = DIRECTION_KEYS[input_key]
-                    alib.create_projectile(direct, model)
-                else:
-                    model.message('That is not a valid direction to shoot')
+                screen.paint()
+            direct = DIRECTION_KEYS[sec_input_key]
+            alib.create_projectile(direct, model)
+            model.message('Projectile shot')
+            screen.paint()
 
         else:
             model.message('unknown command: "' + input_key + '"')
@@ -94,7 +99,7 @@ def player_turn(screen):
 
 def monster_turn(model, monster):
     if monster.move_tactic == 'straight':
-        direct = monster.direction
+        direct = monster.direct
         mlib.move_peep(model, monster, direct)
     elif monster.move_tactic == 'seek':
         dx = model.player.x - monster.x
@@ -132,20 +137,25 @@ def main(scr):
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
         peeps = [p for p in model.peeps]
-        turns = mlib.calc_turn_sequence(peeps)
+        turns = mlib.calc_turn_sequence(model.peeps)
 
         for ti, peep_indexes in enumerate(turns):
             for pi, peep_index in enumerate(peep_indexes):
+                # if there are new peeps in the new_peeps list, break out of loop.
+                # When broken out of loop take remaining clicks to go through from the turns variable
+                # Add those remaining turns into a function that adds the new peeps's turns to it
                 peep = peeps[peep_index]
-                if peep == model.player:
+                if peep.hp <= 0:
+                    continue
+                if model.is_player(peep):
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                 else:
                     if monster_turn(model, peep):
                         model.message('YOU DIED')
+                        screen.paint()
                         time.sleep(3)
                         return 0
-
 
                 # update peeps list to living peeps
                 model.peeps = [p for p in model.peeps if p.hp > 0]

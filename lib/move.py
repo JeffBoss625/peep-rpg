@@ -142,11 +142,11 @@ def move_peep(model, p, direct):
 
     dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
     if dst:
-        if p.type == 'player':
+        if model.is_player(p):
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
-        elif dst == model.player:
+        elif model.is_player(p):
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
