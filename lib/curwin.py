@@ -3,6 +3,7 @@
 
 import os
 from dataclasses import dataclass
+from functools import reduce
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
@@ -40,8 +41,9 @@ class Dim:
 
 # Constraint application strategy - dictates how constraints are merged
 class ConApply:
-    ADD = 'add',    # add the applied constraint, as with width constraints added horizontally across
-    MOST = 'most',  # create the most constraining result of the two, as with height constraints of adjacent components
+    STACK = 'stack',       # add the applied constraint, as with width constraints added horizontally across
+    CONTAIN = 'contain',   # create the most constraining result of the two, as with a parent and it's content constraints
+    ADJACENT = 'adjacent', # use the greatest of lower bound and upper bound, as with height constraints of adjacent components
 
 class Orient:
     VERTICAL = 'vertical',
@@ -61,25 +63,34 @@ class Con:
     def invert(self):
         return Con(self.wmin, self.hmin, self.wmax, self.hmax)
 
-    # add the given constraints resulting in most constrained value: greatest minimum and least maximum
-    def apply(self, con, hmerge, wmerge):
-        if hmerge == ConApply.MOST:
-            self.hmin = max(self.hmin, con.hmin)
-            self.hmax = min(self.hmax, con.hmax) if self.hmax and con.hmax else max(self.hmax, con.hmax)
-        elif hmerge == ConApply.ADD:
-            self.hmin += con.hmin
-            self.hmax += con.hmax
-        else:
-            raise RuntimeError(str(hmerge) + ' not handled')
+    def dup(self):
+        return Con(self.hmin, self.wmin, self.hmax, self.wmax)
 
-        if wmerge == ConApply.MOST:
-            self.wmin = max(self.wmin, con.wmin)
-            self.wmax = min(self.wmax, con.wmax) if self.wmax and con.wmax else max(self.wmax, con.wmax)
-        elif wmerge == ConApply.ADD:
-            self.wmin += con.wmin
-            self.wmax = (self.wmax + con.wmax) if self.wmax and con.wmax else 0
+    # add the given constraints resulting in most constrained value: greatest minimum and least maximum
+    def apply(self, con, h_apply, w_apply):
+        if h_apply == ConApply.CONTAIN:
+            self.hmin = max(self.hmin, con.hmin)
+            self.hmax = max(self.hmax, con.hmax) if self.hmax==0 or con.hmax==0 else min(self.hmax, con.hmax)
+        elif h_apply == ConApply.ADJACENT:
+            self.hmin = max(self.hmin, con.hmin)
+            self.hmax = 0 if self.hmax == 0 or con.hmax == 0 else max(self.hmax, con.hmax)
+        elif h_apply == ConApply.STACK:
+            self.hmin += con.hmin
+            self.hmax = 0 if self.hmax == 0 or con.hmax == 0 else self.hmax + con.hmax
         else:
-            raise RuntimeError(str(wmerge) + ' not handled')
+            raise RuntimeError(str(h_apply) + ' not handled')
+
+        if w_apply == ConApply.CONTAIN:
+            self.wmin = max(self.wmin, con.wmin)
+            self.wmax = max(self.wmax, con.wmax) if self.wmax==0 or con.wmax==0 else min(self.wmax, con.wmax)
+        elif w_apply == ConApply.ADJACENT:
+            self.wmin = max(self.wmin, con.wmin)
+            self.wmax = 0 if self.wmax == 0 or con.wmax == 0 else max(self.wmax, con.wmax)
+        elif w_apply == ConApply.STACK:
+            self.wmin += con.wmin
+            self.wmax = 0 if self.wmax == 0 or con.wmax == 0 else self.wmax + con.wmax
+        else:
+            raise RuntimeError(str(w_apply) + ' not handled')
 
 # Base component class.
 #
@@ -259,19 +270,21 @@ class Panel(Comp):
 
     # derive constraints from children and self._panel_con
     def _calc_con(self):
-        ret = Con()
-
         if self.orient == Orient.VERTICAL:
-            hmerge = ConApply.ADD
-            wmerge = ConApply.MOST
+            h_apply = ConApply.STACK
+            w_apply = ConApply.ADJACENT
         else:
-            hmerge = ConApply.MOST
-            wmerge = ConApply.ADD
+            h_apply = ConApply.ADJACENT
+            w_apply = ConApply.STACK
 
-        for c in self.children:
-            ret.apply(c.con(), hmerge, wmerge)
+        if not len(self.children):
+            return self._panel_con
 
-        ret.apply(self._panel_con, ConApply.MOST, ConApply.MOST)
+        ret = self.children[0].con().dup()
+        for c in self.children[1:]:
+            ret.apply(c.con(), h_apply, w_apply)
+
+        ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
     # noinspection PyProtectedMember

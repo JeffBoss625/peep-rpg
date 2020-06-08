@@ -37,6 +37,7 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     cdim = col.dim()
     assert cdim == expdim
 
+
 FLOW_TESTS = [
     # addcol
     # pos,      con           children constraints,            [ expcon,       expdim ]
@@ -48,30 +49,31 @@ FLOW_TESTS = [
 
     # child constraints factor into panel constraints, but not Dim)
     [ None,     Con(2,3),     [Con(2,8,0,0),  Con(3,5,0,0)], [Con(5,8,0,0),   Dim(10,30)] ],
+    [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,0,0),    Dim(10,30)] ],
 
     # child constraints don't affect panel constraints, but panel constraints affect dim
     [ None,     Con(5,10,8,25),  [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,8,25), Dim(8,25)] ],
     [ None,     Con(5,10,8,25),  [Con(2,8,3,0), Con(3,5,7,0)], [Con(5,10,8,25), Dim(8,25)] ],
 
     # child constraints affect panel constraints, and affect Dim
-    [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
-    [ None,     Con(2,3),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
 ]
 
-# def test_row_layout():
-#     for t in FLOW_TESTS:
-#         panpos = t[0].invert() if t[0] else None
-#         pancon = t[1].invert()
-#         children = map(lambda c: c.invert(), t[2])
-#         expcon = t[3][0].invert()
-#         expdim = t[3][1].invert()
-#
-#         yield check_flow_layout, Orient.HORIZONTAL, Dim(30,10), panpos, pancon, children, expcon, expdim
-#
 def test_col_layout():
     for t in FLOW_TESTS:
         yield check_flow_layout, Orient.VERTICAL, Dim(10,30), t[0], t[1], t[2], t[3][0], t[3][1]
+
+# run same tests as test_col_layout() by using inverted input.
+def test_row_layout():
+    for t in FLOW_TESTS:
+        panpos = t[0].invert() if t[0] else None
+        pancon = t[1].invert()
+        children = map(lambda c: c.invert(), t[2])
+        expcon = t[3][0].invert()
+        expdim = t[3][1].invert()
+
+        yield check_flow_layout, Orient.HORIZONTAL, Dim(30,10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, expdim):
     root = mockroot(rootdim)
