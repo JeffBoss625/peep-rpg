@@ -37,6 +37,9 @@ class ConApply:
     ADD = 'add',    # add the applied constraint, as with width constraints added horizontally across
     MOST = 'most',  # create the most constraining result of the two, as with height constraints of adjacent components
 
+class Orient:
+    VERTICAL = 'vertical',
+    HORIZONTAL = 'horizontal'
 
 # Constraint defines Comp(onent) min and max width and height. It us used for calculating
 # Comp(ononet) Dim(ensions) in flow layouts
@@ -169,12 +172,12 @@ class Win(Comp):
         return ret
 
     def addrow(self, pos=None, con=None):
-        ret = Panel(self, pos, con, ConApply.MOST, ConApply.ADD)
+        ret = Panel(self, pos, con, Orient.HORIZONTAL)
         self.children.append(ret)
         return ret
 
     def addcol(self, pos=None, con=None):
-        ret = Panel(self, pos, con, ConApply.ADD, ConApply.MOST)
+        ret = Panel(self, pos, con, Orient.VERTICAL)
         self.children.append(ret)
         return ret
 
@@ -214,10 +217,9 @@ class Win(Comp):
 #
 
 class Panel(Comp):
-    def __init__(self, parent, pos, con, hmerge, wmerge):
+    def __init__(self, parent, pos, con, orient):
         super().__init__(parent, pos, None) # con is always calculated from children
-        self.hmerge = hmerge
-        self.wmerge = wmerge
+        self.orient = orient
         self._panel_con = con if con else Con()   # self.con() will derive from self._panel_con and children
 
     def _calc_dim(self):
@@ -233,14 +235,14 @@ class Panel(Comp):
         return ret
 
     def addrow(self, con=None):
-        ret = Panel(self, None, con, ConApply.MOST, ConApply.ADD)
+        ret = Panel(self, None, con, Orient.HORIZONTAL)
         self.children.append(ret)
         self._con = None
         self._dim = None
         return ret
 
     def addcol(self, con=None):
-        ret = Panel(self, None, con, ConApply.ADD, ConApply.MOST)
+        ret = Panel(self, None, con, Orient.VERTICAL)
         self.children.append(ret)
         self._con = None
         self._dim = None
@@ -249,8 +251,16 @@ class Panel(Comp):
     # derive constraints from children and self._panel_con
     def _calc_con(self):
         ret = Con()
+
+        if self.orient == Orient.VERTICAL:
+            hmerge = ConApply.ADD
+            wmerge = ConApply.MOST
+        else:
+            hmerge = ConApply.MOST
+            wmerge = ConApply.ADD
+
         for c in self.children:
-            ret.apply(c.con(), self.hmerge, self.wmerge)
+            ret.apply(c.con(), hmerge, wmerge)
 
         ret.apply(self._panel_con, ConApply.MOST, ConApply.MOST)
         return ret

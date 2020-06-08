@@ -37,41 +37,44 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     cdim = col.dim()
     assert cdim == expdim
 
+FLOW_TESTS = [
+    # addcol
+    # pos,      con           children constraints,         [ expcon,       expdim ]
+
+    # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
+    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
+    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
+    [ None,     Con(5,20),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
+
+    # child constraints factor into panel constraints, but not Dim)
+    [ None,     Con(2,3),     [Con(2,8,0,0),  Con(3,5,0,0)], [Con(5,8,0,0),   Dim(10,30)] ],
+
+    # child constraints don't affect panel constraints, but panel constraints affect dim
+    [ None,     Con(5,10,8,25),  [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,8,25), Dim(8,25)] ],
+    [ None,     Con(5,10,8,25),  [Con(2,8,3,0), Con(3,5,7,0)], [Con(5,10,8,25), Dim(8,25)] ],
+
+    # child constraints affect panel constraints, and affect Dim
+    [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
+    [ None,     Con(2,3),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
+]
+
+# def test_row_layout():
+#     for t in FLOW_TESTS:
+#         yield check_flow_layout, Dim(30,10), t[0].invert(), t[1].invert(), t[2].invert(), t[3][0].invert(), t[3][1]
 
 def test_col_layout():
-    tests = [
-        # addcol
-        # pos,      con           children constraints,         [ expcon,       expdim ]
+    for t in FLOW_TESTS:
+        yield check_flow_layout, Dim(10,30), t[0], t[1], t[2], t[3][0], t[3][1]
 
-        # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
-        [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
-        [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
-        [ None,     Con(5,20),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
-
-        # child constraints factor into panel constraints, but not Dim)
-        [ None,     Con(2,3),     [Con(2,8,0,0),  Con(3,5,0,0)], [Con(5,8,0,0),   Dim(10,30)] ],
-
-        # child constraints don't affect panel constraints, but panel constraints affect dim
-        [ None,     Con(5,10,8,25),  [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,8,25), Dim(8,25)] ],
-        [ None,     Con(5,10,8,25),  [Con(2,8,3,0), Con(3,5,7,0)], [Con(5,10,8,25), Dim(8,25)] ],
-
-        # child constraints affect panel constraints, and affect Dim
-        [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
-        [ None,     Con(2,3),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
-        [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
-    ]
-
-    for row in tests:
-        root = mockroot(Dim(10,30))
-        yield check_col_layout, root, row[0], row[1], row[2], row[3][0], row[3][1]
-
-def check_col_layout(root, colpos, colcon, children_con, expcon, expdim):
-    col = root.addcol(colpos, colcon)
+def check_flow_layout(rootdim, panpos, pancon, children_con, expcon, expdim):
+    root = mockroot(rootdim)
+    panel = root.addcol(panpos, pancon)
     for cc in children_con:
-        col.addwin(cc)
-    ccon = col.con()
+        panel.addwin(cc)
+    ccon = panel.con()
     assert ccon == expcon
-    cdim = col.dim()
+    cdim = panel.dim()
     assert cdim == expdim
 
 def mockroot(dim):
