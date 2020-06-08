@@ -10,11 +10,17 @@ class Pos:
     y: int = 0
     x: int = 0
 
+    def invert(self):
+        return Pos(self.x, self.y)
+
 # Width and Height of a Comp(onent).
 @dataclass
 class Dim:
     h: int = 0
     w: int = 0
+
+    def invert(self):
+        return Dim(self.w, self.h)
 
     # calculate dimensions of a component from constraints, position and parent dimensions
     def child_dim(self, con, pos):
@@ -52,6 +58,9 @@ class Con:
     hmax: int = 0
     wmax: int = 0
 
+    def invert(self):
+        return Con(self.wmin, self.hmin, self.wmax, self.hmax)
+
     # add the given constraints resulting in most constrained value: greatest minimum and least maximum
     def apply(self, con, hmerge, wmerge):
         if hmerge == ConApply.MOST:
@@ -68,7 +77,7 @@ class Con:
             self.wmax = min(self.wmax, con.wmax) if self.wmax and con.wmax else max(self.wmax, con.wmax)
         elif wmerge == ConApply.ADD:
             self.wmin += con.wmin
-            self.wmax = self.wmax + con.wmax if self.wmax and con.wmax else 0
+            self.wmax = (self.wmax + con.wmax) if self.wmax and con.wmax else 0
         else:
             raise RuntimeError(str(wmerge) + ' not handled')
 

@@ -39,7 +39,7 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
 
 FLOW_TESTS = [
     # addcol
-    # pos,      con           children constraints,         [ expcon,       expdim ]
+    # pos,      con           children constraints,            [ expcon,       expdim ]
 
     # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
     [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
@@ -61,21 +61,27 @@ FLOW_TESTS = [
 
 # def test_row_layout():
 #     for t in FLOW_TESTS:
-#         yield check_flow_layout, Dim(30,10), t[0].invert(), t[1].invert(), t[2].invert(), t[3][0].invert(), t[3][1]
-
+#         panpos = t[0].invert() if t[0] else None
+#         pancon = t[1].invert()
+#         children = map(lambda c: c.invert(), t[2])
+#         expcon = t[3][0].invert()
+#         expdim = t[3][1].invert()
+#
+#         yield check_flow_layout, Orient.HORIZONTAL, Dim(30,10), panpos, pancon, children, expcon, expdim
+#
 def test_col_layout():
     for t in FLOW_TESTS:
-        yield check_flow_layout, Dim(10,30), t[0], t[1], t[2], t[3][0], t[3][1]
+        yield check_flow_layout, Orient.VERTICAL, Dim(10,30), t[0], t[1], t[2], t[3][0], t[3][1]
 
-def check_flow_layout(rootdim, panpos, pancon, children_con, expcon, expdim):
+def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, expdim):
     root = mockroot(rootdim)
-    panel = root.addcol(panpos, pancon)
+    panel = root.addcol(panpos, pancon) if orient == Orient.VERTICAL else root.addrow(panpos, pancon)
     for cc in children_con:
         panel.addwin(cc)
-    ccon = panel.con()
-    assert ccon == expcon
-    cdim = panel.dim()
-    assert cdim == expdim
+    pcon = panel.con()
+    assert pcon == expcon
+    pdim = panel.dim()
+    assert pdim == expdim
 
 def mockroot(dim):
     root = rootwin(None)
