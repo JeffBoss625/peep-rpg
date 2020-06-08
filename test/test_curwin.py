@@ -43,18 +43,22 @@ def test_col_layout():
         # addcol
         # pos,      con           children constraints,         [ expcon,       expdim ]
 
-        # child constraints fall within existing constraints (have no effect)
-        [ None,     Con(5,20),    [Con(0,0,0,0), Con(0,0,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
-        [ None,     Con(5,20),    [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
-        [ None,     Con(5,10),    [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
+        # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
+        [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
+        [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
+        [ None,     Con(5,20),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
 
-        # child constraints do not fit within other constraints, but not Dim)
+        # child constraints factor into panel constraints, but not Dim)
         [ None,     Con(2,3),     [Con(2,8,0,0),  Con(3,5,0,0)], [Con(5,8,0,0),   Dim(10,30)] ],
 
-        # child constraints do not fit within other constraints, and do affect Dim
+        # child constraints don't affect panel constraints, but panel constraints affect dim
+        [ None,     Con(5,10,8,25),  [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,8,25), Dim(8,25)] ],
+        [ None,     Con(5,10,8,25),  [Con(2,8,3,0), Con(3,5,7,0)], [Con(5,10,8,25), Dim(8,25)] ],
+
+        # child constraints affect panel constraints, and affect Dim
+        [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
         [ None,     Con(2,3),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,9,29),  Dim(9,29)] ],
         [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
-
     ]
 
     for row in tests:
