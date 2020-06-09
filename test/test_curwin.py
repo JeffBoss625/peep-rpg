@@ -89,3 +89,74 @@ def mockroot(dim):
     root = rootwin(None)
     root._dim = dim
     return root
+
+class Scr:
+    def __init__(self, parent, pos, dim):
+        self._parent = parent
+        self._pos = pos
+        self._dim = dim
+        self._border = False
+        self.children = []
+        self.buf = [[]]
+
+    def derwin(self, h, w, y, x):
+        ret = Scr(self, Pos(y, x), Dim(h, w))
+        self.children.append(ret)
+        return ret
+
+    def border(self):
+        self._border = True
+
+    def refresh(self):
+        buf = [x[:] for x in [['.'] * self._dim.w] * self._dim.h]
+        self._refresh(0, 0, buf)
+
+    def _render(self, yoff, xoff, buf):
+        dim = self._dim
+        if not dim.h or not dim.w:
+            return
+
+        if self._border:
+            dim = self._dim
+            for x in range(xoff, xoff + dim.w):
+                buf[yoff][x] = '-'
+                buf[yoff + dim.h-1][x] = '-'
+
+            for y in range(yoff + 1, yoff + dim.h-1):
+                buf[y][xoff] = '|'
+                buf[y][xoff + dim.w-1] = '|'
+        self.buf = buf
+
+    def _refresh(self, yoff, xoff, buf):
+        pos = self._pos
+        self._render(yoff + pos.y, xoff + pos.x, buf)
+        for c in self.children:
+            c._refresh(yoff + pos.y, xoff + pos.x, buf)
+
+    def buflines(self):
+        ret = []
+        for line in self.buf:
+            ret.append(''.join(line))
+        return ret
+
+def test_paint():
+    dim = Dim(8,40)
+    scr = Scr(None, Pos(), dim)
+    root = rootwin(scr)
+    root._dim = dim
+    row = root.addrow()
+    c1 = row.addcol()
+    c2 = row.addcol()
+    r1 = row.addrow()
+
+    c1.addwin(Con(4,4,5,5))
+    c1.addwin(Con(8,8))
+    # c2.addwin(Con(4,3))
+    # c2.addwin(Con(2,2,5,8))
+    # r1.addwin(Con(3,3,4,4))
+
+    root.paint()
+    scr.refresh()
+
+    for line in scr.buflines():
+        print(line)

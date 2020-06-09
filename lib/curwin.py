@@ -55,10 +55,11 @@ class Orient:
 # zero indicates no constraint (min or max)
 @dataclass
 class Con:
-    hmin: int = 0
-    wmin: int = 0
-    hmax: int = 0
-    wmax: int = 0
+    def __init__(self, hmin=0, wmin=0, hmax=0, wmax=0):
+        self.hmin = hmin
+        self.wmin = wmin
+        self.hmax = hmin if hmax and hmax < hmin else hmax  # hmax >= hmin
+        self.wmax = wmin if wmax and wmax < wmin else wmax  # wmax >= wmin
 
     def invert(self):
         return Con(self.wmin, self.hmin, self.wmax, self.hmax)
@@ -132,8 +133,8 @@ class Comp:
 
     # return first parent that is a Win instance, or None, if this component has no parent window
     def parent_win(self):
-        ret = self
-        while ret.parent is not None and not isinstance(ret.parent, Win):
+        ret = self.parent
+        while ret and not isinstance(ret, Win):
             ret = ret.parent
         return ret
 
@@ -177,7 +178,8 @@ class Comp:
         pass
 
     def _paint(self):
-        pass
+        for c in self.children:
+            c._paint()
 
 
 class Win(Comp):
@@ -203,13 +205,11 @@ class Win(Comp):
 
     def _paint(self):
         if not self._scr:
-            h, w = self.dim()
-            y, x = self.pos()
-            win = self.parent_win().scr.derwin(h, w, y, x)
-            win.border()
-            self._scr = win
-        return self._scr
-
+            dim = self.dim()
+            pos = self.pos()
+            self._scr = self.parent_win()._scr.derwin(dim.h, dim.w, pos.y, pos.x)
+            self._scr.border()
+        super()._paint()
 
 # A row adds constraints horizontally and merges vertical constraints, for example:
 #
