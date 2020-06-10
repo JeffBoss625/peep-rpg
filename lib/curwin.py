@@ -2,8 +2,7 @@
 # layout resizing windows in terminal output.
 
 import os
-from dataclasses import dataclass, field
-from functools import reduce
+from dataclasses import dataclass
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
