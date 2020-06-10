@@ -11,6 +11,11 @@ class Pos:
     y: int = 0
     x: int = 0
 
+    def yx(self, orient):
+        if orient == Orient.HORIZONTAL: return self.x
+        if orient == Orient.VERTICAL: return self.y
+        raise ValueError("unknown orientation: " + orient)
+
     def invert(self):
         return Pos(self.x, self.y)
 
@@ -22,6 +27,11 @@ class Dim:
 
     def invert(self):
         return Dim(self.w, self.h)
+
+    def hw(self, orient):
+        if orient == Orient.HORIZONTAL: return self.w
+        if orient == Orient.VERTICAL: return self.h
+        raise ValueError("unknown orientation: " + orient)
 
     # calculate dimensions of a component from constraints, position and parent dimensions
     def child_dim(self, con, pos):
@@ -53,7 +63,7 @@ class Orient:
 # Comp(ononet) Dim(ensions) in flow layouts
 #
 # zero indicates no constraint (min or max)
-@dataclass(repr=True)
+@dataclass
 class Con:
     hmin: int = 0
     wmin: int = 0
@@ -65,6 +75,16 @@ class Con:
             self.hmax = self.hmin
         if self.wmax and self.wmax < self.wmin:
             self.wmax = self.wmin
+
+    def hwmin(self, orient):
+        if orient == Orient.HORIZONTAL: return self.wmin
+        if orient == Orient.VERTICAL: return self.hmin
+        raise ValueError("unknown orientation: " + orient)
+
+    def hwmax(self, orient):
+        if orient == Orient.HORIZONTAL: return self.wmax
+        if orient == Orient.VERTICAL: return self.hmax
+        raise ValueError("unknown orientation: " + orient)
 
     def invert(self):
         return Con(self.wmin, self.hmin, self.wmax, self.hmax)
@@ -193,17 +213,17 @@ class Win(Comp):
         super().__init__(parent, pos, con)
         self._scr = scr
 
-    def addwin(self, pos=None, con=None):
+    def addwin(self, con=None, pos=None):
         ret = Win(self, pos, con)
         self.children.append(ret)
         return ret
 
-    def addrow(self, pos=None, con=None):
+    def addrow(self, con=None, pos=None):
         ret = Panel(self, pos, con, Orient.HORIZONTAL)
         self.children.append(ret)
         return ret
 
-    def addcol(self, pos=None, con=None):
+    def addcol(self, con=None, pos=None):
         ret = Panel(self, pos, con, Orient.VERTICAL)
         self.children.append(ret)
         return ret
@@ -254,37 +274,43 @@ class Panel(Comp):
             return dim
 
         ccon = self._children_con()
+        orient = self.orient
 
-        if self.orient == Orient.HORIZONTAL:
-            space = dim.w - ccon.wmin                # extra space (negative means overage to shrink)
-            if space == 0:
-                pass
+        space = dim.hw(orient) - ccon.hwmin(orient)           # extra space (negative means overage to shrink)
+        if space == 0:
+            return dim
+
+        pos = self.pos()
+        yxoffset = pos.yx(orient)
+        children = self.children
+        nchildren = len(children)
+        for ci in range(nchildren):
+            child = children[ci]
+            ccon = child.con()
+            csize = ccon.hwmin(orient)
+            c_hwmax = ccon.hwmax(orient)
+            adj = int(space/(nchildren-ci))     # adj is positive to expand, negative to shrink
+            if csize + adj < 0:
+                adj = csize
+                csize = 0
+            elif c_hwmax and csize + adj > c_hwmax:
+                adj = c_hwmax - csize
+                csize = c_hwmax
             else:
-                pos = self.pos()
-                xpos = pos.x
-                children = self.children
-                nchildren = len(children)
-                for ci in range(nchildren):
-                    child = children[ci]
-                    ccon = child.con()
-                    csize = ccon.wmin
-                    adj = int(space/(nchildren-ci))     # adj is positive to expand, negative to shrink
-                    if csize + adj < 0:
-                        adj = csize
-                        csize = 0
-                    elif ccon.wmax and csize + adj > ccon.wmax:
-                        adj = ccon.wmax - csize
-                        csize = ccon.wmax
-                    else:
-                        csize += adj
+                csize += adj
 
-                    space -= adj
+            space -= adj
 
-                    child._pos = Pos(pos.y, xpos)
-                    child._dim = Dim(dim.h, csize)
-                    xpos += csize
-        else:
-            raise RuntimeError('VERTICAL not implemented')
+            if orient == Orient.HORIZONTAL:
+                child._pos = Pos(pos.y, yxoffset)
+                child._dim = Dim(dim.h, csize)
+            elif orient == Orient.VERTICAL:
+                child._pos = Pos(yxoffset, pos.x)
+                child._dim = Dim(csize, dim.w)
+            else:
+                raise ValueError("unknown orientation: " + orient)
+
+            yxoffset += csize
 
         return dim
 
@@ -314,9 +340,11 @@ class Panel(Comp):
             if self.orient == Orient.VERTICAL:
                 h_apply = ConApply.STACK
                 w_apply = ConApply.ADJACENT
-            else:
+            elif self.orient == Orient.HORIZONTAL:
                 h_apply = ConApply.ADJACENT
                 w_apply = ConApply.STACK
+            else:
+                raise ValueError("unknown orientation: " + self.orient)
 
             if len(self.children):
                 ccon = self.children[0].con().dup()

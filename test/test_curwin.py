@@ -108,7 +108,7 @@ class Scr:
         self._border = True
 
     def refresh(self):
-        buf = [x[:] for x in [['.'] * self._dim.w] * self._dim.h]
+        buf = [x[:] for x in [['.'] * self._dim.w] * (self._dim.h)]
         self._refresh(0, 0, buf)
 
     def _render(self, yoff, xoff, buf):
@@ -140,14 +140,22 @@ class Scr:
         return ret
 
 def test_paint():
-    dim = Dim(8,40)
+    dim = Dim(12,40)
     scr = Scr(None, Pos(), dim)
     root = rootwin(scr)
     root._dim = dim
     mainrow = root.addrow()
+    mainrow.addwin(Con(6,4,5,5))
+    mainrow.addwin(Con(4,4,6,5))
+    mainrow.addwin(Con())
 
-    mainrow.addwin(Con(4,4,5,5))
-    mainrow.addwin(Con(8,8))
+    # c1 = root.addcol()
+    # c1.addwin(Con(3,8,5,0))
+    # w2 = c1.addwin(Con(3,12,6,0))
+    # r1 = w2.addrow()
+    # r1.addwin(Con(5,5,5,5))
+    # r1.addwin(Con(3,3,3,3))
+
 
     root.paint()
     scr.refresh()
