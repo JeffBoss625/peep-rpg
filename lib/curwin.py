@@ -59,6 +59,12 @@ class Orient:
     VERTICAL = 'vertical',
     HORIZONTAL = 'horizontal'
 
+    @staticmethod
+    def invert(orient):
+        if orient == Orient.HORIZONTAL: return Orient.VERTICAL
+        if orient == Orient.VERTICAL: return Orient.HORIZONTAL
+        raise ValueError("unknown orientation: " + orient)
+
 # Constraint defines Comp(onent) min and max width and height. It us used for calculating
 # Comp(ononet) Dim(ensions) in flow layouts
 #
@@ -231,6 +237,7 @@ class Win(Comp):
     def _paint(self):
         if not self._scr:
             dim = self.dim()
+            print('paint', dim)
             pos = self.pos()
             self._scr = self.parent_win()._scr.derwin(dim.h, dim.w, pos.y, pos.x)
             self._scr.border()
@@ -301,14 +308,22 @@ class Panel(Comp):
 
             space -= adj
 
+            orient2 = Orient.invert(orient)
+            cmax2 = ccon.hwmax(orient2)
+            csize2 = dim.hw(orient2)
+            if cmax2 and cmax2 < csize2:
+                csize2 = cmax2
+
             if orient == Orient.HORIZONTAL:
                 child._pos = Pos(pos.y, yxoffset)
-                child._dim = Dim(dim.h, csize)
+                child._dim = Dim(csize2, csize)
             elif orient == Orient.VERTICAL:
                 child._pos = Pos(yxoffset, pos.x)
-                child._dim = Dim(csize, dim.w)
+                child._dim = Dim(csize, csize2)
             else:
                 raise ValueError("unknown orientation: " + orient)
+
+            print(child._pos, child._dim)
 
             yxoffset += csize
 

@@ -113,11 +113,11 @@ class Scr:
 
     def _render(self, yoff, xoff, buf):
         dim = self._dim
+        print('render', dim)
         if not dim.h or not dim.w:
             return
 
         if self._border:
-            dim = self._dim
             for x in range(xoff, xoff + dim.w):
                 buf[yoff][x] = '-'
                 buf[yoff + dim.h-1][x] = '-'
@@ -145,7 +145,7 @@ def test_paint():
     root = rootwin(scr)
     root._dim = dim
     mainrow = root.addrow()
-    mainrow.addwin(Con(6,4,5,5))
+    mainrow.addwin(Con(8,4,8))
     mainrow.addwin(Con(4,4,6,5))
     mainrow.addwin(Con())
 
