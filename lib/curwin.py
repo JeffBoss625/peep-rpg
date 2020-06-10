@@ -2,7 +2,7 @@
 # layout resizing windows in terminal output.
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import reduce
 
 # Size and location of a Comp(ononent) in it's parent window.
@@ -53,13 +53,18 @@ class Orient:
 # Comp(ononet) Dim(ensions) in flow layouts
 #
 # zero indicates no constraint (min or max)
-@dataclass
+@dataclass(repr=True)
 class Con:
-    def __init__(self, hmin=0, wmin=0, hmax=0, wmax=0):
-        self.hmin = hmin
-        self.wmin = wmin
-        self.hmax = hmin if hmax and hmax < hmin else hmax  # hmax >= hmin
-        self.wmax = wmin if wmax and wmax < wmin else wmax  # wmax >= wmin
+    hmin: int = 0
+    wmin: int = 0
+    hmax: int = 0
+    wmax: int = 0
+
+    def __post_init__(self):
+        if self.hmax and self.hmax < self.hmin:
+            self.hmax = self.hmin
+        if self.wmax and self.wmax < self.wmin:
+            self.wmax = self.wmin
 
     def invert(self):
         return Con(self.wmin, self.hmin, self.wmax, self.hmax)
@@ -241,11 +246,47 @@ class Panel(Comp):
         super().__init__(parent, pos, None) # con is always calculated from children
         self.orient = orient
         self._panel_con = con if con else Con()   # self.con() will derive from self._panel_con and children
+        self._childcon = None                 # collective constraints of child contents (lined up)
 
     def _calc_dim(self):
-        ret = super()._calc_dim()
+        dim = super()._calc_dim()
+        if not self.children:
+            return dim
 
-        return ret
+        ccon = self._children_con()
+
+        if self.orient == Orient.HORIZONTAL:
+            space = dim.w - ccon.wmin                # extra space (negative means overage to shrink)
+            if space == 0:
+                pass
+            else:
+                pos = self.pos()
+                xpos = pos.x
+                children = self.children
+                nchildren = len(children)
+                for ci in range(nchildren):
+                    child = children[ci]
+                    ccon = child.con()
+                    csize = ccon.wmin
+                    adj = int(space/(nchildren-ci))     # adj is positive to expand, negative to shrink
+                    if csize + adj < 0:
+                        adj = csize
+                        csize = 0
+                    elif ccon.wmax and csize + adj > ccon.wmax:
+                        adj = ccon.wmax - csize
+                        csize = ccon.wmax
+                    else:
+                        csize += adj
+
+                    space -= adj
+
+                    child._pos = Pos(pos.y, xpos)
+                    child._dim = Dim(dim.h, csize)
+                    xpos += csize
+        else:
+            raise RuntimeError('VERTICAL not implemented')
+
+        return dim
 
     def addwin(self, con=None):
         ret = Win(self, None, con)
@@ -268,22 +309,28 @@ class Panel(Comp):
         self._dim = None
         return ret
 
+    def _children_con(self):
+        if not self._childcon:
+            if self.orient == Orient.VERTICAL:
+                h_apply = ConApply.STACK
+                w_apply = ConApply.ADJACENT
+            else:
+                h_apply = ConApply.ADJACENT
+                w_apply = ConApply.STACK
+
+            if len(self.children):
+                ccon = self.children[0].con().dup()
+                for c in self.children[1:]:
+                    ccon.apply(c.con(), h_apply, w_apply)
+                self._childcon = ccon
+            else:
+                self._childcon = Con()
+
+        return self._childcon
+
     # derive constraints from children and self._panel_con
     def _calc_con(self):
-        if self.orient == Orient.VERTICAL:
-            h_apply = ConApply.STACK
-            w_apply = ConApply.ADJACENT
-        else:
-            h_apply = ConApply.ADJACENT
-            w_apply = ConApply.STACK
-
-        if not len(self.children):
-            return self._panel_con
-
-        ret = self.children[0].con().dup()
-        for c in self.children[1:]:
-            ret.apply(c.con(), h_apply, w_apply)
-
+        ret = self._children_con().dup()
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 

@@ -144,16 +144,10 @@ def test_paint():
     scr = Scr(None, Pos(), dim)
     root = rootwin(scr)
     root._dim = dim
-    row = root.addrow()
-    c1 = row.addcol()
-    c2 = row.addcol()
-    r1 = row.addrow()
+    mainrow = root.addrow()
 
-    c1.addwin(Con(4,4,5,5))
-    c1.addwin(Con(8,8))
-    # c2.addwin(Con(4,3))
-    # c2.addwin(Con(2,2,5,8))
-    # r1.addwin(Con(3,3,4,4))
+    mainrow.addwin(Con(4,4,5,5))
+    mainrow.addwin(Con(8,8))
 
     root.paint()
     scr.refresh()
