@@ -1,4 +1,5 @@
 from lib.curwin import *
+from lib.printd import printd
 
 def test_con():
     assert Con(4, 7) != Con()
@@ -99,25 +100,42 @@ class Scr:
         self.children = []
         self.buf = [[]]
 
+    def __repr__(self):
+        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self._pos, self._dim, self._border)
+
     def derwin(self, h, w, y, x):
         ret = Scr(self, Pos(y, x), Dim(h, w))
         self.children.append(ret)
         return ret
 
+    def pos(self):
+        if not self._pos:
+            self._pos = Pos(0,0)
+
+        return self._pos
+
+    def dim(self):
+        return self._dim
+
     def border(self):
         self._border = True
 
     def refresh(self):
-        buf = [x[:] for x in [['.'] * self._dim.w] * (self._dim.h)]
-        self._refresh(0, 0, buf)
+        self.buf = [x[:] for x in [['.'] * self._dim.w] * (self._dim.h)]
+        self._render(0, 0, self)
 
-    def _render(self, yoff, xoff, buf):
-        dim = self._dim
-        print('render', dim)
+    def _render(self, yoff, xoff, comp):
+        printd('Scr._render off[{},{}], {}'.format(yoff, xoff, comp))
+        buf = self.buf
+        dim = comp.dim()
         if not dim.h or not dim.w:
+            printd('no size: [{}]'.format(dim))
             return
 
-        if self._border:
+        pos = comp.pos()
+        yoff += pos.y
+        xoff += pos.x
+        if comp._border:
             for x in range(xoff, xoff + dim.w):
                 buf[yoff][x] = '-'
                 buf[yoff + dim.h-1][x] = '-'
@@ -125,13 +143,9 @@ class Scr:
             for y in range(yoff + 1, yoff + dim.h-1):
                 buf[y][xoff] = '|'
                 buf[y][xoff + dim.w-1] = '|'
-        self.buf = buf
 
-    def _refresh(self, yoff, xoff, buf):
-        pos = self._pos
-        self._render(yoff + pos.y, xoff + pos.x, buf)
-        for c in self.children:
-            c._refresh(yoff + pos.y, xoff + pos.x, buf)
+        for c in comp.children:
+            self._render(yoff, xoff, c)
 
     def buflines(self):
         ret = []

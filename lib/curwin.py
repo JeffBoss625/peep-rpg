@@ -2,6 +2,7 @@
 # layout resizing windows in terminal output.
 
 import os
+from lib.printd import printd
 from dataclasses import dataclass
 
 # Size and location of a Comp(ononent) in it's parent window.
@@ -9,6 +10,9 @@ from dataclasses import dataclass
 class Pos:
     y: int = 0
     x: int = 0
+
+    def __repr__(self):
+        return '{},{}'.format(self.y, self.x)
 
     def yx(self, orient):
         if orient == Orient.HORIZONTAL: return self.x
@@ -24,6 +28,9 @@ class Dim:
     h: int = 0
     w: int = 0
 
+    def __repr__(self):
+        return '{},{}'.format(self.h, self.w)
+
     def invert(self):
         return Dim(self.w, self.h)
 
@@ -34,6 +41,7 @@ class Dim:
 
     # calculate dimensions of a component from constraints, position and parent dimensions
     def child_dim(self, con, pos):
+        printd('Dim.child_dim(self[{}],con[{}],pos[{}])'.format(self, con, pos))
         pdim = self
         if con.hmax == 0 or con.hmin > pdim.h - pos.y:
             reth = pdim.h - pos.x
@@ -45,7 +53,9 @@ class Dim:
         else:
             retw = min(con.wmax, pdim.w - pos.x)
 
-        return Dim(reth, retw)
+        ret = Dim(reth, retw)
+        printd('...Dim.child_dim() return', ret)
+        return ret
 
 
 # Constraint application strategy - dictates how constraints are merged
@@ -80,6 +90,9 @@ class Con:
             self.hmax = self.hmin
         if self.wmax and self.wmax < self.wmin:
             self.wmax = self.wmin
+
+    def __repr__(self):
+        return '{},{},{},{}'.format(self.hmin, self.wmin, self.hmax, self.wmax)
 
     def hwmin(self, orient):
         if orient == Orient.HORIZONTAL: return self.wmin
@@ -138,6 +151,11 @@ class Comp:
         self._dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
         self.children = []  # child Comp(onents) painted after parent
 
+    def __repr__(self, **kwargs):
+        chlen = ',#' + str(len(self.children)) if self.children else ''
+
+        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self._dim, self._con, chlen)
+
     # Panels manage their children pos(ition) as well as their own
     def pos(self):
         if not self._pos:
@@ -146,6 +164,7 @@ class Comp:
 
     # Panels manage their children dim(ension) as well as their own
     def dim(self):
+        printd('Comp.dim({})'.format(self))
         if not self._dim:
             self._dim = self._calc_dim()
         return self._dim
@@ -183,9 +202,14 @@ class Comp:
     def _calc_pos(self):
         return Pos()
 
+    def _paint(self):
+        printd('Comp._paint({})'.format(self))
+        for c in self.children:
+            c._paint()
+
     # by default, derive dim from parent size, constraints and position.
     #
-    #      | <-   parent.w  --> |
+    #      | <-   parent.w   -> |
     #                           |
     #      | <-   dim.w  ->  |  |
     #      +-----------------+--+ ---    ---
@@ -201,22 +225,27 @@ class Comp:
     #      |                    |         v
     #      +--------------------+        --- 
     def _calc_dim(self):
-        return self.parent.dim().child_dim(self.con(), self.pos())
+        printd('Comp._calc_dim({})'.format(self))
+        pdim = self.parent.dim()
+        if self._dim:
+            # dim was parent-generated
+            return self._dim
+
+        return pdim.child_dim(self.con(), self.pos())
 
     # components that manage layout of children will implement this method to know when recalculation is needed
     def _child_added(self, comp):
         pass
-
-    def _paint(self):
-        for c in self.children:
-            c._paint()
-
 
 class Win(Comp):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, pos, con, scr=None):
         super().__init__(parent, pos, con)
         self._scr = scr
+
+    def __repr__(self):
+        scr = 'scr' if self._scr else 'x'
+        return 'Win[{}]->{}'.format(scr, super().__repr__())
 
     def addwin(self, con=None, pos=None):
         ret = Win(self, pos, con)
@@ -234,13 +263,16 @@ class Win(Comp):
         return ret
 
     def _paint(self):
+        printd('Win._paint({})'.format(self))
         if not self._scr:
             dim = self.dim()
-            print('paint', dim)
+            printd('...Win._paint() no scr', dim)
             pos = self.pos()
             self._scr = self.parent_win()._scr.derwin(dim.h, dim.w, pos.y, pos.x)
             self._scr.border()
-        super()._paint()
+
+        for c in self.children:
+            c._paint()
 
 # A row adds constraints horizontally and merges vertical constraints, for example:
 #
@@ -272,14 +304,18 @@ class Panel(Comp):
         super().__init__(parent, pos, None) # con is always calculated from children
         self.orient = orient
         self._panel_con = con if con else Con()   # self.con() will derive from self._panel_con and children
-        self._childcon = None                 # collective constraints of child contents (lined up)
+
+    def __repr__(self):
+        orient = 'VER' if self.orient == Orient.VERTICAL else 'HOR'
+        return 'Panel[{},pcon[{}]->{}'.format(orient, self._panel_con, super().__repr__())
 
     def _calc_dim(self):
+        printd('Panel._calc_dim({})'.format(self))
         dim = super()._calc_dim()
         if not self.children:
             return dim
 
-        ccon = self._children_con()
+        ccon = self.con()
         orient = self.orient
 
         space = dim.hw(orient) - ccon.hwmin(orient)           # extra space (negative means overage to shrink)
@@ -322,7 +358,7 @@ class Panel(Comp):
             else:
                 raise ValueError("unknown orientation: " + orient)
 
-            print(child._pos, child._dim)
+            printd('...Panel._calc_dim() child[{}]: pos[{}], dim[{}]'.format(ci, child._pos, child._dim))
 
             yxoffset += csize
 
@@ -349,41 +385,34 @@ class Panel(Comp):
         self._dim = None
         return ret
 
-    def _children_con(self):
-        if not self._childcon:
-            if self.orient == Orient.VERTICAL:
-                h_apply = ConApply.STACK
-                w_apply = ConApply.ADJACENT
-            elif self.orient == Orient.HORIZONTAL:
-                h_apply = ConApply.ADJACENT
-                w_apply = ConApply.STACK
-            else:
-                raise ValueError("unknown orientation: " + self.orient)
-
-            if len(self.children):
-                ccon = self.children[0].con().dup()
-                for c in self.children[1:]:
-                    ccon.apply(c.con(), h_apply, w_apply)
-                self._childcon = ccon
-            else:
-                self._childcon = Con()
-
-        return self._childcon
-
     # derive constraints from children and self._panel_con
     def _calc_con(self):
-        ret = self._children_con().dup()
+        if self.orient == Orient.VERTICAL:
+            h_apply = ConApply.STACK
+            w_apply = ConApply.ADJACENT
+        elif self.orient == Orient.HORIZONTAL:
+            h_apply = ConApply.ADJACENT
+            w_apply = ConApply.STACK
+        else:
+            raise ValueError("unknown orientation: " + self.orient)
+
+        if len(self.children):
+            ret = self.children[0].con().dup()
+            for c in self.children[1:]:
+                ret.apply(c.con(), h_apply, w_apply)
+        else:
+            ret = Con()
+
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
-    # noinspection PyProtectedMember
-    def _paint(self):
-        for c in self.children:
-            c._paint()
-
 class RootWin(Win):
+
     def __init__(self, scr):
         super().__init__(None, None, None, scr)
+
+    def __repr__(self):
+        return 'Root->{}'.format(super().__repr__())
 
     # @override the default which uses parent.dim()
     #
