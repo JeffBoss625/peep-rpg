@@ -1,6 +1,6 @@
 # Demonstrate simple cursor drawing and movement (h,j,k,l)
 import lib.move as mlib
-import curses as curselib
+import curses as curses
 import lib.attack as alib
 from lib.move import Direction
 from lib.monsters import monster_by_name
@@ -127,7 +127,7 @@ def monster_turn(model, monster):
             rotation += 1
 
 def main(scr):
-    curselib.raw()
+    curses.raw()
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = Screen(scr, model)
 
@@ -175,4 +175,4 @@ def main(scr):
 #               DRAW SCREEN CONTENTS
 
 
-curselib.wrapper(main)
+curses.wrapper(main)
