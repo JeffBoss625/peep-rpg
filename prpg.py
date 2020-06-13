@@ -110,7 +110,6 @@ def monster_turn(model, monster):
             direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
         else:
             direct = mlib.direction_from_vector(dx, dy)
-
         if mlib.move_peep(model, monster, direct):
             return
 

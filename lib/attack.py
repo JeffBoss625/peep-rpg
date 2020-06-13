@@ -19,24 +19,39 @@ def choose_melee_attack(src):
     keys = iter(src.attacks.keys())
     return next(keys)
 
+def calc_hit(ac, thaco, seed = 0):
+    if seed > 0:
+        random.seed(seed)
+    chance = thaco - ac
+    die_roll = random.randint(1, 20)
+    # print('chance: ', chance, 'die_roll: ', die_roll)
+    if die_roll >= chance:
+        return True
+    else:
+        return False
+
 def attack(src, dst, attack_name, out, seed=0):
     if seed > 0:
         random.seed(seed)
     out.print(src.name + " attacks with " + attack_name + "!")
+    hit = (calc_hit(dst.ac, src.thaco))
+    if hit:
+        src_attack = src.attacks[attack_name]
+        if not src_attack: raise ReferenceError(src.name + ' has no attack called' + attack_name)
+        dice_info = parse_dice(src_attack.damage)
+        tot_hp_loss = 0
+        for i in range(1, dice_info['num_dice'] + 1):
+            hp_loss = random.randint(1, dice_info['num_sides'])
+            tot_hp_loss += hp_loss
+        dst.hp = dst.hp - tot_hp_loss
+        if dst.hp <= 0:
+            out.print('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
+        if src_attack.blowback != 0:
+            bb = src_attack.blowback * tot_hp_loss / 100
+            src.hp = src.hp - bb
+    else:
+        out.print('The ', src.name, 'missed the ', dst.name)
 
-    src_attack = src.attacks[attack_name]
-    if not src_attack: raise ReferenceError(src.name + ' has no attack called' + attack_name)
-    dice_info = parse_dice(src_attack.damage)
-    tot_hp_loss = 0
-    for i in range(1, dice_info['num_dice'] + 1):
-        hp_loss = random.randint(1, dice_info['num_sides'])
-        tot_hp_loss += hp_loss
-    dst.hp = dst.hp - tot_hp_loss
-    if dst.hp <= 0:
-        out.print('the ' + dst.name + ' has died to the ' + src.name + "'s " + attack_name + '!')
-    if src_attack.blowback != 0:
-        bb = src_attack.blowback * tot_hp_loss / 100
-        src.hp = src.hp - bb
 
 if __name__ == '__main__':
     print("HERE")

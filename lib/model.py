@@ -15,7 +15,9 @@ class Ammo:
     char: str = '?'
     fgcolor: Color = Color.WHITE
     bgcolor: Color = Color.BLACK
-    speed: int = 10
+    thaco: int = 20
+    speed: int = 100
+    ac: int = 20
     maxhp: int = 1
 
     # temp state
