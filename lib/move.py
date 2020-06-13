@@ -1,5 +1,6 @@
 from lib.model import Peep
 import lib.attack as attacklib
+import lib.model as modellib
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of
 #   { number-of-moves: monster-list (indexes) }
@@ -136,20 +137,30 @@ def direction_relative(direct, rotation):
 # failed (hit a wall)
 def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
-    if maze_at_xy(model.maze, p.x + dx, p.y + dy):
-        # hit wall
-        return False
-
     dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
+    if maze_at_xy(model.maze, p.x + dx, p.y + dy):
+        if model.is_player(p) or isinstance(p, modellib.Ammo):
+            dst = maze_at_xy(model.maze, p.x + dx, p.y + dy)
+            weapon = attacklib.choose_melee_attack(p)
+            attacklib.attack(p, dst, weapon, model)
+            return True
+        else:
+            return False
+
+
+
     if dst:
         if model.is_player(p):
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
-        elif model.is_player(p):
+        elif isinstance(p, modellib.Ammo):
             weapon = attacklib.choose_melee_attack(p)
-            attacklib.attack(p, dst, weapon, model)
-            return True
+            if attacklib.attack(p, dst, weapon, model):
+                return True
+            else:
+                p.x = p.x + dx
+                p.y = p.y + dy
         else:
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
@@ -171,8 +182,10 @@ def peep_at_xy(peeps, x, y):
 def maze_at_xy(maze, x, y):
     line = maze[y]
     char = line[x]
-    if char == '#' or char == '%':
-        return Peep(name='Wally', type='wall', char=char, x=x, y=y)
+    if char == '#':
+        return Peep(name='Wally', type='wall', hp= 1000, ac= 20, char=char, x=x, y=y)
+    elif char == '%':
+        return Peep(name='Wally', type='wall', hp= 999999999999, ac=20, char=char, x=x, y=y)
     else:
         return None
 
