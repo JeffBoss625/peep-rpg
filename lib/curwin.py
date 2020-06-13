@@ -319,9 +319,6 @@ class Panel(Comp):
         orient = self.orient
 
         space = dim.hw(orient) - ccon.hwmin(orient)           # extra space (negative means overage to shrink)
-        if space == 0:
-            return dim
-
         pos = self.pos()
         yxoffset = pos.yx(orient)
         children = self.children
