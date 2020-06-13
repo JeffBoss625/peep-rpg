@@ -1,5 +1,6 @@
 from lib.curwin import *
 from lib.printd import printd
+import curses
 
 def test_con():
     assert Con(4, 7) != Con()
@@ -180,3 +181,4 @@ def test_paint():
 
     for line in scr.buflines():
         print(line)
+

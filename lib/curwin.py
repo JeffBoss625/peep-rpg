@@ -262,15 +262,18 @@ class Win(Comp):
         self.children.append(ret)
         return ret
 
-    def _paint(self):
-        printd('Win._paint({})'.format(self))
+    def scr(self):
         if not self._scr:
             dim = self.dim()
             printd('...Win._paint() no scr', dim)
             pos = self.pos()
             self._scr = self.parent_win()._scr.derwin(dim.h, dim.w, pos.y, pos.x)
-            self._scr.border()
 
+        return self._scr
+
+    def _paint(self):
+        printd('Win._paint({})'.format(self))
+        self.scr()
         for c in self.children:
             c._paint()
 
