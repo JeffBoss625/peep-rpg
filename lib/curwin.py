@@ -159,7 +159,7 @@ class Comp:
     # Panels manage their children pos(ition) as well as their own
     def pos(self):
         if not self._pos:
-            self.parent._layout_children()
+            self.parent.layout_children()
 
         return self._pos
 
@@ -201,7 +201,7 @@ class Comp:
 
     # managed by parent container or defaults to 0,0
     def _calc_pos(self):
-        self.parent._layout_children()
+        self.parent.layout_children()
 
     def _paint(self):
         printd('Comp._paint({})'.format(self))
@@ -227,8 +227,8 @@ class Comp:
     #      +--------------------+        --- 
     def _calc_dim(self):
         printd('Comp._calc_dim({})'.format(self))
-        if hasattr(self.parent, '_layout_children'):
-            self.parent._layout_children()
+        if hasattr(self.parent, 'layout_children'):
+            self.parent.layout_children()
             return self._dim
 
         pdim = self.parent.dim()
@@ -317,7 +317,7 @@ class Panel(Comp):
         printd('Panel._calc_dim({})'.format(self))
         return super()._calc_dim()
 
-    def _layout_children(self):
+    def layout_children(self):
         printd('Panel._layout_children({})'.format(self))
         dim = self.dim()
 
