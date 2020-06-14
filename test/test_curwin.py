@@ -64,7 +64,7 @@ FLOW_TESTS = [
 
 def test_col_layout():
     for t in FLOW_TESTS:
-        yield check_flow_layout, Orient.VERTICAL, Dim(10,30), t[0], t[1], t[2], t[3][0], t[3][1]
+        yield check_flow_layout, Orient.VERT, Dim(10, 30), t[0], t[1], t[2], t[3][0], t[3][1]
 
 # run same tests as test_col_layout() by using inverted input.
 def test_row_layout():
@@ -75,11 +75,11 @@ def test_row_layout():
         expcon = t[3][0].invert()
         expdim = t[3][1].invert()
 
-        yield check_flow_layout, Orient.HORIZONTAL, Dim(30,10), panpos, pancon, children, expcon, expdim
+        yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, expdim):
     root = mockroot(rootdim)
-    panel = root.addcol(panpos, pancon) if orient == Orient.VERTICAL else root.addrow(panpos, pancon)
+    panel = root.addcol(panpos, pancon) if orient == Orient.VERT else root.addrow(panpos, pancon)
     for cc in children_con:
         panel.addwin(cc)
     pcon = panel.con()
