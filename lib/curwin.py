@@ -2,6 +2,7 @@
 # layout resizing windows in terminal output.
 
 import os
+import curses
 from lib.printd import printd
 from dataclasses import dataclass
 
@@ -136,6 +137,14 @@ class Con:
         else:
             raise RuntimeError(str(w_apply) + ' not handled')
 
+
+class Out:
+    def printd(self, *args):
+        printd(*args)
+
+
+DEFAULT_OUT = Out()
+
 # Base component class.
 #
 # Comp instances resolve, in order:
@@ -146,6 +155,7 @@ class Con:
 class Comp:
     def __init__(self, parent, pos, con):
         self.parent = parent
+        self.out = self.parent.out if self.parent else DEFAULT_OUT
         self._pos = pos     # upper-left location, fixed or managed by parent prior to calling paint()
         self._con = con     # constraints used to calculate _dim
         self._dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
@@ -156,16 +166,35 @@ class Comp:
 
         return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self._dim, self._con, chlen)
 
+    def setout(self, out):
+        self.out = out
+        for c in self.children:
+            c.setout(out)
+
     # Panels manage their children pos(ition) as well as their own
     def pos(self):
         if not self._pos:
-            self.parent.layout_children()
+            self.parent.do_layout()
 
         return self._pos
 
+    def layout_is_managed(self):
+        return self.parent and isinstance(self.parent, Panel)
+
+    # This is called from root down. Panel instances overide this to clear their own and their child calculated values
+    def clear_layout(self):
+        self._dim = None
+        for c in self.children:
+            c.clear_layout()
+
+    # This is called from root down after clear_layout(). Panel instances override this to layout children
+    # and update their own dimension and constraints
+    def do_layout(self):
+        for c in self.children:
+            c.do_layout()
+
     # Panels manage their children dim(ension) as well as their own
     def dim(self):
-        printd('Comp.dim({})'.format(self))
         if not self._dim:
             self._dim = self._calc_dim()
         return self._dim
@@ -195,13 +224,13 @@ class Comp:
     ###########################
     # virtual methods
     ###########################
-    # managed by parent container or defaults to 0,0 (none)
+    # managed by Panel or defaults to none
     def _calc_con(self):
         return Con()
 
-    # managed by parent container or defaults to 0,0
+    # this is only called if not set (must be managed by parent container)
     def _calc_pos(self):
-        self.parent.layout_children()
+        self.parent.do_layout()
 
     def _paint(self):
         printd('Comp._paint({})'.format(self))
@@ -228,14 +257,11 @@ class Comp:
     def _calc_dim(self):
         printd('Comp._calc_dim({})'.format(self))
         if self.layout_is_managed():
-            self.parent.layout_children()
+            self.parent.do_layout()
             return self._dim
 
         pdim = self.parent.dim()
         return pdim.child_dim(self.con(), self.pos())
-
-    def layout_is_managed(self):
-        return self.parent and isinstance(self.parent, Panel)
 
     # components that manage layout of children will implement this method to know when recalculation is needed
     def _child_added(self, comp):
@@ -243,12 +269,12 @@ class Comp:
 
 class Win(Comp):
     # if not passed in, scr is created later when dimensions are known.
-    def __init__(self, parent, pos, con, scr=None):
+    def __init__(self, parent, pos, con):
         super().__init__(parent, pos, con)
-        self._scr = scr
+        self._derwin = None
 
     def __repr__(self):
-        scr = 'scr' if self._scr else 'x'
+        scr = 'dwin' if self._derwin else ''
         return 'Win[{}]->{}'.format(scr, super().__repr__())
 
     def addwin(self, con=Con(0,0), pos=Pos(0,0)):
@@ -266,14 +292,21 @@ class Win(Comp):
         self.children.append(ret)
         return ret
 
+    def do_layout(self):
+        pos = self.pos()
+        dim = self.dim()
+        scr = self.scr()
+        scr.resize(dim.h, dim.w)
+        scr.mvderwin(pos.y, pos.x)
+
     def scr(self):
-        if not self._scr:
+        if not self._derwin:
             dim = self.dim()
             printd('...Win._paint() no scr', dim)
             pos = self.pos()
-            self._scr = self.parent_win()._scr.derwin(dim.h, dim.w, pos.y, pos.x)
+            self._derwin = self.parent_win().scr().derwin(dim.h, dim.w, pos.y, pos.x)
 
-        return self._scr
+        return self._derwin
 
     def _paint(self):
         printd('Win._paint({})'.format(self))
@@ -315,8 +348,20 @@ class Panel(Comp):
     def __repr__(self):
         return 'Panel[{},pcon[{}]->{}'.format(self.orient, self._panel_con, super().__repr__())
 
-    def layout_children(self):
+    # clear all layout settings for children/subchildren (prepare for new layout)
+    def clear_layout(self):
+        # panel constraints and dimensions are calculated
+        self._con = None
+        self._dim = None
+        for c in self.children:
+            # panel children positions and dimensions are calculated
+            c._pos = None
+            c.clear_layout()
+
+    def do_layout(self):
         flow_layout(self.orient, self.pos(), self.dim(), self.con(), self.children)
+        for c in self.children:
+            c.do_layout()
 
     def addwin(self, con=None):
         ret = Win(self, None, con)
@@ -360,13 +405,30 @@ class Panel(Comp):
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
-class RootWin(Win):
+class OutWin:
+    def __init__(self, win):
+        self.win = win
 
+    def print(self, *args):
+        scr = self.win.scr()
+        scr.addstr(3,2, ' '.join(map(str, args)))
+
+class RootWin(Win):
     def __init__(self, scr):
-        super().__init__(None, Pos(0,0), Con(0,0), scr)
+        super().__init__(None, Pos(0,0), Con(0,0))
+        self._scr = scr
 
     def __repr__(self):
         return 'Root->{}'.format(super().__repr__())
+
+    def scr(self):
+        return self._scr
+
+    def setout(self, out):
+        if isinstance(out, Win):
+            out = OutWin(out)
+
+        super().setout(out)
 
     # @override the default which uses parent.dim()
     #
@@ -375,6 +437,22 @@ class RootWin(Win):
     def _calc_dim(self):
         w, h = os.get_terminal_size()
         return Dim(h, w)
+
+    def resize(self, h, w):
+        scr = self._scr
+        # .addstr(3,2,'resize({},{})'.format(h, w))
+
+        self._dim = Dim(h, w)
+        curses.resizeterm(h, w)
+
+        for c in self.children:
+            c.clear_layout()
+        for c in self.children:
+            c.do_layout()
+
+        scr.resize(h, w)
+        scr.clear()
+
 
 def flow_layout(orient, pos, dim, con, children):
     printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))

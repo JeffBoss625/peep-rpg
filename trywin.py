@@ -39,6 +39,7 @@ class Handler:
         self.root = rootwin(scr)
         col1 = self.root.addcol()
         self.win2 = col1.addwin(Con(10, 80, 14, 80))
+        self.root.setout(self.win2)
         self.bottom_row = col1.addrow()
         self.winblank = self.bottom_row.addwin()
 
@@ -53,7 +54,7 @@ class Handler:
         win4 = self.win4.scr()
 
         win2.addch(0, win2.getmaxyx()[1] - 2, '@')
-        win2.addstr(6, 2, 'scr.maxyx: ' + str(scr.getmaxyx()) + str(win2.getmaxyx()) + str(win4.getmaxyx()))
+        win2.addstr(6, 2, 'w2[{}] w4[{}] scr[{}]'.format(win2.getmaxyx(), win4.getmaxyx(), scr.getmaxyx()))
         win2.addstr(7, 2, repr(self.except_str))
         win2.clrtoeol()
         win2.addch(0, win2.getmaxyx()[1] - 1, '@')
@@ -71,7 +72,6 @@ class Handler:
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
-        scr = self.root.scr()
         win2 = self.win2.scr()
         win4 = self.win4.scr()
         self.term_size = os.get_terminal_size()
@@ -85,17 +85,8 @@ class Handler:
                 t0 = time.time()
 
         try:
-            self.root.resize()
             w, h = self.term_size
-            curses.resizeterm(h, w)
-
-            win3_h = int(h/2)
-            win3_w = int(w/2)
-            win4.resize(win3_h-2, win3_w-2)
-
-            win2.resize(min(h, 20), min(w, 60))
-            scr.resize(h, w)
-            scr.clear()
+            self.root.resize(h, w)
 
         except Exception as e:
             self.except_str = 'resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__))

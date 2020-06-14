@@ -109,6 +109,12 @@ class Scr:
         self.children.append(ret)
         return ret
 
+    def mvderwin(self, y, x):
+        self._pos = Pos(y, x)
+
+    def resize(self, h, w):
+        self._dim = Dim(h, w)
+
     def pos(self):
         if not self._pos:
             self._pos = Pos(0,0)
