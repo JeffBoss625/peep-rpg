@@ -378,13 +378,12 @@ class RootWin(Win):
 
 def flow_layout(orient, pos, dim, con, children):
     printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
-    for i, c in enumerate(children):
-        printd('...child[{}]: {}'.format(i, c))
     space = dim.hw(orient) - con.hwmin(orient)  # extra space (negative means overage to shrink)
     yxoffset = pos.yx(orient)
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
+        printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con()
         csize = ccon.hwmin(orient)
         c_hwmax = ccon.hwmax(orient)
@@ -415,7 +414,7 @@ def flow_layout(orient, pos, dim, con, children):
         else:
             raise ValueError("unknown orientation: " + orient)
 
-        printd('...Panel._calc_dim() child[{}]: pos[{}], dim[{}]'.format(ci, child._pos, child._dim))
+        printd('..->flow_layout child[{}]: ({})'.format(ci, child))
 
         yxoffset += csize
 
