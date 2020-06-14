@@ -36,43 +36,81 @@ Robert Frost
 WINTER_EDEN_STR = WINTER_EDEN.replace('\n', ' ')
 class Handler:
     def __init__(self, scr):
-        self.scr = scr
+        self.root = rootwin(scr)
+        col1 = self.root.addcol()
+        self.win2 = col1.addwin(Con(10, 15, 10, 15))
+        self.bottom_row = col1.addrow()
+        self.winblank = self.bottom_row.addwin()
 
-        root = rootwin(scr)
-        row1 = root.addrow()
-        self.win1 = row1.addwin(Con(10,15,10,15))
-        self.win2 = row1.addwin(Con(20,60))
-
-        # win3_h = int(h/2)
-        # win3_w = int(w/2)
-        # self.win3 = scr.derwin(win3_h, win3_w, h-win3_h, w-win3_w)
-        # self.win4 = self.win3.derwin(win3_h-2, win3_w-2, 1, 1)
-        # self.win4.scrollok(True)
+        self.win4 = self.bottom_row.addwin(Con(20,60))
+        self.win4.scr().scrollok(True)
         self.except_str = ''
+        self.term_size = os.get_terminal_size()
 
     def paint(self):
-        scr = self.scr
-        win1 = self.win1.scr()
+        scr = self.root.scr()
         win2 = self.win2.scr()
+        win4 = self.win4.scr()
 
         win2.addch(0, win2.getmaxyx()[1] - 2, '@')
-        win2.addstr(6, 2, 'scr.maxyx: ' + str(scr.getmaxyx()) + str(win1.getmaxyx()) + str(win2.getmaxyx()))
+        win2.addstr(6, 2, 'scr.maxyx: ' + str(scr.getmaxyx()) + str(win2.getmaxyx()) + str(win4.getmaxyx()))
         win2.addstr(7, 2, repr(self.except_str))
         win2.clrtoeol()
         win2.addch(0, win2.getmaxyx()[1] - 1, '@')
 
-        win1.addch(0, win1.getmaxyx()[1] - 1, '@')
-        win1.move(0,0)
+        win4.addch(0, win4.getmaxyx()[1] - 1, '@')
+        win4.move(0,0)
+        win4.addstr(1, 1, WINTER_EDEN_STR)
 
-        win1.border()
         win2.border()
+        win4.border()
 
+    def size_to_term(self, force = False):
+        if not force and self.term_size == os.get_terminal_size():
+            return
+
+        # wait for resize changes to stop for a moment before resizing
+        t0 = time.time()
+        scr = self.root.scr()
+        win2 = self.win2.scr()
+        win4 = self.win4.scr()
+        self.term_size = os.get_terminal_size()
+        while time.time() - t0 < 0.3:
+            time.sleep(0.1)
+            win2.addstr(3, 2, str(time.time() - t0) + ' elapsed')
+            win2.refresh()
+            if self.term_size != os.get_terminal_size():
+                # size changed, reset timer
+                self.term_size = os.get_terminal_size()
+                t0 = time.time()
+
+        try:
+            self.root.resize()
+            w, h = self.term_size
+            curses.resizeterm(h, w)
+
+            win3_h = int(h/2)
+            win3_w = int(w/2)
+            win4.resize(win3_h-2, win3_w-2)
+
+            win2.resize(min(h, 20), min(w, 60))
+            scr.resize(h, w)
+            scr.clear()
+
+        except Exception as e:
+            self.except_str = 'resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__))
 
 def main(scr):
     curses.raw()
     h = Handler(scr)
 
+    def resize_handler(signum, frame):
+        h.size_to_term(True)
+
+    signal.signal(signal.SIGWINCH, resize_handler)
+
     while 1:
+        h.size_to_term()
         h.paint()
         scr.refresh()
         c = scr.getch()

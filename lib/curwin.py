@@ -159,7 +159,8 @@ class Comp:
     # Panels manage their children pos(ition) as well as their own
     def pos(self):
         if not self._pos:
-            self._pos = self._calc_pos()
+            self.parent._layout_children()
+
         return self._pos
 
     # Panels manage their children dim(ension) as well as their own
@@ -200,7 +201,7 @@ class Comp:
 
     # managed by parent container or defaults to 0,0
     def _calc_pos(self):
-        return Pos()
+        self.parent._layout_children()
 
     def _paint(self):
         printd('Comp._paint({})'.format(self))
@@ -226,11 +227,11 @@ class Comp:
     #      +--------------------+        --- 
     def _calc_dim(self):
         printd('Comp._calc_dim({})'.format(self))
-        pdim = self.parent.dim()
-        if self._dim:
-            # dim was parent-generated
+        if hasattr(self.parent, '_layout_children'):
+            self.parent._layout_children()
             return self._dim
 
+        pdim = self.parent.dim()
         return pdim.child_dim(self.con(), self.pos())
 
     # components that manage layout of children will implement this method to know when recalculation is needed
@@ -247,17 +248,17 @@ class Win(Comp):
         scr = 'scr' if self._scr else 'x'
         return 'Win[{}]->{}'.format(scr, super().__repr__())
 
-    def addwin(self, con=None, pos=None):
+    def addwin(self, con=Con(0,0), pos=Pos(0,0)):
         ret = Win(self, pos, con)
         self.children.append(ret)
         return ret
 
-    def addrow(self, con=None, pos=None):
+    def addrow(self, con=Con(0,0), pos=Pos(0,0)):
         ret = Panel(self, pos, con, Orient.HORIZONTAL)
         self.children.append(ret)
         return ret
 
-    def addcol(self, con=None, pos=None):
+    def addcol(self, con=Con(0,0), pos=Pos(0,0)):
         ret = Panel(self, pos, con, Orient.VERTICAL)
         self.children.append(ret)
         return ret
@@ -314,9 +315,11 @@ class Panel(Comp):
 
     def _calc_dim(self):
         printd('Panel._calc_dim({})'.format(self))
-        dim = super()._calc_dim()
-        if not self.children:
-            return dim
+        return super()._calc_dim()
+
+    def _layout_children(self):
+        printd('Panel._layout_children({})'.format(self))
+        dim = self.dim()
 
         ccon = self.con()
         orient = self.orient
@@ -361,8 +364,6 @@ class Panel(Comp):
             printd('...Panel._calc_dim() child[{}]: pos[{}], dim[{}]'.format(ci, child._pos, child._dim))
 
             yxoffset += csize
-
-        return dim
 
     def addwin(self, con=None):
         ret = Win(self, None, con)
@@ -409,7 +410,7 @@ class Panel(Comp):
 class RootWin(Win):
 
     def __init__(self, scr):
-        super().__init__(None, None, None, scr)
+        super().__init__(None, Pos(0,0), Con(0,0), scr)
 
     def __repr__(self):
         return 'Root->{}'.format(super().__repr__())

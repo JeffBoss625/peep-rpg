@@ -168,14 +168,18 @@ def test_paint():
 
     w1 = c1.addwin(Con(3,8,5,0))
     r1 = w1.addrow()
-    r1.addwin(Con(5,5,5,5))
-    r1.addwin(Con(3,3,3,7))
+    w2 = r1.addwin(Con(5,5,5,5))
+    w3 = r1.addwin(Con(3,3,3,7))
 
-    # w2 = c1.addwin(Con(3,12,6,0))
     c2 = c1.addcol()
-    c2.addwin(Con(3,7,3,0))
-    c2.addwin()
+    w4 = c2.addwin(Con(3,7,3,0))
+    w5 = c2.addwin()
 
+    w1.scr().border()
+    w2.scr().border()
+    w3.scr().border()
+    w4.scr().border()
+    w5.scr().border()
     root.paint()
     scr.refresh()
 
