@@ -38,7 +38,7 @@ class Handler:
     def __init__(self, scr):
         self.root = rootwin(scr)
         col1 = self.root.addcol()
-        self.win2 = col1.addwin(Con(10, 80, 10, 80))
+        self.win2 = col1.addwin(Con(10, 80, 14, 80))
         self.bottom_row = col1.addrow()
         self.winblank = self.bottom_row.addwin()
 

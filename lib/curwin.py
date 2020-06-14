@@ -227,12 +227,15 @@ class Comp:
     #      +--------------------+        --- 
     def _calc_dim(self):
         printd('Comp._calc_dim({})'.format(self))
-        if hasattr(self.parent, 'layout_children'):
+        if self.layout_is_managed():
             self.parent.layout_children()
             return self._dim
 
         pdim = self.parent.dim()
         return pdim.child_dim(self.con(), self.pos())
+
+    def layout_is_managed(self):
+        return self.parent and isinstance(self.parent, Panel)
 
     # components that manage layout of children will implement this method to know when recalculation is needed
     def _child_added(self, comp):
@@ -312,10 +315,6 @@ class Panel(Comp):
     def __repr__(self):
         orient = 'VER' if self.orient == Orient.VERTICAL else 'HOR'
         return 'Panel[{},pcon[{}]->{}'.format(orient, self._panel_con, super().__repr__())
-
-    def _calc_dim(self):
-        printd('Panel._calc_dim({})'.format(self))
-        return super()._calc_dim()
 
     def layout_children(self):
         printd('Panel._layout_children({})'.format(self))
@@ -406,6 +405,8 @@ class Panel(Comp):
 
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
+
+# def flow_layout():
 
 class RootWin(Win):
 
