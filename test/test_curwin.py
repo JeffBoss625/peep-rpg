@@ -32,7 +32,7 @@ def test_addcol():
 # when variables are resolved, so we call "cpos = col.pos()..." as separate steps revieal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
     root = mockroot(rootdim)
-    col = root.addcol(colpos, colcon)
+    col = root.panel(Orient.VERT, colpos, colcon)
 
     ccon = col.con()
     assert ccon == expcon
@@ -79,9 +79,9 @@ def test_row_layout():
 
 def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, expdim):
     root = mockroot(rootdim)
-    panel = root.addcol(panpos, pancon) if orient == Orient.VERT else root.addrow(panpos, pancon)
+    panel = root.panel(orient, panpos, pancon)
     for cc in children_con:
-        panel.addwin(cc)
+        panel.subwin(cc)
     pcon = panel.con()
     assert pcon == expcon
     pdim = panel.dim()
@@ -170,16 +170,16 @@ def test_paint():
     # mainrow.addwin(Con(4,4,6,5))
     # mainrow.addwin(Con())
 
-    c1 = root.addcol()
+    c1 = root.panel(Orient.VERT)
 
-    w1 = c1.addwin(Con(3,8,5,0))
-    r1 = w1.addrow()
-    w2 = r1.addwin(Con(5,5,5,5))
-    w3 = r1.addwin(Con(3,3,3,7))
+    w1 = c1.subwin(Con(3, 8, 5, 0))
+    r1 = w1.panel(Orient.HORI)
+    w2 = r1.subwin(Con(5, 5, 5, 5))
+    w3 = r1.subwin(Con(3, 3, 3, 7))
 
-    c2 = c1.addcol()
-    w4 = c2.addwin(Con(3,7,3,0))
-    w5 = c2.addwin()
+    c2 = c1.panel(Orient.VERT)
+    w4 = c2.subwin(Con(3, 7, 3, 0))
+    w5 = c2.subwin()
 
     w1.scr().border()
     w2.scr().border()

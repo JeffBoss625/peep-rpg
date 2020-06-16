@@ -161,7 +161,7 @@ class Comp:
         self._dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
         self.children = []  # child Comp(onents) painted after parent
 
-    def __repr__(self, **kwargs):
+    def __repr__(self):
         chlen = ',#' + str(len(self.children)) if self.children else ''
 
         return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self._dim, self._con, chlen)
@@ -277,18 +277,13 @@ class Win(Comp):
         scr = 'dwin' if self._derwin else ''
         return 'Win[{}]->{}'.format(scr, super().__repr__())
 
-    def addwin(self, con=Con(0,0), pos=Pos(0,0)):
+    def subwin(self, con=Con(0, 0), pos=Pos(0, 0)):
         ret = Win(self, pos, con)
         self.children.append(ret)
         return ret
 
-    def addrow(self, con=Con(0,0), pos=Pos(0,0)):
-        ret = Panel(self, pos, con, Orient.HORI)
-        self.children.append(ret)
-        return ret
-
-    def addcol(self, con=Con(0,0), pos=Pos(0,0)):
-        ret = Panel(self, pos, con, Orient.VERT)
+    def panel(self, orient, con=Con(0, 0), pos=Pos(0, 0)):
+        ret = Panel(self, pos, con, orient)
         self.children.append(ret)
         return ret
 
@@ -363,22 +358,15 @@ class Panel(Comp):
         for c in self.children:
             c.do_layout()
 
-    def addwin(self, con=None):
+    def subwin(self, con=None):
         ret = Win(self, None, con)
         self.children.append(ret)
         self._con = None
         self._dim = None
         return ret
 
-    def addrow(self, con=None):
-        ret = Panel(self, None, con, Orient.HORI)
-        self.children.append(ret)
-        self._con = None
-        self._dim = None
-        return ret
-
-    def addcol(self, con=None):
-        ret = Panel(self, None, con, Orient.VERT)
+    def panel(self, orient, con=None):
+        ret = Panel(self, None, con, orient)
         self.children.append(ret)
         self._con = None
         self._dim = None
@@ -405,13 +393,18 @@ class Panel(Comp):
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
-class OutWin:
+class OutWin(Win):
     def __init__(self, win):
         self.win = win
+        self.lines = []
 
     def print(self, *args):
-        scr = self.win.scr()
-        scr.addstr(3,2, ' '.join(map(str, args)))
+        self.lines.append(' '.join(map(str, args)))
+
+    def paint(self):
+        for line in self.lines:
+            self.win.scr().addstr(line)
+        self.lines = []
 
 class RootWin(Win):
     def __init__(self, scr):
@@ -423,12 +416,6 @@ class RootWin(Win):
 
     def scr(self):
         return self._scr
-
-    def setout(self, out):
-        if isinstance(out, Win):
-            out = OutWin(out)
-
-        super().setout(out)
 
     # @override the default which uses parent.dim()
     #
