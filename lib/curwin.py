@@ -271,10 +271,10 @@ class Win(Comp):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, pos, con):
         super().__init__(parent, pos, con)
-        self._derwin = None
+        self._subwin = None
 
     def __repr__(self):
-        scr = 'dwin' if self._derwin else ''
+        scr = 'subwin' if self._subwin else ''
         return 'Win[{}]->{}'.format(scr, super().__repr__())
 
     def subwin(self, con=Con(0, 0), pos=Pos(0, 0)):
@@ -295,13 +295,13 @@ class Win(Comp):
         scr.mvderwin(pos.y, pos.x)
 
     def scr(self):
-        if not self._derwin:
+        if not self._subwin:
             dim = self.dim()
             printd('...Win._paint() no scr', dim)
             pos = self.pos()
-            self._derwin = self.parent_win().scr().derwin(dim.h, dim.w, pos.y, pos.x)
+            self._subwin = self.parent_win().scr().derwin(dim.h, dim.w, pos.y, pos.x)
 
-        return self._derwin
+        return self._subwin
 
     def _paint(self):
         printd('Win._paint({})'.format(self))
