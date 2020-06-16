@@ -213,7 +213,7 @@ class Comp:
     # return first parent that is a Win instance, or None, if this component has no parent window
     def parent_win(self):
         ret = self.parent
-        while ret and not isinstance(ret, Win):
+        while ret and not isinstance(ret, Subwin):
             ret = ret.parent
         return ret
 
@@ -267,7 +267,7 @@ class Comp:
     def _child_added(self, comp):
         pass
 
-class Win(Comp):
+class Subwin(Comp):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, pos, con):
         super().__init__(parent, pos, con)
@@ -278,7 +278,7 @@ class Win(Comp):
         return 'Win[{}]->{}'.format(scr, super().__repr__())
 
     def subwin(self, con=Con(0, 0), pos=Pos(0, 0)):
-        ret = Win(self, pos, con)
+        ret = Subwin(self, pos, con)
         self.children.append(ret)
         return ret
 
@@ -359,7 +359,7 @@ class Panel(Comp):
             c.do_layout()
 
     def subwin(self, con=None):
-        ret = Win(self, None, con)
+        ret = Subwin(self, None, con)
         self.children.append(ret)
         self._con = None
         self._dim = None
@@ -393,7 +393,7 @@ class Panel(Comp):
         ret.apply(self._panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
-class OutWin(Win):
+class OutWin(Subwin):
     def __init__(self, win):
         self.win = win
         self.lines = []
@@ -406,7 +406,7 @@ class OutWin(Win):
             self.win.scr().addstr(line)
         self.lines = []
 
-class RootWin(Win):
+class RootWin(Subwin):
     def __init__(self, scr):
         super().__init__(None, Pos(0,0), Con(0,0))
         self._scr = scr
