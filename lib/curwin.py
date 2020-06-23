@@ -428,19 +428,19 @@ class RootWin(Subwin):
         return Dim(h, w)
 
     def resize(self, h, w):
-        scr = self._scr
         # .addstr(3,2,'resize({},{})'.format(h, w))
-
-        self._dim = Dim(h, w)
-        curses.resizeterm(h, w)
 
         for c in self.children:
             c.clear_layout()
+
+        curses.resizeterm(h, w)
+        self._scr.resize(h, w)
+        self._dim = Dim(h, w)
+
         for c in self.children:
             c.do_layout()
 
-        scr.resize(h, w)
-        scr.clear()
+        self._scr.clear()
 
 
 def flow_layout(orient, pos, dim, con, children):

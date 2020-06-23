@@ -2,7 +2,6 @@ import curses
 import signal
 from lib.curwin import *
 
-
 def main(scr):
     curses.raw()
     root = rootwin(scr)
