@@ -97,12 +97,12 @@ class Scr:
         self._parent = parent
         self.pos = pos
         self.dim = dim
-        self._border = False
+        self.border = False
         self.children = []
         self.buf = [[]]
 
     def __repr__(self):
-        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self.pos, self.dim, self._border)
+        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self.pos, self.dim, self.border)
 
     def derwin(self, h, w, y, x):
         ret = Scr(self, Pos(y, x), Dim(h, w))
@@ -124,9 +124,6 @@ class Scr:
     def dim(self):
         return self.dim
 
-    def border(self):
-        self._border = True
-
     def refresh(self):
         self.buf = [x[:] for x in [['.'] * self.dim.w] * (self.dim.h)]
         self._render(0, 0, self)
@@ -142,7 +139,7 @@ class Scr:
         pos = comp.pos
         yoff += pos.y
         xoff += pos.x
-        if comp._border:
+        if comp.border:
             for x in range(xoff, xoff + dim.w):
                 buf[yoff][x] = '-'
                 buf[yoff + dim.h-1][x] = '-'
@@ -183,11 +180,11 @@ def test_paint():
 
     root.do_layout()
 
-    w1.scr().border()
-    w2.scr().border()
-    w3.scr().border()
-    w4.scr().border()
-    w5.scr().border()
+    w1.scr().border = 1
+    w2.scr().border = 1
+    w3.scr().border = 1
+    w4.scr().border = 1
+    w5.scr().border = 1
     root.paint()
     scr.refresh()
 
