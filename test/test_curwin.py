@@ -11,7 +11,7 @@ def test_con():
 def test_addcol():
     tests = [
         # root       addcol                   [ expected column ]
-        # dim,       pos,      con,           [ pos(),   con(),        dim() ]
+        # dim,       pos,      con,           [ pos(),   con(),        dim ]
         
         [ Dim(4,12), None,     None,          [ Con(0,0),     Dim(4,12)] ],
         [ Dim(5,12), None,     Con(2,3),      [ Con(2,3),     Dim(5,12)] ],
@@ -36,7 +36,7 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
 
     ccon = col.con()
     assert ccon == expcon
-    cdim = col.dim()
+    cdim = col.dim
     assert cdim == expdim
 
 
@@ -84,25 +84,25 @@ def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, exp
         panel.subwin(cc)
     pcon = panel.con()
     assert pcon == expcon
-    pdim = panel.dim()
+    pdim = panel.dim
     assert pdim == expdim
 
 def mockroot(dim):
     root = rootwin(None)
-    root._dim = dim
+    root.dim = dim
     return root
 
 class Scr:
     def __init__(self, parent, pos, dim):
         self._parent = parent
         self._pos = pos
-        self._dim = dim
+        self.dim = dim
         self._border = False
         self.children = []
         self.buf = [[]]
 
     def __repr__(self):
-        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self._pos, self._dim, self._border)
+        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self._pos, self.dim, self._border)
 
     def derwin(self, h, w, y, x):
         ret = Scr(self, Pos(y, x), Dim(h, w))
@@ -113,7 +113,7 @@ class Scr:
         self._pos = Pos(y, x)
 
     def resize(self, h, w):
-        self._dim = Dim(h, w)
+        self.dim = Dim(h, w)
 
     def pos(self):
         if not self._pos:
@@ -122,19 +122,19 @@ class Scr:
         return self._pos
 
     def dim(self):
-        return self._dim
+        return self.dim
 
     def border(self):
         self._border = True
 
     def refresh(self):
-        self.buf = [x[:] for x in [['.'] * self._dim.w] * (self._dim.h)]
+        self.buf = [x[:] for x in [['.'] * self.dim.w] * (self.dim.h)]
         self._render(0, 0, self)
 
     def _render(self, yoff, xoff, comp):
         printd('Scr._render off[{},{}], {}'.format(yoff, xoff, comp))
         buf = self.buf
-        dim = comp.dim()
+        dim = comp.dim
         if not dim.h or not dim.w:
             printd('no size: [{}]'.format(dim))
             return
@@ -164,7 +164,7 @@ def test_paint():
     dim = Dim(12,40)
     scr = Scr(None, Pos(), dim)
     root = rootwin(scr)
-    root._dim = dim
+    root.dim = dim
     # mainrow = root.addrow()
     # mainrow.addwin(Con(8,4,8))
     # mainrow.addwin(Con(4,4,6,5))

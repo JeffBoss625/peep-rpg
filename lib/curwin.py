@@ -158,13 +158,13 @@ class Comp:
         self.out = self.parent.out if self.parent else DEFAULT_OUT
         self._pos = pos     # upper-left location, fixed or managed by parent prior to calling paint()
         self._con = con     # constraints used to calculate _dim
-        self._dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
+        self.dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
         self.children = []  # child Comp(onents) painted after parent
 
     def __repr__(self):
         chlen = ',#' + str(len(self.children)) if self.children else ''
 
-        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self._dim, self._con, chlen)
+        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self.dim, self._con, chlen)
 
     def setout(self, out):
         self.out = out
@@ -183,7 +183,7 @@ class Comp:
 
     # This is called from root down. Panel instances overide this to clear their own and their child calculated values
     def clear_layout(self):
-        self._dim = None
+        self.dim = None
         for c in self.children:
             c.clear_layout()
 
@@ -192,12 +192,6 @@ class Comp:
     def do_layout(self):
         for c in self.children:
             c.do_layout()
-
-    # Panels manage their children dim(ension) as well as their own
-    def dim(self):
-        if not self._dim:
-            self._dim = self._calc_dim()
-        return self._dim
 
     def con(self):
         if not self._con:
@@ -257,10 +251,9 @@ class Comp:
     def _calc_dim(self):
         printd('Comp._calc_dim({})'.format(self))
         if self.layout_is_managed():
-            self.parent.do_layout()
-            return self._dim
+            return self.dim
 
-        pdim = self.parent.dim()
+        pdim = self.parent.dim
         return pdim.child_dim(self.con(), self.pos())
 
     # components that manage layout of children will implement this method to know when recalculation is needed
@@ -294,7 +287,7 @@ class Subwin(Comp):
 
     def do_layout(self):
         pos = self.pos()
-        dim = self.dim()
+        dim = self.dim
         if self._subwin:
             self._subwin.resize(dim.h, dim.w)
             self._subwin.mvderwin(pos.y, pos.x)
@@ -343,14 +336,15 @@ class Panel(Comp):
     def clear_layout(self):
         # panel constraints and dimensions are calculated
         self._con = None
-        self._dim = None
+        self.dim = None
         for c in self.children:
             # panel children positions and dimensions are calculated
             c._pos = None
             c.clear_layout()
 
     def do_layout(self):
-        flow_layout(self.orient, self.pos(), self.dim(), self.con(), self.children)
+        self.dim = self._calc_dim()
+        flow_layout(self.orient, self.pos(), self.dim, self.con(), self.children)
         for c in self.children:
             c.do_layout()
 
@@ -358,14 +352,14 @@ class Panel(Comp):
         ret = Subwin(self, None, con)
         self.children.append(ret)
         self._con = None
-        self._dim = None
+        self.dim = None
         return ret
 
     def panel(self, orient, con=None):
         ret = Panel(self, None, con, orient)
         self.children.append(ret)
         self._con = None
-        self._dim = None
+        self.dim = None
         return ret
 
     # derive constraints from children and self._panel_con
@@ -419,7 +413,7 @@ class RootWin(Subwin):
     def scr(self):
         return self._scr
 
-    # @override the default which uses parent.dim()
+    # @override the default which uses parent.dim
     #
     # Note that we can test with RootWin instance by setting _dim directly to control the results of this method, which
     # will prevent calls to os.get_terminal_size()
@@ -435,7 +429,7 @@ class RootWin(Subwin):
 
         curses.resizeterm(h, w)
         self._scr.resize(h, w)
-        self._dim = Dim(h, w)
+        self.dim = Dim(h, w)
 
         for c in self.children:
             c.do_layout()
@@ -474,10 +468,10 @@ def flow_layout(orient, pos, dim, con, children):
 
         if orient == Orient.HORI:
             child._pos = Pos(pos.y, yxoffset)
-            child._dim = Dim(csize2, csize)
+            child.dim = Dim(csize2, csize)
         elif orient == Orient.VERT:
             child._pos = Pos(yxoffset, pos.x)
-            child._dim = Dim(csize, csize2)
+            child.dim = Dim(csize, csize2)
         else:
             raise ValueError("unknown orientation: " + orient)
 
