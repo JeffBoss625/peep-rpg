@@ -34,7 +34,7 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     root = mockroot(rootdim)
     col = root.panel(Orient.VERT, colpos, colcon)
 
-    ccon = col.con()
+    ccon = col.con
     assert ccon == expcon
     cdim = col.dim
     assert cdim == expdim
@@ -82,7 +82,7 @@ def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, exp
     panel = root.panel(orient, panpos, pancon)
     for cc in children_con:
         panel.subwin(cc)
-    pcon = panel.con()
+    pcon = panel.con
     assert pcon == expcon
     pdim = panel.dim
     assert pdim == expdim

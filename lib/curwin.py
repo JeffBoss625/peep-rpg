@@ -156,15 +156,15 @@ class Comp:
     def __init__(self, parent, pos, con):
         self.parent = parent
         self.out = self.parent.out if self.parent else DEFAULT_OUT
-        self._pos = pos     # upper-left location, fixed or managed by parent prior to calling paint()
-        self._con = con     # constraints used to calculate _dim
+        self._pos = pos if pos else Pos()    # upper-left location, fixed or managed by parent prior to calling paint()
+        self.con = con if con else Con()     # constraints used to calculate _dim
         self.dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
         self.children = []  # child Comp(onents) painted after parent
 
     def __repr__(self):
         chlen = ',#' + str(len(self.children)) if self.children else ''
 
-        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self.dim, self._con, chlen)
+        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self.dim, self.con, chlen)
 
     def setout(self, out):
         self.out = out
@@ -194,9 +194,7 @@ class Comp:
             c.do_layout()
 
     def con(self):
-        if not self._con:
-            self._con = self._calc_con()
-        return self._con
+        return self.con
 
     def root(self):
         ret = self
@@ -218,10 +216,6 @@ class Comp:
     ###########################
     # virtual methods
     ###########################
-    # managed by Panel or defaults to none
-    def _calc_con(self):
-        return Con()
-
     # this is only called if not set (must be managed by parent container)
     def _calc_pos(self):
         self.parent.do_layout()
@@ -254,7 +248,7 @@ class Comp:
             return self.dim
 
         pdim = self.parent.dim
-        return pdim.child_dim(self.con(), self.pos())
+        return pdim.child_dim(self.con, self.pos())
 
     # components that manage layout of children will implement this method to know when recalculation is needed
     def _child_added(self, comp):
@@ -327,7 +321,7 @@ class Panel(Comp):
     def __init__(self, parent, pos, con, orient):
         super().__init__(parent, pos, None) # con is always calculated from children
         self.orient = orient
-        self._panel_con = con if con else Con()   # self.con() will derive from self._panel_con and children
+        self._panel_con = con if con else Con()   # self.con will derive from self._panel_con and children
 
     def __repr__(self):
         return 'Panel[{},pcon[{}]->{}'.format(self.orient, self._panel_con, super().__repr__())
@@ -335,7 +329,7 @@ class Panel(Comp):
     # clear all layout settings for children/subchildren (prepare for new layout)
     def clear_layout(self):
         # panel constraints and dimensions are calculated
-        self._con = None
+        self.con = None
         self.dim = None
         for c in self.children:
             # panel children positions and dimensions are calculated
@@ -343,22 +337,23 @@ class Panel(Comp):
             c.clear_layout()
 
     def do_layout(self):
+        self.con = self._calc_con()
         self.dim = self._calc_dim()
-        flow_layout(self.orient, self.pos(), self.dim, self.con(), self.children)
+        flow_layout(self.orient, self.pos(), self.dim, self.con, self.children)
         for c in self.children:
             c.do_layout()
 
     def subwin(self, con=None):
         ret = Subwin(self, None, con)
         self.children.append(ret)
-        self._con = None
+        self.con = None
         self.dim = None
         return ret
 
     def panel(self, orient, con=None):
         ret = Panel(self, None, con, orient)
         self.children.append(ret)
-        self._con = None
+        self.con = None
         self.dim = None
         return ret
 
@@ -374,9 +369,11 @@ class Panel(Comp):
             raise ValueError("unknown orientation: " + self.orient)
 
         if len(self.children):
-            ret = self.children[0].con().dup()
-            for c in self.children[1:]:
-                ret.apply(c.con(), h_apply, w_apply)
+            ret = Con()
+            for c in self.children:
+                if not c.con:
+                    c.con = c._calc_con()
+                ret.apply(c.con, h_apply, w_apply)
         else:
             ret = Con()
 
@@ -445,7 +442,7 @@ def flow_layout(orient, pos, dim, con, children):
     for ci in range(nchildren):
         child = children[ci]
         printd('...flow_layout child[{}]: ({})'.format(ci, child))
-        ccon = child.con()
+        ccon = child.con
         csize = ccon.hwmin(orient)
         c_hwmax = ccon.hwmax(orient)
         adj = int(space / (nchildren - ci))  # adj is positive to expand, negative to shrink
