@@ -211,11 +211,11 @@ class Comp:
         return ret
 
     # return first parent that is a Win instance, or None, if this component has no parent window
-    def parent_win(self):
-        ret = self.parent
-        while ret and not isinstance(ret, Subwin):
-            ret = ret.parent
-        return ret
+    def parent_scr(self):
+        p = self.parent
+        while p and not hasattr(p, 'scr'):
+            p = p.parent
+        return p.scr() if p else None
 
     # re-paint from root. later, this may be optimized to refresh just the component painted
     def paint(self):
@@ -287,27 +287,23 @@ class Subwin(Comp):
         self.children.append(ret)
         return ret
 
+    def scr(self):
+        if not self._subwin:
+            raise RuntimeError('do_layout not called')
+        return self._subwin
+
     def do_layout(self):
         pos = self.pos()
         dim = self.dim()
-        scr = self.scr()
-        scr.resize(dim.h, dim.w)
-        scr.mvderwin(pos.y, pos.x)
+        if self._subwin:
+            self._subwin.resize(dim.h, dim.w)
+            self._subwin.mvderwin(pos.y, pos.x)
+        else:
+            self._subwin = self.parent_scr().derwin(dim.h, dim.w, pos.y, pos.x)
 
-    def scr(self):
-        if not self._subwin:
-            dim = self.dim()
-            printd('...Win._paint() no scr', dim)
-            pos = self.pos()
-            self._subwin = self.parent_win().scr().derwin(dim.h, dim.w, pos.y, pos.x)
-
-        return self._subwin
-
-    def _paint(self):
-        printd('Win._paint({})'.format(self))
-        self.scr()
         for c in self.children:
-            c._paint()
+            c.do_layout()
+
 
 # A row adds constraints horizontally and merges vertical constraints, for example:
 #
@@ -394,17 +390,19 @@ class Panel(Comp):
         return ret
 
 class OutWin(Subwin):
-    def __init__(self, win):
-        self.win = win
+    def __init__(self, parent, pos, con):
+        super().__init__(parent, pos, con)
         self.lines = []
 
     def print(self, *args):
         self.lines.append(' '.join(map(str, args)))
 
     def paint(self):
-        for line in self.lines:
-            self.win.scr().addstr(line)
-        self.lines = []
+        sw = self._subwin
+        lines = self.lines
+        y, x = sw.getmaxyx()
+        for line in lines[-y:]:
+            sw.addstr(line)
 
 class RootWin(Subwin):
     def __init__(self, scr):
@@ -413,6 +411,10 @@ class RootWin(Subwin):
 
     def __repr__(self):
         return 'Root->{}'.format(super().__repr__())
+
+    def do_layout(self):
+        for c in self.children:
+            c.do_layout()
 
     def scr(self):
         return self._scr

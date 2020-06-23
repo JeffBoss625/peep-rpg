@@ -44,9 +44,10 @@ class Handler:
         self.winblank = self.bottom_row.subwin()
 
         self.win4 = self.bottom_row.subwin(Con(20, 60))
-        self.win4.scr().scrollok(True)
+        # self.win4.scr().scrollok(True)
         self.except_str = ''
         self.term_size = os.get_terminal_size()
+        self.root.do_layout()
 
     def paint(self):
         scr = self.root.scr()

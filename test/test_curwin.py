@@ -178,8 +178,10 @@ def test_paint():
     w3 = r1.subwin(Con(3, 3, 3, 7))
 
     c2 = c1.panel(Orient.VERT)
-    w4 = c2.subwin(Con(3, 7, 3, 0))
+    w4 = c2.subwin(Con(3, 7, 3, 8))
     w5 = c2.subwin()
+
+    root.do_layout()
 
     w1.scr().border()
     w2.scr().border()
