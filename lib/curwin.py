@@ -156,7 +156,7 @@ class Comp:
     def __init__(self, parent, pos, con):
         self.parent = parent
         self.out = self.parent.out if self.parent else DEFAULT_OUT
-        self._pos = pos if pos else Pos()    # upper-left location, fixed or managed by parent prior to calling paint()
+        self.pos = pos if pos else Pos()    # upper-left location, fixed or managed by parent prior to calling paint()
         self.con = con if con else Con()     # constraints used to calculate _dim
         self.dim = None    # width and height, managed by parent prior to calling paint(), or sized to parent
         self.children = []  # child Comp(onents) painted after parent
@@ -164,7 +164,7 @@ class Comp:
     def __repr__(self):
         chlen = ',#' + str(len(self.children)) if self.children else ''
 
-        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self._pos, self.dim, self.con, chlen)
+        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self.pos, self.dim, self.con, chlen)
 
     def setout(self, out):
         self.out = out
@@ -173,10 +173,7 @@ class Comp:
 
     # Panels manage their children pos(ition) as well as their own
     def pos(self):
-        if not self._pos:
-            self.parent.do_layout()
-
-        return self._pos
+        return self.pos
 
     def layout_is_managed(self):
         return self.parent and isinstance(self.parent, Panel)
@@ -216,10 +213,6 @@ class Comp:
     ###########################
     # virtual methods
     ###########################
-    # this is only called if not set (must be managed by parent container)
-    def _calc_pos(self):
-        self.parent.do_layout()
-
     def _paint(self):
         printd('Comp._paint({})'.format(self))
         for c in self.children:
@@ -248,7 +241,7 @@ class Comp:
             return self.dim
 
         pdim = self.parent.dim
-        return pdim.child_dim(self.con, self.pos())
+        return pdim.child_dim(self.con, self.pos)
 
     # components that manage layout of children will implement this method to know when recalculation is needed
     def _child_added(self, comp):
@@ -280,7 +273,7 @@ class Subwin(Comp):
         return self._subwin
 
     def do_layout(self):
-        pos = self.pos()
+        pos = self.pos
         dim = self.dim
         if self._subwin:
             self._subwin.resize(dim.h, dim.w)
@@ -333,13 +326,13 @@ class Panel(Comp):
         self.dim = None
         for c in self.children:
             # panel children positions and dimensions are calculated
-            c._pos = None
+            c.pos = None
             c.clear_layout()
 
     def do_layout(self):
         self.con = self._calc_con()
         self.dim = self._calc_dim()
-        flow_layout(self.orient, self.pos(), self.dim, self.con, self.children)
+        flow_layout(self.orient, self.pos, self.dim, self.con, self.children)
         for c in self.children:
             c.do_layout()
 
@@ -464,10 +457,10 @@ def flow_layout(orient, pos, dim, con, children):
             csize2 = cmax2
 
         if orient == Orient.HORI:
-            child._pos = Pos(pos.y, yxoffset)
+            child.pos = Pos(pos.y, yxoffset)
             child.dim = Dim(csize2, csize)
         elif orient == Orient.VERT:
-            child._pos = Pos(yxoffset, pos.x)
+            child.pos = Pos(yxoffset, pos.x)
             child.dim = Dim(csize, csize2)
         else:
             raise ValueError("unknown orientation: " + orient)

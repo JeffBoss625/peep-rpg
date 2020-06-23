@@ -95,14 +95,14 @@ def mockroot(dim):
 class Scr:
     def __init__(self, parent, pos, dim):
         self._parent = parent
-        self._pos = pos
+        self.pos = pos
         self.dim = dim
         self._border = False
         self.children = []
         self.buf = [[]]
 
     def __repr__(self):
-        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self._pos, self.dim, self._border)
+        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self.pos, self.dim, self._border)
 
     def derwin(self, h, w, y, x):
         ret = Scr(self, Pos(y, x), Dim(h, w))
@@ -110,16 +110,16 @@ class Scr:
         return ret
 
     def mvderwin(self, y, x):
-        self._pos = Pos(y, x)
+        self.pos = Pos(y, x)
 
     def resize(self, h, w):
         self.dim = Dim(h, w)
 
     def pos(self):
-        if not self._pos:
-            self._pos = Pos(0,0)
+        if not self.pos:
+            self.pos = Pos(0,0)
 
-        return self._pos
+        return self.pos
 
     def dim(self):
         return self.dim
@@ -139,7 +139,7 @@ class Scr:
             printd('no size: [{}]'.format(dim))
             return
 
-        pos = comp.pos()
+        pos = comp.pos
         yoff += pos.y
         xoff += pos.x
         if comp._border:
