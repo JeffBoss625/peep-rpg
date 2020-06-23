@@ -190,9 +190,6 @@ class Comp:
         for c in self.children:
             c.do_layout()
 
-    def con(self):
-        return self.con
-
     def root(self):
         ret = self
         while ret.parent:
@@ -242,10 +239,6 @@ class Comp:
 
         pdim = self.parent.dim
         return pdim.child_dim(self.con, self.pos)
-
-    # components that manage layout of children will implement this method to know when recalculation is needed
-    def _child_added(self, comp):
-        pass
 
 class Subwin(Comp):
     # if not passed in, scr is created later when dimensions are known.
