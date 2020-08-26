@@ -38,12 +38,12 @@ class Handler:
     def __init__(self, scr):
         self.root = rootwin(scr)
         col1 = self.root.panel(Orient.VERT)
-        self.win2 = col1.subwin(Con(10, 80, 14, 80))
+        self.win2 = col1.window(Con(10, 80, 14, 80))
         self.root.setout(self.win2)
         self.bottom_row = col1.panel(Orient.HORI)
-        self.winblank = self.bottom_row.subwin()
+        self.winblank = self.bottom_row.window()
 
-        self.win4 = self.bottom_row.subwin(Con(20, 60))
+        self.win4 = self.bottom_row.window(Con(20, 60))
         # self.win4.scr().scrollok(True)
         self.except_str = ''
         self.term_size = os.get_terminal_size()

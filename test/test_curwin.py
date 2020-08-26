@@ -28,11 +28,12 @@ def test_addcol():
     for row in tests:
         yield check_col, row[0], row[1], row[2], row[3][0], row[3][1]
 
-# note that running nose tests with "-d" gives assertion descriptions indlucing content of dataclasses
-# when variables are resolved, so we call "cpos = col.pos()..." as separate steps revieal data discrepancies.
+# note that running nose tests with "-d" gives assertion descriptions including content of dataclasses
+# when variables are resolved, so we call "cpos = col.pos()..." as separate steps reveal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
-    root = mockroot(rootdim)
+    root = rootwin(rootdim)
     col = root.panel(Orient.VERT, colpos, colcon)
+    root.do_layout()
 
     ccon = col.con
     assert ccon == expcon
@@ -62,35 +63,32 @@ FLOW_TESTS = [
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
 ]
 
-def test_col_layout():
+def test_layout_vertical():
     for t in FLOW_TESTS:
         yield check_flow_layout, Orient.VERT, Dim(10, 30), t[0], t[1], t[2], t[3][0], t[3][1]
 
-# run same tests as test_col_layout() by using inverted input.
-def test_row_layout():
+# run same tests as test_layout_vertical() by using inverted input.
+def test_layout_horizontal():
     for t in FLOW_TESTS:
         panpos = t[0].invert() if t[0] else None
         pancon = t[1].invert()
-        children = map(lambda c: c.invert(), t[2])
+        children = list(map(lambda c: c.invert(), t[2]))
         expcon = t[3][0].invert()
         expdim = t[3][1].invert()
 
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
-def check_flow_layout(orient, rootdim, panpos, pancon, children_con, expcon, expdim):
-    root = mockroot(rootdim)
-    panel = root.panel(orient, panpos, pancon)
+def check_flow_layout(orient, rootdim, pos, con, children_con, expcon, expdim):
+    printd('check_flow_layout([{}], [{}], [{}], [{}], {})'.format(orient, rootdim, pos, con, children_con))
+    root = rootwin(rootdim)
+    panel = root.panel(orient, pos, con)
     for cc in children_con:
-        panel.subwin(cc)
+        panel.window(None, cc)
+    root.do_layout()
     pcon = panel.con
     assert pcon == expcon
     pdim = panel.dim
     assert pdim == expdim
-
-def mockroot(dim):
-    root = rootwin(None)
-    root.dim = dim
-    return root
 
 class Scr:
     def __init__(self, parent, pos, dim):
@@ -114,12 +112,6 @@ class Scr:
 
     def resize(self, h, w):
         self.dim = Dim(h, w)
-
-    def pos(self):
-        if not self.pos:
-            self.pos = Pos(0,0)
-
-        return self.pos
 
     def dim(self):
         return self.dim
@@ -169,14 +161,14 @@ def test_paint():
 
     c1 = root.panel(Orient.VERT)
 
-    w1 = c1.subwin(Con(3, 8, 5, 0))
+    w1 = c1.window(Con(3, 8, 5, 0))
     r1 = w1.panel(Orient.HORI)
-    w2 = r1.subwin(Con(5, 5, 5, 5))
-    w3 = r1.subwin(Con(3, 3, 3, 7))
+    w2 = r1.window(Con(5, 5, 5, 5))
+    w3 = r1.window(Con(3, 3, 3, 7))
 
     c2 = c1.panel(Orient.VERT)
-    w4 = c2.subwin(Con(3, 7, 3, 8))
-    w5 = c2.subwin()
+    w4 = c2.window(Con(3, 7, 3, 8))
+    w5 = c2.window()
 
     root.do_layout()
 
