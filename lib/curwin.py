@@ -187,8 +187,10 @@ class Comp:
     def do_layout(self):
         # calculate missing constraints (bottom-up)
         def calc_con(comp, v):
+            printd('calc_con({})'.format(comp))
             if not comp.con:
                 comp.calc_constraints()
+
         self.apply_ddf(calc_con)
 
         self.calc_child_dim()
@@ -324,8 +326,12 @@ class Win(Comp):
 class Panel(Comp):
     def __init__(self, parent, orient, pos, panel_con):
         super().__init__(parent, pos, None) # con is calculated from children do_layout()
+
+        if not panel_con:
+            panel_con = Con()
+
         self.orient = orient
-        self.panel_con = panel_con  # constraints applied after children constraints are calculated
+        self.panel_con = panel_con  # further constratins applied to aggregate of child constraints
 
     def __repr__(self):
         return 'Panel[{}->{}'.format(self.orient, super().__repr__())
