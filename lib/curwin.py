@@ -145,6 +145,10 @@ class Out:
 
 DEFAULT_OUT = Out()
 
+@dataclass
+class Data:
+    border: int = 1
+
 # Base component class.
 #
 # Comp instances resolve, in order:
@@ -159,9 +163,10 @@ class Comp:
         self.con = con        # constraints used to calculate dim
         self.dim = None       # calculated in do_layout()
         self.children = []
+        self.data = Data()
 
     def __repr__(self):
-        chlen = ',#' + str(len(self.children)) if self.children else ''
+        chlen = ',#' + str(len(self.children))
 
         return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self.pos, self.dim, self.con, chlen)
 
@@ -177,10 +182,17 @@ class Comp:
             v = c.apply_ddf(fn, v)
         return fn(self, v)
 
-    def apply_fdf(self, fn, v=None):
-        v = fn(self, v)
+    def iterate_win(self, fn, v=None, xoff=0, yoff=0, d=0):
+        if isinstance(self, Win):
+            v = fn(self, v, xoff, yoff, d)
+            d += 1
+
+        xoff += self.pos.x
+        yoff += self.pos.y
         for c in self.children:
-            v = c.apply_fdf(fn, v)
+            v = c.iterate_win(fn, v, xoff, yoff, d)
+
+        return v
 
     # This is called from root down after clear_layout(). Panel instances override this to layout children
     # and update their own dimension and constraints

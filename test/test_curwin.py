@@ -61,7 +61,12 @@ FLOW_TESTS = [
     # child constraints affect panel constraints, and affect Dim
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
-]
+
+    # Positions
+    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
+    [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
+    [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
+][-3:]
 
 def test_layout_vertical():
     for t in FLOW_TESTS:
@@ -85,69 +90,38 @@ def check_flow_layout(orient, rootdim, pos, con, children_con, expcon, expdim):
     for cc in children_con:
         panel.window(None, cc)
     root.do_layout()
-    pcon = panel.con
-    assert pcon == expcon
-    pdim = panel.dim
-    assert pdim == expdim
+    buf = [x[:] for x in [['.'] * root.dim.w] * root.dim.h]
+    root.iterate_win(draw_win, buf)
+    for line in buf:
+        print(''.join(line))
 
-class Scr:
-    def __init__(self, parent, pos, dim):
-        self._parent = parent
-        self.pos = pos
-        self.dim = dim
-        self.border = False
-        self.children = []
-        self.buf = [[]]
+    # pcon = panel.con
+    # assert pcon == expcon
+    # pdim = panel.dim
+    # assert pdim == expdim
 
-    def __repr__(self):
-        return 'Scr[pos[{}],dim[{}],bord:{}]'.format(self.pos, self.dim, self.border)
+# def print_win(v, win, xoff, yoff, depth):
+#     print('{}, {}, {}, {}'.format(win, xoff, yoff, depth))
 
-    def derwin(self, h, w, y, x):
-        ret = Scr(self, Pos(y, x), Dim(h, w))
-        self.children.append(ret)
-        return ret
+def draw_win(comp, buf, xoff, yoff, depth):
+    dim = comp.dim
+    pos = comp.pos
+    xoff += pos.x
+    yoff += pos.y
+    rows = len(buf)
+    cols = len(buf[0])
+    if comp.data.border:
+        xlim = min(cols, xoff + dim.w) -1
+        ylim = min(rows, yoff + dim.h) -1
+        for x in range(xoff, xlim):
+            buf[yoff][x] = '-'
+            buf[ylim][x] = '-'
 
-    def mvderwin(self, y, x):
-        self.pos = Pos(y, x)
+        for y in range(yoff + 1, ylim):
+            buf[y][xoff] = '|'
+            buf[y][xlim] = '|'
 
-    def resize(self, h, w):
-        self.dim = Dim(h, w)
-
-    def dim(self):
-        return self.dim
-
-    def refresh(self):
-        self.buf = [x[:] for x in [['.'] * self.dim.w] * (self.dim.h)]
-        self._render(0, 0, self)
-
-    def _render(self, yoff, xoff, comp):
-        printd('Scr._render off[{},{}], {}'.format(yoff, xoff, comp))
-        buf = self.buf
-        dim = comp.dim
-        if not dim.h or not dim.w:
-            printd('no size: [{}]'.format(dim))
-            return
-
-        pos = comp.pos
-        yoff += pos.y
-        xoff += pos.x
-        if comp.border:
-            for x in range(xoff, xoff + dim.w):
-                buf[yoff][x] = '-'
-                buf[yoff + dim.h-1][x] = '-'
-
-            for y in range(yoff + 1, yoff + dim.h-1):
-                buf[y][xoff] = '|'
-                buf[y][xoff + dim.w-1] = '|'
-
-        for c in comp.children:
-            self._render(yoff, xoff, c)
-
-    def buflines(self):
-        ret = []
-        for line in self.buf:
-            ret.append(''.join(line))
-        return ret
+    return buf
 
 def test_paint():
     dim = Dim(12,40)
