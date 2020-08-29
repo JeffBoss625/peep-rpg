@@ -165,11 +165,6 @@ class Comp:
         self.children = []
         self.data = Data()
 
-    def __repr__(self):
-        chlen = ',#' + str(len(self.children))
-
-        return '{}[P[{}],D[{}],C[{}]{}]'.format(type(self).__name__, self.pos, self.dim, self.con, chlen)
-
     # Called from root down
     def clear_layout(self):
         raise NotImplementedError()
@@ -199,7 +194,7 @@ class Comp:
     def do_layout(self):
         # calculate missing constraints (bottom-up)
         def calc_con(comp, v):
-            printd('calc_con({})'.format(comp))
+            # printd('calc_con({})'.format(comp))
             if not comp.con:
                 comp.calc_constraints()
 
@@ -221,6 +216,7 @@ class Comp:
     # def paint(self):
     #     for c in self.children:
     #         c.paint()
+
 
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
@@ -248,6 +244,9 @@ class Win(Comp):
             self.name = 'window_{}'.format(self.id)
 
         clz.win_by_name[self.name] = self
+
+    def __repr__(self):
+        return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
     def window(self, name, pos, con):
         if not pos:
@@ -454,13 +453,13 @@ class Panel(Comp):
 #
 
 def flow_layout_place_children(orient, pos, dim, con, children):
-    printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
+    # printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
     space = dim.hw(orient) - con.min(orient)  # extra space (negative means overage to shrink)
-    yxoffset = pos.yx(orient)
+    pos_offset = pos.yx(orient)
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
-        printd('...flow_layout child[{}]: ({})'.format(ci, child))
+        # printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con
         csize = ccon.min(orient)
         c_max = ccon.max(orient)
@@ -483,20 +482,21 @@ def flow_layout_place_children(orient, pos, dim, con, children):
             csize2 = cmax2
 
         if orient == Orient.HORI:
-            child.pos = Pos(pos.y, yxoffset)
+            child.pos = Pos(0,pos_offset)
             child.dim = Dim(csize2, csize)
         elif orient == Orient.VERT:
-            child.pos = Pos(yxoffset, pos.x)
+            child.pos = Pos(pos_offset,0)
             child.dim = Dim(csize, csize2)
         else:
             raise ValueError("unknown orientation: " + orient)
 
-        printd('..->flow_layout child[{}]: ({})'.format(ci, child))
+        # printd('..->flow_layout child[{}]: ({})'.format(ci, child))
 
-        yxoffset += csize
+        pos_offset += csize
 
 
 def rootwin(dim):
     ret = Win(None, 'root', Pos(0,0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
+    ret.data.border = 0
     return ret

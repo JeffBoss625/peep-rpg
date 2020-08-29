@@ -83,9 +83,9 @@ def test_layout_horizontal():
 
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
-def check_flow_layout(orient, rootdim, pos, con, children_con, expcon, expdim):
-    printd('check_flow_layout([{}], [{}], [{}], [{}], {})'.format(orient, rootdim, pos, con, children_con))
-    root = rootwin(rootdim)
+def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
+    print('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
+    root = rootwin(dim)
     panel = root.panel(orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
@@ -103,23 +103,24 @@ def check_flow_layout(orient, rootdim, pos, con, children_con, expcon, expdim):
 # def print_win(v, win, xoff, yoff, depth):
 #     print('{}, {}, {}, {}'.format(win, xoff, yoff, depth))
 
-def draw_win(comp, buf, xoff, yoff, depth):
-    dim = comp.dim
-    pos = comp.pos
+def draw_win(win, buf, xoff, yoff, depth):
+    printd('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    dim = win.dim
+    pos = win.pos
     xoff += pos.x
     yoff += pos.y
-    rows = len(buf)
-    cols = len(buf[0])
-    if comp.data.border:
-        xlim = min(cols, xoff + dim.w) -1
-        ylim = min(rows, yoff + dim.h) -1
+    ylim = len(buf)
+    xlim = len(buf[0])
+    if win.data.border:
+        xlim = min(xlim, xoff + dim.w)
+        ylim = min(ylim, yoff + dim.h)
         for x in range(xoff, xlim):
             buf[yoff][x] = '-'
-            buf[ylim][x] = '-'
+            buf[ylim-1][x] = '-'
 
-        for y in range(yoff + 1, ylim):
+        for y in range(yoff, ylim):
             buf[y][xoff] = '|'
-            buf[y][xlim] = '|'
+            buf[y][xlim-1] = '|'
 
     return buf
 
