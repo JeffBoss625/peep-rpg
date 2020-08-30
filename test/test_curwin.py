@@ -92,10 +92,7 @@ def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
     for cc in children_con:
         panel.window(None, cc)
     root.do_layout()
-    buf = [x[:] for x in [['.'] * root.dim.w] * root.dim.h]
-    root.iterate_win(draw_win, buf)
-    for i, line in enumerate(buf):
-        write("{:<4} {}".format(i, ''.join(line)))
+    draw_win(root)
 
 
     # pcon = panel.con
@@ -106,9 +103,15 @@ def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
 # def print_win(v, win, xoff, yoff, depth):
 #     print('{}, {}, {}, {}'.format(win, xoff, yoff, depth))
 
-def draw_win(win, buf, xoff, yoff, depth):
+def draw_win(root):
+    buf = [x[:] for x in [['.'] * root.dim.w] * root.dim.h]
+    root.iterate_win(draw_one_win, buf)
+    for i, line in enumerate(buf):
+        write("{:<4} {}".format(i, ''.join(line)))
+
+def draw_one_win(win, buf, xoff, yoff, depth):
     write('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
-    if not win.data.border:
+    if not win.conf.border:
         return buf
 
     dim = win.dim
@@ -128,27 +131,28 @@ def draw_win(win, buf, xoff, yoff, depth):
     return buf
 
 def render_curses(win, v, xoff, yoff, depth):
-    write('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
-    if not win.data.border:
-        return v
+    write('render_curses({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    win.data = win.winparent.data.derwin(win.dim.h, win.dim.w, win.pos.y, win.pos.x)
+    if win.conf.border:
+        win.data.border()
+    return v
 
-    dim = win.dim
-    pos = win.pos
-    xoff += pos.x
-    yoff += pos.y
-    xlim = min(len(buf[0]), xoff + dim.w)
-    ylim = min(len(buf), yoff + dim.h)
-    for x in range(xoff, xlim):
-        buf[yoff][x] = '-'
-        buf[ylim-1][x] = '-'
+def test_paint():
+    root = rootwin(Dim(12, 40))
+    c1 = root.panel(Orient.VERT)
 
-    for y in range(yoff, ylim):
-        buf[y][xoff] = '|'
-        buf[y][xlim-1] = '|'
+    w1 = c1.window('W1', Con(3, 8, 5, 0))
+    r1 = w1.panel(Orient.HORI)
+    w2 = r1.window('W2', Con(5, 5, 5, 5))
+    w3 = r1.window('W3', Con(3, 3, 3, 7))
 
-    return buf
-# def test_paint():
+    c2 = c1.panel(Orient.VERT)
+    w4 = c2.window('W4', Con(3, 7, 3, 8))
+    w5 = c2.window('W5')
 
+    root.do_layout()
+
+    # rwin =
 #     dim = Dim(12,40)
 #     scr = Scr(None, Pos(), dim)
 #     root = rootwin(scr)

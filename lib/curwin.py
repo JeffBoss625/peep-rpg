@@ -145,10 +145,6 @@ class Out:
 
 DEFAULT_OUT = Out()
 
-@dataclass
-class Data:
-    border: int = 1
-
 # Base component class.
 #
 # Comp instances resolve, in order:
@@ -163,7 +159,6 @@ class Comp:
         self.con = con        # constraints used to calculate dim
         self.dim = None       # calculated in do_layout()
         self.children = []
-        self.data = Data()
 
     # Called from root down
     def clear_layout(self):
@@ -218,6 +213,10 @@ class Comp:
     #         c.paint()
 
 
+@dataclass
+class Config:
+    border: int = 1
+
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
 #
@@ -230,6 +229,12 @@ class Win(Comp):
     def __init__(self, parent, name, pos, con):
         super().__init__(parent, pos, con)
         self.name = name
+        self.conf = Config()
+        wp = parent
+        while wp and not isinstance(wp, Win):
+            wp = wp.parent
+        self.winparent = wp
+        self.data = None        # externally managed data (e.g. corresponding curses window)
 
         # class level info
         clz = self.__class__
@@ -498,5 +503,5 @@ def flow_layout_place_children(orient, pos, dim, con, children):
 def rootwin(dim):
     ret = Win(None, 'root', Pos(0,0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
-    ret.data.border = 0
+    ret.conf.border = 0
     return ret
