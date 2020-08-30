@@ -1,6 +1,8 @@
 from lib.curwin import *
-from lib.printd import printd
-import curses
+import sys
+
+def write(s):
+    sys.stderr.write(s + "\n")
 
 def test_con():
     assert Con(4, 7) != Con()
@@ -66,7 +68,7 @@ FLOW_TESTS = [
     [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
     [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
     [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
-][-3:]
+]
 
 def test_layout_vertical():
     for t in FLOW_TESTS:
@@ -84,7 +86,8 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
-    print('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
+    write("\n")
+    write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     root = rootwin(dim)
     panel = root.panel(orient, pos, con)
     for cc in children_con:
@@ -92,8 +95,9 @@ def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
     root.do_layout()
     buf = [x[:] for x in [['.'] * root.dim.w] * root.dim.h]
     root.iterate_win(draw_win, buf)
-    for line in buf:
-        print(''.join(line))
+    for i, line in enumerate(buf):
+        write("{:<4} {}".format(i, ''.join(line)))
+
 
     # pcon = panel.con
     # assert pcon == expcon
@@ -104,57 +108,57 @@ def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
 #     print('{}, {}, {}, {}'.format(win, xoff, yoff, depth))
 
 def draw_win(win, buf, xoff, yoff, depth):
-    printd('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    write('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    if not win.data.border:
+        return buf
+
     dim = win.dim
     pos = win.pos
     xoff += pos.x
     yoff += pos.y
-    ylim = len(buf)
-    xlim = len(buf[0])
-    if win.data.border:
-        xlim = min(xlim, xoff + dim.w)
-        ylim = min(ylim, yoff + dim.h)
-        for x in range(xoff, xlim):
-            buf[yoff][x] = '-'
-            buf[ylim-1][x] = '-'
+    xlim = min(len(buf[0]), xoff + dim.w)
+    ylim = min(len(buf), yoff + dim.h)
+    for x in range(xoff, xlim):
+        buf[yoff][x] = '-'
+        buf[ylim-1][x] = '-'
 
-        for y in range(yoff, ylim):
-            buf[y][xoff] = '|'
-            buf[y][xlim-1] = '|'
+    for y in range(yoff, ylim):
+        buf[y][xoff] = '|'
+        buf[y][xlim-1] = '|'
 
     return buf
 
-def test_paint():
-    dim = Dim(12,40)
-    scr = Scr(None, Pos(), dim)
-    root = rootwin(scr)
-    root.dim = dim
-    # mainrow = root.addrow()
-    # mainrow.addwin(Con(8,4,8))
-    # mainrow.addwin(Con(4,4,6,5))
-    # mainrow.addwin(Con())
-
-    c1 = root.panel(Orient.VERT)
-
-    w1 = c1.window(Con(3, 8, 5, 0))
-    r1 = w1.panel(Orient.HORI)
-    w2 = r1.window(Con(5, 5, 5, 5))
-    w3 = r1.window(Con(3, 3, 3, 7))
-
-    c2 = c1.panel(Orient.VERT)
-    w4 = c2.window(Con(3, 7, 3, 8))
-    w5 = c2.window()
-
-    root.do_layout()
-
-    w1.scr().border = 1
-    w2.scr().border = 1
-    w3.scr().border = 1
-    w4.scr().border = 1
-    w5.scr().border = 1
-    root.paint()
-    scr.refresh()
-
-    for line in scr.buflines():
-        print(line)
+# def test_paint():
+#     dim = Dim(12,40)
+#     scr = Scr(None, Pos(), dim)
+#     root = rootwin(scr)
+#     root.dim = dim
+#     # mainrow = root.addrow()
+#     # mainrow.addwin(Con(8,4,8))
+#     # mainrow.addwin(Con(4,4,6,5))
+#     # mainrow.addwin(Con())
+#
+#     c1 = root.panel(Orient.VERT)
+#
+#     w1 = c1.window(Con(3, 8, 5, 0))
+#     r1 = w1.panel(Orient.HORI)
+#     w2 = r1.window(Con(5, 5, 5, 5))
+#     w3 = r1.window(Con(3, 3, 3, 7))
+#
+#     c2 = c1.panel(Orient.VERT)
+#     w4 = c2.window(Con(3, 7, 3, 8))
+#     w5 = c2.window()
+#
+#     root.do_layout()
+#
+#     w1.scr().border = 1
+#     w2.scr().border = 1
+#     w3.scr().border = 1
+#     w4.scr().border = 1
+#     w5.scr().border = 1
+#     root.paint()
+#     scr.refresh()
+#
+#     for line in scr.buflines():
+#         print(line)
 

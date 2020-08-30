@@ -455,7 +455,7 @@ class Panel(Comp):
 def flow_layout_place_children(orient, pos, dim, con, children):
     # printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
     space = dim.hw(orient) - con.min(orient)  # extra space (negative means overage to shrink)
-    pos_offset = pos.yx(orient)
+    pos_offset = 0
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
