@@ -86,7 +86,6 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
-    write("\n")
     write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     root = rootwin(dim)
     panel = root.panel(orient, pos, con)
@@ -116,6 +115,27 @@ def draw_win(win, buf, xoff, yoff, depth):
     pos = win.pos
     xoff += pos.x
     yoff += pos.y
+    xlim = xoff + dim.w
+    ylim = yoff + dim.h
+    for x in range(xoff, xlim):
+        buf[yoff][x] = '-'
+        buf[ylim-1][x] = '-'
+
+    for y in range(yoff, ylim):
+        buf[y][xoff] = '|'
+        buf[y][xlim-1] = '|'
+
+    return buf
+
+def render_curses(win, v, xoff, yoff, depth):
+    write('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    if not win.data.border:
+        return v
+
+    dim = win.dim
+    pos = win.pos
+    xoff += pos.x
+    yoff += pos.y
     xlim = min(len(buf[0]), xoff + dim.w)
     ylim = min(len(buf), yoff + dim.h)
     for x in range(xoff, xlim):
@@ -127,8 +147,8 @@ def draw_win(win, buf, xoff, yoff, depth):
         buf[y][xlim-1] = '|'
 
     return buf
-
 # def test_paint():
+
 #     dim = Dim(12,40)
 #     scr = Scr(None, Pos(), dim)
 #     root = rootwin(scr)
@@ -151,11 +171,6 @@ def draw_win(win, buf, xoff, yoff, depth):
 #
 #     root.do_layout()
 #
-#     w1.scr().border = 1
-#     w2.scr().border = 1
-#     w3.scr().border = 1
-#     w4.scr().border = 1
-#     w5.scr().border = 1
 #     root.paint()
 #     scr.refresh()
 #
