@@ -55,7 +55,7 @@ class Handler:
         root.data = scr
         root.data.border()
         h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
-        h_pan.window('leftwin', Con(10,20,17,100))
+        h_pan.window('leftwin', Con(10,40,15,80))
         h_pan.window('rightwin', Con(8,22,12,30))
 
         root.do_layout()
@@ -87,7 +87,9 @@ class Handler:
             root.data.clear()
             render_children(root, None, 0, 0, 1)
             leftwin = root.children[0].children[0]
-            # leftwin.data.addstr(3,3, "term_size: {}".format(self.term_size))
+            leftwin.data.addstr(2,2, "term_size: {}".format(leftwin.dim))
+            rightwin = root.children[0].children[1]
+            rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
             root.data.refresh()
             root.data.border()
 

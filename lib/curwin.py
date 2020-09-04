@@ -467,10 +467,20 @@ def max0(a,b):
     elif b == 0: return a
     else: return max(a, b)
 
+def sum_max0(a):
+    ret = 0
+    for v in a:
+        if v == 0:
+            return 0
+        ret += v
+    return ret
+
 def flow_layout_place_children(orient, pos, dim, con, children):
     printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
-    required = sum(c.con.min(orient) for c in children) # minimum space required
-    max_avail = max0(con.max(orient), dim.hw(orient))
+    required = sum(c.con.min(orient) for c in children)             # minimum space required
+    max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
+    max_avail = min0(max_avail, con.max(orient))                    # ...bound by panel
+    max_avail = min0(max_avail, dim.hw(orient))                     # ...bound by dim
     space = max_avail - required
     pos_offset = 0
     nchildren = len(children)
