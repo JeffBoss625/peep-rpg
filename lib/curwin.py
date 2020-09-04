@@ -1,8 +1,6 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
 
-import os
-import curses
 from lib.printd import printd
 from dataclasses import dataclass
 
@@ -200,19 +198,6 @@ class Comp:
     def calc_child_dim(self):
         raise NotImplementedError()
 
-    # # return first parent that is a Win instance, or None, if this component has no parent window
-    # def parent_scr(self):
-    #     p = self.parent
-    #     while p and not hasattr(p, 'scr'):
-    #         p = p.parent
-    #     return p.scr() if p else None
-
-    # # re-paint from root. later, this may be optimized to refresh just the component painted
-    # def paint(self):
-    #     for c in self.children:
-    #         c.paint()
-
-
 @dataclass
 class Config:
     border: int = 1
@@ -296,24 +281,6 @@ class Win(Comp):
         for c in self.children:
             c.clear_layout()
 
-    # def scr(self):
-    #     if not self._subwin:
-    #         raise RuntimeError('do_layout not called')
-    #     return self._subwin
-
-    # def do_layout(self):
-    #     pos = self.pos
-    #     dim = self.dim
-    #     if self._subwin:
-    #         self._subwin.resize(dim.h, dim.w)
-    #         self._subwin.mvderwin(pos.y, pos.x)
-    #     else:
-    #         self._subwin = self.parent_scr().derwin(dim.h, dim.w, pos.y, pos.x)
-    #
-    #     for c in self.children:
-    #         c.do_layout()
-
-
 # A row adds constraints horizontally and merges vertical constraints, for example:
 #
 #   when: sum(wmin) > parent.w, dimensions should contract to panel.w
@@ -338,7 +305,6 @@ class Win(Comp):
 #
 # A column works the same way but add constraints vertically instead of horizontally.
 #
-
 class Panel(Comp):
     def __init__(self, parent, orient, pos, panel_con):
         super().__init__(parent, pos, None) # con is calculated from children do_layout()
@@ -406,56 +372,6 @@ class Panel(Comp):
         flow_layout_place_children(self.orient, self.pos, self.dim, self.con, self.children)
         for c in self.children:
             c.calc_child_dim()
-
-# class OutWin(Win):
-#     def __init__(self, parent, pos, con):
-#         super().__init__(parent, pos, con)
-#         self.lines = []
-#
-#     def print(self, *args):
-#         self.lines.append(' '.join(map(str, args)))
-#
-#     def paint(self):
-#         sw = self._subwin
-#         lines = self.lines
-#         y, x = sw.getmaxyx()
-#         for line in lines[-y:]:
-#             sw.addstr(line)
-
-# class RootWin(Win):
-#     def __init__(self, scr):
-#         super().__init__(None, Pos(0,0), Con(0,0))
-#         self._scr = scr
-#
-#     def __repr__(self):
-#         return 'Root->{}'.format(super().__repr__())
-#
-#     def scr(self):
-#         return self._scr
-#
-#     # @override the default which uses parent.dim
-#     #
-#     # Note that we can test with RootWin instance by setting _dim directly to control the results of this method, which
-#     # will prevent calls to os.get_terminal_size()
-#     def _calc_dim(self):
-#         w, h = os.get_terminal_size()
-#         return Dim(h, w)
-#
-#     def resize(self, h, w):
-#         # .addstr(3,2,'resize({},{})'.format(h, w))
-#
-#         for c in self.children:
-#             c.clear_layout()
-#
-#         curses.resizeterm(h, w)
-#         self._scr.resize(h, w)
-#         self.dim = Dim(h, w)
-#
-#         for c in self.children:
-#             c.do_layout()
-#
-#         self._scr.clear()
-#
 
 def min0(a, b):
     if a == 0: return b
