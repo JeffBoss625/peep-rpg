@@ -392,7 +392,7 @@ def sum_max0(a):
     return ret
 
 def flow_layout_place_children(orient, pos, dim, con, children):
-    printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
+    # printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
     required = sum(c.con.min(orient) for c in children)             # minimum space required
     max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
     max_avail = min0(max_avail, con.max(orient))                    # ...bound by panel
@@ -402,7 +402,7 @@ def flow_layout_place_children(orient, pos, dim, con, children):
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
-        printd('...flow_layout child[{}]: ({})'.format(ci, child))
+        # printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con
         c_size = ccon.min(orient)
         c_max = min0(ccon.max(orient), max_avail)
@@ -430,7 +430,7 @@ def flow_layout_place_children(orient, pos, dim, con, children):
         else:
             raise ValueError("unknown orientation: " + orient)
 
-        printd('..->flow_layout child[{}]: ({})'.format(ci, child))
+        # printd('..->flow_layout child[{}]: ({})'.format(ci, child))
 
         pos_offset += c_size
 

@@ -90,14 +90,14 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
+    # write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     root = rootwin(dim)
     panel = root.panel(orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
 
     root.do_layout()
-    print_win(root)
+    # print_win(root)
 
     pdim = panel.dim
     assert pdim == exp_pdim
