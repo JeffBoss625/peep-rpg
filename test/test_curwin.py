@@ -43,40 +43,45 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     assert cdim == expdim
 
 
-FLOW_TESTS = [
+# tests of flow layout within a 10x30 master window
+FLOW_TESTS_10_30 = [
     # addcol
     # pos,      con           children constraints,            [ expcon,       expdim ]
 
     # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
-    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
-    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
-    [ None,     Con(5,20),       [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,20,0,0), Dim(10,30)] ],
+    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Dim(10,30), Dim(4,30), Dim(6,30)] ],
+    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Dim(10,30), Dim(5,30), Dim(5,30)] ],
 
-    # child constraints factor into panel constraints, but not Dim)
-    [ None,     Con(2,3),     [Con(2,8,0,0),  Con(3,5,0,0)], [Con(5,8,0,0),   Dim(10,30)] ],
-    [ None,     Con(0,0),     [Con(2,8,9,29), Con(3,5,0,0)],  [Con(5,8,0,0),    Dim(10,30)] ],
+    # children dimensions limited by panel constraints
+    [ None,     Con(5,10,9,25),  [Con(2,8,3,20), Con(3,5,0,0)], [Dim(9,25), Dim(3,20), Dim(6,25)] ],
+    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,2,20)], [Dim(9,25), Dim(4,25), Dim(2,20)] ],
+    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,0,0)], [Dim(9,25), Dim(4,25), Dim(5,25)] ],
 
-    # child constraints don't affect panel constraints, but panel constraints affect dim
-    [ None,     Con(5,10,8,25),  [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,8,25), Dim(8,25)] ],
-    [ None,     Con(5,10,8,25),  [Con(2,8,3,0), Con(3,5,7,0)], [Con(5,10,8,25), Dim(8,25)] ],
-
-    # child constraints affect panel constraints, and affect Dim
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Con(5,8,9,29),  Dim(9,29)] ],
+    # panel shrinks to fit child constraints
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,29), Dim(4,29), Dim(5,28)] ],
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Dim(9,29), Dim(4,29), Dim(5,29)] ],
 
     # Positions
-    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0), Con(3,5,0,0)], [Con(5,10,0,0), Dim(10,30)] ],
-    [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
-    [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
-]
+    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0),  Con(3,5,0,0)],  [Dim(9,29), Dim(4,29), Dim(5,29)] ],
+    [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(8,29), Dim(4,29), Dim(5,29)] ],
+    [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28), Dim(4,29), Dim(5,29)] ],
+
+    #
+    [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28)] ],
+
+][8:9]
+
+# def test_wide():
+# [ Pos(0,2),     Con(12,100,12,100), [Con(5,3,10,6), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
+
 
 def test_layout_vertical():
-    for t in FLOW_TESTS:
-        yield check_flow_layout, Orient.VERT, Dim(10, 30), t[0], t[1], t[2], t[3][0], t[3][1]
+    for t in FLOW_TESTS_10_30:
+        yield check_flow_layout, Orient.VERT, Dim(10, 30), t[0], t[1], t[2], t[3][0], t[3][1:]
 
 # run same tests as test_layout_vertical() by using inverted input.
 def test_layout_horizontal():
-    for t in FLOW_TESTS:
+    for t in FLOW_TESTS_10_30:
         panpos = t[0].invert() if t[0] else None
         pancon = t[1].invert()
         children = list(map(lambda c: c.invert(), t[2]))
@@ -85,32 +90,34 @@ def test_layout_horizontal():
 
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
-def check_flow_layout(orient, dim, pos, con, children_con, expcon, expdim):
+def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     root = rootwin(dim)
     panel = root.panel(orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
+
     root.do_layout()
-    draw_win(root)
+    print_win(root)
 
+    pdim = panel.dim
+    assert pdim == exp_pdim
 
-    # pcon = panel.con
-    # assert pcon == expcon
-    # pdim = panel.dim
-    # assert pdim == expdim
+    dims = list(c.dim for c in panel.children)
+    assert dims == exp_cdims
+
 
 # def print_win(v, win, xoff, yoff, depth):
 #     print('{}, {}, {}, {}'.format(win, xoff, yoff, depth))
 
-def draw_win(root):
+def print_win(root):
     buf = [x[:] for x in [['.'] * root.dim.w] * root.dim.h]
-    root.iterate_win(draw_one_win, buf)
+    root.iterate_win(print_one_win, buf)
     for i, line in enumerate(buf):
         write("{:<4} {}".format(i, ''.join(line)))
 
-def draw_one_win(win, buf, xoff, yoff, depth):
-    write('draw_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+def print_one_win(win, buf, xoff, yoff, depth):
+    write('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
     if not win.conf.border:
         return buf
 
@@ -130,27 +137,14 @@ def draw_one_win(win, buf, xoff, yoff, depth):
 
     return buf
 
-def render_curses(win, v, xoff, yoff, depth):
-    write('render_curses({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
-    win.data = win.winparent.data.derwin(win.dim.h, win.dim.w, win.pos.y, win.pos.x)
-    if win.conf.border:
-        win.data.border()
-    return v
-
 def test_paint():
-    root = rootwin(Dim(12, 40))
-    c1 = root.panel(Orient.VERT)
+    root = rootwin(Dim(15, 100))
+    hpan = root.panel(Orient.HORI, None, None)
 
-    w1 = c1.window('W1', Con(3, 8, 5, 0))
-    r1 = w1.panel(Orient.HORI)
-    w2 = r1.window('W2', Con(5, 5, 5, 5))
-    w3 = r1.window('W3', Con(3, 3, 3, 7))
-
-    c2 = c1.panel(Orient.VERT)
-    w4 = c2.window('W4', Con(3, 7, 3, 8))
-    w5 = c2.window('W5')
-
+    w1 = hpan.window('w1', Con(4, 10, 5, 20))
+    w2 = hpan.window('w2', Con(3,5,8,10))
     root.do_layout()
+    print_win(root)
 
     # rwin =
 #     dim = Dim(12,40)

@@ -457,47 +457,56 @@ class Panel(Comp):
 #         self._scr.clear()
 #
 
+def min0(a, b):
+    if a == 0: return b
+    elif b == 0: return a
+    else: return min(a, b)
+
+def max0(a,b):
+    if a == 0: return b
+    elif b == 0: return a
+    else: return max(a, b)
+
 def flow_layout_place_children(orient, pos, dim, con, children):
-    # printd('flow_layout({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
-    space = dim.hw(orient) - con.min(orient)  # extra space (negative means overage to shrink)
+    printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
+    required = sum(c.con.min(orient) for c in children) # minimum space required
+    max_avail = max0(con.max(orient), dim.hw(orient))
+    space = max_avail - required
     pos_offset = 0
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
-        # printd('...flow_layout child[{}]: ({})'.format(ci, child))
+        printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con
-        csize = ccon.min(orient)
-        c_max = ccon.max(orient)
+        c_size = ccon.min(orient)
+        c_max = min0(ccon.max(orient), max_avail)
         adj = int(space / (nchildren - ci))  # adj is positive to expand, negative to shrink
-        if csize + adj < 0:
-            adj = csize
-            csize = 0
-        elif 0 < c_max < csize + adj:
-            adj = c_max - csize
-            csize = c_max
+        if c_size + adj < 0:
+            adj = c_size
+            c_size = 0
+        elif 0 < c_max < c_size + adj:
+            adj = c_max - c_size
+            c_size = c_max
         else:
-            csize += adj
+            c_size += adj
 
         space -= adj
 
         orient2 = Orient.invert(orient)
-        cmax2 = ccon.max(orient2)
-        csize2 = dim.hw(orient2)
-        if cmax2 and cmax2 < csize2:
-            csize2 = cmax2
+        c_size2 = min0(ccon.max(orient2), dim.hw(orient2))
 
         if orient == Orient.HORI:
             child.pos = Pos(0,pos_offset)
-            child.dim = Dim(csize2, csize)
+            child.dim = Dim(c_size2, c_size)
         elif orient == Orient.VERT:
             child.pos = Pos(pos_offset,0)
-            child.dim = Dim(csize, csize2)
+            child.dim = Dim(c_size, c_size2)
         else:
             raise ValueError("unknown orientation: " + orient)
 
-        # printd('..->flow_layout child[{}]: ({})'.format(ci, child))
+        printd('..->flow_layout child[{}]: ({})'.format(ci, child))
 
-        pos_offset += csize
+        pos_offset += c_size
 
 
 def rootwin(dim):
