@@ -4,6 +4,8 @@ import time
 import traceback
 import os
 from lib.curwin import *
+import logging
+import curses
 
 WINTER_EDEN = """
 A winter garden in an alder swamp,
@@ -33,14 +35,18 @@ To make it worth life's while to wake and sport.
 Robert Frost
 """
 
-def render_children(comp, v, xoff, yoff, depth):
+def create_windows(comp, v, xoff, yoff, depth):
     for c in comp.children:
         if isinstance(c, Win):
             del c.data
-            c.data = c.winparent.data.derwin(c.dim.h, c.dim.w, c.pos.y, c.pos.x)
-            if c.conf.border:
-                c.data.border()
-        v = render_children(c, v, 0, 0, depth + 1)
+            c.data = None
+            if c.dim.h > 2 and c.dim.w > 2:
+                comp.log('derwin({}, {})'.format(c.dim, c.pos))
+                c.data = c.winparent.data.derwin(c.dim.h, c.dim.w, c.pos.y, c.pos.x)
+                if c.conf.border:
+                    c.data.border()
+
+        v = create_windows(c, v, 0, 0, depth + 1)
     return v
 
 
@@ -50,7 +56,7 @@ class Handler:
     def __init__(self, scr):
         # use os.get_terminal_size() since scr.getmaxyx() does not change with resizing (on macos)
         w, h = self.term_size = os.get_terminal_size()
-        root = self.root = rootwin(Dim(h, w))
+        root = self.root = rootwin(Dim(h, w), __file__)
 
         root.data = scr
         h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
@@ -58,7 +64,7 @@ class Handler:
         h_pan.window('rightwin', Con(8,22,12,30))
 
         root.do_layout()
-        render_children(root, None, 0, 0, 1)
+        create_windows(root, None, 0, 0, 1)
         root.data.refresh()
 
     def size_to_term(self, force = False):
@@ -84,11 +90,13 @@ class Handler:
             root.do_layout()
 
             root.data.clear()
-            render_children(root, None, 0, 0, 1)
+            create_windows(root, None, 0, 0, 1)
             leftwin = root.info.win_by_name['leftwin']
-            leftwin.data.addstr(2,2, "term_size: {}".format(leftwin.dim))
+            if leftwin.data:
+                leftwin.data.addstr(2,2, "term_size: {}".format(leftwin.dim))
             rightwin = root.info.win_by_name['rightwin']
-            rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
+            if rightwin.data:
+                rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
             root.data.refresh()
 
         except Exception as e:
@@ -97,6 +105,7 @@ class Handler:
 
 def main(scr):
     curses.raw()
+
     h = Handler(scr)
 
     def resize_handler(signum, frame):

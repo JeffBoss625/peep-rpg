@@ -3,6 +3,9 @@
 
 from lib.printd import printd
 from dataclasses import dataclass
+import re
+import sys
+import logging
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
@@ -157,6 +160,7 @@ class Comp:
         self.con = con        # constraints used to calculate dim
         self.dim = None       # calculated in do_layout()
         self.children = []
+        self.logger = None
 
     # Called from root down
     def clear_layout(self):
@@ -164,6 +168,18 @@ class Comp:
 
     def calc_constraints(self):
         raise NotImplementedError()
+
+    def root(self):
+        p = self
+        while p.parent:
+            p = p.parent
+        return p
+
+    def log(self, s):
+        if not self.logger:
+            self.logger = self.root().logger
+
+        self.logger.log(s)
 
     def apply_ddf(self, fn, v=None):
         for c in self.children:
@@ -187,7 +203,6 @@ class Comp:
     def do_layout(self):
         # calculate missing constraints (bottom-up)
         def calc_con(comp, v):
-            # printd('calc_con({})'.format(comp))
             if not comp.con:
                 comp.calc_constraints()
 
@@ -320,7 +335,7 @@ class Panel(Comp):
         self.panel_con = panel_con  # further constratins applied to aggregate of child constraints
 
     def __repr__(self):
-        return 'Panel[{}->{}'.format(self.orient, super().__repr__())
+        return 'Panel:{}:[P[{}],D[{}],C[{}]]'.format(self.orient, self.pos, self.dim, self.con)
 
     # panels derive their constraints from children and self.panel_con and set child positions
     def clear_layout(self):
@@ -333,6 +348,7 @@ class Panel(Comp):
     # First calculate constraints based on child constraints (set from bottom-up) and panel_con.
     # Then calculate dimensions based on parent.dim and constraints
     def calc_constraints(self):
+        self.log('calc_constraints({})'.format(self))
         if self.orient == Orient.VERT:
             h_apply = ConApply.STACK
             w_apply = ConApply.ADJACENT
@@ -341,6 +357,7 @@ class Panel(Comp):
             w_apply = ConApply.STACK
 
         self.con = self._calc_constraints(h_apply, w_apply)     # calculate AND SET child constraints (bottom up)
+        self.log('...calc_constraints({})'.format(self))
 
     # calculate constraints from bottom-up for all constraints that are not set
     def _calc_constraints(self, h_apply, w_apply):
@@ -373,7 +390,7 @@ class Panel(Comp):
         return ret
 
     def calc_child_dim(self):
-        flow_layout_place_children(self.orient, self.pos, self.dim, self.con, self.children)
+        flow_place_chilldren(self.orient, self.dim, self.con, self.children)
         for c in self.children:
             c.calc_child_dim()
 
@@ -392,12 +409,33 @@ def sum_max0(a):
         ret += v
     return ret
 
-def flow_layout_place_children(orient, pos, dim, con, children):
-    # printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
-    required = sum(c.con.min(orient) for c in children)             # minimum space required
-    max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
-    max_avail = min0(max_avail, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
-    space = max_avail - required
+# place min-sized childrent and truncate the last child and children to fit
+def flow_place_children_trunc(orient, flow_space, fixed_space, children):
+    pos_offset = 0
+    for c in children:
+        c_size = c.con.min(orient)
+        c_size2 = min0(c.con.min(Orient.invert(orient)), fixed_space)
+
+        if c_size > flow_space:
+            c_size += flow_space
+            flow_space = 0
+        else:
+            flow_space -= c_size
+
+        if orient == Orient.HORI:
+            c.pos = Pos(0,pos_offset)
+            c.dim = Dim(c_size2, c_size)
+        elif orient == Orient.VERT:
+            c.pos = Pos(pos_offset,0)
+            c.dim = Dim(c_size, c_size2)
+        else:
+            raise ValueError("unknown orientation: " + orient)
+
+        pos_offset += c_size
+
+
+# expand children from min size to evenly distribute extra allowed space to children
+def flow_place_children_fill(orient, flow_space, fixed_space, children):
     pos_offset = 0
     nchildren = len(children)
     for ci in range(nchildren):
@@ -405,8 +443,8 @@ def flow_layout_place_children(orient, pos, dim, con, children):
         # printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con
         c_size = ccon.min(orient)
-        c_max = min0(ccon.max(orient), max_avail)
-        adj = int(space / (nchildren - ci))  # adj is positive to expand, negative to shrink
+        c_max = min0(ccon.max(orient), ccon.min(orient) + flow_space)
+        adj = int(flow_space / (nchildren - ci))  # adj is positive to expand, negative to shrink
         if c_size + adj < 0:
             adj = c_size
             c_size = 0
@@ -416,10 +454,9 @@ def flow_layout_place_children(orient, pos, dim, con, children):
         else:
             c_size += adj
 
-        space -= adj
+        flow_space -= adj
 
-        orient2 = Orient.invert(orient)
-        c_size2 = min0(ccon.max(orient2), dim.hw(orient2))
+        c_size2 = min0(ccon.max(Orient.invert(orient)), fixed_space)
 
         if orient == Orient.HORI:
             child.pos = Pos(0,pos_offset)
@@ -434,9 +471,61 @@ def flow_layout_place_children(orient, pos, dim, con, children):
 
         pos_offset += c_size
 
+def flow_place_chilldren(orient, dim, con, children):
+    # printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
+    required = sum(c.con.min(orient) for c in children)             # minimum space required
+    max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
+    max_avail = min0(max_avail, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
+    flow_space = max_avail - required
+    fixed_space = dim.hw(Orient.invert(orient))
 
-def rootwin(dim):
+    if flow_space < 0:
+        flow_place_children_trunc(orient, flow_space, fixed_space, children)
+    else:
+        flow_place_children_fill(orient, flow_space, fixed_space, children)
+
+# Simple logger with one level of logging. Logs if file name is given, otherwise no logging.
+class Logger:
+    def __init__(self, outfile):
+        if outfile is None:
+            self.mode = 'none'
+        elif outfile == 'stdout':
+            self.mode = 'stdout'
+        elif outfile == 'stderr':
+            self.mode = 'stderr'
+        else:
+            self.mode = 'delegate'
+
+        if outfile:
+            outfile = re.sub('\\.py$', '', outfile)
+            delegate = logging.getLogger(outfile)
+            hdlr = logging.FileHandler(outfile + ".log")
+            hdlr.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+            delegate.addHandler(hdlr)
+            delegate.setLevel(logging.DEBUG)
+        else:
+            delegate = None
+
+        self.delegate = delegate
+
+    def log(self, s):
+        if self.mode == 'none':
+            return
+
+        if self.mode == 'delegate':
+            self.delegate.info(s)
+        elif self.mode == 'stdout':
+            print(s)
+        elif self.mode == 'stderr':
+            sys.stderr.write('{}\n'.format(s))
+        else:
+            raise ValueError('unknown mode: {}'.format(self.mode))
+
+
+def rootwin(dim, out=None):
     ret = Win(None, 'root', Pos(0,0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
     ret.conf.border = 0
+    ret.logger = Logger(out)
+
     return ret
