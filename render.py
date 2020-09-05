@@ -85,9 +85,9 @@ class Handler:
 
             root.data.clear()
             render_children(root, None, 0, 0, 1)
-            leftwin = root.children[0].children[0]
+            leftwin = root.info.win_by_name['leftwin']
             leftwin.data.addstr(2,2, "term_size: {}".format(leftwin.dim))
-            rightwin = root.children[0].children[1]
+            rightwin = root.info.win_by_name['rightwin']
             rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
             root.data.refresh()
 
