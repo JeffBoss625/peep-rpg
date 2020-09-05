@@ -412,7 +412,7 @@ def sum_max0(a):
     return ret
 
 # place min-sized childrent and truncate the last child and children to fit
-def flow_place_children_trunc(logfn, orient, avail, child_constraints):
+def flow_place_children_trunc(orient, avail, child_constraints):
     ret = []
     for ccon in child_constraints:
         c_size = ccon.min(orient)
@@ -431,7 +431,7 @@ def flow_place_children_trunc(logfn, orient, avail, child_constraints):
     return ret
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(_logfn, orient, flow_space, child_constraints, num_children):
+def flow_place_children_fill(orient, flow_space, child_constraints, num_children):
     ret = []
     for ci, ccon in enumerate(child_constraints):
         c_size = ccon.min(orient)
@@ -462,9 +462,9 @@ def flow_place_children(logfn, orient, dim, con, children):
 
     child_constraints = (c.con for c in children)
     if fill_space < 0:
-        c_sizes = flow_place_children_trunc(logfn, orient, max_avail, child_constraints)
+        c_sizes = flow_place_children_trunc(orient, max_avail, child_constraints)
     else:
-        c_sizes = flow_place_children_fill(logfn, orient, fill_space, child_constraints, len(children))
+        c_sizes = flow_place_children_fill(orient, fill_space, child_constraints, len(children))
 
     pos_offset = 0
     for i, c in enumerate(children):
