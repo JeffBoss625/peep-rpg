@@ -53,7 +53,6 @@ class Handler:
         root = self.root = rootwin(Dim(h, w))
 
         root.data = scr
-        root.data.border()
         h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
         h_pan.window('leftwin', Con(10,40,15,80))
         h_pan.window('rightwin', Con(8,22,12,30))
@@ -91,7 +90,6 @@ class Handler:
             rightwin = root.children[0].children[1]
             rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
             root.data.refresh()
-            root.data.border()
 
         except Exception as e:
             raise RuntimeError('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))

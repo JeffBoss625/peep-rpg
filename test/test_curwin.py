@@ -116,7 +116,7 @@ def print_win(root):
         write("{:<4} {}".format(i, ''.join(line)))
 
 def print_one_win(win, buf, xoff, yoff, depth):
-    write('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    # write('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
     if not win.conf.border:
         return buf
 
@@ -140,37 +140,13 @@ def test_paint():
     root = rootwin(Dim(15, 100))
     hpan = root.panel(Orient.HORI, None, None)
 
-    w1 = hpan.window('w1', Con(4, 10, 5, 20))
-    w2 = hpan.window('w2', Con(3,5,8,10))
+    hpan.window('w1', Con(4, 10, 5, 20))
+    hpan.window('w2', Con(3,5,8,10))
     root.do_layout()
     print_win(root)
 
-    # rwin =
-#     dim = Dim(12,40)
-#     scr = Scr(None, Pos(), dim)
-#     root = rootwin(scr)
-#     root.dim = dim
-#     # mainrow = root.addrow()
-#     # mainrow.addwin(Con(8,4,8))
-#     # mainrow.addwin(Con(4,4,6,5))
-#     # mainrow.addwin(Con())
-#
-#     c1 = root.panel(Orient.VERT)
-#
-#     w1 = c1.window(Con(3, 8, 5, 0))
-#     r1 = w1.panel(Orient.HORI)
-#     w2 = r1.window(Con(5, 5, 5, 5))
-#     w3 = r1.window(Con(3, 3, 3, 7))
-#
-#     c2 = c1.panel(Orient.VERT)
-#     w4 = c2.window(Con(3, 7, 3, 8))
-#     w5 = c2.window()
-#
-#     root.do_layout()
-#
-#     root.paint()
-#     scr.refresh()
-#
-#     for line in scr.buflines():
-#         print(line)
+    assert root.info.win_by_name['w1'].name == 'w1'
+    assert root.info.win_by_name['w2'].name == 'w2'
+    assert root.info.win_by_name['root'].name == 'root'
+
 

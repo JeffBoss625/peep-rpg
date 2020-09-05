@@ -202,6 +202,11 @@ class Comp:
 class Config:
     border: int = 1
 
+@dataclass
+class RootInfo:
+    win_count: int = 0
+    win_by_name = {}
+
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
 #
@@ -219,21 +224,20 @@ class Win(Comp):
         while wp and not isinstance(wp, Win):
             wp = wp.parent
         self.winparent = wp
-        self.data = None        # externally managed data (e.g. corresponding curses window)
+        if wp:
+            self.root = wp.root
+        else:
+            # this is root
+            self.root = self
+            self.info = RootInfo()
 
-        # class level info
-        clz = self.__class__
-        if not hasattr(clz, 'win_count'):
-            clz.win_count = 0
-            clz.win_by_name = {}
-
-        clz.win_count += 1
-
-        self.id = clz.win_count
+        self.root.info.win_count += 1
+        self.id = self.root.info.win_count
         if not self.name:
             self.name = 'window_{}'.format(self.id)
+        self.root.info.win_by_name[self.name] = self
 
-        clz.win_by_name[self.name] = self
+        self.data = None        # externally managed data (e.g. corresponding curses window)
 
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
