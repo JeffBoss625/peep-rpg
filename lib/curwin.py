@@ -412,11 +412,10 @@ def sum_max0(a):
     return ret
 
 # place min-sized childrent and truncate the last child and children to fit
-def flow_place_children_trunc(logfn, orient, avail, children):
-    # logfn('flow_place_ch_trunc({}, {}, {})'.format(orient, avail, fixed_space))
+def flow_place_children_trunc(logfn, orient, avail, child_constraints):
     ret = []
-    for c in children:
-        c_size = c.con.min(orient)
+    for ccon in child_constraints:
+        c_size = ccon.min(orient)
 
         if avail > 0:
             if avail >= c_size:
@@ -432,13 +431,12 @@ def flow_place_children_trunc(logfn, orient, avail, children):
     return ret
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(_logfn, orient, flow_space, children):
-    nchildren = len(children)
+def flow_place_children_fill(_logfn, orient, flow_space, child_constraints, num_children):
     ret = []
-    for ci, c in enumerate(children):
-        c_size = c.con.min(orient)
-        c_max = min0(c.con.max(orient), c.con.min(orient) + flow_space)
-        adj = int(flow_space / (nchildren - ci))  # adj is positive to expand, negative to shrink
+    for ci, ccon in enumerate(child_constraints):
+        c_size = ccon.min(orient)
+        c_max = min0(ccon.max(orient), ccon.min(orient) + flow_space)
+        adj = int(flow_space / (num_children - ci))  # adj is positive to expand, negative to shrink
         if c_size + adj < 0:
             adj = c_size
             c_size = 0
@@ -462,10 +460,11 @@ def flow_place_children(logfn, orient, dim, con, children):
     fill_space = max_avail - required
     fixed_space = dim.hw(Orient.invert(orient))
 
+    child_constraints = (c.con for c in children)
     if fill_space < 0:
-        c_sizes = flow_place_children_trunc(logfn, orient, max_avail, children)
+        c_sizes = flow_place_children_trunc(logfn, orient, max_avail, child_constraints)
     else:
-        c_sizes = flow_place_children_fill(logfn, orient, fill_space, children)
+        c_sizes = flow_place_children_fill(logfn, orient, fill_space, child_constraints, len(children))
 
     pos_offset = 0
     for i, c in enumerate(children):
