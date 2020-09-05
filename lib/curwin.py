@@ -412,7 +412,7 @@ def sum_max0(a):
     return ret
 
 # place min-sized childrent and truncate the last child and children to fit
-def flow_place_children_trunc(logfn, orient, avail, fixed_space, children):
+def flow_place_children_trunc(logfn, orient, avail, children):
     # logfn('flow_place_ch_trunc({}, {}, {})'.format(orient, avail, fixed_space))
     ret = []
     for c in children:
@@ -432,14 +432,12 @@ def flow_place_children_trunc(logfn, orient, avail, fixed_space, children):
     return ret
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(_logfn, orient, flow_space, fixed_space, children):
-    pos_offset = 0
+def flow_place_children_fill(_logfn, orient, flow_space, children):
     nchildren = len(children)
-    for ci in range(nchildren):
-        child = children[ci]
-        ccon = child.con
-        c_size = ccon.min(orient)
-        c_max = min0(ccon.max(orient), ccon.min(orient) + flow_space)
+    ret = []
+    for ci, c in enumerate(children):
+        c_size = c.con.min(orient)
+        c_max = min0(c.con.max(orient), c.con.min(orient) + flow_space)
         adj = int(flow_space / (nchildren - ci))  # adj is positive to expand, negative to shrink
         if c_size + adj < 0:
             adj = c_size
@@ -451,47 +449,39 @@ def flow_place_children_fill(_logfn, orient, flow_space, fixed_space, children):
             c_size += adj
 
         flow_space -= adj
+        ret.append(c_size)
 
-        c_size2 = min0(ccon.max(Orient.invert(orient)), fixed_space)
+    return ret
 
-        if orient == Orient.HORI:
-            child.pos = Pos(0,pos_offset)
-            child.dim = Dim(c_size2, c_size)
-        elif orient == Orient.VERT:
-            child.pos = Pos(pos_offset,0)
-            child.dim = Dim(c_size, c_size2)
-        else:
-            raise ValueError("unknown orientation: " + orient)
-
-        pos_offset += c_size
 
 def flow_place_children(logfn, orient, dim, con, children):
     logfn('flow_place_children({},dim[{}],con[{}])'.format(orient, dim, con))
     required = sum(c.con.min(orient) for c in children)             # minimum space required
     max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
     max_avail = min0(max_avail, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
-    flow_space = max_avail - required
+    fill_space = max_avail - required
     fixed_space = dim.hw(Orient.invert(orient))
 
-    if flow_space < 0:
-        c_sizes = flow_place_children_trunc(logfn, orient, max_avail, fixed_space, children)
-        pos_offset = 0
-        for i, c in enumerate(children):
-            c_size = c_sizes[i]
-            c_size2 = min0(c.con.max(Orient.invert(orient)), fixed_space)
-            if orient == Orient.HORI:
-                c.pos = Pos(0,pos_offset)
-                c.dim = Dim(c_size2, c_size)
-            elif orient == Orient.VERT:
-                c.pos = Pos(pos_offset,0)
-                c.dim = Dim(c_size, c_size2)
-            else:
-                raise ValueError("unknown orientation: " + orient)
-
-            pos_offset += c_size
-
+    if fill_space < 0:
+        c_sizes = flow_place_children_trunc(logfn, orient, max_avail, children)
     else:
-        flow_place_children_fill(logfn, orient, flow_space, fixed_space, children)
+        c_sizes = flow_place_children_fill(logfn, orient, fill_space, children)
+
+    pos_offset = 0
+    for i, c in enumerate(children):
+        c_size = c_sizes[i]
+        c_size2 = min0(c.con.max(Orient.invert(orient)), fixed_space)
+        if orient == Orient.HORI:
+            c.pos = Pos(0,pos_offset)
+            c.dim = Dim(c_size2, c_size)
+        elif orient == Orient.VERT:
+            c.pos = Pos(pos_offset,0)
+            c.dim = Dim(c_size, c_size2)
+        else:
+            raise ValueError("unknown orientation: " + orient)
+
+        pos_offset += c_size
+
 
 # Simple logger with one level of logging. Logs if file name is given, otherwise no logging.
 class Logger:
