@@ -377,15 +377,12 @@ class Panel(Comp):
         for c in self.children:
             c.calc_child_dim()
 
-def min0(a, b):
-    if a == 0: return b
-    elif b == 0: return a
-    else: return min(a, b)
-
-def max0(a,b):
-    if a == 0: return b
-    elif b == 0: return a
-    else: return max(a, b)
+def min0(*a):
+    ret = a[0]
+    for v in a:
+        if v != 0 and ret != 0 and v < ret:
+            ret = v
+    return ret
 
 def sum_max0(a):
     ret = 0
@@ -399,8 +396,7 @@ def flow_layout_place_children(orient, pos, dim, con, children):
     # printd('flow_layout_place_children({},pos[{}],dim[{}],con[{}])'.format(orient, pos, dim, con))
     required = sum(c.con.min(orient) for c in children)             # minimum space required
     max_avail = sum_max0(c.con.max(orient) for c in children)       # max space needed
-    max_avail = min0(max_avail, con.max(orient))                    # ...bound by panel
-    max_avail = min0(max_avail, dim.hw(orient))                     # ...bound by dim
+    max_avail = min0(max_avail, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
     space = max_avail - required
     pos_offset = 0
     nchildren = len(children)
