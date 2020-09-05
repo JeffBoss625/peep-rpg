@@ -72,7 +72,6 @@ FLOW_TESTS_10_30 = [
     # position causes panel to shrink
     [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(8,29), Dim(3,29), Dim(5,28)] ],
     [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28), Dim(4,28), Dim(5,28)] ],
-
 ]
 
 # def test_wide():
@@ -95,7 +94,8 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    root = rootwin(dim, 'stderr')
+    root = rootwin(dim, 'none')
+    # root = rootwin(dim, 'stderr')
     root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel(orient, pos, con)
     for cc in children_con:

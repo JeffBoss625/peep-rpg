@@ -442,12 +442,11 @@ def flow_place_children_trunc(logfn, orient, avail, fixed_space, children):
 
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(logfn, orient, flow_space, fixed_space, children):
+def flow_place_children_fill(_logfn, orient, flow_space, fixed_space, children):
     pos_offset = 0
     nchildren = len(children)
     for ci in range(nchildren):
         child = children[ci]
-        # printd('...flow_layout child[{}]: ({})'.format(ci, child))
         ccon = child.con
         c_size = ccon.min(orient)
         c_max = min0(ccon.max(orient), ccon.min(orient) + flow_space)
@@ -473,8 +472,6 @@ def flow_place_children_fill(logfn, orient, flow_space, fixed_space, children):
             child.dim = Dim(c_size, c_size2)
         else:
             raise ValueError("unknown orientation: " + orient)
-
-        # printd('..->flow_layout child[{}]: ({})'.format(ci, child))
 
         pos_offset += c_size
 
