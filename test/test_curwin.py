@@ -57,6 +57,11 @@ FLOW_TESTS_10_30 = [
     [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,2,20)], [Dim(9,25), Dim(4,25), Dim(2,20)] ],
     [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,0,0)], [Dim(9,25), Dim(4,25), Dim(5,25)] ],
 
+    # children minimum size doesn't fit
+    [ None,     Con(3,6,4,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(4,25), Dim(4,25), Dim(0,25)] ],
+    [ None,     Con(3,6,5,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(5,25), Dim(4,25), Dim(1,25)] ],
+    [ None,     Con(3,6,7,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(7,25), Dim(4,25), Dim(3,25)] ],
+
     # panel shrinks to fit child constraints
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,29), Dim(4,29), Dim(5,28)] ],
     [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Dim(9,29), Dim(4,29), Dim(5,29)] ],
@@ -90,8 +95,8 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    # write('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
-    root = rootwin(dim, 'stdout')
+    root = rootwin(dim, 'stderr')
+    root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel(orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)

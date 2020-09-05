@@ -108,7 +108,7 @@ def main(scr):
 
     h = Handler(scr)
 
-    def resize_handler(signum, frame):
+    def resize_handler(_signum, _frame):
         h.size_to_term(True)
 
     signal.signal(signal.SIGWINCH, resize_handler)
