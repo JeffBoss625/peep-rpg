@@ -1,11 +1,32 @@
 from lib.term import Term
+from lib.winlayout import *
+from lib.curwin import *
+import os
+
+# windows
+STATS = 'stats'
+MAZE = 'maze'
+MESSAGES = 'messages'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class Screen:
     def __init__(self, curses_scr, model):
-        self._term = Term(curses_scr)
+        self.term = Term(curses_scr)
         self.model = model
-        self.model.out = self  # allow the model itself to be used for term printed output
+        w, h = os.terminal_size
+        root = rootwin(Dim(h, w), 'prpg')
+        hpan = root.panel(Orient.HORI)
+        hpan.window(STATS, Con(8, 20, 8, 20))
+        hpan.window(MAZE, Con(40, 40))
+        hpan.window(MESSAGES, Con(8,20))
+        root.data = CurWin(root, curses_scr)
+
+        self.root = root
+        self.reset_layout()
+
+    def reset_layout(self):
+        self.root.do_layout()
+        self.root.data.create_child_screens()
 
     # print messages and standard output
     def print(self, *args):
@@ -14,30 +35,25 @@ class Screen:
         self.paint()
 
     def get_key(self):
-        return self._term.get_key()
+        return self.term.get_key()
 
     # paint the entire screen - all that is visible
     def paint(self):
-        term = self._term
-        model = self.model
-        x_margin = 3
-        y_margin = 3
+        term = self.term
         term.clear()
 
-        term.move_to(x_margin, y_margin)
-        self._draw_stats()
+        self._paint_stats()
+        self._paint_maze()
+        self._paint_messages()
 
-        term.move(0, y_margin)
-        self._draw_maze_area()
-
-        term.move(0, y_margin)
-        term.move_to(len(model.maze[0]) + x_margin * 2, y_margin)
-        term.write_lines(model.messages[-12:])
-
-        term.move_to(0, 0)
+        term.move_to(0,0)
         term.refresh()
 
-    def _draw_stats(self):
+    def _paint_messages(self):
+        win = self.root[MESSAGES].data
+        win.write_lines(self.model.messages[-12:])
+
+    def _paint_stats(self):
         p = self.model.player
         self._term.write_lines([
             p.name,
@@ -45,7 +61,7 @@ class Screen:
             'speed: ' + str(p.speed),
             ])
 
-    def _draw_maze_area(self):
+    def _paint_maze(self):
         term = self._term
         model = self.model
         x, y = term.get_xy()

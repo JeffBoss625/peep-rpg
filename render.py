@@ -3,6 +3,7 @@ import time
 import traceback
 import os
 from lib.winlayout import *
+from lib.curwin import init_win
 import curses
 
 WINTER_EDEN = """
@@ -33,19 +34,17 @@ To make it worth life's while to wake and sport.
 Robert Frost
 """
 
-def create_windows(comp, v, xoff, yoff, depth):
-    for c in comp.children:
-        if isinstance(c, Win):
-            del c.data
-            c.data = None
-            if c.dim.h > 2 and c.dim.w > 2:
-                comp.log('derwin({}, {})'.format(c.dim, c.pos))
-                c.data = c.winparent.data.derwin(c.dim.h, c.dim.w, c.pos.y, c.pos.x)
-                if c.conf.border:
-                    c.data.border()
-
-        v = create_windows(c, v, 0, 0, depth + 1)
-    return v
+# def create_windows(comp, v, xoff, yoff, depth):
+#     for c in comp.children:
+#         if isinstance(c, WinInfo):
+#             del c.data.scr
+#             c.data.scr = None
+#             if c.dim.h > 2 and c.dim.w > 2:
+#                 comp.log('derwin({}, {})'.format(c.dim, c.pos))
+#                 c.data = c.winparent.data.derwin(c.dim, c.pos)
+#
+#         v = create_windows(c, v, 0, 0, depth + 1)
+#     return v
 
 
 WINTER_EDEN_STR = WINTER_EDEN.replace('\n', ' ')
@@ -55,17 +54,16 @@ class Handler:
         # use os.get_terminal_size() since scr.getmaxyx() does not change with resizing (on macos)
         w, h = self.term_size = os.get_terminal_size()
         root = self.root = rootwin(Dim(h, w), __file__)
-
-        root.data = scr
         h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
         h_pan.window('leftwin', Con(10,40,15,80))
         h_pan.window('rightwin', Con(8,22,12,30))
 
+        init_win(root, scr)
         root.do_layout()
-        create_windows(root, None, 0, 0, 1)
-        root.data.refresh()
+        root.data.rebuild_screens()
+        root.data.scr.refresh()
 
-    def size_to_term(self, force = False):
+    def size_to_term(self, force=False):
         if not force and self.term_size == os.get_terminal_size():
             return
 
@@ -87,15 +85,16 @@ class Handler:
             root.clear_layout()
             root.do_layout()
 
-            root.data.clear()
-            create_windows(root, None, 0, 0, 1)
+            root.data.scr.clear()
+            root.data.rebuild_screens()
+
             leftwin = root.info.win_by_name['leftwin']
-            if leftwin.data:
-                leftwin.data.addstr(2,2, "term_size: {}".format(leftwin.dim))
+            if leftwin.data.scr:
+                leftwin.data.scr.addstr(2,2, "term_size: {}".format(leftwin.dim))
             rightwin = root.info.win_by_name['rightwin']
-            if rightwin.data:
-                rightwin.data.addstr(2,2, "term_size: {}".format(rightwin.dim))
-            root.data.refresh()
+            if rightwin.data.scr:
+                rightwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
+            root.data.scr.refresh()
 
         except Exception as e:
             raise RuntimeError('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))

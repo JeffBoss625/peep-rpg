@@ -21,7 +21,7 @@ class Model:
         self.seed = seed
         self.out = out
 
-    # add a message or all messages in an interable to the messages array
+    # add a message or all messages in an iterable to the messages array
     def message(self, msg):
         if isinstance(msg, str):
             self.messages.append(msg)

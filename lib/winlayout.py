@@ -159,6 +159,7 @@ class Comp:
         self.dim = None       # calculated in do_layout()
         self.children = []
         self.logger = None
+        self.data = None      # externally-managed data (e.g. corresponding curses window)
 
     # Called from root down
     def clear_layout(self):
@@ -185,12 +186,12 @@ class Comp:
         return fn(self, v)
 
     def iterate_win(self, fn, v=None, xoff=0, yoff=0, d=0):
-        if isinstance(self, Win):
+        if isinstance(self, WinInfo):
             v = fn(self, v, xoff, yoff, d)
             d += 1
 
-        xoff += self.pos.x
-        yoff += self.pos.y
+        # xoff += self.pos.x
+        # yoff += self.pos.y
         for c in self.children:
             v = c.iterate_win(fn, v, xoff, yoff, d)
 
@@ -212,10 +213,6 @@ class Comp:
         pass
 
 @dataclass
-class Config:
-    border: int = 1
-
-@dataclass
 class RootInfo:
     win_count: int = 0
     win_by_name = {}
@@ -227,14 +224,13 @@ class RootInfo:
 #    win_by_name    all windows by name
 #    win_count      total number of windows created (including those deleted)
 #
-class Win(Comp):
+class WinInfo(Comp):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, name, pos, con):
         super().__init__(parent, pos, con)
         self.name = name
-        self.conf = Config()
         wp = parent
-        while wp and not isinstance(wp, Win):
+        while wp and not isinstance(wp, WinInfo):
             wp = wp.parent
         self.winparent = wp
         if wp:
@@ -250,15 +246,13 @@ class Win(Comp):
             self.name = 'window_{}'.format(self.id)
         self.root.info.win_by_name[self.name] = self
 
-        self.data = None        # externally managed data (e.g. corresponding curses window)
-
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
     def window(self, name, pos, con):
         if not pos:
             pos = Pos(0,0)
-        ret = Win(self, name, pos, con)
+        ret = WinInfo(self, name, pos, con)
         self.children.append(ret)
         return ret
 
@@ -374,7 +368,7 @@ class Panel(Comp):
         return ret
 
     def window(self, name, con):
-        ret = Win(self, name, None, con)
+        ret = WinInfo(self, name, None, con)
         self.children.append(ret)
         self.con = None
         self.dim = None
@@ -486,9 +480,8 @@ def flow_calc_sizes(avail, mins, maxs):
     return c_sizes
 
 def rootwin(dim, out=None):
-    ret = Win(None, 'root', Pos(0,0), Con(dim.h, dim.w, dim.h, dim.w))
+    ret = WinInfo(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
-    ret.conf.border = 0
     ret.logger = Logger(out)
 
     return ret

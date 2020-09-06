@@ -30,14 +30,6 @@ class Term:
     def move_to(self, x, y):
         self.scr.move(y, x)
 
-    def write_lines(self, lines):
-        scr = self.scr
-        y, x = scr.getyx()
-        for i, line in enumerate(lines):
-            scr.move(y+i, x)
-            scr.addstr(line)
-
-        scr.move(y + len(lines), x)
 
     def write_char(self, char, fg=Color.WHITE, bg=Color.BLACK):
         cpair = self.color_pair(fg, bg)
