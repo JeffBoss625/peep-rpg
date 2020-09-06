@@ -412,10 +412,10 @@ def sum_max0(a):
     return ret
 
 # place min-sized childrent and truncate the last child and children to fit
-def flow_place_children_trunc(orient, avail, child_constraints):
+def flow_place_children_trunc(avail, ccon_mins):
     ret = []
-    for ccon in child_constraints:
-        c_size = ccon.min(orient)
+    for ccon_min in ccon_mins:
+        c_size = ccon_min
 
         if avail > 0:
             if avail >= c_size:
@@ -431,12 +431,13 @@ def flow_place_children_trunc(orient, avail, child_constraints):
     return ret
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(orient, required, avail, child_constraints, num_children):
+def flow_place_children_fill(required, avail, ccon_mins, ccon_maxs):
     ret = []
     extra = avail - required    # extra space to distribute among children
-    for ci, ccon in enumerate(child_constraints):
-        c_size = ccon.min(orient)
-        c_max = min0(ccon.max(orient), ccon.min(orient) + extra)
+    num_children = len(ccon_mins)
+    for ci, ccon_min in enumerate(ccon_mins):
+        c_size = c_min = ccon_min
+        c_max = min0(ccon_maxs[ci], c_min + extra)
         adj = int(extra / (num_children - ci))  # adj is positive to expand, negative to shrink
         if c_size + adj < 0:
             adj = c_size
@@ -455,15 +456,17 @@ def flow_place_children_fill(orient, required, avail, child_constraints, num_chi
 
 def flow_place_children(logfn, orient, dim, con, children):
     logfn('flow_place_children({},dim[{}],con[{}])'.format(orient, dim, con))
-    required_space = sum(c.con.min(orient) for c in children)             # minimum space required
-    avail_space = sum_max0(c.con.max(orient) for c in children)       # max space needed
+
+    required_space = sum(c.con.min(orient) for c in children)           # min space required
+    avail_space = sum_max0(c.con.max(orient) for c in children)         # max space needed
     avail_space = min0(avail_space, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
 
-    child_constraints = (c.con for c in children)
+    ccon_mins = list(c.con.min(orient) for c in children)
+    ccon_maxs = list(c.con.max(orient) for c in children)
     if avail_space < required_space:
-        c_sizes = flow_place_children_trunc(orient, avail_space, child_constraints)
+        c_sizes = flow_place_children_trunc(avail_space, ccon_mins)
     else:
-        c_sizes = flow_place_children_fill(orient, required_space, avail_space, child_constraints, len(children))
+        c_sizes = flow_place_children_fill(required_space, avail_space, ccon_mins, ccon_maxs)
 
     fixed_avail_space = dim.hw(Orient.invert(orient))
     pos_offset = 0
