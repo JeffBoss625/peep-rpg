@@ -390,7 +390,33 @@ class Panel(Comp):
         return ret
 
     def calc_child_dim(self):
-        flow_place_children(self.log, self.orient, self.dim, self.con, self.children)
+        orient = self.orient
+        con = self.con
+        dim = self.dim
+        children = self.children
+
+        avail_space = min0(con.max(orient), dim.hw(orient))
+        ccon_mins = list(c.con.min(orient) for c in children)
+        ccon_maxs = list(c.con.max(orient) for c in children)
+
+        c_sizes = flow_calc_sizes(avail_space, ccon_mins, ccon_maxs)
+
+        fixed_avail_space = dim.hw(Orient.invert(orient))
+        pos_offset = 0
+        for i, c in enumerate(children):
+            c_size = c_sizes[i]
+            c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
+            if orient == Orient.HORI:
+                c.pos = Pos(0,pos_offset)
+                c.dim = Dim(c_size_fixed, c_size)
+            elif orient == Orient.VERT:
+                c.pos = Pos(pos_offset,0)
+                c.dim = Dim(c_size, c_size_fixed)
+            else:
+                raise ValueError("unknown orientation: " + orient)
+
+            pos_offset += c_size
+
         for c in self.children:
             c.calc_child_dim()
 
@@ -431,7 +457,7 @@ def flow_place_children_trunc(avail, ccon_mins):
     return ret
 
 # expand children from min size to evenly distribute extra allowed space to children
-def flow_place_children_fill(required, avail, ccon_mins, ccon_maxs):
+def flow_calc_size_fill(required, avail, ccon_mins, ccon_maxs):
     ret = []
     extra = avail - required    # extra space to distribute among children
     num_children = len(ccon_mins)
@@ -453,37 +479,16 @@ def flow_place_children_fill(required, avail, ccon_mins, ccon_maxs):
 
     return ret
 
-
-def flow_place_children(logfn, orient, dim, con, children):
-    logfn('flow_place_children({},dim[{}],con[{}])'.format(orient, dim, con))
-
-    avail_space = min0(con.max(orient), dim.hw(orient))
-    ccon_mins = list(c.con.min(orient) for c in children)
-    ccon_maxs = list(c.con.max(orient) for c in children)
-
-    required_space = sum(ccon_mins)           # min space required
-    avail_space = min0(sum_max0(ccon_maxs), avail_space)    # ...bound by panel and dim
+def flow_calc_sizes(avail, mins, maxs):
+    required_space = sum(mins)                  # min space required
+    avail_space = min0(sum_max0(maxs), avail)   # ...bound by panel and dim
 
     if avail_space < required_space:
-        c_sizes = flow_place_children_trunc(avail_space, ccon_mins)
+        c_sizes = flow_place_children_trunc(avail_space, mins)
     else:
-        c_sizes = flow_place_children_fill(required_space, avail_space, ccon_mins, ccon_maxs)
+        c_sizes = flow_calc_size_fill(required_space, avail_space, mins, maxs)
 
-    fixed_avail_space = dim.hw(Orient.invert(orient))
-    pos_offset = 0
-    for i, c in enumerate(children):
-        c_size = c_sizes[i]
-        c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
-        if orient == Orient.HORI:
-            c.pos = Pos(0,pos_offset)
-            c.dim = Dim(c_size_fixed, c_size)
-        elif orient == Orient.VERT:
-            c.pos = Pos(pos_offset,0)
-            c.dim = Dim(c_size, c_size_fixed)
-        else:
-            raise ValueError("unknown orientation: " + orient)
-
-        pos_offset += c_size
+    return c_sizes
 
 
 # Simple logger with one level of logging. Logs if file name is given, otherwise no logging.
