@@ -7,26 +7,30 @@ import os
 STATS = 'stats'
 MAZE = 'maze'
 MESSAGES = 'messages'
+ROOT = 'root'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class Screen:
     def __init__(self, curses_scr, model):
-        self.term = Term(curses_scr)
         self.model = model
-        w, h = os.terminal_size
-        root = rootwin(Dim(h, w), 'prpg')
-        hpan = root.panel(Orient.HORI)
-        hpan.window(STATS, Con(8, 20, 8, 20))
-        hpan.window(MAZE, Con(40, 40))
-        hpan.window(MESSAGES, Con(8,20))
-        root.data = CurWin(root, curses_scr)
+        w, h = os.get_terminal_size()
+        root_layout = create_layout(Dim(h, w), 'prpg')
+        hpan = root_layout.panel(Orient.VERT, None, None)
+        hpan.window(STATS, Con(6, 40, 6, 40))
+        hpan.window(MAZE, Con(25, 40, 0, 80))
+        hpan.window(MESSAGES, Con(6, 40, 10, 80))
 
-        self.root = root
-        self.reset_layout()
+        init_win(root_layout, curses_scr)
+        self.root_win = root_layout.data
 
-    def reset_layout(self):
-        self.root.do_layout()
-        self.root.data.create_child_screens()
+        self.root_layout = root_layout
+        self.rebuild_screens()
+        curses.curs_set(0)
+
+    def rebuild_screens(self):
+        self.root_layout.do_layout()
+        self.win(ROOT).rebuild_screens()
+        self.win(ROOT).scr.refresh()
 
     # print messages and standard output
     def print(self, *args):
@@ -35,41 +39,46 @@ class Screen:
         self.paint()
 
     def get_key(self):
-        return self.term.get_key()
+        return self.root_win.get_key()
+
+    def win(self, name):
+        return self.root_layout.info.win_by_name[name].data
 
     # paint the entire screen - all that is visible
     def paint(self):
-        term = self.term
-        term.clear()
+        root = self.win(ROOT)
+        root.clear()
 
         self._paint_stats()
         self._paint_maze()
         self._paint_messages()
 
-        term.move_to(0,0)
-        term.refresh()
+        root.refresh()
 
     def _paint_messages(self):
-        win = self.root[MESSAGES].data
-        win.write_lines(self.model.messages[-12:])
+        msgwin = self.win(MESSAGES)
+        msgwin.write_lines(self.model.messages[-12:])
+        msgwin.scr.border()
 
     def _paint_stats(self):
         p = self.model.player
-        self._term.write_lines([
+        statwin = self.win(STATS)
+        self.root_layout.log('_paint_stats({})'.format(statwin))
+        statwin.write_lines([
             p.name,
             'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
             'speed: ' + str(p.speed),
             ])
+        statwin.scr.border()
 
     def _paint_maze(self):
-        term = self._term
+        mazewin = self.win(MAZE)
         model = self.model
-        x, y = term.get_xy()
-
-        term.write_lines(model.maze)
+        mazewin.write_lines(model.maze)
 
         for p in model.peeps:
-            term.move_to(x + p.x, y + p.y)
-            term.write_char(p.char,  p.fgcolor, p.bgcolor)
+            mazewin.move_to(p.x, p.y)
+            mazewin.write_char(p.char, p.fgcolor, p.bgcolor)
 
-        term.move_to(x, y + len(model.maze))  # move cursor to end of maze
+        mazewin.scr.border()
+        # win.move_to(x, y + len(model.maze))  # move cursor to end of maze

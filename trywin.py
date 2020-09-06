@@ -36,7 +36,7 @@ Robert Frost
 WINTER_EDEN_STR = WINTER_EDEN.replace('\n', ' ')
 class Handler:
     def __init__(self, scr):
-        self.root = rootwin(scr)
+        self.root = create_layout(scr)
         col1 = self.root.panel(Orient.VERT)
         self.win2 = col1.window(Con(10, 80, 14, 80))
         self.root.setout(self.win2)

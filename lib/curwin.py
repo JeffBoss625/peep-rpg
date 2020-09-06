@@ -1,12 +1,18 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import curses
-from lib.winlayout import *
+# from lib.winlayout import *
+from lib.constants import Color
 
 class CurWin:
     def __init__(self, winfo):
         self.winfo = winfo      # layout window information
         self.border = 1
+        self.x_margin = 1
+        self.y_margin = 1
         self.scr = None         # curses window
+
+        self.color_pairs = {}       # color pair codes by (fg, bg) tuple
+        self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
 
     #
     # TREE Navigation/Initialization functions
@@ -19,21 +25,57 @@ class CurWin:
     #
     # CURSES Interface
     #
+    def clear(self):
+        self.scr.clear()
+
     def derwin(self, dim, pos):
         ret = self.scr.derwin(dim.h, dim.w, pos.y, pos.x)
         if self.border:
             ret.border()
         return ret
 
-    def write_lines(self, lines, x_margin, y_margin):
+    def write_lines(self, lines):
         scr = self.scr
-        y, x = scr.getyx()
-        y += y_margin
-        x += x_margin
+        x = self.x_margin
+        y = self.y_margin
         # todo: enforce bottom/right margins and truncate strings
         for i, line in enumerate(lines):
             scr.move(y+i, x)
             scr.addstr(line)
+
+    def refresh(self):
+        self.scr.refresh()
+
+    def get_key(self):
+        return self.scr.getkey()
+
+    def get_xy(self):
+        y, x = self.scr.getyx()
+        return x, y
+
+    # Relative move of cursor
+    def move(self, dx, dy):
+        y, x = self.scr.getyx()
+        self.scr.move(y + dy, x + dx)
+
+    # Absolute move of cursor
+    def move_to(self, x, y):
+        self.scr.move(y + self.y_margin, x + self.x_margin)
+
+    def write_char(self, char, fg=Color.WHITE, bg=Color.BLACK):
+        cpair = self.color_pair(fg, bg)
+        self.scr.addstr(char, cpair)
+
+    def color_pair(self, fg, bg):
+        key = (fg, bg)
+        if key not in self.color_pairs:
+            self.color_pair_count += 1
+            fgc = getattr(curses, 'COLOR_' + fg.name)
+            bgc = getattr(curses, 'COLOR_' + bg.name)
+            curses.init_pair(self.color_pair_count, fgc, bgc)
+            self.color_pairs[key] = curses.color_pair(self.color_pair_count)
+
+        return self.color_pairs[key]
 
 # delete and re-create derived curses windows/screens using parent windows/screens
 def _rebuild_screen(winfo, v, xoff, yoff, d):

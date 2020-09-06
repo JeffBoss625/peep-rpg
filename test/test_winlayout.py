@@ -33,7 +33,7 @@ def test_addcol():
 # note that running nose tests with "-d" gives assertion descriptions including content of dataclasses
 # when variables are resolved, so we call "cpos = col.pos()..." as separate steps reveal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
-    root = rootwin(rootdim)
+    root = create_layout(rootdim)
     col = root.panel(Orient.VERT, colpos, colcon)
     root.do_layout()
 
@@ -122,7 +122,7 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    root = rootwin(dim, None)
+    root = create_layout(dim, None)
     # root = rootwin(dim, 'stderr')
     root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel(orient, pos, con)
@@ -169,7 +169,7 @@ def print_one_win(win, buf, xoff, yoff, depth):
     return buf
 
 def test_paint():
-    root = rootwin(Dim(15, 100))
+    root = create_layout(Dim(15, 100))
     hpan = root.panel(Orient.HORI, None, None)
 
     hpan.window('w1', Con(4, 10, 5, 20))

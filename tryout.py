@@ -4,7 +4,7 @@ from lib.curwin import *
 
 def main(scr):
     curses.raw()
-    root = rootwin(scr)
+    root = create_layout(scr)
 
     while 1:
         h.paint()

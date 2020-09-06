@@ -479,7 +479,7 @@ def flow_calc_sizes(avail, mins, maxs):
 
     return c_sizes
 
-def rootwin(dim, out=None):
+def create_layout(dim, out=None):
     ret = WinInfo(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
     ret.logger = Logger(out)
