@@ -122,7 +122,7 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    root = rootwin(dim, 'none')
+    root = rootwin(dim, None)
     # root = rootwin(dim, 'stderr')
     root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel(orient, pos, con)
@@ -169,7 +169,7 @@ def print_one_win(win, buf, xoff, yoff, depth):
     return buf
 
 def test_paint():
-    root = rootwin(Dim(15, 100), 'stderr')
+    root = rootwin(Dim(15, 100))
     hpan = root.panel(Orient.HORI, None, None)
 
     hpan.window('w1', Con(4, 10, 5, 20))
