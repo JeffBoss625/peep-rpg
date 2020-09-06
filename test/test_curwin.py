@@ -175,10 +175,16 @@ def test_paint():
     hpan.window('w1', Con(4, 10, 5, 20))
     hpan.window('w2', Con(3,5,8,10))
     root.do_layout()
-    print_win(root)
+    # print_win(root)
 
     assert root.info.win_by_name['w1'].name == 'w1'
     assert root.info.win_by_name['w2'].name == 'w2'
     assert root.info.win_by_name['root'].name == 'root'
+    assert hpan.con == Con(4,15,8,30)
 
+    root.clear_layout()
+    assert hpan.con is None
+
+    root.do_layout()
+    assert hpan.con == Con(4,15,8,30)
 
