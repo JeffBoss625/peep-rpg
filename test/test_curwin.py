@@ -43,7 +43,7 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     assert cdim == expdim
 
 def test_flow_calc_sizes():
-    # orient, required, avail, child_constraints, expected_sizes
+    # avail_space, mins, maxs, expected_sizes
     tests = [
         [5, [4], [5], [5]],
         [4, [4], [5], [4]],
