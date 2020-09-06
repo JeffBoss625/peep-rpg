@@ -1,7 +1,6 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
 
-from lib.printd import printd
 from lib.logger import Logger
 from dataclasses import dataclass
 
@@ -136,13 +135,6 @@ class Con:
         else:
             raise RuntimeError(str(w_apply) + ' not handled')
 
-
-class Out:
-    def printd(self, *args):
-        printd(*args)
-
-
-DEFAULT_OUT = Out()
 
 # Base component class.
 #

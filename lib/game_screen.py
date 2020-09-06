@@ -1,4 +1,3 @@
-from lib.term import Term
 from lib.winlayout import *
 from lib.curwin import *
 import os
