@@ -1,10 +1,8 @@
-import curses
 import signal
 import time
 import traceback
 import os
-from lib.curwin import *
-import logging
+from lib.winlayout import *
 import curses
 
 WINTER_EDEN = """

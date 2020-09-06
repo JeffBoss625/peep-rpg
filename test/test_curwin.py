@@ -1,4 +1,4 @@
-from lib.curwin import *
+from lib.winlayout import *
 import sys
 
 def printe(s):
