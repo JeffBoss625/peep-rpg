@@ -457,12 +457,13 @@ def flow_place_children_fill(required, avail, ccon_mins, ccon_maxs):
 def flow_place_children(logfn, orient, dim, con, children):
     logfn('flow_place_children({},dim[{}],con[{}])'.format(orient, dim, con))
 
-    required_space = sum(c.con.min(orient) for c in children)           # min space required
-    avail_space = sum_max0(c.con.max(orient) for c in children)         # max space needed
-    avail_space = min0(avail_space, con.max(orient), dim.hw(orient))    # ...bound by panel and dim
-
+    avail_space = min0(con.max(orient), dim.hw(orient))
     ccon_mins = list(c.con.min(orient) for c in children)
     ccon_maxs = list(c.con.max(orient) for c in children)
+
+    required_space = sum(ccon_mins)           # min space required
+    avail_space = min0(sum_max0(ccon_maxs), avail_space)    # ...bound by panel and dim
+
     if avail_space < required_space:
         c_sizes = flow_place_children_trunc(avail_space, ccon_mins)
     else:
