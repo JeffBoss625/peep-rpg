@@ -4,9 +4,6 @@
 from lib.printd import printd
 from lib.logger import Logger
 from dataclasses import dataclass
-import re
-import sys
-import logging
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass

@@ -1,4 +1,6 @@
 import sys
+import logging
+import re
 
 # Simple logger with one level of logging. Logs if file name is given, otherwise no logging.
 class Logger:
