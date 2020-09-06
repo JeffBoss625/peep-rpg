@@ -162,10 +162,10 @@ class Comp:
 
     # Called from root down
     def clear_layout(self):
-        raise NotImplementedError()
+        pass
 
     def calc_constraints(self):
-        raise NotImplementedError()
+        pass
 
     def root(self):
         p = self
@@ -209,7 +209,7 @@ class Comp:
         self.calc_child_dim()
 
     def calc_child_dim(self):
-        raise NotImplementedError()
+        pass
 
 @dataclass
 class Config:
