@@ -438,7 +438,7 @@ def sum_max0(a):
     return ret
 
 # place min-sized childrent and truncate the last child and children to fit
-def flow_place_children_trunc(avail, ccon_mins):
+def flow_calc_size_trunc(avail, ccon_mins):
     ret = []
     for ccon_min in ccon_mins:
         c_size = ccon_min
@@ -461,30 +461,27 @@ def flow_calc_size_fill(required, avail, ccon_mins, ccon_maxs):
     ret = []
     extra = avail - required    # extra space to distribute among children
     num_children = len(ccon_mins)
-    for ci, ccon_min in enumerate(ccon_mins):
-        c_size = c_min = ccon_min
+    for ci, c_min in enumerate(ccon_mins):
         c_max = min0(ccon_maxs[ci], c_min + extra)
-        adj = int(extra / (num_children - ci))  # adj is positive to expand, negative to shrink
-        if c_size + adj < 0:
-            adj = c_size
-            c_size = 0
-        elif 0 < c_max < c_size + adj:
-            adj = c_max - c_size
-            c_size = c_max
-        else:
-            c_size += adj
+        adj = int(extra / (num_children - ci))
+        if 0 < c_max < c_min + adj:
+            # more adjustment than can be taken - only consume the needed adjustment
+            adj = c_max - c_min
 
         extra -= adj
-        ret.append(c_size)
+        ret.append(c_min + adj)
 
     return ret
 
+# calculate dimension size in a flow layout (e.g. left-to-right or top-to-bottom) for
+# a given list of min and max constraints in an available amount of space.
+# Return the list of sizes, one per constraint pair
 def flow_calc_sizes(avail, mins, maxs):
     required_space = sum(mins)                  # min space required
     avail_space = min0(sum_max0(maxs), avail)   # ...bound by panel and dim
 
     if avail_space < required_space:
-        c_sizes = flow_place_children_trunc(avail_space, mins)
+        c_sizes = flow_calc_size_trunc(avail_space, mins)
     else:
         c_sizes = flow_calc_size_fill(required_space, avail_space, mins, maxs)
 

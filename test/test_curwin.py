@@ -42,21 +42,34 @@ def check_col(rootdim, colpos, colcon, expcon, expdim):
     cdim = col.dim
     assert cdim == expdim
 
-# def test_flow_place_children_fill():
-#     # orient, required, avail, child_constraints, expected_sizes
-#     tests = [
-#         [Orient.HORI, 4, 12, [Con(0,4,0,5)], [5]],
-#         [Orient.HORI, 4, 12, [Con(0,4,0,0)], [12]],
-#         [Orient.HORI, 8, 12, [Con(0,4,0,5), Con(0,4,0,0)], [5, 7]],
-#     ]
-#
-#     for row in tests:
-#         yield check_flow_fill, row[0], row[1], row[2], row[3], row[4]
-#
-# def check_flow_fill(orient, required, avail, child_constraints, exp):
-#     sizes = flow_place_children_fill(orient, required, avail, child_constraints, len(child_constraints))
-#     assert sizes == exp
-#
+def test_flow_calc_sizes():
+    # orient, required, avail, child_constraints, expected_sizes
+    tests = [
+        [5, [4], [5], [5]],
+        [4, [4], [5], [4]],
+        [3, [4], [5], [3]],
+        [5, [4,4], [8,8], [4,1]],
+        [6, [4,4], [8,8], [4,2]],
+        [7, [4,4], [8,8], [4,3]],
+        [8, [4,4], [8,8], [4,4]],
+        [9, [4,4], [8,8], [4,5]],
+        [10, [4,4], [8,8], [5,5]],
+        [3, [4,4,4], [5,6,7], [3,0,0]],
+        [4, [4,4,4], [5,6,7], [4,0,0]],
+        [5, [4,4,4], [5,6,7], [4,1,0]],
+        [11, [4,4,4], [5,6,7], [4,4,3]],
+        [12, [4,4,4], [5,6,7], [4,4,4]],
+        [13, [4,4,4], [5,6,7], [4,4,5]],
+        [20, [4,4,4], [5,6,7], [5,6,7]],
+    ]
+
+    for row in tests:
+        yield check_flow_sizes, row[0], row[1], row[2], row[3]
+
+def check_flow_sizes(avail, mins, maxs, exp):
+    sizes = flow_calc_sizes(avail, mins, maxs)
+    assert sizes == exp
+
 
 # tests of flow layout within a 10x30 master window
 FLOW_TESTS_10_30 = [
