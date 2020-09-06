@@ -473,13 +473,13 @@ def flow_place_children(logfn, orient, dim, con, children):
     pos_offset = 0
     for i, c in enumerate(children):
         c_size = c_sizes[i]
-        c_size2 = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
+        c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
         if orient == Orient.HORI:
             c.pos = Pos(0,pos_offset)
-            c.dim = Dim(c_size2, c_size)
+            c.dim = Dim(c_size_fixed, c_size)
         elif orient == Orient.VERT:
             c.pos = Pos(pos_offset,0)
-            c.dim = Dim(c_size, c_size2)
+            c.dim = Dim(c_size, c_size_fixed)
         else:
             raise ValueError("unknown orientation: " + orient)
 
