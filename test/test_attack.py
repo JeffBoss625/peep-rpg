@@ -14,3 +14,26 @@ def test_attack():
     attacklib.attack(p1, p2, 'teeth', out, 3)
     assert p2.hp == 0
     assert len(out.args) == 4
+
+    # try this.... not changing.
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)
+    # attacklib.attack(p1, p2, 'teeth', out, 3)
+    # attacklib.attack(p2, p1, 'teeth', out, 3)
+    # print(p1.hp, p2.hp)

@@ -56,7 +56,10 @@ class Handler:
         root = self.root = create_layout(Dim(h, w), __file__)
         h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
         h_pan.window('leftwin', Con(10,40,15,80))
-        h_pan.window('rightwin', Con(8,22,12,30))
+
+        v_pan = h_pan.panel(Orient.VERT, None)
+        v_pan.window('rightwin', Con(8,22,12,30))
+        v_pan.window('lowerwin', Con(6,10))
 
         init_win(root, scr)
         root.do_layout()
@@ -94,6 +97,10 @@ class Handler:
             rightwin = root.info.win_by_name['rightwin']
             if rightwin.data.scr:
                 rightwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
+            lowerwin = root.info.win_by_name['lowerwin']
+            if lowerwin.data.scr:
+                lowerwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
+
             root.data.scr.refresh()
 
         except Exception as e:

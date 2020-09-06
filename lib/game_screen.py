@@ -7,6 +7,7 @@ STATS = 'stats'
 MAZE = 'maze'
 MESSAGES = 'messages'
 ROOT = 'root'
+DEBUG = 'debug'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class Screen:
@@ -14,10 +15,14 @@ class Screen:
         self.model = model
         w, h = os.get_terminal_size()
         root_layout = create_layout(Dim(h, w), 'prpg')
-        hpan = root_layout.panel(Orient.VERT, None, None)
-        hpan.window(STATS, Con(6, 40, 6, 40))
-        hpan.window(MAZE, Con(25, 40, 0, 80))
-        hpan.window(MESSAGES, Con(6, 40, 10, 80))
+        row_panel = root_layout.panel(Orient.VERT, None, None)
+        row_panel.window(STATS, Con(6, 40, 6, 40))
+
+        maze_panel = row_panel.panel(Orient.HORI, None)
+        maze_panel.window(MAZE, Con(25, 40, 0, 80))
+        maze_panel.window(DEBUG, Con(0,30,0,50))
+
+        row_panel.window(MESSAGES, Con(6, 40, 10, 80))
 
         init_win(root_layout, curses_scr)
         self.root_win = root_layout.data
@@ -51,11 +56,17 @@ class Screen:
         self._paint_stats()
         self._paint_maze()
         self._paint_messages()
+        self._paint_debug()
 
         root.refresh()
 
     def _paint_messages(self):
         msgwin = self.win(MESSAGES)
+        msgwin.write_lines(self.model.messages[-12:])
+        msgwin.scr.border()
+
+    def _paint_debug(self):
+        msgwin = self.win(DEBUG)
         msgwin.write_lines(self.model.messages[-12:])
         msgwin.scr.border()
 

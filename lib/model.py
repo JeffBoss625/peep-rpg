@@ -47,6 +47,7 @@ class Peep:
     y: int = 0
     attacks: dict = dclib.field(default_factory=dict)
 
+
 # CONSTRUCTION FROM DICTIONARY LOGIC - ignore
 CLASS_FIELDS = {}
 

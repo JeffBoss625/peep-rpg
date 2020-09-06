@@ -373,6 +373,17 @@ class Panel(Comp):
         self.dim = None
         return ret
 
+    def pos_offset(self, orient):
+        ret = self.pos.yx(orient)
+        p = self.parent
+        while p and isinstance(p, Panel):
+            # self.log('...pos_offset({}, {}, {})'.format(self, p, orient))
+            ret += p.pos.yx(orient)
+            p = p.parent
+
+        # self.log('...pos_offset returns: {}'.format(ret))
+        return ret
+
     def calc_child_dim(self):
         orient = self.orient
         con = self.con
@@ -386,20 +397,21 @@ class Panel(Comp):
         c_sizes = flow_calc_sizes(avail_space, ccon_mins, ccon_maxs)
 
         fixed_avail_space = dim.hw(Orient.invert(orient))
-        pos_offset = 0
+        offset_flow = self.pos_offset(orient)
+        offset_fixed = self.pos_offset(Orient.invert(orient))
         for i, c in enumerate(children):
             c_size = c_sizes[i]
             c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
             if orient == Orient.HORI:
-                c.pos = Pos(0,pos_offset)
+                c.pos = Pos(offset_fixed,offset_flow)
                 c.dim = Dim(c_size_fixed, c_size)
             elif orient == Orient.VERT:
-                c.pos = Pos(pos_offset,0)
+                c.pos = Pos(offset_flow,offset_fixed)
                 c.dim = Dim(c_size, c_size_fixed)
             else:
                 raise ValueError("unknown orientation: " + orient)
 
-            pos_offset += c_size
+            offset_flow += c_size
 
         for c in self.children:
             c.calc_child_dim()
