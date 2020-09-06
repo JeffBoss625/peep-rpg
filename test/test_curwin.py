@@ -100,13 +100,13 @@ def test_layout_vertical():
 # run same tests as test_layout_vertical() by using inverted input.
 def test_layout_horizontal():
     for t in FLOW_TESTS_10_30:
-        panpos = t[0].invert() if t[0] else None
-        pancon = t[1].invert()
-        children = list(map(lambda c: c.invert(), t[2]))
+        pos = t[0].invert() if t[0] else None
+        con = t[1].invert()
+        children = list(c.invert() for c in t[2])
         expcon = t[3][0].invert()
-        expdim = t[3][1].invert()
+        expdims = list(c.invert() for c in t[3][1:])
 
-        yield check_flow_layout, Orient.HORI, Dim(30, 10), panpos, pancon, children, expcon, expdim
+        yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = rootwin(dim, 'none')
