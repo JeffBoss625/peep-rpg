@@ -9,32 +9,27 @@
 # that will be costly to change, but easier to work with and understand.
 
 import dataclasses as dclib
-from lib.output import Out
 
 @dclib.dataclass
 class Model:
-    def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0, out=Out()):
+    def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0):
         self.player = player
         self.maze = maze if maze else []
         self.peeps = peeps if peeps else []
         self.messages = messages if messages else []
         self.seed = seed
-        self.out = out
+        self.out = []
 
     # add a message or all messages in an iterable to the messages array
-    def message(self, msg):
-        if isinstance(msg, str):
-            self.messages.append(msg)
-        else:
-            self.messages.extend(msg)
+    def message(self, *args):
+        s = ' '.join(str(a) for a in args)
+        self.messages.extend(s.split('\n'))
 
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area
-    def print(self, *msg):
-        if self.out is None:
-            print(*msg)
-        else:
-            self.out.print(*msg)
+    def print(self, *args):
+        s = ' '.join(str(a) for a in args)
+        self.out.extend(s.split('\n'))
 
     def is_player(self, peep):
         return peep == self.player

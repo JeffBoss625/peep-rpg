@@ -2,7 +2,6 @@ import lib.move as mlib
 from lib.move import Direction
 from lib.model import Peep, Attack
 from lib.model_game import Model
-from lib.output import Hector
 
 def test_elapse_time():
     peeps = [
@@ -38,7 +37,7 @@ def test_move_peep():
         '......',        # monster here at [4,3]
     ]
     player = peeps[0]
-    model = Model(peeps=peeps, maze=maze, out=Hector())
+    model = Model(peeps=peeps, maze=maze)
     mlib.move_peep(model, player, mlib.Direction.RIGHT)
     assert player.x == 1 # x changed!
     assert player.y == 0
@@ -74,8 +73,7 @@ def test_move_attack():
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    out = Hector()
-    model = Model(peeps=peeps, maze=maze, out=Hector())
+    model = Model(peeps=peeps, maze=maze)
     # Run into monster at [0,2]
     mlib.move_peep(model, player, mlib.Direction.DOWN)
     assert player.x == 0
@@ -95,7 +93,7 @@ def test_handle_enemy_move():
         '......',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = Model(peeps=peeps, maze=maze, player=peeps[0], out=Hector())
+    model = Model(peeps=peeps, maze=maze, player=peeps[0])
     enemy = peeps[1]
     dx = model.player.x - enemy.x
     dy = model.player.y - enemy.y

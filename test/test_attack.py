@@ -1,12 +1,19 @@
 import lib.attack as attacklib
 from lib.model import Peep, Attack
-from lib.output import Hector
+
+class Out:
+    def __init__(self):
+        self.args = []
+
+    def message(self, *args):
+        self.args.append(args)
 
 def test_attack():
     p1 = Peep(name='p1', hp=3, attacks={'teeth': Attack(damage='1d3')})
     p2 = Peep(name='m1', hp=2, attacks={'teeth': Attack(damage='1d3')})
 
-    out = Hector()
+    out = Out()
+
     attacklib.attack(p1, p2, 'teeth', out, 3)
     assert p2.hp == 1
     attacklib.attack(p2, p1, 'teeth', out, 3)

@@ -66,9 +66,9 @@ class Screen:
         msgwin.scr.border()
 
     def _paint_debug(self):
-        msgwin = self.win(DEBUG)
-        msgwin.write_lines(self.model.messages[-12:])
-        msgwin.scr.border()
+        dbgwin = self.win(DEBUG)
+        dbgwin.write_lines(self.model.out[-12:])
+        dbgwin.scr.border()
 
     def _paint_stats(self):
         p = self.model.player
