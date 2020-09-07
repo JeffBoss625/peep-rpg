@@ -9,6 +9,8 @@ from lib.game_screen import Screen
 from lib.model_game import Model
 import random
 import time
+import signal
+import os
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -75,7 +77,7 @@ def player_turn(screen):
                 model.player = player
                 model.message("You are now " + model.player.name)
             else:
-               model.message("You have nothing in range to brain-swap with")
+                model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
             model.message('Where do you want to shoot?')
             screen.paint()
@@ -91,7 +93,7 @@ def player_turn(screen):
             screen.paint()
 
         else:
-            model.message('unknown command: "' + input_key + '"')
+            model.message('unknown command: "{}"'.format(input_key))
 
         screen.paint()  # update messages
         # continue with loop to get more input
@@ -131,6 +133,11 @@ def main(scr):
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = Screen(scr, model)
 
+    def resize_handler(_signum, _frame):
+        screen.size_to_terminal()
+        screen.paint()
+
+    signal.signal(signal.SIGWINCH, resize_handler)
     screen.paint()
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)

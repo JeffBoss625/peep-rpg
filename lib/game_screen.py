@@ -1,6 +1,8 @@
 from lib.winlayout import *
 from lib.curwin import *
 import os
+import time
+import traceback
 
 # windows
 STATS = 'stats'
@@ -13,7 +15,7 @@ DEBUG = 'debug'
 class Screen:
     def __init__(self, curses_scr, model):
         self.model = model
-        w, h = os.get_terminal_size()
+        w, h = self.term_size = os.get_terminal_size()
         root_layout = create_layout(Dim(h, w), 'prpg')
         row_panel = root_layout.panel(Orient.VERT, None, None)
         row_panel.window(STATS, Con(6, 40, 6, 40))
@@ -36,6 +38,32 @@ class Screen:
         self.win(ROOT).rebuild_screens()
         self.win(ROOT).scr.refresh()
 
+    def size_to_terminal(self):
+        if self.term_size == os.get_terminal_size():
+            return
+
+        # wait for resize changes to stop for a moment before resizing
+        t0 = time.time()
+        self.term_size = os.get_terminal_size()
+        while time.time() - t0 < 0.3:
+            time.sleep(0.1)
+            if self.term_size != os.get_terminal_size():
+                # size changed, reset timer
+                self.term_size = os.get_terminal_size()
+                t0 = time.time()
+
+        try:
+            w, h = self.term_size
+            curses.resizeterm(h, w)
+            self.root_layout.dim.w = w
+            self.root_layout.dim.h = h
+            self.root_layout.clear_layout()
+            self.root_layout.do_layout()
+            self.rebuild_screens()
+
+        except Exception as e:
+            self.root_layout.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
+
     # print messages and standard output
     def print(self, *args):
         line = ' '.join([str(a) for a in args])
@@ -43,7 +71,10 @@ class Screen:
         self.paint()
 
     def get_key(self):
-        return self.root_win.get_key()
+        try:
+            return self.root_win.get_key()
+        except Exception as e:
+            self.root_layout.log('get_key failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
 
     def win(self, name):
         return self.root_layout.info.win_by_name[name].data
@@ -87,8 +118,7 @@ class Screen:
         mazewin.write_lines(model.maze)
 
         for p in model.peeps:
-            mazewin.move_to(p.x, p.y)
-            mazewin.write_char(p.char, p.fgcolor, p.bgcolor)
+            mazewin.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
         mazewin.scr.border()
         # win.move_to(x, y + len(model.maze))  # move cursor to end of maze

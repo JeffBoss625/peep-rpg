@@ -103,7 +103,6 @@ class Handler:
 
         win4.addstr(1, 1, WINTER_EDEN_STR)
         win1.addch(0, win1.getmaxyx()[1] - 1, '@')
-        win1.move(0,0)
 
         win1.border()
         win2.border()

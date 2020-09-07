@@ -40,8 +40,7 @@ class CurWin:
         y = self.y_margin
         # todo: enforce bottom/right margins and truncate strings
         for i, line in enumerate(lines):
-            scr.move(y+i, x)
-            scr.addstr(line)
+            scr.addstr(y+i, x, line)
 
     def refresh(self):
         self.scr.refresh()
@@ -49,22 +48,9 @@ class CurWin:
     def get_key(self):
         return self.scr.getkey()
 
-    def get_xy(self):
-        y, x = self.scr.getyx()
-        return x, y
-
-    # Relative move of cursor
-    def move(self, dx, dy):
-        y, x = self.scr.getyx()
-        self.scr.move(y + dy, x + dx)
-
-    # Absolute move of cursor
-    def move_to(self, x, y):
-        self.scr.move(y + self.y_margin, x + self.x_margin)
-
-    def write_char(self, char, fg=Color.WHITE, bg=Color.BLACK):
+    def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK):
         cpair = self.color_pair(fg, bg)
-        self.scr.addstr(char, cpair)
+        self.scr.addstr(y + self.y_margin, x + self.x_margin, char, cpair)
 
     def color_pair(self, fg, bg):
         key = (fg, bg)
