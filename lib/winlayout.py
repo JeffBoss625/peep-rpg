@@ -337,7 +337,7 @@ class Panel(Comp):
     # First calculate constraints based on child constraints (set from bottom-up) and panel_con.
     # Then calculate dimensions based on parent.dim and constraints
     def calc_constraints(self):
-        self.log('calc_constraints({})'.format(self))
+        # self.log('calc_constraints({})'.format(self))
         if self.orient == Orient.VERT:
             h_apply = ConApply.STACK
             w_apply = ConApply.ADJACENT
@@ -346,7 +346,7 @@ class Panel(Comp):
             w_apply = ConApply.STACK
 
         self.con = self._calc_constraints(h_apply, w_apply)     # calculate AND SET child constraints (bottom up)
-        self.log('...calc_constraints({})'.format(self))
+        # self.log('...calc_constraints({})'.format(self))
 
     # calculate constraints from bottom-up for all constraints that are not set
     def _calc_constraints(self, h_apply, w_apply):
