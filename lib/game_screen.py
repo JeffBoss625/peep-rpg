@@ -71,10 +71,7 @@ class Screen:
         self.paint()
 
     def get_key(self):
-        try:
-            return self.root_win.get_key()
-        except Exception as e:
-            self.root_layout.log('get_key failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
+        return self.root_win.get_key()
 
     def win(self, name):
         return self.root_layout.info.win_by_name[name].data
@@ -93,18 +90,23 @@ class Screen:
 
     def _paint_messages(self):
         msgwin = self.win(MESSAGES)
+        if not msgwin.scr:
+            return
         msgwin.write_lines(self.model.messages[-12:])
         msgwin.scr.border()
 
     def _paint_debug(self):
         dbgwin = self.win(DEBUG)
+        if not dbgwin.scr:
+            return
         dbgwin.write_lines(self.model.out[-12:])
         dbgwin.scr.border()
 
     def _paint_stats(self):
         p = self.model.player
         statwin = self.win(STATS)
-        self.root_layout.log('_paint_stats({})'.format(statwin))
+        if not statwin.scr:
+            return
         statwin.write_lines([
             p.name,
             'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
@@ -114,6 +116,8 @@ class Screen:
 
     def _paint_maze(self):
         mazewin = self.win(MAZE)
+        if not mazewin.scr:
+            return
         model = self.model
         mazewin.write_lines(model.maze)
 

@@ -1,7 +1,11 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import curses
-# from lib.winlayout import *
+import traceback
 from lib.constants import Color
+
+IGNORED_KEYS = {
+    'KEY_RESIZE': 1,
+}
 
 class CurWin:
     def __init__(self, winfo):
@@ -9,18 +13,20 @@ class CurWin:
         self.border = 1
         self.x_margin = 1
         self.y_margin = 1
-        self.scr = None         # curses window
+        self.scr = None               # curses window
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
 
+    def __repr__(self):
+        return '{}: margin:[{},{}] scr:{}'.format(self.winfo, self.x_margin, self.y_margin, self.scr)
     #
     # TREE Navigation/Initialization functions
     #
 
     # delete and rebuild curses screens using layout information in winfo (recursive on children)
     def rebuild_screens(self):
-        self.winfo.iterate_win(_rebuild_screen)
+        self.winfo.iterate_win(_rebuild_screen, self.winfo.root())
 
     #
     # CURSES Interface
@@ -34,21 +40,56 @@ class CurWin:
             ret.border()
         return ret
 
+    def getmax_wh(self):
+        max_y, max_x = self.scr.getmaxyx()
+        max_h = max_y - self.y_margin * 2
+        max_w = max_x - self.x_margin * 2
+        if max_h < 0 or max_h < 0:
+            return 0, 0
+
+        return max_w, max_h
+
     def write_lines(self, lines):
+        if not len(lines):
+            return
         scr = self.scr
+        max_w, max_h = self.getmax_wh()
+        if not max_h:
+            return
+
         x = self.x_margin
         y = self.y_margin
-        # todo: enforce bottom/right margins and truncate strings
+
+        nlines = len(lines)
+        if nlines > max_h:
+            lines = lines[nlines - max_h:]
         for i, line in enumerate(lines):
+            if len(line) > max_w:
+                line = line[0:max_w-1]
             scr.addstr(y+i, x, line)
 
     def refresh(self):
         self.scr.refresh()
 
     def get_key(self):
-        return self.scr.getkey()
+        while 1:
+            try:
+                ret = self.scr.getkey()
+                if ret not in IGNORED_KEYS:
+                    return ret
+
+            except Exception as e:
+                # self.winfo.log('get_key failed: type:"{}", trace: {}'.format(
+                #     str(e),
+                #     ''.join(traceback.format_tb(e.__traceback__)))
+                # )
+                pass        # ignore failed calls to getkey() following resize events etc.
 
     def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK):
+        max_w, max_h = self.getmax_wh()
+        if x >= max_w or y >= max_h:
+            return
+
         cpair = self.color_pair(fg, bg)
         self.scr.addstr(y + self.y_margin, x + self.x_margin, char, cpair)
 
@@ -70,6 +111,7 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
 
     if winfo.data.scr:
         del winfo.data.scr
+        winfo.data.scr = None # allow .scr to be checked
 
     winfo.data.scr = winfo.winparent.data.derwin(winfo.dim, winfo.pos)
     if winfo.data.border:
@@ -85,7 +127,6 @@ def init_win(root_info, scr):
 
     # build Win wrappers for children
     def _build_win(winfo, v, xoff, yoff, d):
-        root_info.log('_build_win({}, depth:{})'.format(winfo, d))
         winfo.data = CurWin(winfo)
 
     for c in root_info.children:

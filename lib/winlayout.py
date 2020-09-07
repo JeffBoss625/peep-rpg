@@ -221,22 +221,27 @@ class WinInfo(Comp):
     def __init__(self, parent, name, pos, con):
         super().__init__(parent, pos, con)
         self.name = name
+
+        # store window immediate windows parent
         wp = parent
         while wp and not isinstance(wp, WinInfo):
             wp = wp.parent
         self.winparent = wp
-        if wp:
-            self.root = wp.root
-        else:
-            # this is root
-            self.root = self
-            self.info = RootInfo()
 
-        self.root.info.win_count += 1
-        self.id = self.root.info.win_count
+        # store consolidated window information in the root object
+        if parent:
+            root = parent
+            while root.parent:
+                root = root.parent
+        else:
+            self.info = RootInfo()
+            root = self
+
+        root.info.win_count += 1
+        self.id = root.info.win_count
         if not self.name:
             self.name = 'window_{}'.format(self.id)
-        self.root.info.win_by_name[self.name] = self
+        root.info.win_by_name[self.name] = self
 
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)

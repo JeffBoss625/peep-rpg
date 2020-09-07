@@ -91,7 +91,6 @@ def player_turn(screen):
             alib.create_projectile(direct, model)
             model.message('Projectile shot')
             screen.paint()
-
         else:
             model.message('unknown command: "{}"'.format(input_key))
 
