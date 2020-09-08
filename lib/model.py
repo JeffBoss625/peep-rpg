@@ -16,10 +16,11 @@ class Attack(YAMLObject):
 
 @dclib.dataclass
 class Ammo:
+    yaml_tag = '!ammo'
     name: str = ''
     char: str = '?'
-    fgcolor: Color = Color.WHITE
-    bgcolor: Color = Color.BLACK
+    fgcolor: str = Color.WHITE
+    bgcolor: str = Color.BLACK
     thaco: int = 20
     speed: int = 100
     ac: int = 20
@@ -32,6 +33,9 @@ class Ammo:
     attacks: dict = dclib.field(default_factory=dict)
     move_tactic: str = 'straight'
     direct: int = 0
+
+    def __getstate__(self):
+        return uniq_state(self, {})
 
 @dclib.dataclass
 class Peep(YAMLObject):
