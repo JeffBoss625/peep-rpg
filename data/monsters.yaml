@@ -1,0 +1,33 @@
+  /Users/dad/dev/py/qbjson/bin/python /Users/dad/ghub/peep-rpg/lib/monsters.py
+    !peep
+  name: Thark
+  type: goblin
+  char: g
+  fgcolor: !!python/object/apply:lib.constants.Color
+    - !!python/tuple
+      - 3
+  bgcolor: !!python/object/apply:lib.constants.Color
+    - !!python/tuple
+      - 0
+  maxhp: 10
+  thaco: 18
+  speed: 13
+  ac: 19
+  move_tactic: seek
+  hp: 0
+  tics: 0
+  x: 0
+  y: 0
+  attacks:
+    bite: !!python/object:lib.model.Attack
+      damage: 1d3
+      range: 0
+      blowback: 0
+    scratch: !!python/object:lib.model.Attack
+      damage: 2d2
+      range: 0
+      blowback: 0
+    punch: !!python/object:lib.model.Attack
+      damage: 2d1
+      range: 0
+      blowback: 0
