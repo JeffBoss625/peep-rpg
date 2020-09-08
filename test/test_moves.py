@@ -1,7 +1,7 @@
 import lib.move as mlib
 from lib.move import Direction
 from lib.model import Peep, Attack
-from lib.model_game import Model
+from lib.prpg_model import Model
 
 def test_elapse_time():
     peeps = [

@@ -1,4 +1,4 @@
-from lib.winlayout import *
+from lib.screen_layout import *
 import sys
 
 def printe(s):

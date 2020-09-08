@@ -1,5 +1,5 @@
-from lib.winlayout import *
-from lib.curwin import *
+from lib.screen_layout import *
+from lib.screen import *
 import os
 import time
 import traceback
