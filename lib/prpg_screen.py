@@ -12,7 +12,7 @@ ROOT = 'root'
 DEBUG = 'debug'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
-class Screen:
+class PrpgScreen:
     def __init__(self, curses_scr, model):
         self.model = model
         w, h = self.term_size = os.get_terminal_size()

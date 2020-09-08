@@ -1,13 +1,14 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import curses
-import traceback
 from lib.constants import Color
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
 }
 
-class CurWin:
+# abstraction wrapping a curses screen.
+# todo: extend cureses behavior into subclass "CursesScreen" and implent another "PrintScreen" subclass for testing
+class Screen:
     def __init__(self, winfo):
         self.winfo = winfo      # layout window information
         self.border = 1
@@ -121,13 +122,13 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
 # initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
 def init_screens(root_info, scr):
     # set up root
-    root_info.data = CurWin(root_info)
+    root_info.data = Screen(root_info)
     root_info.data.scr = scr
     root_info.data.border = 0
 
     # build Win wrappers for children
     def _build_win(winfo, v, xoff, yoff, d):
-        winfo.data = CurWin(winfo)
+        winfo.data = Screen(winfo)
 
     for c in root_info.children:
         c.iterate_win(_build_win)

@@ -5,7 +5,7 @@ import lib.attack as alib
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
-from lib.prpg_screen import Screen
+from lib.prpg_screen import PrpgScreen
 from lib.prpg_model import Model
 import random
 import time
@@ -130,7 +130,7 @@ def monster_turn(model, monster):
 def main(scr):
     curses.raw()
     model = Model(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-    screen = Screen(scr, model)
+    screen = PrpgScreen(scr, model)
 
     def resize_handler(_signum, _frame):
         screen.size_to_terminal()
