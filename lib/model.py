@@ -2,12 +2,17 @@
 
 import dataclasses as dclib
 from lib.constants import Color
+from yaml import YAMLObject
 
 @dclib.dataclass
-class Attack:
+class Attack(YAMLObject):
+    yaml_tag = '!attack'
     damage: str = '1d1'
     range: int = 0
     blowback: int = 0
+
+    def __getstate__(self):
+        return uniq_state(self, {})
 
 @dclib.dataclass
 class Ammo:
@@ -29,42 +34,38 @@ class Ammo:
     direct: int = 0
 
 @dclib.dataclass
-class Peep:
+class Peep(YAMLObject):
+    yaml_tag = '!peep'
     name: str = ''
     type: str = ''
     char: str = '?'
-    fgcolor: Color = Color.WHITE
-    bgcolor: Color = Color.BLACK
+    fgcolor: str = Color.WHITE
+    bgcolor: str = Color.BLACK
     maxhp: int = 0
     thaco: int = 20
     speed: int = 10
     ac: int = 10
     move_tactic: str = 'seek'
+
     # temp state
+    # todo: natural state and temp state - maintain both
     hp: int = 0
     tics: int = 0
     x: int = 0
     y: int = 0
     attacks: dict = dclib.field(default_factory=dict)
 
+    def __getstate__(self):
+        return uniq_state(self, {'tics', 'x', 'y'})
 
-# CONSTRUCTION FROM DICTIONARY LOGIC - ignore
-CLASS_FIELDS = {}
+def uniq_state(obj, nocopy):
+    ret = {}
+    sdict = obj.__dict__
+    cdict = obj.__class__.__dict__
+    for k in obj.__dict__:
+        if k not in cdict or (sdict[k] != cdict[k] and k not in nocopy):
+            ret[k] = sdict[k]
 
-def _class_fields(klass):
-    if klass not in CLASS_FIELDS:
-        CLASS_FIELDS[klass] = {f.name: f.type for f in dclib.fields(klass)}
-    return CLASS_FIELDS[klass]
-
-def from_dict(klass, d):
-    if not dclib.is_dataclass(klass):
-        return d
-    fields = _class_fields(klass)
-    args = {}
-    for f in d:
-        if f not in fields:
-            raise KeyError(str(klass.__name__) + ' has no property "' + f + '"')
-        args[f] = from_dict(fields[f], d[f])
-
-    ret = klass(**args)
     return ret
+
+

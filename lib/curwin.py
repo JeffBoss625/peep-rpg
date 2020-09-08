@@ -97,8 +97,8 @@ class CurWin:
         key = (fg, bg)
         if key not in self.color_pairs:
             self.color_pair_count += 1
-            fgc = getattr(curses, 'COLOR_' + fg.name)
-            bgc = getattr(curses, 'COLOR_' + bg.name)
+            fgc = getattr(curses, Color.curses_color(fg))
+            bgc = getattr(curses, Color.curses_color(bg))
             curses.init_pair(self.color_pair_count, fgc, bgc)
             self.color_pairs[key] = curses.color_pair(self.color_pair_count)
 

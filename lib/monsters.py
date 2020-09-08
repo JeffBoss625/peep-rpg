@@ -1,6 +1,6 @@
 from lib.model import Peep, Attack
 from lib.constants import Color
-
+import yaml
 
 MONSTERS = [
     # GOBLINS
@@ -101,4 +101,10 @@ def monster_by_name(name, x=0, y=0, hp=0):
     ret.y = y
     return ret
 
+def color_rep(dumper, data):
+    return dumper.represent_scalar('!color', data.name)
 
+
+if __name__ == '__main__':
+    for m in MONSTERS:
+        print(yaml.dump(m, sort_keys=False, default_flow_style=False))
