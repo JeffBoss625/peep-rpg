@@ -178,7 +178,7 @@ class Comp:
         return fn(self, v)
 
     def iterate_win(self, fn, v=None, xoff=0, yoff=0, d=0):
-        if isinstance(self, WinInfo):
+        if isinstance(self, WinComp):
             v = fn(self, v, xoff, yoff, d)
             d += 1
 
@@ -216,7 +216,7 @@ class RootInfo:
 #    win_by_name    all windows by name
 #    win_count      total number of windows created (including those deleted)
 #
-class WinInfo(Comp):
+class WinComp(Comp):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, name, pos, con):
         super().__init__(parent, pos, con)
@@ -224,7 +224,7 @@ class WinInfo(Comp):
 
         # store window immediate windows parent
         wp = parent
-        while wp and not isinstance(wp, WinInfo):
+        while wp and not isinstance(wp, WinComp):
             wp = wp.parent
         self.winparent = wp
 
@@ -249,7 +249,7 @@ class WinInfo(Comp):
     def window(self, name, pos, con):
         if not pos:
             pos = Pos(0,0)
-        ret = WinInfo(self, name, pos, con)
+        ret = WinComp(self, name, pos, con)
         self.children.append(ret)
         return ret
 
@@ -365,7 +365,7 @@ class Panel(Comp):
         return ret
 
     def window(self, name, con):
-        ret = WinInfo(self, name, None, con)
+        ret = WinComp(self, name, None, con)
         self.children.append(ret)
         self.con = None
         self.dim = None
@@ -489,7 +489,7 @@ def flow_calc_sizes(avail, mins, maxs):
     return c_sizes
 
 def create_layout(dim, out=None):
-    ret = WinInfo(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
+    ret = WinComp(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
     ret.logger = Logger(out)
 

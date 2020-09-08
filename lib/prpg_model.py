@@ -11,7 +11,7 @@
 import dataclasses as dclib
 
 @dclib.dataclass
-class Model:
+class PrpgModel:
     def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0):
         self.player = player
         self.maze = maze if maze else []
