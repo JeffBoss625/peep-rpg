@@ -119,7 +119,7 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
 
 
 # initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
-def init_win(root_info, scr):
+def init_screens(root_info, scr):
     # set up root
     root_info.data = CurWin(root_info)
     root_info.data.scr = scr

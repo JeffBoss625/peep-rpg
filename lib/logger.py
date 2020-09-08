@@ -2,7 +2,6 @@ import sys
 import logging
 import re
 import traceback
-import dataclasses
 
 
 # Simple logger with one level of logging. Logs if file name is given, otherwise no logging.
@@ -44,17 +43,11 @@ class Logger:
 
 
 # A simple debug function for printing with stacktrace depth
-@dataclasses.dataclass
-class History:
-    min_depth: int = 10000
-
-
-HISTORY = History()
-
+MIN_DEPTH = [10000]
 def printd(*args):
     depth = len(traceback.extract_stack())
-    HISTORY.min_depth = min(HISTORY.min_depth, depth)
-    depth -= HISTORY.min_depth
+    MIN_DEPTH[0] = min(MIN_DEPTH[0], depth)
+    depth -= MIN_DEPTH[0]
     if depth <= 0:
         print(*args)
     else:

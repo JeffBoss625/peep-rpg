@@ -16,8 +16,8 @@ class Screen:
     def __init__(self, curses_scr, model):
         self.model = model
         w, h = self.term_size = os.get_terminal_size()
-        root_layout = create_layout(Dim(h, w), 'prpg')
-        row_panel = root_layout.panel(Orient.VERT, None, None)
+        layout = create_layout(Dim(h, w), 'prpg')
+        row_panel = layout.panel(Orient.VERT, None, None)
         row_panel.window(STATS, Con(6, 40, 6, 40))
 
         maze_panel = row_panel.panel(Orient.HORI, None)
@@ -26,10 +26,10 @@ class Screen:
 
         row_panel.window(MESSAGES, Con(6, 40, 10, 80))
 
-        init_win(root_layout, curses_scr)
-        self.root_win = root_layout.data
+        init_screens(layout, curses_scr)
+        self.root_win = layout.data
 
-        self.root_layout = root_layout
+        self.root_layout = layout
         self.rebuild_screens()
         curses.curs_set(0)
 
