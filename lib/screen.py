@@ -58,6 +58,7 @@ class Screen:
         if not max_h:
             return
 
+        # scr.clear()
         x = self.x_margin
         y = self.y_margin
 

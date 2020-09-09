@@ -147,8 +147,6 @@ def move_peep(model, p, direct):
         else:
             return False
 
-
-
     if dst:
         if model.is_player(p):
             weapon = attacklib.choose_melee_attack(p)

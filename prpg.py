@@ -144,8 +144,8 @@ def main(scr):
         peeps = [p for p in model.peeps]
         turns = mlib.calc_turn_sequence(model.peeps)
 
-        for ti, peep_indexes in enumerate(turns):
-            for pi, peep_index in enumerate(peep_indexes):
+        for peep_indexes in turns:
+            for peep_index in peep_indexes:
                 # if there are new peeps in the new_peeps list, break out of loop.
                 # When broken out of loop take remaining clicks to go through from the turns variable
                 # Add those remaining turns into a function that adds the new peeps's turns to it
@@ -156,7 +156,7 @@ def main(scr):
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                 else:
-                    if monster_turn(model, peep):
+                    if monster_turn(model, peep) == 'q':
                         model.message('YOU DIED')
                         screen.paint()
                         time.sleep(3)

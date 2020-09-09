@@ -8,9 +8,9 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 
-import dataclasses as dclib
+from dataclasses import dataclass
 
-@dclib.dataclass
+@dataclass
 class PrpgModel:
     def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0):
         self.player = player
@@ -18,7 +18,7 @@ class PrpgModel:
         self.peeps = peeps if peeps else []
         self.messages = messages if messages else []
         self.seed = seed
-        self.out = []
+        self.log_output = []
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):
@@ -27,9 +27,9 @@ class PrpgModel:
 
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area
-    def print(self, *args):
+    def log(self, *args):
         s = ' '.join(str(a) for a in args)
-        self.out.extend(s.split('\n'))
+        self.log_output.extend(s.split('\n'))
 
     def is_player(self, peep):
         return peep == self.player

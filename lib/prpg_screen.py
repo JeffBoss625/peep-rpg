@@ -9,7 +9,7 @@ STATS = 'stats'
 MAZE = 'maze'
 MESSAGES = 'messages'
 ROOT = 'root'
-DEBUG = 'debug'
+LOG = 'log'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:
@@ -22,7 +22,7 @@ class PrpgScreen:
 
         maze_panel = row_panel.panel(Orient.HORI, None)
         maze_panel.window(MAZE, Con(25, 40, 0, 80))
-        maze_panel.window(DEBUG, Con(0,30,0,50))
+        maze_panel.window(LOG, Con(0, 30, 0, 50))
 
         row_panel.window(MESSAGES, Con(6, 40, 10, 80))
 
@@ -64,65 +64,59 @@ class PrpgScreen:
         except Exception as e:
             self.root_layout.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
 
-    # print messages and standard output
-    def print(self, *args):
-        line = ' '.join([str(a) for a in args])
-        self.model.message(line)
-        self.paint()
-
     def get_key(self):
         return self.root_win.get_key()
 
     def win(self, name):
         return self.root_layout.info.win_by_name[name].data
 
+    def clear(self):
+        self.win(ROOT).clear()
+
     # paint the entire screen - all that is visible
     def paint(self):
-        root = self.win(ROOT)
-        root.clear()
-
+        self.win(ROOT).clear()
         self._paint_stats()
         self._paint_maze()
         self._paint_messages()
-        self._paint_debug()
+        self._paint_log()
 
-        root.refresh()
+        self.win(ROOT).refresh()
 
     def _paint_messages(self):
-        msgwin = self.win(MESSAGES)
-        if not msgwin.scr:
+        win = self.win(MESSAGES)
+        if not win.scr:
             return
-        msgwin.write_lines(self.model.messages[-12:])
-        msgwin.scr.border()
+        win.write_lines(self.model.messages[-12:])
+        win.scr.border()
 
-    def _paint_debug(self):
-        dbgwin = self.win(DEBUG)
-        if not dbgwin.scr:
+    def _paint_log(self):
+        win = self.win(LOG)
+        if not win.scr:
             return
-        dbgwin.write_lines(self.model.out[-12:])
-        dbgwin.scr.border()
+        win.write_lines(self.model.log_output[-12:])
+        win.scr.border()
 
     def _paint_stats(self):
         p = self.model.player
-        statwin = self.win(STATS)
-        if not statwin.scr:
+        win = self.win(STATS)
+        if not win.scr:
             return
-        statwin.write_lines([
+        win.write_lines([
             p.name,
             'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
             'speed: ' + str(p.speed),
             ])
-        statwin.scr.border()
+        win.scr.border()
 
     def _paint_maze(self):
-        mazewin = self.win(MAZE)
-        if not mazewin.scr:
+        win = self.win(MAZE)
+        if not win.scr:
             return
         model = self.model
-        mazewin.write_lines(model.maze)
+        win.write_lines(model.maze)
 
         for p in model.peeps:
-            mazewin.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
+            win.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
-        mazewin.scr.border()
-        # win.move_to(x, y + len(model.maze))  # move cursor to end of maze
+        win.scr.border()
