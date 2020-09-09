@@ -1,10 +1,10 @@
 # Data model for
 
-import dataclasses as dclib
+from dataclasses import dataclass, field
 from lib.constants import Color
 from yaml import YAMLObject
 
-@dclib.dataclass
+@dataclass
 class Attack(YAMLObject):
     yaml_tag = '!attack'
     damage: str = '1d1'
@@ -14,8 +14,8 @@ class Attack(YAMLObject):
     def __getstate__(self):
         return uniq_state(self, {})
 
-@dclib.dataclass
-class Ammo:
+@dataclass
+class Ammo(YAMLObject):
     yaml_tag = '!ammo'
     name: str = ''
     char: str = '?'
@@ -30,14 +30,14 @@ class Ammo:
     tics: int = 0
     x: int = 0
     y: int = 0
-    attacks: dict = dclib.field(default_factory=dict)
+    attacks: dict = field(default_factory=dict)
     move_tactic: str = 'straight'
     direct: int = 0
 
     def __getstate__(self):
         return uniq_state(self, {})
 
-@dclib.dataclass
+@dataclass
 class Peep(YAMLObject):
     yaml_tag = '!peep'
     name: str = ''
@@ -57,7 +57,7 @@ class Peep(YAMLObject):
     tics: int = 0
     x: int = 0
     y: int = 0
-    attacks: dict = dclib.field(default_factory=dict)
+    attacks: dict = field(default_factory=dict)
 
     def __getstate__(self):
         return uniq_state(self, {'tics', 'x', 'y'})
