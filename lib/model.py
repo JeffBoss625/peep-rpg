@@ -2,21 +2,21 @@
 
 from dataclasses import dataclass, field
 from lib.constants import Color
-from yaml import YAMLObject
+import yaml
+
+class Model:
+    def __post_init__(self):
+        self._dirty = False     # changing values of attributes without '_' prefix marks model as _dirty
 
 @dataclass
-class Attack(YAMLObject):
-    yaml_tag = '!attack'
+class Attack(Model):
     damage: str = '1d1'
     range: int = 0
     blowback: int = 0
 
-    def __getstate__(self):
-        return uniq_state(self, {})
 
 @dataclass
-class Ammo(YAMLObject):
-    yaml_tag = '!ammo'
+class Ammo(Model):
     name: str = ''
     char: str = '?'
     fgcolor: str = Color.WHITE
@@ -34,12 +34,8 @@ class Ammo(YAMLObject):
     move_tactic: str = 'straight'
     direct: int = 0
 
-    def __getstate__(self):
-        return uniq_state(self, {})
-
 @dataclass
-class Peep(YAMLObject):
-    yaml_tag = '!peep'
+class Peep(Model):
     name: str = ''
     type: str = ''
     char: str = '?'
@@ -59,17 +55,53 @@ class Peep(YAMLObject):
     y: int = 0
     attacks: dict = field(default_factory=dict)
 
-    def __getstate__(self):
-        return uniq_state(self, {'tics', 'x', 'y'})
+    _yaml_ignore = {'tics', 'x', 'y'}
 
-def uniq_state(obj, nocopy):
+def _model_getstate(self):
+    nocopy = getattr(self, '_yaml_ignore', {})
     ret = {}
-    sdict = obj.__dict__
-    cdict = obj.__class__.__dict__
-    for k in obj.__dict__:
-        if k not in cdict or (sdict[k] != cdict[k] and k not in nocopy):
-            ret[k] = sdict[k]
+    sdict = self.__dict__
+    cdict = self.__class__.__dict__
+    for k in self.__dict__:
+        if k[0] == '_' or k in nocopy:
+            continue
+        if k in cdict and sdict[k] == cdict[k]:
+            continue
+        ret[k] = sdict[k]
 
     return ret
 
+def _model_setattr(self, k, v):
+    if k[0] != '_' and getattr(self, k, v) != v:
+        object.__setattr__(self, '_dirty', True)
 
+    object.__setattr__(self, k, v)
+
+def _to_yaml(tag, cls):
+    def fn(dpr, v):
+        return dpr.represent_yaml_object(tag, v, cls)
+    return fn
+
+def _from_yaml(cls):
+    def fn(ldr, node):
+        return ldr.construct_yaml_object(node, cls)
+    return fn
+
+
+for cls in [Peep, Ammo, Attack]:
+    tag = '!' + cls.__name__.lower()
+
+    yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
+    yaml.Loader.add_constructor(tag, _from_yaml(cls))
+
+    cls.__getstate__ = _model_getstate
+    cls.__setattr__ = _model_setattr
+
+if __name__ == '__main__':
+    p = Peep('bill')
+    print(p._dirty)
+    p.name = 'bill'
+    print(p._dirty)
+    p.name = 'bbb'
+    print(p._dirty)
+    # print(yaml.dump(p, sort_keys = False))

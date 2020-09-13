@@ -36,6 +36,7 @@ class Screen:
         self.scr.clear()
 
     def derwin(self, dim, pos):
+        # self.log('derwin({}, {}, {})'.format(self, dim, pos))
         ret = self.scr.derwin(dim.h, dim.w, pos.y, pos.x)
         if self.border:
             ret.border()
@@ -49,6 +50,9 @@ class Screen:
             return 0, 0
 
         return max_w, max_h
+
+    def log(self, *args):
+        self.winfo.log(args)
 
     def write_lines(self, lines):
         if not len(lines):
