@@ -24,13 +24,14 @@ class PrpgScreen:
         maze_panel.window(MAZE, Con(25, 40, 0, 80))
         maze_panel.window(LOG, Con(0, 30, 0, 50))
 
-        row_panel.window(MESSAGES, Con(6, 40, 10, 80))
+        row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.FIXED)
 
-        init_screens(layout, curses_scr)
+        create_win_data(layout, curses_scr)
         self.root_win = layout.data
 
         self.root_layout = layout
         self.rebuild_screens()
+        self.win(MESSAGES).messages = self.model.message_model
         curses.curs_set(0)
 
     def rebuild_screens(self):
@@ -85,10 +86,7 @@ class PrpgScreen:
 
     def _paint_messages(self):
         win = self.win(MESSAGES)
-        if not win.scr:
-            return
-        win.write_lines(self.model.messages[-12:])
-        win.scr.border()
+        win.paint()
 
     def _paint_log(self):
         win = self.win(LOG)
@@ -120,3 +118,8 @@ class PrpgScreen:
             win.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
         win.scr.border()
+
+
+# if __name__ == '__main__':
+#     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
+#     screen = PrpgScreen(None, model)

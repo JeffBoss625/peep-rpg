@@ -1,13 +1,14 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import curses
 from lib.constants import Color
+from lib.screen_layout import WIN
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
 }
 
 # abstraction wrapping a curses screen.
-# todo: extend cureses behavior into subclass "CursesScreen" and implent another "PrintScreen" subclass for testing
+# todo: extend curses behavior into subclass "CursesScreen" and implent another "PrintScreen" subclass for testing
 class Screen:
     def __init__(self, winfo):
         self.winfo = winfo      # layout window information
@@ -75,7 +76,14 @@ class Screen:
             scr.addstr(y+i, x, line)
 
     def refresh(self):
-        self.scr.refresh()
+        self.noutupdate()      # todo: use noutrefresh() then doupdate() for main screen
+        self.doupdate()
+
+    def doupdate(self):
+        self.scr.doupdate()
+
+    def noutupdate(self):
+        self.scr.noutupdate()
 
     def get_key(self):
         while 1:
@@ -110,7 +118,7 @@ class Screen:
 
         return self.color_pairs[key]
 
-# delete and re-create derived curses windows/screens using parent windows/screens
+# delete and re-create derived curses windows ("screens") using parent windows/screens
 def _rebuild_screen(winfo, v, xoff, yoff, d):
     if not winfo.winparent:         # don't build root screen - root screen is fixed
         return
@@ -123,20 +131,39 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
     if winfo.data.border:
         winfo.data.scr.border()
 
+class MessageScreen(Screen):
+    def __init__(self, winfo):
+        super().__init__(winfo)
+        self.model = None
+
+    def noutupdate(self):
+        if not self.model:
+            self.log('no model for screen {}'.format(self.winfo.name))
+            return
+
+        if self.model._dirty:
+            self.write_lines(self.model.messages)
+
+        self.scr.noutupdate()
+
+# build Win wrappers for children
+def _create_win_data(winfo, v, xoff, yoff, d):    # todo: remove xoff and yoff params
+    if winfo.wintype == WIN.FIXED:
+        winfo.data = Screen(winfo)
+    elif winfo.wintype == WIN.MESSAGE:
+        winfo.data = MessageScreen(winfo)
+    else:
+        raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
 
 # initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
-def init_screens(root_info, scr):
+def create_win_data(root_info, scr):
     # set up root
-    root_info.data = Screen(root_info)
+    _create_win_data(root_info, None, None, None, 0)
     root_info.data.scr = scr
     root_info.data.border = 0
 
-    # build Win wrappers for children
-    def _build_win(winfo, v, xoff, yoff, d):
-        winfo.data = Screen(winfo)
-
     for c in root_info.children:
-        c.iterate_win(_build_win)
+        c.iterate_win(_create_win_data)
 
 
 

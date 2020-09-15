@@ -4,6 +4,10 @@
 from lib.logger import Logger
 from dataclasses import dataclass
 
+class WIN:
+    FIXED = "FIXED"
+    MESSAGE = "MESSAGE"
+
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
 class Pos:
@@ -143,11 +147,13 @@ class Con:
 #   dim(ensions) of themselves and sometimes their children (panel layout) (top-down)
 #   paint for themselves, then their children (top-down)
 #
-class Comp:
-    def __init__(self, parent, pos, con):
+class Layout:
+    def __init__(self, parent, pos, con, **kwds):
         self.parent = parent
         self.pos = pos        # position within parent (panels will update this in do_layout)
         self.con = con        # constraints used to calculate dim
+        self.kwds = kwds if kwds else {}
+
         self.dim = None       # calculated in do_layout()
         self.children = []
         self.logger = None
@@ -178,7 +184,7 @@ class Comp:
         return fn(self, v)
 
     def iterate_win(self, fn, v=None, xoff=0, yoff=0, d=0):
-        if isinstance(self, WinComp):
+        if isinstance(self, WinLayout):
             v = fn(self, v, xoff, yoff, d)
             d += 1
 
@@ -216,15 +222,18 @@ class RootInfo:
 #    win_by_name    all windows by name
 #    win_count      total number of windows created (including those deleted)
 #
-class WinComp(Comp):
+class WinLayout(Layout):
     # if not passed in, scr is created later when dimensions are known.
-    def __init__(self, parent, name, pos, con):
-        super().__init__(parent, pos, con)
+    def __init__(self, parent, name, pos, con, **kwds):
+        if con is None:
+            con = Con()
+        super().__init__(parent, pos, con, **kwds)
         self.name = name
+        self.wintype = self.kwds.get('wintype', WIN.FIXED)
 
         # store window immediate windows parent
         wp = parent
-        while wp and not isinstance(wp, WinComp):
+        while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
         self.winparent = wp
 
@@ -246,17 +255,17 @@ class WinComp(Comp):
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
-    def window(self, name, pos, con):
+    def window(self, name, pos, con, **kwds):
         if not pos:
             pos = Pos(0,0)
-        ret = WinComp(self, name, pos, con)
+        ret = WinLayout(self, name, pos, con, **kwds)
         self.children.append(ret)
         return ret
 
     def panel(self, orient, pos, con):
         if not pos:
             pos = Pos(0,0)
-        ret = Panel(self, orient, pos, con)
+        ret = FlowLayout(self, orient, pos, con)
         self.children.append(ret)
         return ret
 
@@ -289,31 +298,50 @@ class WinComp(Comp):
         for c in self.children:
             c.clear_layout()
 
-# A row adds constraints horizontally and merges vertical constraints, for example:
+# A FlowLayout positions child components adjacent to each other horizontally (Orient.HORI) or
+# vertically (Orient.VERT). In the stacked direction, child components are assigned wmin size plus
+# an even distribution among growable children of any extra space available.
 #
-#   when: sum(wmin) > parent.w, dimensions should contract to panel.w
+# children dimensions expand to min(wmax, panel.w)
 #
-#       ->      wmin         <-
-#      +------+------+----+----+
-#      |      |      |         |
-#      +------+------+----|----+
-#      |                  |
-#      +------------------+
+# e.g. for a horizontal panel when sum(wmin) < parent.w:
+#                                parent wmax
+#       children:   wmin  wmax     |
+#                    |    |        |
+#      +---+----+----+----+--------+
+#      | A | B  | C  |             |
+#      +---|    |----+             |  <- C child hmax
+#      |   +----+                  |  <- A and B child hmax
+#      +---------------------------+
 #
-#    vertical constraints are max(hmin) and min(hmax), handling zero as a non-constraint
+# ... children grow to their collective max size
 #
-#    when: sum(wmin) < parent.w, dimensions should expand to min(wmax, panel.w)
+#                                parent wmax
+#       children:   wmin  wmax     |
+#                    |    |        |
+#      +----+-----+-------+--------+
+#      | A  |  B  |   C   |        |
+#      |    |     +-------+        |  <- C child hmax
+#      +----+-----+                |  <- A and B child hmax
+#      +---------------------------+
 #
-#       <- wmin ->     | <- wmax, when less than panel.w, is the constraint.
-#      +--+--+----+----+--+
-#      |  |  |    |    |  |
-#      +--+--+----+    |  |
-#      |               |  |
-#      +------------------+
+#   when: sum(wmin) < parent.w and sum(wmax) >= parent.w (in this case, C has no max, for example):
 #
-# A column works the same way but add constraints vertically instead of horizontally.
+#                                parent wmax
+#       children:   wmin  wmax     |
+#                    |    |        |
+#      +----+-----+----------------+
+#      | A  |  B  |      C         |
+#      |    |     +----------------|  <- C child hmax
+#      +----+-----+                |  <- A and B child hmax
+#      +---------------------------+
 #
-class Panel(Comp):
+#   when: sum(wmin) > parent.w, dimensions of the children are shrunk to panel.w starting with the RIGHT-most or
+#   BOTTOM-most component. That is, the minimum sizes of first-added components are kept and all of the adjustment is
+#   made on the last component. The reasoning for this is that going below min size is avoided as long as possible
+#   for prioritized (left or top) components.
+#
+class FlowLayout(Layout):
     def __init__(self, parent, orient, pos, panel_con):
         super().__init__(parent, pos, None) # con is calculated from children do_layout()
 
@@ -364,15 +392,15 @@ class Panel(Comp):
         ret.apply(self.panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
         return ret
 
-    def window(self, name, con):
-        ret = WinComp(self, name, None, con)
+    def window(self, name, con, **kwds):
+        ret = WinLayout(self, name, None, con, **kwds)
         self.children.append(ret)
         self.con = None
         self.dim = None
         return ret
 
     def panel(self, orient, con):
-        ret = Panel(self, orient, None, con)
+        ret = FlowLayout(self, orient, None, con)
         self.children.append(ret)
         self.con = None
         self.dim = None
@@ -381,7 +409,7 @@ class Panel(Comp):
     def pos_offset(self, orient):
         ret = self.pos.yx(orient)
         p = self.parent
-        while p and isinstance(p, Panel):
+        while p and isinstance(p, FlowLayout):
             # self.log('...pos_offset({}, {}, {})'.format(self, p, orient))
             ret += p.pos.yx(orient)
             p = p.parent
@@ -489,7 +517,7 @@ def flow_calc_sizes(avail, mins, maxs):
     return c_sizes
 
 def create_layout(dim, out=None):
-    ret = WinComp(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
+    ret = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
     ret.dim = dim
     ret.logger = Logger(out)
 

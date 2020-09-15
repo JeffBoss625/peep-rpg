@@ -1,3 +1,5 @@
+from lib.dummy_screen import DummyScreen
+from lib.screen import create_win_data
 from lib.screen_layout import *
 import sys
 
@@ -148,8 +150,8 @@ def print_win(root):
         printe("{:<4} {}".format(i, ''.join(line)))
 
 def print_one_win(win, buf, xoff, yoff, depth):
-    # write('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
-    if not win.conf.border:
+    # printe('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
+    if not win.data.border:
         return buf
 
     dim = win.dim
@@ -169,12 +171,16 @@ def print_one_win(win, buf, xoff, yoff, depth):
     return buf
 
 def test_paint():
-    root = create_layout(Dim(15, 100))
+    printe('')
+    screen_dim = Dim(15, 100)
+    root = create_layout(screen_dim)
     hpan = root.panel(Orient.HORI, None, None)
 
     hpan.window('w1', Con(4, 10, 5, 20))
     hpan.window('w2', Con(3,5,8,10))
     root.do_layout()
+    create_win_data(root, DummyScreen(screen_dim))
+    root.data.refresh()
     # print_win(root)
 
     assert root.info.win_by_name['w1'].name == 'w1'

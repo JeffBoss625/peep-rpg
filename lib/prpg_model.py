@@ -9,21 +9,21 @@
 # that will be costly to change, but easier to work with and understand.
 
 from dataclasses import dataclass
+from lib.model import MessageModel
 
 @dataclass
 class PrpgModel:
-    def __init__(self, player=None, maze=None, peeps=None, messages=None, seed=0):
+    def __init__(self, player=None, maze=None, peeps=None, seed=0):
         self.player = player
         self.maze = maze if maze else []
         self.peeps = peeps if peeps else []
-        self.messages = messages if messages else []
+        self.message_model = MessageModel()
         self.seed = seed
         self.log_output = []
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):
-        s = ' '.join(str(a) for a in args)
-        self.messages.extend(s.split('\n'))
+        self.message_model.message(args)
 
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area

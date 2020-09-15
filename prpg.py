@@ -10,7 +10,6 @@ from lib.prpg_model import PrpgModel
 import random
 import time
 import signal
-import os
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',

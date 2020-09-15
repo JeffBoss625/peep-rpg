@@ -5,6 +5,9 @@ from lib.constants import Color
 import yaml
 
 class Model:
+    def __init__(self):
+        self._dirty = True
+
     def __post_init__(self):
         self._dirty = False     # changing values of attributes without '_' prefix marks model as _dirty
 
@@ -56,6 +59,18 @@ class Peep(Model):
     attacks: dict = field(default_factory=dict)
 
     _yaml_ignore = {'tics', 'x', 'y'}
+
+
+@dataclass
+class MessageModel(Model):
+    messages: list = field(default_factory=list)
+
+    # add a message or all messages in an iterable to the messages array
+    def message(self, *args):
+        s = ' '.join(str(a) for a in args)
+        self.messages.extend(s.split('\n'))
+        self._dirty = True
+
 
 def _model_getstate(self):
     nocopy = getattr(self, '_yaml_ignore', {})

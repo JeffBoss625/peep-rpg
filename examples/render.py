@@ -2,9 +2,10 @@ import signal
 import time
 import traceback
 import os
-from lib.winlayout import *
-from lib.curwin import init_win
 import curses
+
+from lib.screen import create_win_data
+from lib.screen_layout import create_layout, Orient, Pos, Con, Dim
 
 WINTER_EDEN = """
 A winter garden in an alder swamp,
@@ -61,7 +62,7 @@ class Handler:
         v_pan.window('rightwin', Con(8,22,12,30))
         v_pan.window('lowerwin', Con(6,10))
 
-        init_win(root, scr)
+        create_win_data(root, scr)
         root.do_layout()
         root.data.rebuild_screens()
         root.data.scr.refresh()
