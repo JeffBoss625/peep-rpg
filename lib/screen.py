@@ -1,5 +1,4 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
-import curses
 from lib.constants import Color
 from lib.screen_layout import WIN
 
@@ -8,14 +7,14 @@ IGNORED_KEYS = {
 }
 
 # abstraction wrapping a curses screen.
-# todo: extend curses behavior into subclass "CursesScreen" and implent another "PrintScreen" subclass for testing
 class Screen:
-    def __init__(self, winfo):
+    def __init__(self, winfo, curses):
         self.winfo = winfo      # layout window information
+        self.curses = curses    # curses library - allow dummy lib injection
         self.border = 1
         self.x_margin = 1
         self.y_margin = 1
-        self.scr = None               # curses window
+        self.scr = None               # curses.window or lib.DummyWin
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
@@ -76,14 +75,14 @@ class Screen:
             scr.addstr(y+i, x, line)
 
     def refresh(self):
-        self.noutupdate()      # todo: use noutrefresh() then doupdate() for main screen
+        self.noutrefresh()      # todo: use noutrefresh() then doupdate() for main screen
         self.doupdate()
 
     def doupdate(self):
-        self.scr.doupdate()
+        self.curses.doupdate()
 
-    def noutupdate(self):
-        self.scr.noutupdate()
+    def noutrefresh(self):
+        self.scr.noutrefresh()
 
     def get_key(self):
         while 1:
@@ -108,6 +107,7 @@ class Screen:
         self.scr.addstr(y + self.y_margin, x + self.x_margin, char, cpair)
 
     def color_pair(self, fg, bg):
+        curses = self.curses
         key = (fg, bg)
         if key not in self.color_pairs:
             self.color_pair_count += 1
@@ -132,38 +132,45 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
         winfo.data.scr.border()
 
 class MessageScreen(Screen):
-    def __init__(self, winfo):
-        super().__init__(winfo)
+    def __init__(self, winfo, curses):
+        super().__init__(winfo, curses)
         self.model = None
 
-    def noutupdate(self):
+    def noutrefresh(self):
         if not self.model:
             self.log('no model for screen {}'.format(self.winfo.name))
             return
 
+        if self.border:
+            self.scr.border()
+
         if self.model._dirty:
             self.write_lines(self.model.messages)
 
-        self.scr.noutupdate()
+        self.scr.noutrefresh()
+
+    def doupdate(self):
+        self.scr.doupdate()
 
 # build Win wrappers for children
-def _create_win_data(winfo, v, xoff, yoff, d):    # todo: remove xoff and yoff params
+def _create_win_data(winfo, curses, xoff, yoff, d):    # todo: remove xoff and yoff params
     if winfo.wintype == WIN.FIXED:
-        winfo.data = Screen(winfo)
+        winfo.data = Screen(winfo, curses)
     elif winfo.wintype == WIN.MESSAGE:
-        winfo.data = MessageScreen(winfo)
+        winfo.data = MessageScreen(winfo, curses)
     else:
         raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
+    return curses
 
 # initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
-def create_win_data(root_info, scr):
+def create_win_data(root_info, scr, curses):
     # set up root
-    _create_win_data(root_info, None, None, None, 0)
+    _create_win_data(root_info, curses, None, None, 0)
     root_info.data.scr = scr
     root_info.data.border = 0
 
     for c in root_info.children:
-        c.iterate_win(_create_win_data)
+        c.iterate_win(_create_win_data, curses)
 
 
 

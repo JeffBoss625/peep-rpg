@@ -23,7 +23,7 @@ class PrpgModel:
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):
-        self.message_model.message(args)
+        self.message_model.message(*args)
 
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area

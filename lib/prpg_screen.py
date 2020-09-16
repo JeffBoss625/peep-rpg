@@ -1,6 +1,5 @@
 from lib.screen_layout import *
 from lib.screen import *
-import os
 import time
 import traceback
 
@@ -13,9 +12,10 @@ LOG = 'log'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:
-    def __init__(self, curses_scr, model):
+    def __init__(self, curses_scr, curses, model):
         self.model = model
-        w, h = self.term_size = os.get_terminal_size()
+        self.curses = curses
+        w, h = self.term_size = curses.get_terminal_size()
         layout = create_layout(Dim(h, w), 'prpg')
         row_panel = layout.panel(Orient.VERT, None, None)
         row_panel.window(STATS, Con(6, 40, 6, 40))
@@ -24,9 +24,9 @@ class PrpgScreen:
         maze_panel.window(MAZE, Con(25, 40, 0, 80))
         maze_panel.window(LOG, Con(0, 30, 0, 50))
 
-        row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.FIXED)
-
-        create_win_data(layout, curses_scr)
+        msg_win = row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.MESSAGE)
+        create_win_data(layout, curses_scr, curses)
+        msg_win.data.model = model.message_model
         self.root_win = layout.data
 
         self.root_layout = layout
@@ -40,22 +40,22 @@ class PrpgScreen:
         self.win(ROOT).scr.refresh()
 
     def size_to_terminal(self):
-        if self.term_size == os.get_terminal_size():
+        if self.term_size == self.curses.get_terminal_size():
             return
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
-        self.term_size = os.get_terminal_size()
+        self.term_size = self.curses.get_terminal_size()
         while time.time() - t0 < 0.3:
             time.sleep(0.1)
-            if self.term_size != os.get_terminal_size():
+            if self.term_size != self.curses.get_terminal_size():
                 # size changed, reset timer
-                self.term_size = os.get_terminal_size()
+                self.term_size = self.curses.get_terminal_size()
                 t0 = time.time()
 
         try:
             w, h = self.term_size
-            curses.resizeterm(h, w)
+            self.curses.resizeterm(h, w)
             self.root_layout.dim.w = w
             self.root_layout.dim.h = h
             self.root_layout.clear_layout()
@@ -86,7 +86,7 @@ class PrpgScreen:
 
     def _paint_messages(self):
         win = self.win(MESSAGES)
-        win.paint()
+        win.noutrefresh()
 
     def _paint_log(self):
         win = self.win(LOG)

@@ -62,7 +62,7 @@ class Handler:
         v_pan.window('rightwin', Con(8,22,12,30))
         v_pan.window('lowerwin', Con(6,10))
 
-        create_win_data(root, scr)
+        create_win_data(root, scr, curses)
         root.do_layout()
         root.data.rebuild_screens()
         root.data.scr.refresh()
