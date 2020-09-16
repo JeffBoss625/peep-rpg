@@ -27,7 +27,14 @@ class DummyWin:
         return 'DummyWin(pos:[{}],dim:[{}])'.format(self.pos, self.dim)
 
     def clear(self):
-        raise NotImplementedError()
+        dim = self.dim
+        buf = self.buf
+        xoff, yoff = self.xyoff()
+        xlim = xoff + dim.w
+        ylim = yoff + dim.h
+        for y in range(yoff, ylim):
+            for x in range(xoff, xlim):
+                buf[y][x] = '.'
 
     def border(self):
         # printe('border({})'.format(self))
@@ -85,6 +92,10 @@ class DummyWin:
         x += xoff
         for xi in range(0, len(s)):
             self.buf[y][x + xi] = s[xi]
+
+    def getkey(self):
+        ret = input('->')
+        return ret[0]
 
 
 DEFAULT_DIM = Dim(40,80)
