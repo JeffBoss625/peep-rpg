@@ -1,4 +1,4 @@
-from lib.screen_layout import Dim
+from lib.screen_layout import Dim, Pos
 import sys
 
 COLOR_BLACK = 0
@@ -14,19 +14,26 @@ def printe(s):
     sys.stderr.write(s + "\n")
 
 class DummyWin:
-    def __init__(self, dim, parent):
-        self.dim = dim
+    def __init__(self, parent, pos, dim):
         self.parent = parent
-        self.buf = [x[:] for x in [['.'] * dim.w] * dim.h]
+        self.pos = pos
+        self.dim = dim
+        if parent:
+            self.buf = parent.buf
+        else:
+            self.buf = [x[:] for x in [['.'] * dim.w] * dim.h]
+
+    def __repr__(self):
+        return 'DummyWin(pos:[{}],dim:[{}])'.format(self.pos, self.dim)
 
     def clear(self):
-        self.buf = [x[:] for x in [['.'] * self.dim.w] * self.dim.h]
+        raise NotImplementedError()
 
     def border(self):
+        # printe('border({})'.format(self))
         dim = self.dim
         buf = self.buf
-        xoff = 0        # todo: use offset position from parent
-        yoff = 0
+        xoff, yoff = self.xyoff()
         xlim = xoff + dim.w
         ylim = yoff + dim.h
         for x in range(xoff, xlim):
@@ -58,18 +65,30 @@ class DummyWin:
         printe('')
 
     def derwin(self, h, w, y, x):
-        return self
+        return DummyWin(self, Pos(y,x), Dim(h,w))
+
+    def xyoff(self):
+        win = self
+        x = y = 0
+        while win:
+            x += win.pos.x
+            y += win.pos.y
+            win = win.parent
+        return x, y
 
     def getmaxyx(self):
         return self.dim.h, self.dim.w
 
     def addstr(self, y, x, s, color=COLOR_WHITE):
+        xoff, yoff = self.xyoff()
+        y += yoff
+        x += xoff
         for xi in range(0, len(s)):
             self.buf[y][x + xi] = s[xi]
 
 
 DEFAULT_DIM = Dim(40,80)
-TERM = DummyWin(DEFAULT_DIM, None)
+TERM = DummyWin(None, Pos(), DEFAULT_DIM)
 
 def wrapper(fn):
     fn(TERM)

@@ -5,30 +5,19 @@ from lib.screen_layout import *
 from lib.model import *
 
 def test_message_screen():
-    root_dim = Dim(10, 20)
+    root_dim = Dim(10, 30)
+    root_scr = DummyWin(None, Pos(), root_dim)
     root = create_layout(root_dim)
-    mwin = root.window('message_win', None, None, wintype=WIN.MESSAGE)
-    create_win_data(root, DummyWin(root_dim, None), curses)
+    pan = root.panel(Orient.VERT, None, None)
+    pan.window('win1', Con(4,6,8,10))
+    msg = pan.window('win2', Con(4,8,9,11), wintype=WIN.MESSAGE)
     root.do_layout()
+    create_win_data(root, root_scr, curses)
     root.data.rebuild_screens()
-    mwin.data.model = MessageModel()
-    assert mwin.data.model._dirty is False
-    mwin.data.model.message('hi there', 'you')
-    mwin.data.refresh()
-    assert mwin.data.model._dirty is True
-    assert mwin.data.model.messages == ['hi there you']
+    msg.data.model = MessageModel()
+    msg.data.model.message('hi there', 'you')
+    assert msg.data.model._dirty is True
+    assert msg.data.model.messages == ['hi there you']
+    msg.data.refresh()
 
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.refresh()
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.model.message('oh boy')
-    mwin.data.refresh()
 
