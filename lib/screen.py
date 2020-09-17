@@ -85,7 +85,12 @@ class Screen:
     # calling on all subwindows.
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self):
+        self.do_paint()
         self.scr.noutrefresh()
+
+    def do_paint(self):
+        pass
+        # raise NotImplementedError()
 
     def paint_all(self):
         self.winfo.iterate_win(lambda win, v, c: {win.paint()})
@@ -144,7 +149,7 @@ class TextScreen(Screen):
         self.trunc_x = winfo.params.get('trunc_x', Side.RIGHT)
         self.trunc_y = winfo.params.get('trunc_y', Side.BOTTOM)
 
-    def paint(self):
+    def do_paint(self):
         if not self.model:
             self.log('no model for screen {}'.format(self.winfo.name))
             return
@@ -154,8 +159,6 @@ class TextScreen(Screen):
 
         if self.model._dirty:
             self.write_lines(self.model.messages, self.trunc_x, self.trunc_y)
-
-        self.scr.noutrefresh()
 
 # build windows for children
 def _create_child_data(winfo, curses, _depth):

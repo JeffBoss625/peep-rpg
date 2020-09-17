@@ -30,6 +30,7 @@ def calc_hit(ac, thaco, seed = 0):
         return False
 
 def attack(src, dst, attack_name, out, seed=0):
+    out.log('attack({}, {}, {})'.format(src, dst, attack_name))
     if seed > 0:
         random.seed(seed)
     out.message(src.name, "attacks with", attack_name + "!")

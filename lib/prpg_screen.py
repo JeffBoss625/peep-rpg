@@ -20,18 +20,20 @@ class PrpgScreen:
         row_panel = layout.panel(Orient.VERT, None, None)
         row_panel.window(STATS, Con(6, 40, 6, 40))
 
-        maze_panel = row_panel.panel(Orient.HORI, None)
-        maze_panel.window(MAZE, Con(25, 40, 0, 80))
-        maze_panel.window(LOG, Con(0, 30, 0, 50))
+        center_panel = row_panel.panel(Orient.HORI, None)
+        center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
+        msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
-        msg_win = row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        log_win = row_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
         create_win_data(layout, curses_scr, curses)
+
         msg_win.data.model = model.message_model
+        log_win.data.model = model.log_model
+
         self.root_win = layout.data
 
         self.root_layout = layout
         self.rebuild_screens()
-        self.win(MESSAGES).messages = self.model.message_model
         curses.curs_set(0)
 
     def rebuild_screens(self):
@@ -78,18 +80,11 @@ class PrpgScreen:
         self._paint_stats()
         self._paint_maze()
         self.win(MESSAGES).paint()
-        self._paint_log()
+        self.win(LOG).paint()
 
         self.win(ROOT).paint()
 
         self.curses.doupdate()
-
-    def _paint_log(self):
-        win = self.win(LOG)
-        if not win.scr:
-            return
-        win.write_lines(self.model.log_output[-12:])
-        win.scr.border()
 
     def _paint_stats(self):
         p = self.model.player

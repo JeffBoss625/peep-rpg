@@ -19,7 +19,7 @@ class PrpgModel:
         self.peeps = peeps if peeps else []
         self.message_model = MessageModel()
         self.seed = seed
-        self.log_output = []
+        self.log_model = MessageModel()
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):
@@ -28,8 +28,7 @@ class PrpgModel:
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area
     def log(self, *args):
-        s = ' '.join(str(a) for a in args)
-        self.log_output.extend(s.split('\n'))
+        self.log_model.message(*args)
 
     def is_player(self, peep):
         return peep == self.player
