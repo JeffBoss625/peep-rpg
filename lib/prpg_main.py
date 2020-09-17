@@ -140,8 +140,8 @@ def main(scr):
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
-        peeps = [p for p in model.peeps]
-        turns = mlib.calc_turn_sequence(model.peeps)
+        peeps = [p for p in model.peeps.peeps]
+        turns = mlib.calc_turn_sequence(model.peeps.peeps)
 
         for peep_indexes in turns:
             for peep_index in peep_indexes:
@@ -162,7 +162,7 @@ def main(scr):
                         return 0
 
                 # update peeps list to living peeps
-                model.peeps = [p for p in model.peeps if p.hp > 0]
+                model.peeps.peeps = [p for p in model.peeps.peeps if p.hp > 0]
 
                 screen.paint()
 

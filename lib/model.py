@@ -61,9 +61,10 @@ class Peep(Model):
     _yaml_ignore = {'tics', 'x', 'y'}
 
 
-@dataclass
 class TextModel(Model):
-    text: list = field(default_factory=list)
+    def __init__(self, text=None):
+        super().__init__()
+        self.text = text if text else []
 
     # add all arguments as a single joined line/message.
     # break newlines into separate lines

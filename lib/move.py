@@ -137,10 +137,10 @@ def direction_relative(direct, rotation):
 # failed (hit a wall)
 def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
-    dst = peep_at_xy(model.peeps, p.x + dx, p.y + dy)
-    if maze_at_xy(model.maze.text, p.x + dx, p.y + dy):
+    dst = peep_at_xy(model.peeps.peeps, p.x + dx, p.y + dy)
+    if maze_at_xy(model.maze.maze.text, p.x + dx, p.y + dy):
         if model.is_player(p) or isinstance(p, modellib.Ammo):
-            dst = maze_at_xy(model.maze.text, p.x + dx, p.y + dy)
+            dst = maze_at_xy(model.maze.maze.text, p.x + dx, p.y + dy)
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True

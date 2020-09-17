@@ -9,19 +9,31 @@
 # that will be costly to change, but easier to work with and understand.
 
 from dataclasses import dataclass
-from lib.model import TextModel
+from lib.model import TextModel, Model
+
+class MazeModel(Model):
+    def __init__(self, maze, peeps):
+        super().__init__()
+        self.maze = maze
+        self.peeps = peeps
+
+    def get_dirty(self):
+        return self.maze._dirty or self.peeps._dirty
+
+class PeepsModel(Model):
+    def __init__(self, peeps):
+        super().__init__()
+        self.peeps = peeps if peeps else []
+
 
 class PrpgModel:
     def __init__(self, player=None, maze=None, peeps=None, seed=0):
         self.player = player
-        self.maze = TextModel()
-        self.peeps = peeps if peeps else []
+        self.peeps = PeepsModel(peeps)
+        self.maze = MazeModel(TextModel(maze), self.peeps)
         self.message_model = TextModel()
         self.log_model = TextModel()
         self.seed = seed
-
-        if maze:
-            self.maze.extend(maze)
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):

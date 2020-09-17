@@ -7,6 +7,7 @@ from dataclasses import dataclass
 class WIN:
     FIXED = "FIXED"
     TEXT = "MESSAGE"
+    MAZE = "MAZE"
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass

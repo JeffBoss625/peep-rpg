@@ -26,7 +26,7 @@ class PrpgScreen:
 
         # Center Row
         center_panel = main_panel.panel(Orient.HORI, None)
-        maze_win = center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
+        maze_win = center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
         msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
@@ -84,7 +84,7 @@ class PrpgScreen:
     def paint(self):
         self.win(ROOT).clear()
         self._paint_stats()
-        self._paint_maze()
+        self.win(MAZE).paint()
         self.win(MESSAGES).paint()
         self.win(LOG).paint()
 
@@ -103,14 +103,6 @@ class PrpgScreen:
             'speed: ' + str(p.speed),
             ])
         win.scr.border()
-
-    def _paint_maze(self):
-        win = self.win(MAZE)
-        if not win.scr:
-            return
-        win.paint()
-        for p in self.model.peeps:
-            win.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
 
 # if __name__ == '__main__':

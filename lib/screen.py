@@ -85,6 +85,8 @@ class Screen:
     # calling on all subwindows.
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self):
+        if not self.scr:
+            return
         self.do_paint()
         self.scr.noutrefresh()
 
@@ -154,11 +156,28 @@ class TextScreen(Screen):
             self.log('no model for screen {}'.format(self.winfo.name))
             return
 
-        if self.border:
-            self.scr.border()
-
         if self.model._dirty:
+            if self.border:
+                self.scr.border()
             self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
+
+class MazeScreen(Screen):
+    def __init__(self, winfo, curses):
+        super().__init__(winfo, curses)
+        self.model = None
+
+    def do_paint(self):
+        if self.model._dirty:
+            if self.border:
+                self.scr.border()
+
+            self.write_lines(self.model.maze.text, Side.RIGHT, Side.BOTTOM)
+
+            for p in self.model.peeps.peeps:
+                self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
+
+
+
 
 # build windows for children
 def _create_child_data(winfo, curses, _depth):
@@ -166,6 +185,8 @@ def _create_child_data(winfo, curses, _depth):
         winfo.data = Screen(winfo, curses)
     elif winfo.wintype == WIN.TEXT:
         winfo.data = TextScreen(winfo, curses)
+    elif winfo.wintype == WIN.MAZE:
+        winfo.data = MazeScreen(winfo, curses)
     else:
         raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
     return curses
