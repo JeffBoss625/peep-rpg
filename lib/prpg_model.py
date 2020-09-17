@@ -11,7 +11,6 @@
 from dataclasses import dataclass
 from lib.model import TextModel
 
-@dataclass
 class PrpgModel:
     def __init__(self, player=None, maze=None, peeps=None, seed=0):
         self.player = player
