@@ -158,7 +158,7 @@ class TextScreen(Screen):
             self.scr.border()
 
         if self.model._dirty:
-            self.write_lines(self.model.messages, self.trunc_x, self.trunc_y)
+            self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
 
 # build windows for children
 def _create_child_data(winfo, curses, _depth):

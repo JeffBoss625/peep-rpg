@@ -26,7 +26,7 @@ class PrpgScreen:
 
         # Center Row
         center_panel = main_panel.panel(Orient.HORI, None)
-        center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
+        maze_win = center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
         msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
@@ -37,6 +37,7 @@ class PrpgScreen:
         # connect models to screens
         msg_win.data.model = model.message_model
         log_win.data.model = model.log_model
+        maze_win.data.model = model.maze
 
         self.rebuild_screens()
         curses.curs_set(0)
@@ -107,13 +108,9 @@ class PrpgScreen:
         win = self.win(MAZE)
         if not win.scr:
             return
-        model = self.model
-        win.write_lines(model.maze)
-
-        for p in model.peeps:
+        win.paint()
+        for p in self.model.peeps:
             win.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
-
-        win.scr.border()
 
 
 # if __name__ == '__main__':

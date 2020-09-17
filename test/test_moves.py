@@ -95,8 +95,8 @@ def test_handle_enemy_move():
     ]
     model = PrpgModel(peeps=peeps, maze=maze, player=peeps[0])
     enemy = peeps[1]
-    dx = model.player.x - enemy.x
-    dy = model.player.y - enemy.y
+    dx = model.player_model.x - enemy.x
+    dy = model.player_model.y - enemy.y
     edir = mlib.direction_from_vector(dx, dy)
 
     mlib.move_peep(model, enemy, edir)

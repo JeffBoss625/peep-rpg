@@ -14,17 +14,17 @@ def test_message_screen():
     root.do_layout()
     create_win_data(root, root_scr, curses)
     root.data.rebuild_screens()
-    msg.data.model = MessageModel()
-    msg.data.model.message('hi there', 'you')
+    msg.data.model = TextModel()
+    msg.data.model.append('hi there', 'you')
     assert msg.data.model._dirty is True
     assert msg.data.model.messages == ['hi there you']
     msg.data.refresh()
-    msg.data.model.message('hi 1234567890')
-    msg.data.model.message('hi 1234567890')
-    msg.data.model.message('hi 1234567890')
-    msg.data.model.message('hi 1234567890')
-    msg.data.model.message('hi 1234567890')
-    msg.data.model.message('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
+    msg.data.model.append('hi 1234567890')
     msg.data.refresh()
 
 

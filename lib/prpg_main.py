@@ -74,24 +74,24 @@ def player_turn(screen):
                 while model.player == player:
                     player = model.peeps[random.randint(0, len(model.peeps) - 1)]
                 model.player = player
-                model.message("You are now " + model.player.name)
+                model.append("You are now " + model.player.name)
             else:
-                model.message("You have nothing in range to brain-swap with")
+                model.append("You have nothing in range to brain-swap with")
         elif input_key == 'a':
-            model.message('Where do you want to shoot?')
+            model.append('Where do you want to shoot?')
             screen.paint()
             sec_input_key = screen.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 sec_input_key = screen.get_key()
-                model.message('That is not a valid direction to shoot')
-                model.message('Where do you want to shoot?')
+                model.append('That is not a valid direction to shoot')
+                model.append('Where do you want to shoot?')
                 screen.paint()
             direct = DIRECTION_KEYS[sec_input_key]
             alib.create_projectile(direct, model)
-            model.message('Projectile shot')
+            model.append('Projectile shot')
             screen.paint()
         else:
-            model.message('unknown command: "{}"'.format(input_key))
+            model.append('unknown command: "{}"'.format(input_key))
 
         screen.paint()  # update messages
         # continue with loop to get more input

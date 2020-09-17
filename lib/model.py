@@ -62,15 +62,19 @@ class Peep(Model):
 
 
 @dataclass
-class MessageModel(Model):
-    messages: list = field(default_factory=list)
+class TextModel(Model):
+    text: list = field(default_factory=list)
 
-    # add a message or all messages in an iterable to the messages array
-    def message(self, *args):
+    # add all arguments as a single joined line/message.
+    # break newlines into separate lines
+    def print(self, *args):
         s = ' '.join(str(a) for a in args)
-        self.messages.extend(s.split('\n'))
+        self.text.extend(s.split('\n'))
         self._dirty = True
 
+    def extend(self, lines):
+        for s in lines: self.text.extend(s.split('\n'))
+        self._dirty = True
 
 def _model_getstate(self):
     nocopy = getattr(self, '_yaml_ignore', {})
