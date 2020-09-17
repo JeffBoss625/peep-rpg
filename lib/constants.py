@@ -18,3 +18,9 @@ class Color:
     def curses_color(color):
         return 'COLOR_' + color
 
+
+class Side:
+    TOP = 'TOP'
+    LEFT = 'LEFT'
+    BOTTOM = 'BOTTOM'
+    RIGHT = 'RIGHT'

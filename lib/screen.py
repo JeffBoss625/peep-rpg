@@ -1,5 +1,5 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
-from lib.constants import Color
+from lib.constants import Color, Side
 from lib.screen_layout import WIN
 
 IGNORED_KEYS = {
@@ -54,7 +54,7 @@ class Screen:
     def log(self, *args):
         self.winfo.log(args)
 
-    def write_lines(self, lines):
+    def write_lines(self, lines, trunc_x=Side.RIGHT, trunc_y=Side.BOTTOM):
         if not len(lines):
             return
         scr = self.scr
@@ -68,10 +68,17 @@ class Screen:
 
         nlines = len(lines)
         if nlines > max_h:
-            lines = lines[nlines - max_h:]
+            if trunc_y == Side.TOP:
+                lines = lines[:max_h]
+            else: # Side.BOTTOM
+                lines = lines[nlines - max_h:]
+
         for i, line in enumerate(lines):
             if len(line) > max_w:
-                line = line[0:max_w-1]
+                if trunc_x == Side.RIGHT:
+                    line = line[0:max_w - 1]
+                else: # Side.LEFT
+                    line = line[len(line) - max_w:]
             scr.addstr(y+i, x, line)
 
     def refresh(self):
@@ -145,7 +152,7 @@ class MessageScreen(Screen):
             self.scr.border()
 
         if self.model._dirty:
-            self.write_lines(self.model.messages)
+            self.write_lines(self.model.messages, trunc_y=Side.TOP)
 
         self.scr.noutrefresh()
 
