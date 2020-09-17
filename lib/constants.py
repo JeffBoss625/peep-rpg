@@ -24,3 +24,7 @@ class Side:
     LEFT = 'LEFT'
     BOTTOM = 'BOTTOM'
     RIGHT = 'RIGHT'
+
+class Key:
+    CTRL_Q = '\x11'
+

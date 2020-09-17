@@ -1,3 +1,4 @@
+from lib.constants import Key
 from lib.screen_layout import Dim, Pos
 import sys
 
@@ -86,7 +87,7 @@ class DummyWin:
     def getmaxyx(self):
         return self.dim.h, self.dim.w
 
-    def addstr(self, y, x, s, color=COLOR_WHITE):
+    def addstr(self, y, x, s, _color_pair=None):
         xoff, yoff = self.xyoff()
         y += yoff
         x += xoff
@@ -94,8 +95,12 @@ class DummyWin:
             self.buf[y][x + xi] = s[xi]
 
     def getkey(self):
-        ret = input('->')
-        return ret[0]
+        try:
+            ret = input('->')
+            return ret[0]
+        except KeyboardInterrupt:
+            printe('KeyboardInterrupt')
+            return Key.CTRL_Q
 
 
 DEFAULT_DIM = Dim(40,80)

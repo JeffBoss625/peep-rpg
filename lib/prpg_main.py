@@ -1,5 +1,6 @@
 import lib.move as mlib
 import lib.attack as alib
+from lib.constants import Key
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
@@ -65,7 +66,7 @@ def player_turn(screen):
             if mlib.move_peep(model, model.player, direct):
                 return input_key
             # else didn't spend turn
-        elif input_key == '\x11':               # ^Q
+        elif input_key == Key.CTRL_Q:
             return 'q'
         elif input_key == 'm':
             if len(model.peeps) > 1:

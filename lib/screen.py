@@ -81,10 +81,14 @@ class Screen:
                     line = line[len(line) - max_w:]
             scr.addstr(y+i, x, line)
 
+    # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient for
+    # calling on all subwindows.
+    # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self):
         self.scr.noutrefresh()
-        # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient.
-        # We call curses.doupdate() from the main screen loop instead.
+
+    def paint_all(self):
+        self.winfo.iterate_win(lambda win, v, c: {win.paint()})
 
     def get_key(self):
         while 1:
@@ -98,7 +102,7 @@ class Screen:
                 #     str(e),
                 #     ''.join(traceback.format_tb(e.__traceback__)))
                 # )
-                pass        # ignore failed calls to getkey() following resize events etc.
+                pass        # ignore interrupts to getkey() following resize events etc.
 
     def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK):
         max_w, max_h = self.getmax_wh()
