@@ -165,6 +165,7 @@ def main(scr):
                 model.peeps.peeps = [p for p in model.peeps.peeps if p.hp > 0]
 
                 screen.paint()
+                # model.undirty()
 
 
 def startup(curses_lib):

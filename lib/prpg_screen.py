@@ -31,12 +31,12 @@ class PrpgScreen:
 
         # Bottom Row
         main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        self.root_layout.do_layout()
 
         create_win_data(layout, curses_scr, curses)
-
         self.connect_models()
 
-        self.rebuild_screens()
+        self.win(ROOT).rebuild_screens()
         curses.curs_set(0)
 
     def connect_models(self):
@@ -46,12 +46,6 @@ class PrpgScreen:
         self.win(MAZE).model = self.model.maze
         self.win(STATS).model = self.model.peeps
         self.win(ROOT).model = self.model
-
-    def rebuild_screens(self):
-        self.root_layout.do_layout()
-        self.win(ROOT).rebuild_screens()
-        self.win(ROOT).scr.noutrefresh()
-        self.curses.doupdate()
 
     def size_to_terminal(self):
         if self.term_size == self.curses.get_terminal_size():
@@ -74,7 +68,7 @@ class PrpgScreen:
             self.root_layout.dim.h = h
             self.root_layout.clear_layout()
             self.root_layout.do_layout()
-            self.rebuild_screens()
+            self.root_layout.data.rebuild_screens()
 
         except Exception as e:
             self.root_layout.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
