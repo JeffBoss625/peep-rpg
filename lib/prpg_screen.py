@@ -21,16 +21,16 @@ class PrpgScreen:
         row_panel.window(STATS, Con(6, 40, 6, 40))
 
         center_panel = row_panel.panel(Orient.HORI, None)
+
         center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
         msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         log_win = row_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
         create_win_data(layout, curses_scr, curses)
 
+        # connect models to screens
         msg_win.data.model = model.message_model
         log_win.data.model = model.log_model
-
-        self.root_win = layout.data
 
         self.root_layout = layout
         self.rebuild_screens()
@@ -69,7 +69,7 @@ class PrpgScreen:
             self.root_layout.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
 
     def get_key(self):
-        return self.root_win.get_key()
+        return self.win(ROOT).get_key()
 
     def win(self, name):
         return self.root_layout.info.win_by_name[name].data
