@@ -15,24 +15,29 @@ class PrpgScreen:
     def __init__(self, curses_scr, curses, model):
         self.model = model
         self.curses = curses
+
+        # Setup Main Panel
         w, h = self.term_size = curses.get_terminal_size()
-        layout = create_layout(Dim(h, w), 'prpg')
-        row_panel = layout.panel(Orient.VERT, None, None)
-        row_panel.window(STATS, Con(6, 40, 6, 40))
+        self.root_layout = layout = create_layout(Dim(h, w), 'prpg')
+        main_panel = layout.panel(Orient.VERT, None, None)
 
-        center_panel = row_panel.panel(Orient.HORI, None)
+        # Top Row
+        main_panel.window(STATS, Con(6, 40, 6, 40))
 
+        # Center Row
+        center_panel = main_panel.panel(Orient.HORI, None)
         center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.TEXT)
         msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
-        log_win = row_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        # Bottom Row
+        log_win = main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+
         create_win_data(layout, curses_scr, curses)
 
         # connect models to screens
         msg_win.data.model = model.message_model
         log_win.data.model = model.log_model
 
-        self.root_layout = layout
         self.rebuild_screens()
         curses.curs_set(0)
 
