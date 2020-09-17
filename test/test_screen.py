@@ -19,5 +19,12 @@ def test_message_screen():
     assert msg.data.model._dirty is True
     assert msg.data.model.messages == ['hi there you']
     msg.data.refresh()
+    msg.data.model.message('hi 1234567890')
+    msg.data.model.message('hi 1234567890')
+    msg.data.model.message('hi 1234567890')
+    msg.data.model.message('hi 1234567890')
+    msg.data.model.message('hi 1234567890')
+    msg.data.model.message('hi 1234567890')
+    msg.data.refresh()
 
 

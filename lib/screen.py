@@ -68,9 +68,9 @@ class Screen:
 
         nlines = len(lines)
         if nlines > max_h:
-            if trunc_y == Side.TOP:
+            if trunc_y == Side.BOTTOM:
                 lines = lines[:max_h]
-            else: # Side.BOTTOM
+            else: # Side.TOP
                 lines = lines[nlines - max_h:]
 
         for i, line in enumerate(lines):
