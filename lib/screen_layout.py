@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 class WIN:
     FIXED = "FIXED"
-    MESSAGE = "MESSAGE"
+    TEXT = "MESSAGE"
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
@@ -152,7 +152,7 @@ class Layout:
         self.parent = parent
         self.pos = pos        # position within parent (panels will update this in do_layout)
         self.con = con        # constraints used to calculate dim
-        self.kwds = kwds if kwds else {}
+        self.params = kwds if kwds else {}
 
         self.dim = None       # calculated in do_layout()
         self.children = []
@@ -229,7 +229,7 @@ class WinLayout(Layout):
             con = Con()
         super().__init__(parent, pos, con, **kwds)
         self.name = name
-        self.wintype = self.kwds.get('wintype', WIN.FIXED)
+        self.wintype = self.params.get('wintype', WIN.FIXED)
 
         # store window immediate windows parent
         wp = parent

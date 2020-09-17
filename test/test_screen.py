@@ -10,7 +10,7 @@ def test_message_screen():
     root = create_layout(root_dim)
     pan = root.panel(Orient.VERT, None, None)
     pan.window('win1', Con(4,6,8,10))
-    msg = pan.window('win2', Con(4,8,9,11), wintype=WIN.MESSAGE)
+    msg = pan.window('win2', Con(4,8,9,11), wintype=WIN.TEXT)
     root.do_layout()
     create_win_data(root, root_scr, curses)
     root.data.rebuild_screens()

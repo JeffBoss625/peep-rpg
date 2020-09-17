@@ -52,7 +52,7 @@ class DummyWin:
             buf[y][xlim-1] = '|'
 
     def refresh(self):
-        self.noutrefresh()
+        raise NotImplementedError("use noutrefresh() instead")
 
     def noutrefresh(self):
         pass

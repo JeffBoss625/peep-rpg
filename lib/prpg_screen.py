@@ -24,7 +24,7 @@ class PrpgScreen:
         maze_panel.window(MAZE, Con(25, 40, 0, 80))
         maze_panel.window(LOG, Con(0, 30, 0, 50))
 
-        msg_win = row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.MESSAGE)
+        msg_win = row_panel.window(MESSAGES, Con(6, 40, 10, 80), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
         create_win_data(layout, curses_scr, curses)
         msg_win.data.model = model.message_model
         self.root_win = layout.data
@@ -37,7 +37,8 @@ class PrpgScreen:
     def rebuild_screens(self):
         self.root_layout.do_layout()
         self.win(ROOT).rebuild_screens()
-        self.win(ROOT).scr.refresh()
+        self.win(ROOT).scr.noutrefresh()
+        self.curses.doupdate()
 
     def size_to_terminal(self):
         if self.term_size == self.curses.get_terminal_size():
@@ -71,22 +72,17 @@ class PrpgScreen:
     def win(self, name):
         return self.root_layout.info.win_by_name[name].data
 
-    def clear(self):
-        self.win(ROOT).clear()
-
     # paint the entire screen - all that is visible
     def paint(self):
         self.win(ROOT).clear()
         self._paint_stats()
         self._paint_maze()
-        self._paint_messages()
+        self.win(MESSAGES).paint()
         self._paint_log()
 
-        self.win(ROOT).refresh()
+        self.win(ROOT).paint()
 
-    def _paint_messages(self):
-        win = self.win(MESSAGES)
-        win.noutrefresh()
+        self.curses.doupdate()
 
     def _paint_log(self):
         win = self.win(LOG)

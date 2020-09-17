@@ -1,6 +1,6 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 from lib.constants import Color, Side
-from lib.screen_layout import WIN
+from lib.screen_layout import WIN, WinLayout
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
@@ -81,15 +81,10 @@ class Screen:
                     line = line[len(line) - max_w:]
             scr.addstr(y+i, x, line)
 
-    def refresh(self):
-        self.noutrefresh()      # todo: use noutrefresh() then doupdate() for main screen
-        self.doupdate()
-
-    def doupdate(self):
-        self.curses.doupdate()
-
-    def noutrefresh(self):
+    def paint(self):
         self.scr.noutrefresh()
+        # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient.
+        # We call curses.doupdate() from the main screen loop instead.
 
     def get_key(self):
         while 1:
@@ -138,12 +133,14 @@ def _rebuild_screen(winfo, v, xoff, yoff, d):
     if winfo.data.border:
         winfo.data.scr.border()
 
-class MessageScreen(Screen):
+class TextScreen(Screen):
     def __init__(self, winfo, curses):
         super().__init__(winfo, curses)
         self.model = None
+        self.trunc_x = winfo.params.get('trunc_x', Side.RIGHT)
+        self.trunc_y = winfo.params.get('trunc_y', Side.BOTTOM)
 
-    def noutrefresh(self):
+    def paint(self):
         if not self.model:
             self.log('no model for screen {}'.format(self.winfo.name))
             return
@@ -152,19 +149,16 @@ class MessageScreen(Screen):
             self.scr.border()
 
         if self.model._dirty:
-            self.write_lines(self.model.messages, trunc_y=Side.TOP)
+            self.write_lines(self.model.messages, self.trunc_x, self.trunc_y)
 
         self.scr.noutrefresh()
-
-    def doupdate(self):
-        self.scr.doupdate()
 
 # build Win wrappers for children
 def _create_win_data(winfo, curses, xoff, yoff, d):    # todo: remove xoff and yoff params
     if winfo.wintype == WIN.FIXED:
         winfo.data = Screen(winfo, curses)
-    elif winfo.wintype == WIN.MESSAGE:
-        winfo.data = MessageScreen(winfo, curses)
+    elif winfo.wintype == WIN.TEXT:
+        winfo.data = TextScreen(winfo, curses)
     else:
         raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
     return curses
