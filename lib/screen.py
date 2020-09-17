@@ -18,6 +18,7 @@ class Screen:
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
+        self.model = None
 
     def __repr__(self):
         return '{}: margin:[{},{}] scr:{}'.format(self.winfo, self.x_margin, self.y_margin, self.scr)
@@ -87,6 +88,13 @@ class Screen:
     def paint(self):
         if not self.scr:
             return
+        if not self.model:
+            raise RuntimeError('no model for screen {}'.format(self.winfo.name))
+        if not self.model._dirty:
+            return
+
+        if self.border:
+            self.scr.border()
         self.do_paint()
         self.scr.noutrefresh()
 
@@ -147,35 +155,33 @@ def _rebuild_screen(winfo, _v, _d):
 class TextScreen(Screen):
     def __init__(self, winfo, curses):
         super().__init__(winfo, curses)
-        self.model = None
         self.trunc_x = winfo.params.get('trunc_x', Side.RIGHT)
         self.trunc_y = winfo.params.get('trunc_y', Side.BOTTOM)
 
     def do_paint(self):
-        if not self.model:
-            self.log('no model for screen {}'.format(self.winfo.name))
-            return
-
-        if self.model._dirty:
-            if self.border:
-                self.scr.border()
-            self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
+        self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
 
 class MazeScreen(Screen):
     def __init__(self, winfo, curses):
         super().__init__(winfo, curses)
-        self.model = None
 
     def do_paint(self):
-        if self.model._dirty:
-            if self.border:
-                self.scr.border()
+        self.write_lines(self.model.maze.text, Side.RIGHT, Side.BOTTOM)
 
-            self.write_lines(self.model.maze.text, Side.RIGHT, Side.BOTTOM)
+        for p in self.model.peeps.peeps:
+            self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
-            for p in self.model.peeps.peeps:
-                self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
+class PlayerStatsScreen(Screen):
+    def __init__(self, winfo, curses):
+        super().__init__(winfo, curses)
 
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            p.name,
+            'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
+            'speed: ' + str(p.speed),
+            ])
 
 
 
@@ -187,6 +193,8 @@ def _create_child_data(winfo, curses, _depth):
         winfo.data = TextScreen(winfo, curses)
     elif winfo.wintype == WIN.MAZE:
         winfo.data = MazeScreen(winfo, curses)
+    elif winfo.wintype == WIN.STATS:
+        winfo.data = PlayerStatsScreen(winfo, curses)
     else:
         raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
     return curses

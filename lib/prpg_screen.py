@@ -22,25 +22,30 @@ class PrpgScreen:
         main_panel = layout.panel(Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(STATS, Con(6, 40, 6, 40))
+        main_panel.window(STATS, Con(6, 40, 6, 40), wintype=WIN.STATS)
 
         # Center Row
         center_panel = main_panel.panel(Orient.HORI, None)
-        maze_win = center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
-        msg_win = center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
+        center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
-        log_win = main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         create_win_data(layout, curses_scr, curses)
 
-        # connect models to screens
-        msg_win.data.model = model.message_model
-        log_win.data.model = model.log_model
-        maze_win.data.model = model.maze
+        self.connect_models()
 
         self.rebuild_screens()
         curses.curs_set(0)
+
+    def connect_models(self):
+        # connect models to screens
+        self.win(MESSAGES).model = self.model.message_model
+        self.win(LOG).model = self.model.log_model
+        self.win(MAZE).model = self.model.maze
+        self.win(STATS).model = self.model.peeps
+        self.win(ROOT).model = self.model
 
     def rebuild_screens(self):
         self.root_layout.do_layout()
@@ -83,7 +88,7 @@ class PrpgScreen:
     # paint the entire screen - all that is visible
     def paint(self):
         self.win(ROOT).clear()
-        self._paint_stats()
+        self.win(STATS).paint()
         self.win(MAZE).paint()
         self.win(MESSAGES).paint()
         self.win(LOG).paint()
@@ -91,19 +96,6 @@ class PrpgScreen:
         self.win(ROOT).paint()
 
         self.curses.doupdate()
-
-    def _paint_stats(self):
-        p = self.model.player
-        win = self.win(STATS)
-        if not win.scr:
-            return
-        win.write_lines([
-            p.name,
-            'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
-            'speed: ' + str(p.speed),
-            ])
-        win.scr.border()
-
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])

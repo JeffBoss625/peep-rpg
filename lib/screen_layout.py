@@ -8,6 +8,7 @@ class WIN:
     FIXED = "FIXED"
     TEXT = "MESSAGE"
     MAZE = "MAZE"
+    STATS = "STATS"
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass

@@ -63,7 +63,7 @@ def player_turn(screen):
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
-            if mlib.move_peep(model, model.player, direct):
+            if mlib.move_peep(model, model.peeps.player, direct):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -74,24 +74,24 @@ def player_turn(screen):
                 while model.player == player:
                     player = model.peeps[random.randint(0, len(model.peeps) - 1)]
                 model.player = player
-                model.append("You are now " + model.player.name)
+                model.message("You are now " + model.player.name)
             else:
-                model.append("You have nothing in range to brain-swap with")
+                model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
-            model.append('Where do you want to shoot?')
+            model.message('Where do you want to shoot?')
             screen.paint()
             sec_input_key = screen.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 sec_input_key = screen.get_key()
-                model.append('That is not a valid direction to shoot')
-                model.append('Where do you want to shoot?')
+                model.message('That is not a valid direction to shoot')
+                model.message('Where do you want to shoot?')
                 screen.paint()
             direct = DIRECTION_KEYS[sec_input_key]
             alib.create_projectile(direct, model)
-            model.append('Projectile shot')
+            model.message('Projectile shot')
             screen.paint()
         else:
-            model.append('unknown command: "{}"'.format(input_key))
+            model.message('unknown command: "{}"'.format(input_key))
 
         screen.paint()  # update messages
         # continue with loop to get more input
@@ -102,9 +102,9 @@ def monster_turn(model, monster):
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
     elif monster.move_tactic == 'seek':
-        dx = model.player.x - monster.x
-        dy = model.player.y - monster.y
-        if model.player.hp <= 0:
+        dx = model.peeps.player.x - monster.x
+        dy = model.peeps.player.y - monster.y
+        if model.peeps.player.hp <= 0:
             return 'q'
         if monster.hp/monster.maxhp < 0.3:
             direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away

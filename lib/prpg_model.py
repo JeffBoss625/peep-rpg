@@ -20,16 +20,21 @@ class MazeModel(Model):
     def get_dirty(self):
         return self.maze._dirty or self.peeps._dirty
 
+    def set_dirty(self, v):
+        pass    # ignore super() init _dirty=True
+
+    _dirty = property(get_dirty, set_dirty)
+
 class PeepsModel(Model):
-    def __init__(self, peeps):
+    def __init__(self, player, peeps):
         super().__init__()
+        self.player = player
         self.peeps = peeps if peeps else []
 
-
-class PrpgModel:
+class PrpgModel(Model):
     def __init__(self, player=None, maze=None, peeps=None, seed=0):
-        self.player = player
-        self.peeps = PeepsModel(peeps)
+        super().__init__()
+        self.peeps = PeepsModel(player, peeps)
         self.maze = MazeModel(TextModel(maze), self.peeps)
         self.message_model = TextModel()
         self.log_model = TextModel()
@@ -45,4 +50,4 @@ class PrpgModel:
         self.log_model.print(*args)
 
     def is_player(self, peep):
-        return peep == self.player
+        return peep == self.peeps.player
