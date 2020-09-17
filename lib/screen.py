@@ -121,7 +121,7 @@ class Screen:
         return self.color_pairs[key]
 
 # delete and re-create derived curses windows ("screens") using parent windows/screens
-def _rebuild_screen(winfo, v, xoff, yoff, d):
+def _rebuild_screen(winfo, _v, _d):
     if not winfo.winparent:         # don't build root screen - root screen is fixed
         return
 
@@ -153,8 +153,8 @@ class TextScreen(Screen):
 
         self.scr.noutrefresh()
 
-# build Win wrappers for children
-def _create_win_data(winfo, curses, xoff, yoff, d):    # todo: remove xoff and yoff params
+# build windows for children
+def _create_child_data(winfo, curses, _depth):
     if winfo.wintype == WIN.FIXED:
         winfo.data = Screen(winfo, curses)
     elif winfo.wintype == WIN.TEXT:
@@ -164,14 +164,14 @@ def _create_win_data(winfo, curses, xoff, yoff, d):    # todo: remove xoff and y
     return curses
 
 # initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
-def create_win_data(root_info, scr, curses):
+def create_win_data(winfo, scr, curses):
     # set up root
-    _create_win_data(root_info, curses, None, None, 0)
-    root_info.data.scr = scr
-    root_info.data.border = 0
+    _create_child_data(winfo, curses, 0)
+    winfo.data.scr = scr
+    winfo.data.border = 0
 
-    for c in root_info.children:
-        c.iterate_win(_create_win_data, curses)
+    for c in winfo.children:
+        c.iterate_win(_create_child_data, curses)
 
 
 

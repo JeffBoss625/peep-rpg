@@ -183,15 +183,13 @@ class Layout:
             v = c.apply_ddf(fn, v)
         return fn(self, v)
 
-    def iterate_win(self, fn, v=None, xoff=0, yoff=0, d=0):
+    def iterate_win(self, fn, v=None, d=0):
         if isinstance(self, WinLayout):
-            v = fn(self, v, xoff, yoff, d)
+            v = fn(self, v, d)
             d += 1
 
-        # xoff += self.pos.x
-        # yoff += self.pos.y
         for c in self.children:
-            v = c.iterate_win(fn, v, xoff, yoff, d)
+            v = c.iterate_win(fn, v, d)
 
         return v
 
