@@ -8,9 +8,6 @@ class Model:
     def __init__(self):
         self._dirty = True
 
-    def __post_init__(self):
-        self._dirty = False     # changing values of attributes without '_' prefix marks model as _dirty
-
 @dataclass
 class Attack(Model):
     damage: str = '1d1'
