@@ -38,7 +38,7 @@ class DummyWin:
                 buf[y][x] = '.'
 
     def border(self):
-        # printe('border({})'.format(self))
+        printe('border({})'.format(self))
         dim = self.dim
         buf = self.buf
         xoff, yoff = self.xyoff()
@@ -103,7 +103,7 @@ class DummyWin:
             return Key.CTRL_Q
 
 
-DEFAULT_DIM = Dim(40,80)
+DEFAULT_DIM = Dim(40,120)
 TERM = DummyWin(None, Pos(), DEFAULT_DIM)
 
 def wrapper(fn):

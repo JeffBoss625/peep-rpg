@@ -9,6 +9,7 @@ MAZE = 'maze'
 MESSAGES = 'messages'
 ROOT = 'root'
 LOG = 'log'
+BILLBOARD = 'billboard'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:
@@ -25,9 +26,11 @@ class PrpgScreen:
         main_panel.window(STATS, Con(6, 40, 6, 40), wintype=WIN.STATS)
 
         # Center Row
-        center_panel = main_panel.panel(Orient.HORI, None)
-        center_panel.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
-        center_panel.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        center = main_panel.panel(Orient.HORI, None)
+        left_center = center.panel(Orient.VERT, None)
+        left_center.window(BILLBOARD, Con(0,4,0,4), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        left_center.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
+        center.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
         main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)

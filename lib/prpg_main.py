@@ -152,6 +152,7 @@ def main(scr):
                 if peep.hp <= 0:
                     continue
                 if model.is_player(peep):
+                    screen.paint()
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                 else:
@@ -164,7 +165,6 @@ def main(scr):
                 # update peeps list to living peeps
                 model.peeps.peeps = [p for p in model.peeps.peeps if p.hp > 0]
 
-                screen.paint()
                 # model.undirty()
 
 

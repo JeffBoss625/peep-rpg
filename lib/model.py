@@ -51,7 +51,7 @@ class Peep(Model):
     move_tactic: str = 'seek'
 
     # temp state
-    # todo: natural state and temp state - maintain both
+    # todo: original state and current state - maintain both
     hp: int = 0
     tics: int = 0
     x: int = 0
