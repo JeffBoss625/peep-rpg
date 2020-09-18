@@ -7,15 +7,32 @@ import yaml
 class Model:
     def __init__(self):
         self._dirty = True
-        self._subscribers = []
+        self._subscribers = {}
 
     def __setattr__(self, k, v):
-        if k[0] != '_' and getattr(self, k, v) != v:
+        if not hasattr(self, '_subscribers') or k[0] == '_':   # not initialized
+            object.__setattr__(self, k, v)
+            return
+
+        if getattr(self, k, v) != v:
+            object.__setattr__(self, k, v)
             object.__setattr__(self, '_dirty', True)
+            self.publish('update', k, v)
+        else:
+            object.__setattr__(self, k, v)
 
-        object.__setattr__(self, k, v)
+    def subscribe(self, topic, fn):
+        subs = self._subscribers.get(topic, [])
+        if not subs:
+            self._subscribers[topic] = subs
+        subs.append(fn)
 
+    def unsubscribe(self, topic, fn):
+        self._subscribers[topic].remove(fn)
 
+    def publish(self, topic, *args):
+        for sub in self._subscribers.get(topic, []):
+            sub(topic, *args)
 
 
 @dataclass
