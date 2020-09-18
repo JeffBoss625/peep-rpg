@@ -37,6 +37,7 @@ class PrpgModel(Model):
         self.maze = MazeModel(TextModel(maze), self.peeps)
         self.message_model = TextModel()
         self.log_model = TextModel()
+        self.billboard = TextModel()
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array

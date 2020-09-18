@@ -20,20 +20,20 @@ class PrpgScreen:
         # Setup Main Panel
         w, h = self.term_size = curses.get_terminal_size()
         self.root_layout = layout = create_layout(Dim(h, w), 'prpg')
-        main_panel = layout.panel(Orient.VERT, None, None)
+        main_panel = layout.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(STATS, Con(6, 40, 6, 40), wintype=WIN.STATS)
+        main_panel.window(STATS, Con(6, 40), wintype=WIN.STATS)
 
         # Center Row
-        center = main_panel.panel(Orient.HORI, None)
-        left_center = center.panel(Orient.VERT, None)
-        left_center.window(BILLBOARD, Con(0,4,0,4), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
-        left_center.window(MAZE, Con(25, 30, 0, 60), wintype=WIN.MAZE)
+        center = main_panel.panel('center_panel', Orient.HORI, None)
+        left_center = center.panel('leftcenter_panel', Orient.VERT, None)
+        left_center.window(BILLBOARD, Con(4,0,4,0), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        left_center.window(MAZE, Con(25, 20), wintype=WIN.MAZE)
         center.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
-        main_panel.window(LOG, Con(0, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        main_panel.window(LOG, Con(4, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
         self.root_layout.do_layout()
 
         create_win_data(layout, curses_scr, curses)
@@ -49,6 +49,7 @@ class PrpgScreen:
         self.win(MAZE).model = self.model.maze
         self.win(STATS).model = self.model.peeps
         self.win(ROOT).model = self.model
+        self.win(BILLBOARD).model = self.model.billboard
 
     def size_to_terminal(self):
         if self.term_size == self.curses.get_terminal_size():
@@ -89,6 +90,7 @@ class PrpgScreen:
         self.win(MAZE).paint()
         self.win(MESSAGES).paint()
         self.win(LOG).paint()
+        self.win(BILLBOARD).paint()
 
         self.win(ROOT).paint()
 

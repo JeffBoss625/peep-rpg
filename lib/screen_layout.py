@@ -150,8 +150,9 @@ class Con:
 #   paint for themselves, then their children (top-down)
 #
 class Layout:
-    def __init__(self, parent, pos, con, **kwds):
+    def __init__(self, parent, name, pos, con, **kwds):
         self.parent = parent
+        self.name = name
         self.pos = pos        # position within parent (panels will update this in do_layout)
         self.con = con        # constraints used to calculate dim
         self.params = kwds if kwds else {}
@@ -160,6 +161,21 @@ class Layout:
         self.children = []
         self.logger = None
         self.data = None      # externally-managed data (e.g. corresponding curses window)
+
+        # store consolidated window information in the root object
+        if parent:
+            root = parent
+            while root.parent:
+                root = root.parent
+        else:
+            self.info = RootInfo()
+            root = self
+
+        root.info.comp_count += 1
+        self.id = root.info.comp_count
+        if not self.name:
+            self.name = 'comp{}'.format(self.id)
+        root.info.win_by_name[self.name] = self
 
     # Called from root down
     def clear_layout(self):
@@ -212,7 +228,7 @@ class Layout:
 
 @dataclass
 class RootInfo:
-    win_count: int = 0
+    comp_count: int = 0
     win_by_name = {}
 
 # a component with fixed position children (relative to parent).
@@ -227,8 +243,7 @@ class WinLayout(Layout):
     def __init__(self, parent, name, pos, con, **kwds):
         if con is None:
             con = Con()
-        super().__init__(parent, pos, con, **kwds)
-        self.name = name
+        super().__init__(parent, name, pos, con, **kwds)
         self.wintype = self.params.get('wintype', WIN.FIXED)
 
         # store window immediate windows parent
@@ -236,21 +251,6 @@ class WinLayout(Layout):
         while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
         self.winparent = wp
-
-        # store consolidated window information in the root object
-        if parent:
-            root = parent
-            while root.parent:
-                root = root.parent
-        else:
-            self.info = RootInfo()
-            root = self
-
-        root.info.win_count += 1
-        self.id = root.info.win_count
-        if not self.name:
-            self.name = 'window_{}'.format(self.id)
-        root.info.win_by_name[self.name] = self
 
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
@@ -262,10 +262,10 @@ class WinLayout(Layout):
         self.children.append(ret)
         return ret
 
-    def panel(self, orient, pos, con):
+    def panel(self, name, orient, pos, con):
         if not pos:
             pos = Pos(0,0)
-        ret = FlowLayout(self, orient, pos, con)
+        ret = FlowLayout(self, name, orient, pos, con)
         self.children.append(ret)
         return ret
 
@@ -342,8 +342,8 @@ class WinLayout(Layout):
 #   for prioritized (left or top) components.
 #
 class FlowLayout(Layout):
-    def __init__(self, parent, orient, pos, panel_con):
-        super().__init__(parent, pos, None) # con is calculated from children do_layout()
+    def __init__(self, parent, name, orient, pos, panel_con):
+        super().__init__(parent, name, pos, None) # con is calculated from children do_layout()
 
         if not panel_con:
             panel_con = Con()
@@ -352,7 +352,7 @@ class FlowLayout(Layout):
         self.panel_con = panel_con  # further constratins applied to aggregate of child constraints
 
     def __repr__(self):
-        return 'Panel:{}:[P[{}],D[{}],C[{}]]'.format(self.orient, self.pos, self.dim, self.con)
+        return 'Panel "{}":{}:[P[{}],D[{}],C[{}]]'.format(self.name, self.orient, self.pos, self.dim, self.con)
 
     # panels derive their constraints from children and self.panel_con and set child positions
     def clear_layout(self):
@@ -399,22 +399,11 @@ class FlowLayout(Layout):
         self.dim = None
         return ret
 
-    def panel(self, orient, con):
-        ret = FlowLayout(self, orient, None, con)
+    def panel(self, name, orient, con):
+        ret = FlowLayout(self, name, orient, None, con)
         self.children.append(ret)
         self.con = None
         self.dim = None
-        return ret
-
-    def pos_offset(self, orient):
-        ret = self.pos.yx(orient)
-        p = self.parent
-        while p and isinstance(p, FlowLayout):
-            # self.log('...pos_offset({}, {}, {})'.format(self, p, orient))
-            ret += p.pos.yx(orient)
-            p = p.parent
-
-        # self.log('...pos_offset returns: {}'.format(ret))
         return ret
 
     def calc_child_dim(self):
@@ -430,8 +419,10 @@ class FlowLayout(Layout):
         c_sizes = flow_calc_sizes(avail_space, ccon_mins, ccon_maxs)
 
         fixed_avail_space = dim.hw(Orient.invert(orient))
-        offset_flow = self.pos_offset(orient)
-        offset_fixed = self.pos_offset(Orient.invert(orient))
+
+        offset_flow = self.pos.yx(orient)
+        offset_fixed = self.pos.yx(Orient.invert(orient))
+
         for i, c in enumerate(children):
             c_size = c_sizes[i]
             c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)

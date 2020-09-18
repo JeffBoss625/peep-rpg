@@ -55,7 +55,7 @@ class Handler:
         # use os.get_terminal_size() since scr.getmaxyx() does not change with resizing (on macos)
         w, h = self.term_size = os.get_terminal_size()
         root = self.root = create_layout(Dim(h, w), __file__)
-        h_pan = root.panel(Orient.HORI, Pos(0,0), Con(0,0))
+        h_pan = root.panel(Orient.HORI, 'h_pan', Pos(0,0), Con(0,0))
         h_pan.window('leftwin', Con(10,40,15,80))
 
         v_pan = h_pan.panel(Orient.VERT, None)

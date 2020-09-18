@@ -96,6 +96,7 @@ class Screen:
         if self.border:
             self.scr.border()
         self.do_paint()
+        # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
 
     def do_paint(self):
