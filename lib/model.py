@@ -7,6 +7,16 @@ import yaml
 class Model:
     def __init__(self):
         self._dirty = True
+        self._subscribers = []
+
+    def __setattr__(self, k, v):
+        if k[0] != '_' and getattr(self, k, v) != v:
+            object.__setattr__(self, '_dirty', True)
+
+        object.__setattr__(self, k, v)
+
+
+
 
 @dataclass
 class Attack(Model):
@@ -88,12 +98,6 @@ def _model_getstate(self):
 
     return ret
 
-def _model_setattr(self, k, v):
-    if k[0] != '_' and getattr(self, k, v) != v:
-        object.__setattr__(self, '_dirty', True)
-
-    object.__setattr__(self, k, v)
-
 def _to_yaml(tag, cls):
     def fn(dpr, v):
         return dpr.represent_yaml_object(tag, v, cls)
@@ -112,7 +116,6 @@ for cls in [Peep, Ammo, Attack]:
     yaml.Loader.add_constructor(tag, _from_yaml(cls))
 
     cls.__getstate__ = _model_getstate
-    cls.__setattr__ = _model_setattr
 
 if __name__ == '__main__':
     p = Peep('bill')
