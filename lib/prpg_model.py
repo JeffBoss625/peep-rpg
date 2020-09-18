@@ -8,7 +8,6 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 
-from dataclasses import dataclass
 from lib.model import TextModel, Model
 
 class MazeModel(Model):
