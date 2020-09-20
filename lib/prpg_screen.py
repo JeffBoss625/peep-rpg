@@ -13,14 +13,12 @@ BILLBOARD = 'billboard'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:
-    def __init__(self, curses_scr, curses, model):
-        self.model = model
+    def __init__(self, root, curses, model):
+        self.root = root
         self.curses = curses
+        self.model = model
 
-        # Setup Main Panel
-        w, h = self.term_size = curses.get_terminal_size()
-        self.root_layout = layout = create_layout(Dim(h, w), 'prpg')
-        main_panel = layout.panel('main_panel', Orient.VERT, None, None)
+        main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
         main_panel.window(STATS, Con(6, 40), wintype=WIN.STATS)
@@ -34,11 +32,10 @@ class PrpgScreen:
 
         # Bottom Row
         main_panel.window(LOG, Con(4, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
-        self.root_layout.do_layout()
 
-        create_win_data(layout, curses_scr, curses)
+        root.do_layout()
+        init_delegates(root, curses)
         self.connect_models()
-
         self.win(ROOT).rebuild_screens()
         curses.curs_set(0)
 
@@ -68,31 +65,30 @@ class PrpgScreen:
         try:
             w, h = self.term_size
             self.curses.resizeterm(h, w)
-            self.root_layout.dim.w = w
-            self.root_layout.dim.h = h
-            self.root_layout.clear_layout()
-            self.root_layout.do_layout()
-            self.root_layout.data.rebuild_screens()
+            self.root.dim.w = w
+            self.root.dim.h = h
+            self.root.clear_layout()
+            self.root.do_layout()
+            self.root.data.rebuild_screens()
 
         except Exception as e:
-            self.root_layout.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
+            self.root.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
 
     def get_key(self):
         return self.win(ROOT).get_key()
 
     def win(self, name):
-        return self.root_layout.info.win_by_name[name].data
+        return self.root.info.win_by_name[name].data
 
     # paint the entire screen - all that is visible
     def paint(self):
         self.win(ROOT).clear()
+        self.win(ROOT).paint()
         self.win(STATS).paint()
         self.win(MAZE).paint()
         self.win(MESSAGES).paint()
         self.win(LOG).paint()
         self.win(BILLBOARD).paint()
-
-        self.win(ROOT).paint()
 
         self.curses.doupdate()
 

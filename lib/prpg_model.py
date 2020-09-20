@@ -8,36 +8,28 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 
-from lib.model import TextModel, Model
+from lib.model import TextModel, DataModel
 
-class MazeModel(Model):
+class MazeModel(DataModel):
     def __init__(self, maze, peeps):
         super().__init__()
         self.maze = maze
         self.peeps = peeps
 
-    def get_dirty(self):
-        return self.maze._dirty or self.peeps._dirty
-
-    def set_dirty(self, v):
-        pass    # ignore super() init _dirty=True
-
-    _dirty = property(get_dirty, set_dirty)
-
-class PeepsModel(Model):
+class PeepsModel(DataModel):
     def __init__(self, player, peeps):
         super().__init__()
         self.player = player
         self.peeps = peeps if peeps else []
 
-class PrpgModel(Model):
+class PrpgModel(DataModel):
     def __init__(self, player=None, maze=None, peeps=None, seed=0):
         super().__init__()
         self.peeps = PeepsModel(player, peeps)
-        self.maze = MazeModel(TextModel(maze), self.peeps)
-        self.message_model = TextModel()
-        self.log_model = TextModel()
-        self.billboard = TextModel()
+        self.maze = MazeModel(TextModel('maze', maze), self.peeps)
+        self.message_model = TextModel('messages')
+        self.log_model = TextModel('log')
+        self.billboard = TextModel('billboard')
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array

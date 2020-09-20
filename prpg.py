@@ -1,7 +1,4 @@
-from lib.prpg_main import startup
-import curses
-import os
+from lib.startup import curses_wrapper
+from lib.prpg_main import main
 
-curses.get_terminal_size = os.get_terminal_size     # bundle terminal-related functions together for injection
-
-startup(curses)
+curses_wrapper(main, __file__)

@@ -9,7 +9,6 @@ from lib.prpg_model import PrpgModel
 import random
 import time
 import signal
-curses = None       # passed in on startup()
 
 MAZE = [
     '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -126,7 +125,7 @@ def monster_turn(model, monster):
                 return
             rotation += 1
 
-def main(scr):
+def main(scr, curses):
     curses.raw()
     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = PrpgScreen(scr, curses, model)
@@ -166,9 +165,3 @@ def main(scr):
                 model.peeps.peeps = [p for p in model.peeps.peeps if p.hp > 0]
 
                 # model.undirty()
-
-
-def startup(curses_lib):
-    global curses
-    curses = curses_lib
-    curses.wrapper(main)

@@ -111,19 +111,25 @@ class Handler:
 
 def main(scr):
     curses.raw()
-    h = Handler(scr)
+    handler = Handler(scr)
 
     def resize_handler(signum, frame):
-        h.size_to_term(True)
+        handler.size_to_term(True)
 
     signal.signal(signal.SIGWINCH, resize_handler)
     while 1:
-        h.size_to_term()
-        h.paint()
+        handler.size_to_term()
+        handler.paint()
         scr.refresh()
         c = scr.getch()
         if c == ord('q'):
             break
+        elif c == ord('='):
+            w, h = os.get_terminal_size()
+            curses.resizeterm(h+3, w+3)
+        elif c == ord('-'):
+            w, h = os.get_terminal_size()
+            curses.resizeterm(h-3, w-3)
 
 
 curses.wrapper(main)

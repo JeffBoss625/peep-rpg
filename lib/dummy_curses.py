@@ -2,19 +2,11 @@ from lib.constants import Key
 from lib.screen_layout import Dim, Pos
 import sys
 
-COLOR_BLACK = 0
-COLOR_BLUE = 4
-COLOR_CYAN = 6
-COLOR_GREEN = 2
-COLOR_MAGENTA = 5
-COLOR_RED = 1
-COLOR_WHITE = 7
-COLOR_YELLOW = 3
-
 def printe(s):
     sys.stderr.write(s + "\n")
 
-class DummyWin:
+# substitute window implementing curses window behavior as printed output to terminal stderr, for debugging.
+class DummyCursesWindow:
     def __init__(self, parent, pos, dim):
         self.parent = parent
         self.pos = pos
@@ -73,7 +65,7 @@ class DummyWin:
         printe('')
 
     def derwin(self, h, w, y, x):
-        return DummyWin(self, Pos(y,x), Dim(h,w))
+        return DummyCursesWindow(self, Pos(y, x), Dim(h, w))
 
     def xyoff(self):
         win = self
@@ -102,28 +94,34 @@ class DummyWin:
             printe('KeyboardInterrupt')
             return Key.CTRL_Q
 
+class DummyCurses:
+    COLOR_BLACK = 0
+    COLOR_BLUE = 4
+    COLOR_CYAN = 6
+    COLOR_GREEN = 2
+    COLOR_MAGENTA = 5
+    COLOR_RED = 1
+    COLOR_WHITE = 7
+    COLOR_YELLOW = 3
 
-DEFAULT_DIM = Dim(40,120)
-TERM = DummyWin(None, Pos(), DEFAULT_DIM)
+    def __init__(self, dim):
+        self.term = DummyCursesWindow(None, Pos(), dim)
+        self.term.curses = self
 
-def wrapper(fn):
-    fn(TERM)
+    def doupdate(self):
+        self.term.doupdate()
 
-def doupdate():
-    TERM.doupdate()
+    def raw(self):
+        pass
 
-def raw():
-    pass
+    def get_terminal_size(self):
+        return self.term.dim.w, self.term.dim.h
 
-def get_terminal_size():
-    return DEFAULT_DIM.w, DEFAULT_DIM.h
+    def curs_set(self, _n):
+        pass
 
-def curs_set(n):
-    pass
+    def init_pair(self, _n, _fgc, _bgc):
+        pass
 
-def init_pair(n, fgc, bgc):
-    pass
-
-def color_pair(n):
-    pass
-
+    def color_pair(self, _n):
+        pass

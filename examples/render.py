@@ -2,10 +2,10 @@ import signal
 import time
 import traceback
 import os
-import curses
 
-from lib.screen import create_win_data
-from lib.screen_layout import create_layout, Orient, Pos, Con, Dim
+from lib.screen import init_delegates
+from lib.startup import create_root
+from lib.screen_layout import Orient, Pos, Con, Dim
 
 WINTER_EDEN = """
 A winter garden in an alder swamp,
@@ -51,10 +51,10 @@ Robert Frost
 WINTER_EDEN_STR = WINTER_EDEN.replace('\n', ' ')
 
 class Handler:
-    def __init__(self, scr):
+    def __init__(self, root, curses):
+        self.root = root
+        self.curses = curses
         # use os.get_terminal_size() since scr.getmaxyx() does not change with resizing (on macos)
-        w, h = self.term_size = os.get_terminal_size()
-        root = self.root = create_layout(Dim(h, w), __file__)
         h_pan = root.panel(Orient.HORI, 'h_pan', Pos(0,0), Con(0,0))
         h_pan.window('leftwin', Con(10,40,15,80))
 
@@ -62,8 +62,8 @@ class Handler:
         v_pan.window('rightwin', Con(8,22,12,30))
         v_pan.window('lowerwin', Con(6,10))
 
-        create_win_data(root, scr, curses)
         root.do_layout()
+        init_delegates(root, curses)
         root.data.rebuild_screens()
         root.data.scr.refresh()
 
@@ -83,7 +83,7 @@ class Handler:
         try:
             root = self.root
             w, h = self.term_size
-            curses.resizeterm(h, w)
+            self.curses.resizeterm(h, w)
             root.dim.w = root.con.wmin = root.con.wmax = w
             root.dim.h = root.con.hmin = root.con.hmax = h
             root.clear_layout()
@@ -124,5 +124,6 @@ def main(scr):
         if c == ord('q'):
             break
 
+        create_root(Dim(h, w), __file__)
 
-curses.wrapper(main)
+curses.wrapper(create_root(None, __file__))

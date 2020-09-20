@@ -246,7 +246,7 @@ class WinLayout(Layout):
         super().__init__(parent, name, pos, con, **kwds)
         self.wintype = self.params.get('wintype', WIN.FIXED)
 
-        # store window immediate windows parent
+        # store parent window
         wp = parent
         while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
@@ -507,9 +507,3 @@ def flow_calc_sizes(avail, mins, maxs):
 
     return c_sizes
 
-def create_layout(dim, out=None):
-    ret = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w))
-    ret.dim = dim
-    ret.logger = Logger(out)
-
-    return ret

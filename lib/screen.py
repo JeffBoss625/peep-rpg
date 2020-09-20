@@ -1,6 +1,10 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 from lib.constants import Color, Side
 from lib.screen_layout import WIN, WinLayout
+import sys
+
+def printe(s):
+    sys.stderr.write(s + "\n")
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
@@ -28,7 +32,7 @@ class Screen:
 
     # delete and rebuild curses screens using layout information in winfo (recursive on children)
     def rebuild_screens(self):
-        self.winfo.iterate_win(_rebuild_screen, self.winfo.root())
+        self.winfo.iterate_win(_rebuild_screen)
 
     #
     # CURSES Interface
@@ -87,11 +91,10 @@ class Screen:
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self):
         if not self.scr:
+            printe('no scr to paint in {}'.format(self.winfo.name))
             return
-        if not self.model:
-            raise RuntimeError('no model for screen {}'.format(self.winfo.name))
-        if not self.model._dirty:
-            return
+        if self.winfo.parent and not self.model:
+            raise RuntimeError('no model to paint in {}'.format(self.winfo.name))
 
         if self.border:
             self.scr.border()
@@ -104,7 +107,7 @@ class Screen:
         # raise NotImplementedError()
 
     def paint_all(self):
-        self.winfo.iterate_win(lambda win, v, c: {win.paint()})
+        self.winfo.iterate_win(lambda win, v, c: {win.data.paint()})
 
     def get_key(self):
         while 1:
@@ -186,29 +189,31 @@ class PlayerStatsScreen(Screen):
 
 
 
-# build windows for children
-def _create_child_data(winfo, curses, _depth):
-    if winfo.wintype == WIN.FIXED:
-        winfo.data = Screen(winfo, curses)
-    elif winfo.wintype == WIN.TEXT:
-        winfo.data = TextScreen(winfo, curses)
-    elif winfo.wintype == WIN.MAZE:
-        winfo.data = MazeScreen(winfo, curses)
-    elif winfo.wintype == WIN.STATS:
-        winfo.data = PlayerStatsScreen(winfo, curses)
+def create_win(layout, curses):
+    wintype = layout.wintype
+
+    if wintype == WIN.FIXED:
+        ret = Screen(layout, curses)
+    elif wintype == WIN.TEXT:
+        ret = TextScreen(layout, curses)
+    elif wintype == WIN.MAZE:
+        ret = MazeScreen(layout, curses)
+    elif wintype == WIN.STATS:
+        ret = PlayerStatsScreen(layout, curses)
     else:
-        raise ValueError('unknown wintype "{}"'.format(winfo.wintype))
-    return curses
+        raise ValueError('unknown wintype "{}"'.format(layout.wintype))
 
-# initialize Win wrappers, populating all WinInfo with wrappers and set up root screen.
-def create_win_data(winfo, scr, curses):
-    # set up root
-    _create_child_data(winfo, curses, 0)
-    winfo.data.scr = scr
-    winfo.data.border = 0
+    return ret
 
-    for c in winfo.children:
-        c.iterate_win(_create_child_data, curses)
+# After root layout and all children are defined, call init_delegates() on root layout to
+# create and assign screens and models for the layout.
+def init_delegates(root, curses):
+    # initialize window delegates of children
+    def assign_win(layout, _v, _d):
+        layout.data = create_win(layout, curses)
+    for c in root.children:
+        c.iterate_win(assign_win)
 
+    return root
 
 
