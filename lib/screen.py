@@ -199,7 +199,7 @@ class PlayerStatsScreen(Screen):
             'speed: ' + str(p.speed),
             ])
 
-def create_win(winfo):
+def create_win(parent, winfo):
     wintype = winfo.params.get('wintype', WIN.FIXED)
     name = winfo.name
     params = winfo.params
@@ -215,8 +215,8 @@ def create_win(winfo):
     else:
         raise ValueError('unknown wintype "{}"'.format(wintype))
 
-    if winfo.winparent:
-        ret.parent = winfo.winparent.data
+    if parent:
+        ret.parent = parent
         ret.parent.children.append(ret)
 
     ret.curses = winfo.root().params['curses']
@@ -232,7 +232,7 @@ def init_delegates(root):
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
-            layout.data = create_win(layout)
+            layout.data = create_win(layout.winparent.data, layout)
     for c in root.children:
         c.iterate_win(assign_win)
 
