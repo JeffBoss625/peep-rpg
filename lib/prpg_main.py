@@ -125,10 +125,10 @@ def monster_turn(model, monster):
                 return
             rotation += 1
 
-def main(scr, curses):
-    curses.raw()
+def main(root):
+    root.curses.raw()
     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-    screen = PrpgScreen(scr, curses, model)
+    screen = PrpgScreen(root, model)
 
     def resize_handler(_signum, _frame):
         screen.size_to_terminal()

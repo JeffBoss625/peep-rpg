@@ -12,27 +12,43 @@ IGNORED_KEYS = {
 
 # abstraction wrapping a curses screen.
 class Screen:
-    def __init__(self, winfo, curses):
-        self.winfo = winfo      # layout window information
-        self.curses = curses    # curses library - allow dummy lib injection
+    def __init__(self, name, params):
+        self.name = name
+        self.params = params
+        self.parent = None
+        self.children = []
+
         self.border = 1
         self.x_margin = 1
         self.y_margin = 1
-        self.scr = None               # curses.window or lib.DummyWin
+        self.curses = None      # curses library or lib.DummyCurses
+        self.scr = None         # curses.window or lib.DummyWin
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.model = None
 
+        self.logger = None
+
     def __repr__(self):
-        return '{}: margin:[{},{}] scr:{}'.format(self.winfo, self.x_margin, self.y_margin, self.scr)
+        return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
+
     #
     # TREE Navigation/Initialization functions
     #
+    def root(self):
+        ret = self
+        while ret.parent:
+            ret = ret.parent
+        return ret
 
-    # delete and rebuild curses screens using layout information in winfo (recursive on children)
+    # delete and rebuild curses screens using layout information (recursive on children)
     def rebuild_screens(self):
-        self.winfo.iterate_win(_rebuild_screen)
+        for c in self.children:
+            if c.scr:
+                del c.scr
+            c.scr = self.derwin(c.dim, c.pos)
+            c.rebuild_screens()
 
     #
     # CURSES Interface
@@ -56,8 +72,11 @@ class Screen:
 
         return max_w, max_h
 
-    def log(self, *args):
-        self.winfo.log(args)
+    def log(self, s):
+        if not self.logger:
+            self.logger = self.root().logger
+
+        self.logger.log(s)
 
     def write_lines(self, lines, trunc_x=Side.RIGHT, trunc_y=Side.BOTTOM):
         if not len(lines):
@@ -91,10 +110,10 @@ class Screen:
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self):
         if not self.scr:
-            printe('no scr to paint in {}'.format(self.winfo.name))
+            printe('no scr to paint in {}'.format(self.name))
             return
-        if self.winfo.parent and not self.model:
-            raise RuntimeError('no model to paint in {}'.format(self.winfo.name))
+        if self.parent and not self.model:
+            raise RuntimeError('no model to paint in {}'.format(self.name))
 
         if self.border:
             self.scr.border()
@@ -107,10 +126,12 @@ class Screen:
         # raise NotImplementedError()
 
     def paint_all(self):
-        self.winfo.iterate_win(lambda win, v, c: {win.data.paint()})
+        self.paint()
+        for c in self.children:
+            c.paint_all()
 
     def doupdate(self):
-        self.winfo.root().curses.doupdate()
+        self.curses.doupdate()
 
     def get_key(self):
         while 1:
@@ -146,7 +167,7 @@ class Screen:
 
         return self.color_pairs[key]
 
-# delete and re-create derived curses windows ("screens") using parent windows/screens
+# delete and re-create curses windows ("screens") using parent windows/screens
 def _rebuild_screen(winfo, _v, _d):
     if not winfo.winparent:         # don't build root screen - root screen is fixed
         return
@@ -160,17 +181,17 @@ def _rebuild_screen(winfo, _v, _d):
         winfo.data.scr.border()
 
 class TextScreen(Screen):
-    def __init__(self, winfo, curses):
-        super().__init__(winfo, curses)
-        self.trunc_x = winfo.params.get('trunc_x', Side.RIGHT)
-        self.trunc_y = winfo.params.get('trunc_y', Side.BOTTOM)
+    def __init__(self, name, params):
+        super().__init__(name, params)
+        self.trunc_x = params.get('trunc_x', Side.RIGHT)
+        self.trunc_y = params.get('trunc_y', Side.BOTTOM)
 
     def do_paint(self):
         self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
 
 class MazeScreen(Screen):
-    def __init__(self, winfo, curses):
-        super().__init__(winfo, curses)
+    def __init__(self, name, params):
+        super().__init__(name, params)
 
     def do_paint(self):
         self.write_lines(self.model.maze.text, Side.RIGHT, Side.BOTTOM)
@@ -179,8 +200,8 @@ class MazeScreen(Screen):
             self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
 
 class PlayerStatsScreen(Screen):
-    def __init__(self, winfo, curses):
-        super().__init__(winfo, curses)
+    def __init__(self, name, params):
+        super().__init__(name, params)
 
     def do_paint(self):
         p = self.model.player
@@ -190,30 +211,39 @@ class PlayerStatsScreen(Screen):
             'speed: ' + str(p.speed),
             ])
 
-
-
-def create_win(layout, curses):
-    wintype = layout.wintype
+def create_win(winfo):
+    wintype = winfo.params.get('wintype', WIN.FIXED)
+    name = winfo.name
+    params = winfo.params
 
     if wintype == WIN.FIXED:
-        ret = Screen(layout, curses)
+        ret = Screen(name, params)
     elif wintype == WIN.TEXT:
-        ret = TextScreen(layout, curses)
+        ret = TextScreen(name, params)
     elif wintype == WIN.MAZE:
-        ret = MazeScreen(layout, curses)
+        ret = MazeScreen(name, params)
     elif wintype == WIN.STATS:
-        ret = PlayerStatsScreen(layout, curses)
+        ret = PlayerStatsScreen(name, params)
     else:
-        raise ValueError('unknown wintype "{}"'.format(layout.wintype))
+        raise ValueError('unknown wintype "{}"'.format(wintype))
 
+    if winfo.winparent:
+        ret.parent = winfo.winparent.data
+        ret.parent.children.append(ret)
+
+    ret.curses = winfo.root().curses
+    ret.pos = winfo.pos
+    ret.dim = winfo.dim
     return ret
 
 # After root layout and all children are defined, call init_delegates() on root layout to
 # create and assign screens and models for the layout.
-def init_delegates(root, curses):
+def init_delegates(root):
+    root.do_layout()
+
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
-        layout.data = create_win(layout, curses)
+        layout.data = create_win(layout)
     for c in root.children:
         c.iterate_win(assign_win)
 

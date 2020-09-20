@@ -63,7 +63,7 @@ class Handler:
         v_pan.window('lowerwin', Con(6,10))
 
         root.do_layout()
-        init_delegates(root, curses)
+        init_delegates(root)
         root.data.rebuild_screens()
         root.data.scr.refresh()
 

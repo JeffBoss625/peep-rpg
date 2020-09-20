@@ -1,7 +1,6 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
 
-from lib.logger import Logger
 from dataclasses import dataclass
 
 class WIN:
@@ -244,7 +243,6 @@ class WinLayout(Layout):
         if con is None:
             con = Con()
         super().__init__(parent, name, pos, con, **kwds)
-        self.wintype = self.params.get('wintype', WIN.FIXED)
 
         # store parent window
         wp = parent

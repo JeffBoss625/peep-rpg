@@ -13,10 +13,10 @@ BILLBOARD = 'billboard'
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:
-    def __init__(self, root, curses, model):
+    def __init__(self, root, model):
         self.root = root
-        self.curses = curses
         self.model = model
+        self.curses = root.curses
 
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
@@ -33,11 +33,10 @@ class PrpgScreen:
         # Bottom Row
         main_panel.window(LOG, Con(4, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
-        root.do_layout()
-        init_delegates(root, curses)
+        init_delegates(root)
         self.connect_models()
         root.data.rebuild_screens()
-        curses.curs_set(0)
+        self.curses.curs_set(0)
 
     def connect_models(self):
         # connect models to screens

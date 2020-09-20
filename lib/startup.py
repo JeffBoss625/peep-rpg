@@ -11,15 +11,15 @@ def create_root(dim, out=None, scr=None):
     root.logger = Logger(out)
 
     if scr:
-        curses_lib = curses
+        root.curses = curses
     else:
-        curses_lib = DummyCurses(dim)
-        scr = curses_lib.term
-        root.curses = curses_lib
+        root.curses = DummyCurses(dim)
+        scr = root.curses.term
 
-    root.data = create_win(root, curses_lib)
+    root.data = create_win(root)
     root.data.scr = scr
     root.data.border = 0
+    root.data.curses = root.curses
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify
@@ -27,7 +27,7 @@ def create_root(dim, out=None, scr=None):
 def curses_wrapper(fn, out=None):
     w, h = os.get_terminal_size()
     dim = Dim(h, w)
-    curses.wrapper(lambda scr: fn(create_root(dim, out, scr), curses))
+    curses.wrapper(lambda scr: fn(create_root(dim, out, scr)))
 
 
 # note - to set terminal size on windows machines: os.system("mode con cols=120 lines=40")
