@@ -181,10 +181,10 @@ class Layout:
 
     # Called from root down
     def clear_layout(self):
-        pass
+        raise NotImplementedError()
 
     def calc_constraints(self):
-        pass
+        raise NotImplementedError()
 
     def root(self):
         p = self
