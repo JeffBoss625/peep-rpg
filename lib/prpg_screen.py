@@ -36,7 +36,7 @@ class PrpgScreen:
         root.do_layout()
         init_delegates(root, curses)
         self.connect_models()
-        self.win(ROOT).rebuild_screens()
+        root.data.rebuild_screens()
         curses.curs_set(0)
 
     def connect_models(self):

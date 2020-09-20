@@ -109,6 +109,9 @@ class Screen:
     def paint_all(self):
         self.winfo.iterate_win(lambda win, v, c: {win.data.paint()})
 
+    def doupdate(self):
+        self.winfo.root().curses.doupdate()
+
     def get_key(self):
         while 1:
             try:

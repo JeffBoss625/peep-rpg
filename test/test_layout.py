@@ -1,7 +1,11 @@
-from lib.dummy_screen import DummyScreen
-from lib.screen import create_win_data
+import lib.dummy_curses as dcurses
+from lib.model import TextModel
+from lib.screen import init_delegates
 from lib.screen_layout import *
 import sys
+
+from lib.startup import create_root
+
 
 def printe(s):
     sys.stderr.write(s + "\n")
@@ -35,7 +39,7 @@ def test_addcol():
 # note that running nose tests with "-d" gives assertion descriptions including content of dataclasses
 # when variables are resolved, so we call "cpos = col.pos()..." as separate steps reveal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
-    root = create_layout(rootdim)
+    root = create_root(rootdim)
     col = root.panel(Orient.VERT, colpos, colcon)
     root.do_layout()
 
@@ -124,8 +128,7 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    root = create_layout(dim, None)
-    # root = rootwin(dim, 'stderr')
+    root = create_root(dim)
     root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel(orient, pos, con)
     for cc in children_con:
@@ -172,15 +175,21 @@ def print_one_win(win, buf, xoff, yoff, depth):
 
 def test_paint():
     printe('')
-    screen_dim = Dim(15, 100)
-    root = create_layout(screen_dim)
-    hpan = root.panel(Orient.HORI, None, None)
+    root = create_root(Dim(15, 100))
+    hpan = root.panel('root-panel', Orient.HORI, None, None)
 
-    hpan.window('w1', Con(4, 10, 5, 20))
-    hpan.window('w2', Con(3,5,8,10))
+    w1 = hpan.window('w1', Con(4, 10, 5, 20), type=WIN.TEXT)
+    w2 = hpan.window('w2', Con(3,5,8,10), type=WIN.TEXT)
     root.do_layout()
-    create_win_data(root, DummyScreen(screen_dim))
-    root.data.refresh()
+    init_delegates(root, root.curses)
+
+    w1.data.model = TextModel('model 1', 'window 1')
+    w2.data.model = TextModel('model 2')
+    w2.data.model.print('window 2')
+
+    root.data.rebuild_screens()
+    root.data.paint_all()
+    root.data.doupdate()
     # print_win(root)
 
     assert root.info.win_by_name['w1'].name == 'w1'
