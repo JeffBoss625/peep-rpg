@@ -16,7 +16,7 @@ def create_root(dim, out=None, scr=None):
     root.dim = dim
     root.logger = Logger(out)
 
-    root.data = create_win(None, root)
+    root.data = create_win(None, root.name, root.params)
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify

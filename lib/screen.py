@@ -21,8 +21,8 @@ class Screen:
         self.border = params.get('border', 1)
         self.x_margin = params.get('x_margin', 1)
         self.y_margin = params.get('y_margin', 1)
-        self.scr = params.get('scr')                # curses.window or lib.DummyWin
-        self.curses = params.get('curses')          # curses library or lib.DummyCurses
+        self.curses = params.get('curses', None)        # curses library or lib.DummyCurses
+        self.scr = params.get('scr', None)              # curses.window or lib.DummyWin
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
@@ -199,10 +199,8 @@ class PlayerStatsScreen(Screen):
             'speed: ' + str(p.speed),
             ])
 
-def create_win(parent, winfo):
-    wintype = winfo.params.get('wintype', WIN.FIXED)
-    name = winfo.name
-    params = winfo.params
+def create_win(parent, name, params):
+    wintype = params.get('wintype', WIN.FIXED)
 
     if wintype == WIN.FIXED:
         ret = Screen(name, params)
@@ -218,10 +216,8 @@ def create_win(parent, winfo):
     if parent:
         ret.parent = parent
         ret.parent.children.append(ret)
+        ret.curses = parent.curses
 
-    ret.curses = winfo.root().params['curses']
-    ret.pos = winfo.pos
-    ret.dim = winfo.dim
     return ret
 
 # After root layout and all children are defined, call init_delegates() on root layout to
@@ -232,7 +228,10 @@ def init_delegates(root):
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
-            layout.data = create_win(layout.winparent.data, layout)
+            win = create_win(layout.winparent.data, layout.name, layout.params)
+            win.dim = layout.dim
+            win.pos = layout.pos
+            layout.data = win
     for c in root.children:
         c.iterate_win(assign_win)
 
