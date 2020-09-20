@@ -18,9 +18,9 @@ class Screen:
         self.parent = None
         self.children = []
 
-        self.border = 1
-        self.x_margin = 1
-        self.y_margin = 1
+        self.border = params.get('border', 1)
+        self.x_margin = params.get('x_margin', 1)
+        self.y_margin = params.get('y_margin', 1)
         self.curses = None      # curses library or lib.DummyCurses
         self.scr = None         # curses.window or lib.DummyWin
 
@@ -42,7 +42,8 @@ class Screen:
             ret = ret.parent
         return ret
 
-    # delete and rebuild curses screens using layout information (recursive on children)
+    # delete and rebuild curses screens using layout information (recursive on children. root screen
+    # is kept intact.)
     def rebuild_screens(self):
         for c in self.children:
             if c.scr:
@@ -167,19 +168,6 @@ class Screen:
 
         return self.color_pairs[key]
 
-# delete and re-create curses windows ("screens") using parent windows/screens
-def _rebuild_screen(winfo, _v, _d):
-    if not winfo.winparent:         # don't build root screen - root screen is fixed
-        return
-
-    if winfo.data.scr:
-        del winfo.data.scr
-        winfo.data.scr = None # allow .scr to be checked
-
-    winfo.data.scr = winfo.winparent.data.derwin(winfo.dim, winfo.pos)
-    if winfo.data.border:
-        winfo.data.scr.border()
-
 class TextScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
@@ -243,7 +231,8 @@ def init_delegates(root):
 
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
-        layout.data = create_win(layout)
+        if not layout.data:
+            layout.data = create_win(layout)
     for c in root.children:
         c.iterate_win(assign_win)
 

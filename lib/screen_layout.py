@@ -149,14 +149,14 @@ class Con:
 #   paint for themselves, then their children (top-down)
 #
 class Layout:
-    def __init__(self, parent, name, pos, con, **kwds):
+    def __init__(self, parent, name, pos, con, **params):
         self.parent = parent
         self.name = name
-        self.pos = pos        # position within parent (panels will update this in do_layout)
+        self.pos = pos        # position within parent. children of panels have this managed by parent.do_layout()
         self.con = con        # constraints used to calculate dim
-        self.params = kwds if kwds else {}
+        self.params = params if params else {}
 
-        self.dim = None       # calculated in do_layout()
+        self.dim = None       # managed by parent panel and constrained by parent dim - see do_layout()
         self.children = []
         self.logger = None
         self.data = None      # externally-managed data (e.g. corresponding curses window)
@@ -239,10 +239,10 @@ class RootInfo:
 #
 class WinLayout(Layout):
     # if not passed in, scr is created later when dimensions are known.
-    def __init__(self, parent, name, pos, con, **kwds):
+    def __init__(self, parent, name, pos, con, **params):
         if con is None:
             con = Con()
-        super().__init__(parent, name, pos, con, **kwds)
+        super().__init__(parent, name, pos, con, **params)
 
         # store parent window
         wp = parent
