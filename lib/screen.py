@@ -219,7 +219,7 @@ def create_win(winfo):
         ret.parent = winfo.winparent.data
         ret.parent.children.append(ret)
 
-    ret.curses = winfo.root().curses
+    ret.curses = winfo.root().params['curses']
     ret.pos = winfo.pos
     ret.dim = winfo.dim
     return ret

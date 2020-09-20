@@ -16,7 +16,7 @@ class PrpgScreen:
     def __init__(self, root, model):
         self.root = root
         self.model = model
-        self.curses = root.curses
+        self.curses = root.data.curses
 
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
@@ -77,7 +77,7 @@ class PrpgScreen:
         return self.win(ROOT).get_key()
 
     def win(self, name):
-        return self.root.info.win_by_name[name].data
+        return self.root.info.comp_by_name[name].data
 
     # paint the entire screen - all that is visible
     def paint(self):

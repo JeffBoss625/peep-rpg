@@ -174,7 +174,10 @@ class Layout:
         self.id = root.info.comp_count
         if not self.name:
             self.name = 'comp{}'.format(self.id)
-        root.info.win_by_name[self.name] = self
+        if hasattr(root.info.comp_by_name, self.name):
+            raise ValueError(f'multiple components with the same name: "{self.name}"')
+
+        root.info.comp_by_name[self.name] = self
 
     # Called from root down
     def clear_layout(self):
@@ -228,15 +231,10 @@ class Layout:
 @dataclass
 class RootInfo:
     comp_count: int = 0
-    win_by_name = {}
+    comp_by_name = {}
 
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
-#
-# __class__ attributes:
-#    win_by_name    all windows by name
-#    win_count      total number of windows created (including those deleted)
-#
 class WinLayout(Layout):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, name, pos, con, **params):

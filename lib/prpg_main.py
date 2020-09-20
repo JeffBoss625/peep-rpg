@@ -126,7 +126,7 @@ def monster_turn(model, monster):
             rotation += 1
 
 def main(root):
-    root.curses.raw()
+    root.data.curses.raw()
     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
     screen = PrpgScreen(root, model)
 

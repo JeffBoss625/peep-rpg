@@ -12,11 +12,10 @@ def create_root(dim, out=None, scr=None):
         curseslib = DummyCurses(dim)
         scr = curseslib.term
 
-    root = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), border=1, scr=scr, curses=curses)
+    root = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), border=1, scr=scr, curses=curseslib)
     root.dim = dim
     root.logger = Logger(out)
 
-    root.curses = curseslib
     root.data = create_win(root)
     return root
 
