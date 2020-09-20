@@ -69,7 +69,7 @@ class Attack(DataModel):
     blowback: int = 0
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Ammo(DataModel):
     name: str = ''
     char: str = '?'

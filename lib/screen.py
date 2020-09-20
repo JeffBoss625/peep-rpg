@@ -21,8 +21,8 @@ class Screen:
         self.border = params.get('border', 1)
         self.x_margin = params.get('x_margin', 1)
         self.y_margin = params.get('y_margin', 1)
-        self.curses = None      # curses library or lib.DummyCurses
-        self.scr = None         # curses.window or lib.DummyWin
+        self.scr = params.get('scr')                # curses.window or lib.DummyWin
+        self.curses = params.get('curses')          # curses library or lib.DummyCurses
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair

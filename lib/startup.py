@@ -6,18 +6,18 @@ from lib.screen import create_win
 from lib.dummy_curses import DummyCurses
 
 def create_root(dim, out=None, scr=None):
-    root = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), border=1)
+    if scr:
+        curseslib = curses
+    else:
+        curseslib = DummyCurses(dim)
+        scr = curseslib.term
+
+    root = WinLayout(None, 'root', Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), border=1, scr=scr, curses=curses)
     root.dim = dim
     root.logger = Logger(out)
 
-    if scr:
-        root.curses = curses
-    else:
-        root.curses = DummyCurses(dim)
-        scr = root.curses.term
-
+    root.curses = curseslib
     root.data = create_win(root)
-    root.data.scr = scr
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify
