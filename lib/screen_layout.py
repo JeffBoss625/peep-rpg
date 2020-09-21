@@ -217,7 +217,7 @@ class Layout:
     # and update their own dimension and constraints
     def do_layout(self):
         # calculate missing constraints (bottom-up)
-        def calc_con(comp, v):
+        def calc_con(comp, _v):
             if not comp.con:
                 comp.calc_constraints()
 
@@ -226,7 +226,7 @@ class Layout:
         self.calc_child_dim()
 
     def calc_child_dim(self):
-        pass
+        raise NotImplementedError()
 
 @dataclass
 class RootInfo:
