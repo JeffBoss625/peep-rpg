@@ -288,7 +288,7 @@ class WinLayout(Layout):
             c.calc_child_dim()
 
     def clear_layout(self):
-        if self.parent:         # root dim is static, child dim is calculated from constraints
+        if self.parent:       # root dim is unchanged here (managed elsewhere), only child dim is calculated from constraints
             self.dim = None
 
         for c in self.children:

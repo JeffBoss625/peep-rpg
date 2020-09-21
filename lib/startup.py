@@ -4,10 +4,12 @@ from lib.logger import Logger
 from lib.screen_layout import WinLayout, Pos, Con, Dim
 from lib.screen import create_win
 from lib.dummy_curses import DummyCurses
+import os
 
 def create_root(dim, out=None, scr=None):
     if scr:
         curseslib = curses
+        curses.get_terminal_size = os.get_terminal_size
     else:
         curseslib = DummyCurses(dim)
         scr = curseslib.term
@@ -17,6 +19,7 @@ def create_root(dim, out=None, scr=None):
     root.logger = Logger(out)
 
     root.data = create_win(None, root.name, root.params)
+    root.data.term_size = dim.w, dim.h
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify

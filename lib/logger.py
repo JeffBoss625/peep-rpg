@@ -8,7 +8,7 @@ import traceback
 class Logger:
     def __init__(self, outfile):
         if outfile is None:
-            self.mode = 'none'
+            self.mode = 'stderr'
         elif outfile == 'stdout':
             self.mode = 'stdout'
         elif outfile == 'stderr':

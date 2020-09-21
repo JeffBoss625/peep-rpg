@@ -2,6 +2,7 @@ from lib.screen_layout import *
 from lib.screen import *
 import time
 import traceback
+import os
 
 # windows
 STATS = 'stats'
@@ -16,6 +17,7 @@ class PrpgScreen:
     def __init__(self, root, model):
         self.root = root
         self.model = model
+        self.term_size = None
 
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
@@ -31,8 +33,8 @@ class PrpgScreen:
 
         # Bottom Row
         main_panel.window(LOG, Con(4, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
-
-        init_delegates(root)
+        root.do_layout()
+        sync_delegates(root)
         self.connect_models()
         root.data.rebuild_screens()
         root.data.curses.curs_set(0)
@@ -47,31 +49,14 @@ class PrpgScreen:
         self.win(BILLBOARD).model = self.model.billboard
 
     def size_to_terminal(self):
-        curses = self.root.data.curses
-        if self.term_size == curses.get_terminal_size():
-            return
-
-        # wait for resize changes to stop for a moment before resizing
-        t0 = time.time()
-        self.term_size = curses.get_terminal_size()
-        while time.time() - t0 < 0.3:
-            time.sleep(0.1)
-            if self.term_size != curses.get_terminal_size():
-                # size changed, reset timer
-                self.term_size = curses.get_terminal_size()
-                t0 = time.time()
-
-        try:
-            w, h = self.term_size
-            curses.resizeterm(h, w)
-            self.root.dim.w = w
-            self.root.dim.h = h
-            self.root.clear_layout()
-            self.root.do_layout()
-            self.root.data.rebuild_screens()
-
-        except Exception as e:
-            self.root.log('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))
+        win = self.root.data
+        w, h = win.size_to_terminal()
+        self.root.dim = Dim(h,w)
+        self.root.con = Con(h,w,h,w)
+        self.root.clear_layout()
+        self.root.do_layout()
+        sync_delegates(self.root)
+        self.root.data.rebuild_screens()
 
     def get_key(self):
         return self.win(ROOT).get_key()

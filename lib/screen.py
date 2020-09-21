@@ -1,7 +1,11 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
-from lib.constants import Color, Side
-from lib.screen_layout import WIN, WinLayout
+import time
 import sys
+
+from lib.constants import Color, Side
+from lib.logger import Logger
+from lib.screen_layout import WIN, Pos, Dim, Con
+
 
 def printe(s):
     sys.stderr.write(s + "\n")
@@ -27,6 +31,8 @@ class Screen:
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.model = None
+        # self.dim = None
+        # self.pos = None     # todo: manage these from layout manager
 
         self.logger = None
 
@@ -48,6 +54,7 @@ class Screen:
         for c in self.children:
             if c.scr:
                 del c.scr
+                c.scr = None
             c.scr = self.derwin(c.dim, c.pos)
             c.rebuild_screens()
 
@@ -58,7 +65,7 @@ class Screen:
         self.scr.clear()
 
     def derwin(self, dim, pos):
-        # self.log('derwin({}, {}, {})'.format(self, dim, pos))
+        # self.log(f'derwin({self}, {dim}, {pos})')
         ret = self.scr.derwin(dim.h, dim.w, pos.y, pos.x)
         if self.border:
             ret.border()
@@ -168,6 +175,30 @@ class Screen:
 
         return self.color_pairs[key]
 
+    def size_to_terminal(self):
+        if self.parent:
+            raise ValueError(f'resize_term is only valid on the root screen, not "{self.name}"')
+
+        curses = self.curses
+        if getattr(self, 'term_size', None) == curses.get_terminal_size():
+            return
+
+        # wait for resize changes to stop for a moment before resizing
+        t0 = time.time()
+        self.term_size = curses.get_terminal_size()
+        while time.time() - t0 < 0.3:
+            time.sleep(0.1)
+            if self.term_size != curses.get_terminal_size():
+                # size changed, reset timer
+                self.term_size = curses.get_terminal_size()
+                t0 = time.time()
+
+        w, h = self.term_size
+        curses.resizeterm(h, w)
+        self.dim = Dim(h, w)
+        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
+        return w, h
+
 class TextScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
@@ -220,18 +251,20 @@ def create_win(parent, name, params):
 
     return ret
 
-# After root layout and all children are defined, call init_delegates() on root layout to
-# create and assign screens and models for the layout.
-def init_delegates(root):
-    root.do_layout()
+# After root layout and all children are defined, call sync_delegates() on root layout to
+# build and/or refresh delegate screen dimensions
+def sync_delegates(root):
+    root.data.dim = Dim(root.dim.h, root.dim.w)
+    root.data.pos = Pos(0,0)
+    root.data.logger = root.logger
 
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
-            win = create_win(layout.winparent.data, layout.name, layout.params)
-            win.dim = layout.dim
-            win.pos = layout.pos
-            layout.data = win
+            layout.data = create_win(layout.winparent.data, layout.name, layout.params)
+
+        layout.data.dim = Dim(layout.dim.h, layout.dim.w)
+        layout.data.pos = Pos(layout.pos.y, layout.pos.x)
     for c in root.children:
         c.iterate_win(assign_win)
 

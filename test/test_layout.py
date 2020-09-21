@@ -1,6 +1,6 @@
 import lib.dummy_curses as dcurses
 from lib.model import TextModel
-from lib.screen import init_delegates
+from lib.screen import sync_delegates
 from lib.screen_layout import *
 import sys
 
@@ -181,7 +181,7 @@ def test_paint():
     w1 = hpan.window('w1', Con(4, 10, 5, 20), type=WIN.TEXT)
     w2 = hpan.window('w2', Con(3,5,8,10), type=WIN.TEXT)
     root.do_layout()
-    init_delegates(root, root.curses)
+    sync_delegates(root, root.curses)
 
     w1.data.model = TextModel('model 1', 'window 1')
     w2.data.model = TextModel('model 2')

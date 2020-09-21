@@ -1,5 +1,5 @@
 from lib.constants import Key
-from lib.screen_layout import Dim, Pos
+from lib.screen_layout import Dim, Pos, Con
 import sys
 
 def printe(s):
@@ -9,15 +9,23 @@ def printe(s):
 class DummyCursesWindow:
     def __init__(self, parent, pos, dim):
         self.parent = parent
-        self.pos = pos
-        self.dim = dim
+        self.pos = Pos(pos.y, pos.x)
+        self.con = None
         if parent:
             self.buf = parent.buf
+            self.dim = Dim(dim.h, dim.w)
         else:
-            self.buf = [x[:] for x in [['.'] * dim.w] * dim.h]
+            self.resize(dim.h, dim.w)
 
     def __repr__(self):
         return 'DummyWin(pos:[{}],dim:[{}])'.format(self.pos, self.dim)
+
+    def resize(self, h, w):
+        if self.parent:
+            raise ValueError("resize() supported only for root")
+
+        self.dim = Dim(h, w)
+        self.buf = [x[:] for x in [['.'] * self.dim.w] * self.dim.h]
 
     def clear(self):
         dim = self.dim
@@ -108,14 +116,17 @@ class DummyCurses:
         self.term = DummyCursesWindow(None, Pos(), dim)
         self.term.curses = self
 
+    def resizeterm(self, h, w):
+        self.term.resize(h, w)
+
+    def get_terminal_size(self):
+        return self.term.dim.w, self.term.dim.h
+
     def doupdate(self):
         self.term.doupdate()
 
     def raw(self):
         pass
-
-    def get_terminal_size(self):
-        return self.term.dim.w, self.term.dim.h
 
     def curs_set(self, _n):
         pass
@@ -125,3 +136,4 @@ class DummyCurses:
 
     def color_pair(self, _n):
         pass
+

@@ -3,7 +3,7 @@ import time
 import traceback
 import os
 
-from lib.screen import init_delegates
+from lib.screen import sync_delegates
 from lib.startup import create_root
 from lib.screen_layout import Orient, Pos, Con, Dim
 
@@ -63,7 +63,7 @@ class Handler:
         v_pan.window('lowerwin', Con(6,10))
 
         root.do_layout()
-        init_delegates(root)
+        sync_delegates(root)
         root.data.rebuild_screens()
         root.data.scr.refresh()
 

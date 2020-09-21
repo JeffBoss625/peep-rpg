@@ -67,6 +67,8 @@ def player_turn(screen):
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
             return 'q'
+        # elif input_key in ('=', '+', '-'):
+        #     return input_key
         elif input_key == 'm':
             if len(model.peeps) > 1:
                 player = model.player
@@ -154,6 +156,11 @@ def main(root):
                     screen.paint()
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
+                    # elif key_input in ('=','+'):
+                    #     term = root.data.curses.term
+                    #     term.dim.w += 5
+                    #     term.dim.h += 2
+                    #     screen.size_to_terminal()
                 else:
                     if monster_turn(model, peep) == 'q':
                         model.message('YOU DIED')
