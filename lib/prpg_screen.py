@@ -16,7 +16,6 @@ class PrpgScreen:
     def __init__(self, root, model):
         self.root = root
         self.model = model
-        self.curses = root.data.curses
 
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
@@ -48,22 +47,23 @@ class PrpgScreen:
         self.win(BILLBOARD).model = self.model.billboard
 
     def size_to_terminal(self):
-        if self.term_size == self.curses.get_terminal_size():
+        curses = self.root.data.curses
+        if self.term_size == curses.get_terminal_size():
             return
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
-        self.term_size = self.curses.get_terminal_size()
+        self.term_size = curses.get_terminal_size()
         while time.time() - t0 < 0.3:
             time.sleep(0.1)
-            if self.term_size != self.curses.get_terminal_size():
+            if self.term_size != curses.get_terminal_size():
                 # size changed, reset timer
-                self.term_size = self.curses.get_terminal_size()
+                self.term_size = curses.get_terminal_size()
                 t0 = time.time()
 
         try:
             w, h = self.term_size
-            self.curses.resizeterm(h, w)
+            curses.resizeterm(h, w)
             self.root.dim.w = w
             self.root.dim.h = h
             self.root.clear_layout()
@@ -89,7 +89,7 @@ class PrpgScreen:
         self.win(LOG).paint()
         self.win(BILLBOARD).paint()
 
-        self.curses.doupdate()
+        self.root.data.curses.doupdate()
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
