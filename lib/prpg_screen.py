@@ -36,7 +36,7 @@ class PrpgScreen:
         init_delegates(root)
         self.connect_models()
         root.data.rebuild_screens()
-        self.curses.curs_set(0)
+        root.data.curses.curs_set(0)
 
     def connect_models(self):
         # connect models to screens
