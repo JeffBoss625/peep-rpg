@@ -4,7 +4,7 @@ import sys
 
 from lib.constants import Color, Side
 from lib.logger import Logger
-from lib.screen_layout import WIN, Pos, Dim, Con
+from lib.screen_layout import WIN, Pos, Dim, min0
 
 
 def printe(s):
@@ -86,17 +86,19 @@ class Screen:
 
         self.logger.log(s)
 
-    def write_lines(self, lines, trunc_x=Side.RIGHT, trunc_y=Side.BOTTOM):
+    def write_lines(self, lines, **params):
+        trunc_x = params.get('trunc_x', Side.RIGHT)
+        trunc_y = params.get('trunc_y', Side.BOTTOM)
+        align_x = params.get('align_x', Side.LEFT)
+        align_y = params.get('align_y', Side.TOP)
+        text_w = params.get('text_w', 0)    # if set, use this as the fixed text width for alignment and truncation
+
         if not len(lines):
             return
-        scr = self.scr
         max_w, max_h = self.getmax_wh()
         if not max_h:
             return
-
-        # scr.clear()
-        x = self.x_margin
-        y = self.y_margin
+        trunc_w = min0(text_w, max_w)
 
         nlines = len(lines)
         if nlines > max_h:
@@ -105,12 +107,22 @@ class Screen:
             else: # Side.TOP
                 lines = lines[nlines - max_h:]
 
+        y = align_y_offset(align_y, self.y_margin, len(lines), max_h)
+
+        scr = self.scr
         for i, line in enumerate(lines):
-            if len(line) > max_w:
+            if len(line) > trunc_w:
                 if trunc_x == Side.RIGHT:
-                    line = line[0:max_w - 1]
+                    line = line[0:trunc_w - 1]
                 else: # Side.LEFT
                     line = line[len(line) - max_w:]
+
+            if len(line) >= max_w:
+                x = self.x_margin
+            else:
+                x = align_x_offset(align_x, self.x_margin, len(line), max_w)
+
+            # self.log(f'addstr({y+i}, {x}, {len(line)})')
             scr.addstr(y+i, x, line)
 
     # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient for
@@ -155,13 +167,22 @@ class Screen:
                 # )
                 pass        # ignore interrupts to getkey() following resize events etc.
 
-    def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK):
+    def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK, **params):
         max_w, max_h = self.getmax_wh()
         if x >= max_w or y >= max_h:
             return
 
+        align_x = params.get('align_x', Side.LEFT)
+        align_y = params.get('align_y', Side.TOP)
+        text_w = min(params.get('text_w', 1), max_w)
+        text_h = min(params.get('text_h', 1), max_h)
+
         cpair = self.color_pair(fg, bg)
-        self.scr.addstr(y + self.y_margin, x + self.x_margin, char, cpair)
+        xoff = align_x_offset(align_x, self.x_margin, text_w, max_w)
+        # self.log(f'align_y_offset({align_y}, {self.y_margin}, 1, {max_h})')
+        yoff = align_y_offset(align_y, self.y_margin, text_h, max_h)
+        # self.log(f'addstr({yoff} + {y}, {xoff} + {x}, {char})')
+        self.scr.addstr(yoff + y, xoff + x, char, cpair)
 
     def color_pair(self, fg, bg):
         curses = self.curses
@@ -199,24 +220,47 @@ class Screen:
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
         return w, h
 
+# align_x_offset only called when linelen < max_w
+def align_x_offset(align_x, margin_x, linelen, max_w):
+    if align_x == Side.LEFT:
+        return margin_x
+    elif align_x == Side.RIGHT:
+        return max_w - linelen
+    elif align_x == Side.CENTER:
+        return margin_x + int(max_w/2) - int(linelen/2)
+    else:
+        raise ValueError(f'illegal value for align_x: "{align_x}"')
+
+def align_y_offset(align_y, margin_y, nlines, max_h):
+    if align_y == Side.TOP:
+        return margin_y
+    elif align_y == Side.BOTTOM:
+        return max_h - nlines
+    elif align_y == Side.CENTER:
+        return margin_y + int(max_h/2) - int(nlines/2)
+    else:
+        raise ValueError(f'illegal value for align_y: "{align_y}"')
+
+
 class TextScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
-        self.trunc_x = params.get('trunc_x', Side.RIGHT)
-        self.trunc_y = params.get('trunc_y', Side.BOTTOM)
 
     def do_paint(self):
-        self.write_lines(self.model.text, self.trunc_x, self.trunc_y)
+        self.write_lines(self.model.text, **self.params)
 
 class MazeScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
     def do_paint(self):
-        self.write_lines(self.model.maze.text, Side.RIGHT, Side.BOTTOM)
+        text_h = len(self.model.maze.text)
+        text_w = len(self.model.maze.text[0])
+        params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
+        self.write_lines(self.model.maze.text, **params)
 
         for p in self.model.peeps.peeps:
-            self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor)
+            self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor, **params)
 
 class PlayerStatsScreen(Screen):
     def __init__(self, name, params):

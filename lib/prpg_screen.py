@@ -29,9 +29,9 @@ class PrpgScreen:
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
 
         left_center.window(BILLBOARD,   Con(billboard_h, maze_w,  billboard_h,    60),    wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
-        left_center.window(MAZE,        Con(maze_h,      maze_w,  30,             60),    wintype=WIN.MAZE)
+        left_center.window(MAZE,        Con(maze_h,      maze_w,  30,             60),    wintype=WIN.MAZE, align_x=Side.CENTER, align_y = Side.CENTER)
 
-        center.window(MESSAGES,         Con(6,           maze_w,  30+billboard_h, 0),         wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        center.window(MESSAGES,         Con(6,           maze_w,  30+billboard_h, 0),     wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
         main_panel.window(LOG, Con(4,30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
