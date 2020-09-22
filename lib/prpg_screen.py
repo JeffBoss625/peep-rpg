@@ -1,8 +1,5 @@
 from lib.screen_layout import *
 from lib.screen import *
-import time
-import traceback
-import os
 
 # windows
 STATS = 'stats'
@@ -22,17 +19,17 @@ class PrpgScreen:
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(STATS, Con(6, 40), wintype=WIN.STATS)
+        main_panel.window(STATS, Con(6,40,6,0), wintype=WIN.STATS)
 
         # Center Row
         center = main_panel.panel('center_panel', Orient.HORI, None)
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
-        left_center.window(BILLBOARD, Con(4,0,4,0), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
-        left_center.window(MAZE, Con(25, 20), wintype=WIN.MAZE)
-        center.window(MESSAGES, Con(6, 40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        left_center.window(BILLBOARD,   Con(4,30,4,40), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        left_center.window(MAZE,        Con(25,30,30,40), wintype=WIN.MAZE)
+        center.window(MESSAGES,         Con(6,40,34,0), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
 
         # Bottom Row
-        main_panel.window(LOG, Con(4, 30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        main_panel.window(LOG, Con(4,30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
         root.do_layout()
         sync_delegates(root)
         self.connect_models()
