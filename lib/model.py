@@ -14,9 +14,13 @@ class PubSub:
 
     def subscribe(self, fn):
         self._subscribers.append(fn)
+        for sm in self.submodels():
+            sm.subscribe(fn)
 
     def unsubscribe(self, fn):
         self._subscribers.remove(fn)
+        for sm in self.submodels():
+            sm.unsubscribe(fn)
 
     def publish(self, model, msg, **kwds):
         for fn in self._subscribers:
@@ -31,6 +35,9 @@ class PubSub:
                 new_val.subscribe(s)
 
         self.publish(self, 'update', prev=prev_val, new=new_val, **kwds)
+
+    def submodels(self):
+        return []
 
 # a dictionary containing models for which we will publish events when dictionary models are
 # added (publishes "add" message) or removed (publishes "remove" message).
@@ -57,6 +64,9 @@ class ModelDict(dict, PubSub):
             return
         super().__setitem__(k, v)
         self.publish_update(prev, v, key=k)
+
+    def submodels(self):
+        return self.values()
 
 class ModelList(list, PubSub):
     def __init__(self):
@@ -93,18 +103,12 @@ class ModelList(list, PubSub):
             i = len(args)-1
         self.publish_update(prev, None, i=i )
 
-    def subscribe(self, fn):
-        for m in self:
-            m.subscribe(fn)
-        super().subscribe(fn)
-
-    def unsubscribe(self, fn):
-        for m in self:
-            m.unsubscribe(fn)
-        super().unsubscribe(fn)
+    def submodels(self):
+        return self
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
+    # ** NOTE ** __init__() is called by @dataclass __postinit__()
     def __init__(self):
         super().__init__()
 
@@ -121,6 +125,13 @@ class DataModel(PubSub):
             prev = None
         object.__setattr__(self, k, v)
         self.publish_update(prev, v, key=k)
+
+    def submodels(self):
+        ret = []
+        for v in self.__dict__.values():
+            if v and isinstance(v, PubSub):
+                ret.append(v)
+        return ret
 
     @classmethod
     def model_name(cls):
