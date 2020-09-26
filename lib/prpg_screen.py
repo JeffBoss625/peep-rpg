@@ -28,13 +28,13 @@ class PrpgScreen:
         center = main_panel.panel('center_panel', Orient.HORI, None)
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
 
-        left_center.window(BILLBOARD,   Con(billboard_h, maze_w,  billboard_h,    60),    wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        left_center.window(BILLBOARD,   Con(billboard_h, maze_w,  billboard_h,    60),    wintype=WIN.TEXT, trunc_y=Side.TOP)
         left_center.window(MAZE,        Con(maze_h,      maze_w,  30,             60),    wintype=WIN.MAZE, align_x=Side.CENTER, align_y = Side.CENTER)
 
-        center.window(MESSAGES,         Con(6,           maze_w,  30+billboard_h, 0),     wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        center.window(MESSAGES,         Con(6,           maze_w,  30+billboard_h, 0),     wintype=WIN.TEXT, trunc_y=Side.TOP)
 
         # Bottom Row
-        main_panel.window(LOG, Con(4,30), wintype=WIN.TEXT, trunc_y=Side.BOTTOM)
+        main_panel.window(LOG, Con(4,30), wintype=WIN.TEXT, trunc_y=Side.TOP)
         root.do_layout()
         sync_delegates(root)
         self.connect_models()
@@ -49,6 +49,13 @@ class PrpgScreen:
         self.win(STATS).model = self.model.maze
         self.win(ROOT).model = self.model
         self.win(BILLBOARD).model = self.model.billboard
+
+        log = self.win(LOG).model
+
+        def log_event(model, msg, **kwds):
+            log.print('event:', model.__class__.__name__, getattr(model, 'name', 'noname'), msg, kwds)
+
+        self.win(MAZE).model.peeps.subscribe(log_event)
 
     def size_to_terminal(self):
         win = self.root.data
