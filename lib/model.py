@@ -173,14 +173,15 @@ class Peep(DataModel):
     char: str = '?'
     fgcolor: str = Color.WHITE
     bgcolor: str = Color.BLACK
+
+    # todo: maintain two structures, the resting/normal state and the current state (hp, speed... enhanced from potions etc)
+    # todo: lazy-calculate values such as "speed" and "ac" from equipment, dexterity, etc...
     maxhp: int = 0
     thaco: int = 20
     speed: int = 10
     ac: int = 10
     move_tactic: str = 'seek'
 
-    # temp state
-    # todo: original state and current state - maintain both
     hp: int = 0
     tics: int = 0
     x: int = 0
