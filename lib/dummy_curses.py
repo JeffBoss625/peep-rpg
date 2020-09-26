@@ -69,7 +69,7 @@ class DummyCursesWindow:
 
     def _doupdate(self):
         for i, line in enumerate(self.buf):
-            printe("{:<4} {}".format(i, ''.join(line)))
+            printe("{:<3} {}".format(i, ''.join(line)))
         printe('')
 
     def derwin(self, h, w, y, x):
