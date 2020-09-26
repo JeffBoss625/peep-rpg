@@ -52,10 +52,10 @@ class PrpgScreen:
 
         log = self.win(LOG).model
 
-        def log_event(model, msg, **kwds):
+        def log_event_fn(model, msg, **kwds):
             log.print('event:', model.__class__.__name__, getattr(model, 'name', 'noname'), msg, kwds)
 
-        self.win(MAZE).model.peeps.subscribe(log_event)
+        self.win(MAZE).model.subscribe(log_event_fn)
 
     def size_to_terminal(self):
         win = self.root.data

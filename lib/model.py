@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 from lib.constants import Color
 import yaml
 
+# special value (used simply as a class, not instance) to indicate non-existent items with obj.get(key, default)
+class NotSet:
+    pass
+
 class PubSub:
     def __init__(self):
         self._subscribers = []
@@ -18,6 +22,15 @@ class PubSub:
         for fn in self._subscribers:
             fn(model, msg, **kwds)
 
+    def publish_update(self, prev_val, new_val, **kwds):
+        if prev_val and isinstance(prev_val, PubSub):
+            for s in self._subscribers:
+                prev_val.unsubscribe(s)
+        if new_val and isinstance(new_val, PubSub):
+            for s in self._subscribers:
+                new_val.subscribe(s)
+
+        self.publish(self, 'update', prev=prev_val, new=new_val, **kwds)
 
 # a dictionary containing models for which we will publish events when dictionary models are
 # added (publishes "add" message) or removed (publishes "remove" message).
@@ -36,16 +49,14 @@ class ModelDict(dict, PubSub):
     def __delitem__(self, k):
         prev = self.get(k)
         super().__delitem__(k)
-        self.publish(self, 'remove', key=k, val=prev)
+        self.publish_update(prev, None, key=k)
 
     def __setitem__(self, k, v):
         prev = self.get(k, None)
         if prev == v:
             return
         super().__setitem__(k, v)
-        if prev:
-            self.publish(self, 'remove', key=k, val=prev)
-        self.publish(self, 'add', key=k, val=v)
+        self.publish_update(prev, v, key=k)
 
 class ModelList(list, PubSub):
     def __init__(self):
@@ -55,29 +66,32 @@ class ModelList(list, PubSub):
     def __delitem__(self, i):
         prev = self[i]
         super().__delitem__(i)
-        remove_submodel(self, prev, i=i)
+        self.publish_update(prev, None, i=i)
 
     def __setitem__(self, i, v):
         prev = self[i]
         if prev == v:
             return
         super().__setitem__(i, v)
-        if prev:
-            remove_submodel(self, prev, i=i)
-        add_submodel(self, v, i=i)
+        self.publish_update(prev, v, i=i)
 
     def append(self, v):
         super().append(v)
-        add_submodel(self, v, i=len(self)-1)
+        self.publish_update(None, v, i=len(self)-1)
 
     def remove(self, v):
         super().remove(v)
-        remove_submodel(self, v)
+        self.publish_update(v, None)
 
     def pop(self, *args):
-        ret = super().pop(*args)
-        kwds = {'i':args[0]} if len(args) else {}
-        remove_submodel(self, ret, **kwds)
+        prev = super().pop(*args)
+        if len(args):
+            i = args[0]
+            if i < 0:
+                i += len(args)
+        else:
+            i = len(args)-1
+        self.publish_update(prev, None, i=i )
 
     def subscribe(self, fn):
         for m in self:
@@ -88,22 +102,6 @@ class ModelList(list, PubSub):
         for m in self:
             m.unsubscribe(fn)
         super().unsubscribe(fn)
-
-def remove_submodel(model, submodel, **kwds):
-    for s in model._subscribers:
-        submodel.unsubscribe(s)
-    model.publish(model, 'remove', val=submodel, **kwds)
-
-def add_submodel(model, submodel, **kwds):
-    for s in model._subscribers:
-        submodel.subscribe(s)
-    model.publish(model, 'add', val=submodel, **kwds)
-
-
-class DoesNotExist:
-    pass
-
-DOES_NOT_EXIST = DoesNotExist()
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
@@ -116,12 +114,13 @@ class DataModel(PubSub):
             object.__setattr__(self, k, v)
             return
 
-        prev = getattr(self, k, DOES_NOT_EXIST)
+        prev = getattr(self, k, NotSet)
         if v == prev:
             return
+        if prev == NotSet:
+            prev = None
         object.__setattr__(self, k, v)
-
-        self.publish(self, 'update', key=k, val=v)
+        self.publish_update(prev, v, key=k)
 
     @classmethod
     def model_name(cls):
@@ -200,6 +199,9 @@ class TextModel(PubSub):
         self.text.extend(slines)
         self.publish(self, 'update', added=slines)
 
+#
+# YAML Serialization Functions
+#
 def _getstate(sdict, cdict):
     nocopy = getattr(dict, '_yaml_ignore', {})
     ret = {}
