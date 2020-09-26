@@ -36,5 +36,8 @@ class PrpgModel(DataModel):
     def log(self, *args):
         self.log_model.print(*args)
 
+    def banner(self, *args):
+        self.billboard.print(*args)
+
     def is_player(self, peep):
         return peep == self.maze.player

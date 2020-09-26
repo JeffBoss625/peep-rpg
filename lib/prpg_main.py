@@ -163,7 +163,7 @@ def main(root):
                     #     screen.size_to_terminal()
                 else:
                     if monster_turn(model, peep) == 'q':
-                        model.message('YOU DIED')
+                        model.banner('YOU DIED')
                         screen.paint()
                         time.sleep(3)
                         return 0
