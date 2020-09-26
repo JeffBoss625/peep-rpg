@@ -22,8 +22,8 @@ class PrpgScreen:
         main_panel.window(STATS, Con(6,40,6,0), wintype=WIN.STATS)
 
         # Center Row
-        maze_h = len(model.maze.maze.text) + 2
-        maze_w = len(model.maze.maze.text[0]) + 2
+        maze_h = len(model.maze.walls.text) + 2
+        maze_w = len(model.maze.walls.text[0]) + 2
         billboard_h = 4
         center = main_panel.panel('center_panel', Orient.HORI, None)
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
@@ -46,7 +46,7 @@ class PrpgScreen:
         self.win(MESSAGES).model = self.model.message_model
         self.win(LOG).model = self.model.log_model
         self.win(MAZE).model = self.model.maze
-        self.win(STATS).model = self.model.peeps
+        self.win(STATS).model = self.model.maze
         self.win(ROOT).model = self.model
         self.win(BILLBOARD).model = self.model.billboard
 
@@ -67,14 +67,13 @@ class PrpgScreen:
         return self.root.info.comp_by_name[name].data
 
     # paint the entire screen - all that is visible
-    def paint(self):
-        self.win(ROOT).clear()
-        self.win(ROOT).paint()
-        self.win(STATS).paint()
-        self.win(MAZE).paint()
-        self.win(MESSAGES).paint()
-        self.win(LOG).paint()
-        self.win(BILLBOARD).paint()
+    def paint(self, force=False):
+        self.win(ROOT).paint(force=force)
+        self.win(STATS).paint(force=force)
+        self.win(MAZE).paint(force=force)
+        self.win(MESSAGES).paint(force=force)
+        self.win(LOG).paint(force=force)
+        self.win(BILLBOARD).paint(force=force)
 
         self.root.data.curses.doupdate()
 

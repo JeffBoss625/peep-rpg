@@ -30,14 +30,14 @@ def test_move_peep():
         Peep(name='p1', x=4, y=3),
     ]
 
-    maze = [
+    walls = [
         '..####',
         '.#####',
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
     player = peeps[0]
-    model = PrpgModel(peeps=peeps, maze=maze)
+    model = PrpgModel(walls=walls, peeps=peeps)
     mlib.move_peep(model, player, mlib.Direction.RIGHT)
     assert player.x == 1 # x changed!
     assert player.y == 0

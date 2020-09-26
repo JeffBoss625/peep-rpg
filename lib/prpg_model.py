@@ -8,25 +8,20 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 
-from lib.model import TextModel, DataModel
+from lib.model import TextModel, ModelList, DataModel
 
 class MazeModel(DataModel):
-    def __init__(self, maze, peeps):
+    def __init__(self, walls, peeps, player):
         super().__init__()
-        self.maze = maze
-        self.peeps = peeps
-
-class PeepsModel(DataModel):
-    def __init__(self, player, peeps):
-        super().__init__()
+        self.walls = TextModel('walls', walls)
+        self.peeps = ModelList()
+        self.peeps.extend(peeps)
         self.player = player
-        self.peeps = peeps if peeps else []
 
 class PrpgModel(DataModel):
-    def __init__(self, player=None, maze=None, peeps=None, seed=0):
+    def __init__(self, walls=None, peeps=None, player=None, seed=0):
         super().__init__()
-        self.peeps = PeepsModel(player, peeps)
-        self.maze = MazeModel(TextModel('maze', maze), self.peeps)
+        self.maze = MazeModel(walls, peeps, player)
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.billboard = TextModel('billboard')
@@ -42,4 +37,4 @@ class PrpgModel(DataModel):
         self.log_model.print(*args)
 
     def is_player(self, peep):
-        return peep == self.peeps.player
+        return peep == self.maze.player

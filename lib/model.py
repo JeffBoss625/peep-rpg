@@ -6,24 +6,29 @@ import yaml
 
 class PubSub:
     def __init__(self):
-        self._subscribers = {}  # subscribers by topic
+        self._subscribers = []
 
-    def subscribe(self, topic, fn):
-        subs = self._subscribers.get(topic, [])
-        if not subs:
-            self._subscribers[topic] = subs
-        subs.append(fn)
+    def subscribe(self, fn):
+        self._subscribers.append(fn)
 
-    def unsubscribe(self, topic, fn):
-        self._subscribers[topic].remove(fn)
+    def unsubscribe(self, fn):
+        self._subscribers.remove(fn)
 
-    def publish(self, model_name, *args):
-        for fn in self._subscribers.get(model_name, []):
-            fn(model_name, *args)
+    def publish(self, model, msg, **kwds):
+        for fn in self._subscribers:
+            fn(model, msg, **kwds)
 
 
-# a dictionary containing models for which we will publish events when dictionary entries change.
-class MDict(dict, PubSub):
+# a dictionary containing models for which we will publish events when dictionary models are
+# added (publishes "add" message) or removed (publishes "remove" message).
+#
+# NOTE: the dict extension only handles set and delete operations, not constructors, update etc.
+# To propogate changes, callers need to confine updates to simply:
+#   dict[key] = x
+#   del dict[key]
+#
+#
+class ModelDict(dict, PubSub):
     def __init__(self):
         super().__init__()
         PubSub.__init__(self)
@@ -31,32 +36,92 @@ class MDict(dict, PubSub):
     def __delitem__(self, k):
         prev = self.get(k)
         super().__delitem__(k)
-        self.publish(prev.model_name(), 'delete', k, prev)
+        self.publish(self, 'remove', key=k, val=prev)
 
     def __setitem__(self, k, v):
-        mname = v.model_name()
         prev = self.get(k, None)
         if prev == v:
             return
         super().__setitem__(k, v)
         if prev:
-            self.publish(mname, 'replace', k, prev, v)
-        else:
-            self.publish(mname, 'add', k, v)
+            self.publish(self, 'remove', key=k, val=prev)
+        self.publish(self, 'add', key=k, val=v)
+
+class ModelList(list, PubSub):
+    def __init__(self):
+        super().__init__()
+        PubSub.__init__(self)
+
+    def __delitem__(self, i):
+        prev = self[i]
+        super().__delitem__(i)
+        remove_submodel(self, prev, i=i)
+
+    def __setitem__(self, i, v):
+        prev = self[i]
+        if prev == v:
+            return
+        super().__setitem__(i, v)
+        if prev:
+            remove_submodel(self, prev, i=i)
+        add_submodel(self, v, i=i)
+
+    def append(self, v):
+        super().append(v)
+        add_submodel(self, v, i=len(self)-1)
+
+    def remove(self, v):
+        super().remove(v)
+        remove_submodel(self, v)
+
+    def pop(self, *args):
+        ret = super().pop(*args)
+        kwds = {'i':args[0]} if len(args) else {}
+        remove_submodel(self, ret, **kwds)
+
+    def subscribe(self, fn):
+        for m in self:
+            m.subscribe(fn)
+        super().subscribe(fn)
+
+    def unsubscribe(self, fn):
+        for m in self:
+            m.unsubscribe(fn)
+        super().unsubscribe(fn)
+
+def remove_submodel(model, submodel, **kwds):
+    for s in model._subscribers:
+        submodel.unsubscribe(s)
+    model.publish(model, 'remove', val=submodel, **kwds)
+
+def add_submodel(model, submodel, **kwds):
+    for s in model._subscribers:
+        submodel.subscribe(s)
+    model.publish(model, 'add', val=submodel, **kwds)
 
 
-# dataclass models with change-tracking, yaml serialization and update event publication
-# topic is often the class name (lower case)
+class DoesNotExist:
+    pass
+
+DOES_NOT_EXIST = DoesNotExist()
+
+# dataclass models with change-tracking
 class DataModel(PubSub):
     def __init__(self):
         super().__init__()
 
     def __setattr__(self, k, v):
-        if hasattr(self, '_subscribers') and k[0] != '_' and getattr(self, k, v) != v:
+        if not hasattr(self, '_subscribers') or k[0] == '_':
+            # not initialized
             object.__setattr__(self, k, v)
-            self.publish(self.model_name(), 'update', k, v)
-        else:
-            object.__setattr__(self, k, v)
+            return
+
+        prev = getattr(self, k, DOES_NOT_EXIST)
+        if v == prev:
+            return
+        object.__setattr__(self, k, v)
+
+        self.publish(self, 'update', key=k, val=v)
 
     @classmethod
     def model_name(cls):
@@ -110,7 +175,7 @@ class Peep(DataModel):
     tics: int = 0
     x: int = 0
     y: int = 0
-    attacks: dict = field(default_factory=lambda: MDict())
+    attacks: dict = field(default_factory=lambda: ModelDict())
 
     _yaml_ignore = {'tics', 'x', 'y'}
 
@@ -133,7 +198,7 @@ class TextModel(PubSub):
         slines = []
         for s in lines: slines.extend(s.split('\n'))
         self.text.extend(slines)
-        self.publish(self.model_name, 'extend', slines)
+        self.publish(self, 'update', added=slines)
 
 def _getstate(sdict, cdict):
     nocopy = getattr(dict, '_yaml_ignore', {})
@@ -145,7 +210,7 @@ def _getstate(sdict, cdict):
         if k in cdict and v == cdict[k]:
             continue
 
-        if isinstance(v, MDict):
+        if isinstance(v, ModelDict):
             v = v.copy()    # as regular dict
         ret[k] = v
 
@@ -164,8 +229,7 @@ def _from_yaml(cls):
         return ldr.construct_yaml_object(node, cls)
     return fn
 
-
-for cls in [Peep, Ammo, Attack]:
+def reg(cls):
     tag = '!' + cls.model_name()
 
     yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
@@ -173,19 +237,25 @@ for cls in [Peep, Ammo, Attack]:
 
     cls.__getstate__ = _model_getstate
 
-def printargs(*args):
-    print(args)
+def init_cls():
+    for cls in [Peep, Ammo, Attack]:
+        reg(cls)
+
+def printargs(model, msg, **args):
+    print(model.__class__.__name__, model.name, msg, args)
 
 
 if __name__ == '__main__':
     p = Peep('bill')
-    p.subscribe('peep', printargs)
+    p.subscribe(printargs)
     p.name = 'bill'
     p.name = 'bbb'
+    p.hp = 2
+    p.hp = 2
 
-    a = MDict()
-    a.subscribe('attack', printargs)
-    a['bite'] = Attack('3d4', 4)
-    del a['bite']
-    print(a)
-    print(yaml.dump(p, sort_keys = False))
+    # a = ModelDict()
+    # a.subscribe(printargs)
+    # a['bite'] = Attack('3d4', 4)
+    # del a['bite']
+    # print(a)
+    # print(yaml.dump(p, sort_keys = False))

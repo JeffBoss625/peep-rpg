@@ -31,6 +31,7 @@ class Screen:
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.model = None
+        self.needs_paint = True
         # self.dim = None
         # self.pos = None     # todo: manage these from layout manager
 
@@ -38,6 +39,21 @@ class Screen:
 
     def __repr__(self):
         return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
+
+    @property
+    def model(self):
+        return self.__model
+
+    @model.setter
+    def model(self, m):
+        if not hasattr(self, '__model') or m != getattr(self, '__model', None):
+            self.__model = m
+
+            if m:
+                def update_fn(_model, _msg, **_kwds):
+                    self.needs_paint = True
+                m.subscribe(update_fn)
+                self.needs_paint = True
 
     #
     # TREE Navigation/Initialization functions
@@ -128,25 +144,29 @@ class Screen:
     # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient for
     # calling on all subwindows.
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
-    def paint(self):
+    def paint(self, force=False):
         if not self.scr:
             printe('no scr to paint in {}'.format(self.name))
             return
         if self.parent and not self.model:
             raise RuntimeError('no model to paint in {}'.format(self.name))
+        # if not self.needs_paint and not force:
+        #     return
 
+        self.clear()
         if self.border:
             self.scr.border()
         self.do_paint()
         # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
+        self.needs_paint = False
 
     def do_paint(self):
         pass
         # raise NotImplementedError()
 
-    def paint_all(self):
-        self.paint()
+    def paint_all(self, force=False):
+        self.paint(force=force)
         for c in self.children:
             c.paint_all()
 
@@ -254,12 +274,12 @@ class MazeScreen(Screen):
         super().__init__(name, params)
 
     def do_paint(self):
-        text_h = len(self.model.maze.text)
-        text_w = len(self.model.maze.text[0])
+        text_h = len(self.model.walls.text)
+        text_w = len(self.model.walls.text[0])
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
-        self.write_lines(self.model.maze.text, **params)
+        self.write_lines(self.model.walls.text, **params)
 
-        for p in self.model.peeps.peeps:
+        for p in self.model.peeps:
             self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor, **params)
 
 class PlayerStatsScreen(Screen):

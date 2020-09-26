@@ -62,7 +62,7 @@ def player_turn(screen):
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
-            if mlib.move_peep(model, model.peeps.player, direct):
+            if mlib.move_peep(model, model.maze.player, direct):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -70,12 +70,12 @@ def player_turn(screen):
         # elif input_key in ('=', '+', '-'):
         #     return input_key
         elif input_key == 'm':
-            if len(model.peeps) > 1:
+            if len(model.maze.peeps) > 1:
                 player = model.player
                 while model.player == player:
-                    player = model.peeps[random.randint(0, len(model.peeps) - 1)]
+                    player = model.maze.peeps[random.randint(0, len(model.maze.peeps) - 1)]
                 model.player = player
-                model.message("You are now " + model.player.name)
+                model.message("You are now " + model.maze.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
@@ -103,9 +103,9 @@ def monster_turn(model, monster):
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
     elif monster.move_tactic == 'seek':
-        dx = model.peeps.player.x - monster.x
-        dy = model.peeps.player.y - monster.y
-        if model.peeps.player.hp <= 0:
+        dx = model.maze.player.x - monster.x
+        dy = model.maze.player.y - monster.y
+        if model.maze.player.hp <= 0:
             return 'q'
         if monster.hp/monster.maxhp < 0.3:
             direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
@@ -129,20 +129,20 @@ def monster_turn(model, monster):
 
 def main(root):
     root.data.curses.raw()
-    model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
+    model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
     screen = PrpgScreen(root, model)
 
     def resize_handler(_signum, _frame):
         screen.size_to_terminal()
-        screen.paint()
+        screen.paint(force=True)
 
     signal.signal(signal.SIGWINCH, resize_handler)
     screen.paint()
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
-        peeps = [p for p in model.peeps.peeps]
-        turns = mlib.calc_turn_sequence(model.peeps.peeps)
+        peeps = [p for p in model.maze.peeps]
+        turns = mlib.calc_turn_sequence(model.maze.peeps)
 
         for peep_indexes in turns:
             for peep_index in peep_indexes:
@@ -169,6 +169,6 @@ def main(root):
                         return 0
 
                 # update peeps list to living peeps
-                model.peeps.peeps = [p for p in model.peeps.peeps if p.hp > 0]
+                model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
 
                 # model.undirty()
