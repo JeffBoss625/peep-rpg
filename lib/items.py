@@ -64,6 +64,7 @@ class ItemSlot:
 class Holster(Item):
     slots: tuple = field(default_factory=tuple)     # item slots supported
 
+# A weapon that shoots Ammo
 @dataclass
 class Shooter(Item):
     shoots_slot_type: str = ''
@@ -82,15 +83,15 @@ class Bow(Shooter):
 
 @dataclass
 class Ammo(Item):
-    speed: int = 100
-    distance: int = 0   # track distance travelled, 10 per square.
     ac: int = 20
     maxhp: int = 1
     thaco: int = 20
     move_tactic: str = 'straight'
+    distance: int = 0   # track distance travelled, 10 per square.
 
     # temp state
     tics: int = 0
+    speed: int = 100
     pos: tuple = field(default_factory=tuple)
     attacks: dict = field(default_factory=dict)
     direct: int = 0
