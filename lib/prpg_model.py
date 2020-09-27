@@ -24,7 +24,7 @@ class PrpgModel(DataModel):
         self.maze = MazeModel(walls, peeps, player)
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
-        self.billboard = TextModel('billboard')
+        self.banner = TextModel('banner')
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array
@@ -37,7 +37,7 @@ class PrpgModel(DataModel):
         self.log_model.print(*args)
 
     def banner(self, *args):
-        self.billboard.print(*args)
+        self.banner.print(*args)
 
     def is_player(self, peep):
         return peep == self.maze.player

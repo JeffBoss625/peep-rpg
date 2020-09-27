@@ -165,6 +165,8 @@ class Screen:
         # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
         self.needs_paint = False
+        # if self.parent is None:
+        #     self.doupdate()
 
     def do_paint(self):
         raise NotImplementedError()
