@@ -286,34 +286,33 @@ class BlankScreen(Screen):
 class MainScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
+        w, h = self.curses.get_terminal_size()
+        self.dim = Dim(h, w)
 
     def do_paint(self, force=False):
         for win in self.children:
             win.paint(force=force)
 
     def size_to_terminal(self):
-        if self.parent:
-            raise ValueError(f'resize_term is only valid on the root screen, not "{self.name}"')
-
         curses = self.curses
-        if getattr(self, 'term_size', None) == curses.get_terminal_size():
+        term_size = (self.dim.w, self.dim.h)
+        if term_size == curses.get_terminal_size():
             return
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
-        self.term_size = curses.get_terminal_size()
+        term_size = curses.get_terminal_size()
         while time.time() - t0 < 0.3:
             time.sleep(0.1)
-            if self.term_size != curses.get_terminal_size():
+            if term_size != curses.get_terminal_size():
                 # size changed, reset timer
-                self.term_size = curses.get_terminal_size()
+                term_size = curses.get_terminal_size()
                 t0 = time.time()
 
-        w, h = self.term_size
+        w, h = term_size
         curses.resizeterm(h, w)
         self.dim = Dim(h, w)
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
-        return w, h
 
 def create_win(parent, name, params):
     wintype = params.get('wintype', None)
