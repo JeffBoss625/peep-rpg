@@ -1,4 +1,5 @@
-from lib.model import Peep
+from lib.items import Ammo
+from lib.peeps import Peep
 import lib.attack as attacklib
 import lib.model as modellib
 # update time for monsters
@@ -140,7 +141,7 @@ def move_peep(model, p, direct):
     dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
     dst = peep_at_pos(model.maze.peeps, dst_pos)
     if maze_at_pos(model.maze.walls.text, dst_pos):
-        if model.is_player(p) or isinstance(p, modellib.Ammo):
+        if model.is_player(p) or isinstance(p, Ammo):
             dst = maze_at_pos(model.maze.walls.text, dst_pos)
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
@@ -153,7 +154,7 @@ def move_peep(model, p, direct):
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
-        elif isinstance(p, modellib.Ammo):
+        elif isinstance(p, Ammo):
             weapon = attacklib.choose_melee_attack(p)
             if attacklib.attack(p, dst, weapon, model):
                 return True

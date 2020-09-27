@@ -137,63 +137,24 @@ class DataModel(PubSub):
     def model_name(cls):
         return cls.__name__.lower()
 
-@dataclass
-class Attack(DataModel):
-    def __post_init__(self):
-        super().__init__()
+#
+# YAML Serialization Functions
+#
+def _getstate(sdict, cdict):
+    nocopy = getattr(dict, '_yaml_ignore', {})
+    ret = {}
+    for k in sdict:
+        if k[0] == '_' or k in nocopy:
+            continue
+        v = sdict[k]
+        if k in cdict and v == cdict[k]:
+            continue
 
-    damage: str = '1d1'
-    range: int = 0
-    blowback: int = 0
+        if isinstance(v, ModelDict):
+            v = v.copy()    # as regular dict
+        ret[k] = v
 
-
-@dataclass
-class Ammo(DataModel):
-    def __post_init__(self):
-        super().__init__()
-
-    name: str = ''
-    char: str = '?'
-    fgcolor: str = Color.WHITE
-    bgcolor: str = Color.BLACK
-    thaco: int = 20
-    speed: int = 100
-    ac: int = 20
-    maxhp: int = 1
-
-    # temp state
-    tics: int = 0
-    pos: tuple = field(default_factory=tuple)
-    attacks: dict = field(default_factory=dict)
-    move_tactic: str = 'straight'
-    direct: int = 0
-
-@dataclass
-class Peep(DataModel):
-    def __post_init__(self):
-        super().__init__()
-
-    name: str = ''
-    type: str = ''
-    char: str = '?'
-    fgcolor: str = Color.WHITE
-    bgcolor: str = Color.BLACK
-
-    # todo: maintain two structures, the resting/normal state and the current state (hp, speed... enhanced from potions etc)
-    # todo: lazy-calculate values such as "speed" and "ac" from equipment, dexterity, etc...
-    maxhp: int = 0
-    thaco: int = 20
-    speed: int = 10
-    ac: int = 10
-    move_tactic: str = 'seek'
-
-    hp: int = 0
-    tics: int = 0
-    pos: tuple = field(default_factory=tuple)
-    attacks: dict = field(default_factory=lambda: ModelDict())
-
-    _yaml_ignore = {'tics', 'pos'}
-
+    return ret
 
 class TextModel(PubSub):
     def __init__(self, model_name, text=None):
@@ -215,24 +176,6 @@ class TextModel(PubSub):
         self.text.extend(slines)
         self.publish_update(None, lines)
 
-#
-# YAML Serialization Functions
-#
-def _getstate(sdict, cdict):
-    nocopy = getattr(dict, '_yaml_ignore', {})
-    ret = {}
-    for k in sdict:
-        if k[0] == '_' or k in nocopy:
-            continue
-        v = sdict[k]
-        if k in cdict and v == cdict[k]:
-            continue
-
-        if isinstance(v, ModelDict):
-            v = v.copy()    # as regular dict
-        ret[k] = v
-
-    return ret
 
 def _datamodel_getstate(self):
     return _getstate(self.__dict__, self.__class__.__dict__)
@@ -247,33 +190,10 @@ def _from_yaml(cls):
         return ldr.construct_yaml_object(node, cls)
     return fn
 
-def reg(cls):
+def register_yaml(cls):
     tag = '!' + cls.model_name()
 
     yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
     yaml.Loader.add_constructor(tag, _from_yaml(cls))
 
     cls.__getstate__ = _datamodel_getstate
-
-def init_cls():
-    for cls in [Peep, Ammo, Attack]:
-        reg(cls)
-
-def printargs(model, msg, **args):
-    print(model.__class__.__name__, model.name, msg, args)
-
-
-if __name__ == '__main__':
-    p = Peep('bill')
-    p.subscribe(printargs)
-    p.name = 'bill'
-    p.name = 'bbb'
-    p.hp = 2
-    p.hp = 2
-
-    # a = ModelDict()
-    # a.subscribe(printargs)
-    # a['bite'] = Attack('3d4', 4)
-    # del a['bite']
-    # print(a)
-    # print(yaml.dump(p, sort_keys = False))

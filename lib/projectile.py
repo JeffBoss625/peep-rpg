@@ -1,4 +1,5 @@
-from lib.model import Ammo, Attack
+from lib.items import Ammo
+from lib.peeps import Attack
 from lib.constants import Color
 
 

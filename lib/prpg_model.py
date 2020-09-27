@@ -8,7 +8,8 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 
-from lib.model import TextModel, ModelList, DataModel
+from lib.model import ModelList, DataModel, TextModel
+
 
 class MazeModel(DataModel):
     def __init__(self, walls, peeps, player):
