@@ -59,8 +59,7 @@ class PrpgScreen:
         self.win(MAZE).model.subscribe(log_event_fn)
 
     def size_to_terminal(self):
-        win = self.root.data
-        w, h = win.size_to_terminal()
+        w, h = self.root.data.size_to_terminal()
         self.root.dim = Dim(h,w)
         self.root.con = Con(h,w,h,w)
         self.root.clear_layout()
