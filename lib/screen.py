@@ -159,22 +159,20 @@ class Screen:
         #     return
 
         self.clear()
+        for c in self.children:
+            c.paint(force)
+
         if self.border:
             self.scr.border()
-        self.do_paint(force=force)
+        self.do_paint()
         # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
         self.needs_paint = False
         if self.parent is None:
             self.doupdate()
 
-    def do_paint(self, force=False):
-        raise NotImplementedError()
-
-    def paint_all(self, force=False):
-        self.paint(force=force)
-        for c in self.children:
-            c.paint_all()
+    def do_paint(self):
+        pass
 
     def doupdate(self):
         self.curses.doupdate()
@@ -248,14 +246,14 @@ class TextScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self, force=False):
+    def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
 class MazeScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self, force=False):
+    def do_paint(self):
         text_h = len(self.model.walls.text)
         text_w = len(self.model.walls.text[0])
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
@@ -268,7 +266,7 @@ class PlayerStatsScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self, force=False):
+    def do_paint(self):
         p = self.model.player
         self.write_lines([
             p.name,
@@ -280,18 +278,11 @@ class BlankScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self, force=False):
-        pass
-
 class MainScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
-
-    def do_paint(self, force=False):
-        for win in self.children:
-            win.paint(force=force)
 
     def size_to_terminal(self):
         curses = self.curses
