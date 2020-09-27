@@ -28,10 +28,8 @@ class PrpgScreen:
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=Side.TOP)
 
-        root.do_layout()
-        sync_delegates(root)
-        root.data.rebuild_screens()
-        root.data.model = model
+        self.size_and_rebuild()         # builds curses windows
+        root.data.model = model         # links curses windows to submodels
 
         def log_event_fn(m, msg, **kwds):
             name = getattr(m, '"name" ', '')
@@ -39,7 +37,7 @@ class PrpgScreen:
 
         model.maze.subscribe(log_event_fn)
 
-    def size_to_terminal(self):
+    def size_and_rebuild(self):
         win = self.root.data
         win.size_to_terminal()
 

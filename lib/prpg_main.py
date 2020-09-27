@@ -133,7 +133,7 @@ def main(root):
     screen = PrpgScreen(root, model)
 
     def resize_handler(_signum, _frame):
-        screen.size_to_terminal()
+        screen.size_and_rebuild()
         screen.paint(force=True)
 
     signal.signal(signal.SIGWINCH, resize_handler)
