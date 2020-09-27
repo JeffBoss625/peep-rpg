@@ -222,30 +222,6 @@ class Screen:
 
         return self.color_pairs[key]
 
-    def size_to_terminal(self):
-        if self.parent:
-            raise ValueError(f'resize_term is only valid on the root screen, not "{self.name}"')
-
-        curses = self.curses
-        if getattr(self, 'term_size', None) == curses.get_terminal_size():
-            return
-
-        # wait for resize changes to stop for a moment before resizing
-        t0 = time.time()
-        self.term_size = curses.get_terminal_size()
-        while time.time() - t0 < 0.3:
-            time.sleep(0.1)
-            if self.term_size != curses.get_terminal_size():
-                # size changed, reset timer
-                self.term_size = curses.get_terminal_size()
-                t0 = time.time()
-
-        w, h = self.term_size
-        curses.resizeterm(h, w)
-        self.dim = Dim(h, w)
-        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
-        return w, h
-
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):
     if align_x == Side.LEFT:
@@ -314,6 +290,30 @@ class MainScreen(Screen):
     def do_paint(self, force=False):
         for win in self.children:
             win.paint(force=force)
+
+    def size_to_terminal(self):
+        if self.parent:
+            raise ValueError(f'resize_term is only valid on the root screen, not "{self.name}"')
+
+        curses = self.curses
+        if getattr(self, 'term_size', None) == curses.get_terminal_size():
+            return
+
+        # wait for resize changes to stop for a moment before resizing
+        t0 = time.time()
+        self.term_size = curses.get_terminal_size()
+        while time.time() - t0 < 0.3:
+            time.sleep(0.1)
+            if self.term_size != curses.get_terminal_size():
+                # size changed, reset timer
+                self.term_size = curses.get_terminal_size()
+                t0 = time.time()
+
+        w, h = self.term_size
+        curses.resizeterm(h, w)
+        self.dim = Dim(h, w)
+        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
+        return w, h
 
 def create_win(parent, name, params):
     wintype = params.get('wintype', None)
