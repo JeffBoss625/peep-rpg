@@ -42,11 +42,11 @@ class PrpgScreen:
 
     def connect_models(self):
         # connect models to screens
+        self.win(MAIN).model = self.model
         self.win(MESSAGES).model = self.model.message_model
         self.win(LOG).model = self.model.log_model
         self.win(MAZE).model = self.model.maze
         self.win(STATS).model = self.model.maze
-        self.win(MAIN).model = self.model
         self.win(BANNER).model = self.model.banner
 
         log = self.win(LOG).model
@@ -60,6 +60,7 @@ class PrpgScreen:
     def size_to_terminal(self):
         win = self.root.data
         win.size_to_terminal()
+
         h = win.dim.h
         w = win.dim.w
         self.root.dim = Dim(h,w)
@@ -67,7 +68,8 @@ class PrpgScreen:
         self.root.clear_layout()
         self.root.do_layout()
         sync_delegates(self.root)
-        self.root.data.rebuild_screens()
+
+        win.rebuild_screens()
 
     def get_key(self):
         return self.win(MAIN).get_key()
