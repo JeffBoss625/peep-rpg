@@ -38,7 +38,7 @@ class DummyCursesWindow:
                 buf[y][x] = '.'
 
     def border(self):
-        printe('border({})'.format(self))
+        # printe('border({})'.format(self))
         dim = self.dim
         buf = self.buf
         xoff, yoff = self.xyoff()

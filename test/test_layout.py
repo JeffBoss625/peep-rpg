@@ -128,7 +128,7 @@ def test_layout_horizontal():
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = create_root(dim)
-    root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
+    # root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel('root-pan', orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
