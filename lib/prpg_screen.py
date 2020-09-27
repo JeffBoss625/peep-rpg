@@ -27,20 +27,17 @@ class PrpgScreen:
 
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=Side.TOP)
+
         root.do_layout()
         sync_delegates(root)
-        self.connect_models()
         root.data.rebuild_screens()
+        root.data.model = model
 
-    def connect_models(self):
-        # connect models to screens
-        self.root.data.model = self.model
+        def log_event_fn(m, msg, **kwds):
+            name = getattr(m, '"name" ', '')
+            model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
-        def log_event_fn(model, msg, **kwds):
-            name = getattr(model, '"name" ', '')
-            self.model.log_model.print(f'{msg}: {model.__class__.__name__} {name}{kwds}')
-
-        self.model.maze.subscribe(log_event_fn)
+        model.maze.subscribe(log_event_fn)
 
     def size_to_terminal(self):
         win = self.root.data
