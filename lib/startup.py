@@ -1,4 +1,3 @@
-import os
 import curses
 from lib.logger import Logger
 from lib.screen_layout import WinLayout, Pos, Con, Dim
