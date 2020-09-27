@@ -29,7 +29,7 @@ class Screen:
     def __init__(self, name, parent, params):
         self.name = name
         self.params = params
-        self.parent = None
+        self.parent = parent
         self.children = []
 
         self.border = params.get('border', 1)
@@ -46,6 +46,10 @@ class Screen:
         # self.pos = None     # todo: manage these from layout manager
 
         self.logger = None
+
+        if parent:
+            self.curses = parent.curses
+            parent.children.append(self)
 
         # store consolidated window information in the root object
         if parent:
@@ -354,24 +358,8 @@ def create_win(parent, name, params):
     wintype = params.get('wintype', None)
 
     if wintype is None:
-        ret = BlankScreen(name, parent, params)
-    elif wintype == WinType.MAIN:
-        ret = MainScreen(name, parent, params)
-    elif wintype == WinType.TEXT:
-        ret = TextScreen(name, parent, params)
-    elif wintype == WinType.MAZE:
-        ret = MazeScreen(name, parent, params)
-    elif wintype == WinType.STATS:
-        ret = PlayerStatsScreen(name, parent, params)
-    else:
-        raise ValueError('unknown wintype "{}"'.format(wintype))
-
-    if parent:
-        ret.parent = parent
-        ret.parent.children.append(ret)
-        ret.curses = parent.curses
-
-    return ret
+        wintype = BlankScreen
+    return wintype(name, parent, params)
 
 # After root layout and all children are defined, call sync_delegates() on root layout to
 # build and/or refresh delegate screen dimensions

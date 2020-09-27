@@ -1,7 +1,7 @@
 import curses
 from lib.logger import Logger
 from lib.screen_layout import WinLayout, Pos, Con, Dim
-from lib.screen import create_win, WinType
+from lib.screen import create_win, MainScreen
 from lib.dummy_curses import DummyCurses
 import os
 
@@ -19,7 +19,7 @@ def create_root(dim=None, out=None, scr=None, name='root'):
         curseslib = DummyCurses(dim)
         scr = curseslib.term
 
-    root = WinLayout(None, name, Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), wintype=WinType.MAIN, border=0, scr=scr, curses=curseslib)
+    root = WinLayout(None, name, Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), wintype=MainScreen, border=0, scr=scr, curses=curseslib)
     root.dim = dim
     root.logger = Logger(out)
 

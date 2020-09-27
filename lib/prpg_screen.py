@@ -11,7 +11,7 @@ class PrpgScreen:
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.STATS, Con(6, 40, 6, 0), wintype=WinType.STATS)
+        main_panel.window(Win.STATS, Con(6, 40, 6, 0), wintype=PlayerStatsScreen)
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
@@ -20,13 +20,13 @@ class PrpgScreen:
         center = main_panel.panel('center_panel', Orient.HORI, None)
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
 
-        left_center.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=WinType.TEXT, trunc_y=Side.TOP)
-        left_center.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=WinType.MAZE, align_x=Side.CENTER, align_y = Side.CENTER)
+        left_center.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=Side.TOP)
+        left_center.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=Side.CENTER, align_y = Side.CENTER)
 
-        center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=WinType.TEXT, trunc_y=Side.TOP)
+        center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=Side.TOP)
 
         # Bottom Row
-        main_panel.window(Win.LOG, Con(4,30), wintype=WinType.TEXT, trunc_y=Side.TOP)
+        main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=Side.TOP)
         root.do_layout()
         sync_delegates(root)
         self.connect_models()
