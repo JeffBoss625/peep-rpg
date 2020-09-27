@@ -9,7 +9,7 @@ class Hector:
         self.args = []
 
     def collect(self, model, msg, **args):
-        self.args.append((model.__class__.__name__, msg) + tuple(args.values()))
+        self.args.append((model, msg) + tuple(args.values()))
 
     def print_args(self):
         for a in self.args:
@@ -27,17 +27,16 @@ def test_model_list():
 
     a.append(brog)
     assert a[0] == brog
-    assert hec1.args.pop() == ('ModelList', 'add', brog, 0)
-    assert hec2.args.pop() == ('ModelList', 'add', brog, 0)
+    assert hec1.args.pop() == (a, 'update', None, brog, 0)
+    assert hec2.args.pop() == (a, 'update', None, brog, 0)
     a.unsubscribe(hec2.collect)
 
     brog.hp = 333
-    assert hec1.args.pop() == ('Peep', 'update', 'hp', 333)
+    assert hec1.args.pop() == (brog, 'update', 0, 333, 'hp')
     assert hec2.args == []
     a[0] = spark
 
-    assert hec1.args.pop() == ('ModelList', 'add', spark, 0)
-    assert hec1.args.pop() == ('ModelList', 'remove', brog, 0)
+    assert hec1.args.pop() == (a, 'update', brog, spark, 0)
     brog.hp = 222
     a.append(brog)
     brog.hp = 111
