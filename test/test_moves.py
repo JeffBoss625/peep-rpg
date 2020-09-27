@@ -17,17 +17,17 @@ def test_maze_at_xy():
         '..####',
         '.#####',
     ]
-    assert mlib.maze_at_xy(maze, 0, 0) is None
-    assert mlib.maze_at_xy(maze, 1, 0) is None
-    wall = mlib.maze_at_xy(maze, 2, 0)
+    assert mlib.maze_at_pos(maze, (0,0)) is None
+    assert mlib.maze_at_pos(maze, (1,0)) is None
+    wall = mlib.maze_at_pos(maze, (2,0))
     assert wall.type == 'wall'
-    assert mlib.maze_at_xy(maze, 0, 1) is None
+    assert mlib.maze_at_pos(maze, (0,1)) is None
 
 def test_move_peep():
     peeps = [
-        Peep(name='p1', x=0, y=0),     # player information and state
-        Peep(name='p1', x=0, y=2),
-        Peep(name='p1', x=4, y=3),
+        Peep(name='p1', pos=(0,0)),     # player information and state
+        Peep(name='p1', pos=(0,2)),
+        Peep(name='p1', pos=(4,3)),
     ]
 
     walls = [
@@ -39,72 +39,64 @@ def test_move_peep():
     player = peeps[0]
     model = PrpgModel(walls=walls, peeps=peeps)
     mlib.move_peep(model, player, mlib.Direction.RIGHT)
-    assert player.x == 1 # x changed!
-    assert player.y == 0
+    assert player.pos == (1,0) # x changed!
 
     # Run into wall (right)
     mlib.move_peep(model, player, mlib.Direction.RIGHT)
-    assert player.x == 1
-    assert player.y == 0
+    assert player.pos == (1,0)
     # Run into wall diagnally-right
     mlib.move_peep(model, player, mlib.Direction.DOWN_RIGHT)
-    assert player.x == 1
-    assert player.y == 0
+    assert player.pos == (1,0)
     # Run into wall down
     mlib.move_peep(model, player, mlib.Direction.DOWN)
-    assert player.x == 1
-    assert player.y == 0
+    assert player.pos == (1,0)
     # Move down left without collision
     mlib.move_peep(model, player, mlib.Direction.DOWN_LEFT)
-    assert player.x == 0
-    assert player.y == 1
+    assert player.pos == (0,1)
 
 def test_move_attack():
     peeps = [
-        Peep(name='p1', x=0, y=1, attacks={'sword': Attack(damage='1d6')}),
-        Peep(name='m1', x=0, y=2, hp=5),
-        Peep(name='m2', x=4, y=3, hp=10),
+        Peep(name='p1', pos=(0,1), attacks={'sword': Attack(damage='1d6')}),
+        Peep(name='m1', pos=(0,2), hp=5),
+        Peep(name='m2', pos=(4,3), hp=10),
     ]
     player = peeps[0]
 
-    maze = [
+    walls = [
         '..####',
         '.#####',
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = PrpgModel(peeps=peeps, maze=maze)
+    model = PrpgModel(peeps=peeps, walls=walls)
     # Run into monster at [0,2]
     mlib.move_peep(model, player, mlib.Direction.DOWN)
-    assert player.x == 0
-    assert player.y == 1
+    assert player.pos == (0,1)
 
 
 def test_handle_enemy_move():
     peeps = [
-        Peep(name='p1', x=0, y=0),
-        Peep(name='m1', x=1, y=2),
-        Peep(name='m2', x=4, y=3),
+        Peep(name='p1', pos=(0,0)),
+        Peep(name='m1', pos=(1,2)),
+        Peep(name='m2', pos=(4,3)),
     ]
 
-    maze = [
+    walls = [
         '..####',
         '..####',
         '......',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = PrpgModel(peeps=peeps, maze=maze, player=peeps[0])
+    model = PrpgModel(peeps=peeps, walls=walls, player=peeps[0])
     enemy = peeps[1]
-    dx = model.player_model.x - enemy.x
-    dy = model.player_model.y - enemy.y
+    dx = model.maze.player.pos[0] - enemy.pos[0]
+    dy = model.maze.player.pos[0] - enemy.pos[0]
     edir = mlib.direction_from_vector(dx, dy)
 
     mlib.move_peep(model, enemy, edir)
-    assert enemy.x == 0
-    assert enemy.y == 1
+    assert enemy.pos == (0,1)
     mlib.move_peep(model, enemy, edir)
-    assert enemy.x == 0
-    assert enemy.y == 1
+    assert enemy.pos == (0,1)
 
 def test_direction_relative():
 

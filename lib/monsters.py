@@ -94,11 +94,10 @@ MONSTERS = [
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}
 
-def monster_by_name(name, x=0, y=0, hp=0):
+def monster_by_name(name, pos=(0,0), hp=0):
     ret = MONSTERS_BY_NAME[name]
     ret.hp = ret.maxhp if hp == 0 else hp
-    ret.x = x
-    ret.y = y
+    ret.pos = pos
     return ret
 
 def color_rep(dumper, data):

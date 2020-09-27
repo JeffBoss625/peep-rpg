@@ -53,8 +53,8 @@ class PrpgScreen:
         log = self.win(LOG).model
 
         def log_event_fn(model, msg, **kwds):
-            name = getattr(model, "name", "noname")
-            log.print(f'event: {model.__class__.__name__} "{name}" {msg} {kwds}')
+            name = getattr(model, '"name" ', '')
+            log.print(f'{msg}: {model.__class__.__name__} {name}{kwds}')
 
         self.win(MAZE).model.subscribe(log_event_fn)
 

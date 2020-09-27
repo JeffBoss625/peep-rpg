@@ -5,8 +5,13 @@ import lib.projectile as ammolib
 
 def create_projectile(direction, model):
     dx, dy = mlib.direction_to_dxdy(direction)
-    model.maze.peeps.append(ammolib.create_projectile('arrow', x=model.maze.player.x + dx,
-                         y=model.maze.player.y +dy, hp=1, direct=direction))
+    ammo = ammolib.create_projectile(
+        'arrow',
+        pos=(model.maze.player.pos[0] + dx, model.maze.player.pos[1] + dy),
+        hp=1,
+        direct=direction
+    )
+    model.maze.peeps.append(ammo)
 
 def parse_dice(dstring):
     parts = dstring.split("d")

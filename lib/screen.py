@@ -280,7 +280,7 @@ class MazeScreen(Screen):
         self.write_lines(self.model.walls.text, **params)
 
         for p in self.model.peeps:
-            self.write_char(p.x, p.y, p.char, p.fgcolor, p.bgcolor, **params)
+            self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
 class PlayerStatsScreen(Screen):
     def __init__(self, name, params):

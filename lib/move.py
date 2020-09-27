@@ -137,10 +137,11 @@ def direction_relative(direct, rotation):
 # failed (hit a wall)
 def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
-    dst = peep_at_xy(model.maze.peeps, p.x + dx, p.y + dy)
-    if maze_at_xy(model.maze.walls.text, p.x + dx, p.y + dy):
+    dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
+    dst = peep_at_pos(model.maze.peeps, dst_pos)
+    if maze_at_pos(model.maze.walls.text, dst_pos):
         if model.is_player(p) or isinstance(p, modellib.Ammo):
-            dst = maze_at_xy(model.maze.walls.text, p.x + dx, p.y + dy)
+            dst = maze_at_pos(model.maze.walls.text, dst_pos)
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
@@ -157,33 +158,30 @@ def move_peep(model, p, direct):
             if attacklib.attack(p, dst, weapon, model):
                 return True
             else:
-                p.x = p.x + dx
-                p.y = p.y + dy
+                p.pos = dst_pos
         else:
             weapon = attacklib.choose_melee_attack(p)
             attacklib.attack(p, dst, weapon, model)
             return True
 
     # all clear. just move
-    p.x += dx
-    p.y += dy
+    p.pos = (p.pos[0] + dx, p.pos[1] + dy)
     return True
 
 
-def peep_at_xy(peeps, x, y):
+def peep_at_pos(peeps, pos):
     for p in peeps:
-        if x == p.x:
-            if y == p.y:
-                return p
+        if p.pos == pos:
+            return p
     return None
 
-def maze_at_xy(maze, x, y):
-    line = maze[y]
-    char = line[x]
+def maze_at_pos(maze, pos):
+    line = maze[pos[1]]
+    char = line[pos[0]]
     if char == '#':
-        return Peep(name='Wally', type='wall', hp= 1000, ac= 20, char=char, x=x, y=y)
+        return Peep(name='Wally', type='wall', hp= 1000, ac= 20, char=char, pos=pos)
     elif char == '%':
-        return Peep(name='Wally', type='wall', hp= 999999999999, ac=20, char=char, x=x, y=y)
+        return Peep(name='Wally', type='wall', hp= 999999999999, ac=20, char=char, pos=pos)
     else:
         return None
 

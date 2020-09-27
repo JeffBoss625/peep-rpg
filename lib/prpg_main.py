@@ -37,10 +37,10 @@ MAZE = [
 
 
 PEEPS = [
-    player_by_name('Bo Bo the Destroyer', x=1, y=2, hp=100, speed=33),
-    monster_by_name('Thark', x=2, y=2, hp=10),
-    monster_by_name('Spark', x=24, y=7, hp=50),
-    monster_by_name('Brog', x=14, y=20, hp=200,)
+    player_by_name('Bo Bo the Destroyer', pos=(1,2), hp=100, speed=33),
+    monster_by_name('Thark', pos=(2,2), hp=10),
+    monster_by_name('Spark', pos=(24,7), hp=50),
+    monster_by_name('Brog', pos=(14,20), hp=200,)
 ]
 
 DIRECTION_KEYS = {
@@ -103,12 +103,12 @@ def monster_turn(model, monster):
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
     elif monster.move_tactic == 'seek':
-        dx = model.maze.player.x - monster.x
-        dy = model.maze.player.y - monster.y
+        dx = model.maze.player.pos[0] - monster.pos[0]
+        dy = model.maze.player.pos[1] - monster.pos[1]
         if model.maze.player.hp <= 0:
             return 'q'
         if monster.hp/monster.maxhp < 0.3:
-            direct = mlib.direction_from_vector(-dx, -dy) #If low health, run away
+            direct = mlib.direction_from_vector(-dx, -dy)  # If low health, run away
         else:
             direct = mlib.direction_from_vector(dx, dy)
         if mlib.move_peep(model, monster, direct):

@@ -108,7 +108,7 @@ class ModelList(list, PubSub):
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
-    # ** NOTE ** __init__() is called by @dataclass __postinit__()
+    # ** NOTE ** __init__() must be called by @dataclass __postinit__()
     def __init__(self):
         super().__init__()
 
@@ -137,15 +137,21 @@ class DataModel(PubSub):
     def model_name(cls):
         return cls.__name__.lower()
 
-@dataclass(frozen=True)
+@dataclass
 class Attack(DataModel):
+    def __post_init__(self):
+        super().__init__()
+
     damage: str = '1d1'
     range: int = 0
     blowback: int = 0
 
 
-@dataclass()
+@dataclass
 class Ammo(DataModel):
+    def __post_init__(self):
+        super().__init__()
+
     name: str = ''
     char: str = '?'
     fgcolor: str = Color.WHITE
@@ -157,8 +163,7 @@ class Ammo(DataModel):
 
     # temp state
     tics: int = 0
-    x: int = 0
-    y: int = 0
+    pos: tuple = field(default_factory=tuple)
     attacks: dict = field(default_factory=dict)
     move_tactic: str = 'straight'
     direct: int = 0
@@ -184,11 +189,10 @@ class Peep(DataModel):
 
     hp: int = 0
     tics: int = 0
-    x: int = 0
-    y: int = 0
+    pos: tuple = field(default_factory=tuple)
     attacks: dict = field(default_factory=lambda: ModelDict())
 
-    _yaml_ignore = {'tics', 'x', 'y'}
+    _yaml_ignore = {'tics', 'pos'}
 
 
 class TextModel(PubSub):
@@ -230,7 +234,7 @@ def _getstate(sdict, cdict):
 
     return ret
 
-def _model_getstate(self):
+def _datamodel_getstate(self):
     return _getstate(self.__dict__, self.__class__.__dict__)
 
 def _to_yaml(tag, cls):
@@ -249,7 +253,7 @@ def reg(cls):
     yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
     yaml.Loader.add_constructor(tag, _from_yaml(cls))
 
-    cls.__getstate__ = _model_getstate
+    cls.__getstate__ = _datamodel_getstate
 
 def init_cls():
     for cls in [Peep, Ammo, Attack]:
