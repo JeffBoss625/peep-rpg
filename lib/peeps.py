@@ -1,5 +1,10 @@
-from dataclasses import dataclass
-from lib.model import *
+from dataclasses import dataclass, field, MISSING
+from typing import List, Dict
+
+from lib.constants import Color
+from lib.items import Ammo
+from lib.model import DataModel, ModelDict, register_yaml, PubSub
+from yaml import dump
 
 
 @dataclass
@@ -33,8 +38,8 @@ class Peep(DataModel):
 
     hp: int = 0
     tics: int = 0
-    pos: tuple = field(default_factory=tuple)
-    attacks: dict = field(default_factory=lambda: ModelDict())
+    pos: tuple = field(default=(0,0))
+    attacks: Dict[str, PubSub] = field(default_factory=ModelDict)
 
     _yaml_ignore = {'tics', 'pos'}
 
@@ -48,6 +53,8 @@ def printargs(model, msg, **args):
     print(model.__class__.__name__, model.name, msg, args)
 
 
+init_cls()
+
 if __name__ == '__main__':
     p = Peep('bill')
     p.subscribe(printargs)
@@ -55,6 +62,10 @@ if __name__ == '__main__':
     p.name = 'bbb'
     p.hp = 2
     p.hp = 2
+    p.attacks['bite'] = Attack(damage='3d6')
+
+    print('DUMP:')
+    print(dump(p))
 
     # a = ModelDict()
     # a.subscribe(printargs)

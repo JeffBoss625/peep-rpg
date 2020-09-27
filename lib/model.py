@@ -1,6 +1,6 @@
 # Data model for
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, MISSING
 from lib.constants import Color
 import yaml
 
@@ -64,6 +64,9 @@ class ModelDict(dict, PubSub):
             return
         super().__setitem__(k, v)
         self.publish_update(prev, v, key=k)
+
+    def __getstate__(self):
+        return self.copy()
 
     def submodels(self):
         return self.values()
@@ -137,24 +140,16 @@ class DataModel(PubSub):
     def model_name(cls):
         return cls.__name__.lower()
 
+def yaml_friendly(v):
+    if hasattr(v, '__getstate__'):
+        v = v.__getstate__()
+    elif isinstance(v, tuple):
+        v = list(v)
+    return v
+
 #
 # YAML Serialization Functions
 #
-def _getstate(sdict, cdict):
-    nocopy = getattr(dict, '_yaml_ignore', {})
-    ret = {}
-    for k in sdict:
-        if k[0] == '_' or k in nocopy:
-            continue
-        v = sdict[k]
-        if k in cdict and v == cdict[k]:
-            continue
-
-        if isinstance(v, ModelDict):
-            v = v.copy()    # as regular dict
-        ret[k] = v
-
-    return ret
 
 class TextModel(PubSub):
     def __init__(self, model_name, text=None):
@@ -178,7 +173,25 @@ class TextModel(PubSub):
 
 
 def _datamodel_getstate(self):
-    return _getstate(self.__dict__, self.__class__.__dict__)
+    sdict = self.__dict__
+    fields = self.__class__.__dataclass_fields__
+
+    nocopy = getattr(dict, '_yaml_ignore', {})
+    ret = {}
+    for k in sdict:
+        if k[0] == '_' or k in nocopy:
+            continue
+        v = sdict[k]
+        if k in fields:
+            fld = fields[k]
+            if fld.default != MISSING:
+                if v == fld.default:
+                    continue
+            elif v == fld.default_factory():
+                continue
+
+        ret[k] = yaml_friendly(v)
+    return ret
 
 def _to_yaml(tag, cls):
     def fn(dpr, v):
