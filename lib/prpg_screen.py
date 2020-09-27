@@ -75,13 +75,7 @@ class PrpgScreen:
     # paint the entire screen - all that is visible
     def paint(self, force=False):
         self.win(MAIN).paint(force=force)
-        self.win(STATS).paint(force=force)
-        self.win(MAZE).paint(force=force)
-        self.win(MESSAGES).paint(force=force)
-        self.win(LOG).paint(force=force)
-        self.win(BANNER).paint(force=force)
 
-        self.root.data.curses.doupdate()
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
 #     screen = PrpgScreen(None, model)

@@ -161,14 +161,14 @@ class Screen:
         self.clear()
         if self.border:
             self.scr.border()
-        self.do_paint()
+        self.do_paint(force=force)
         # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
         self.needs_paint = False
-        # if self.parent is None:
-        #     self.doupdate()
+        if self.parent is None:
+            self.doupdate()
 
-    def do_paint(self):
+    def do_paint(self, force=False):
         raise NotImplementedError()
 
     def paint_all(self, force=False):
@@ -272,14 +272,14 @@ class TextScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self):
+    def do_paint(self, force=False):
         self.write_lines(self.model.text, **self.params)
 
 class MazeScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self):
+    def do_paint(self, force=False):
         text_h = len(self.model.walls.text)
         text_w = len(self.model.walls.text[0])
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
@@ -292,7 +292,7 @@ class PlayerStatsScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self):
+    def do_paint(self, force=False):
         p = self.model.player
         self.write_lines([
             p.name,
@@ -304,15 +304,16 @@ class BlankScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self):
+    def do_paint(self, force=False):
         pass
 
 class MainScreen(Screen):
     def __init__(self, name, params):
         super().__init__(name, params)
 
-    def do_paint(self):
-        pass
+    def do_paint(self, force=False):
+        for win in self.children:
+            win.paint(force=force)
 
 def create_win(parent, name, params):
     wintype = params.get('wintype', None)
