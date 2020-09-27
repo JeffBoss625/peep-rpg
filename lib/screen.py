@@ -4,8 +4,13 @@ import sys
 
 from lib.constants import Color, Side
 from lib.logger import Logger
-from lib.screen_layout import WIN, Pos, Dim, min0
+from lib.screen_layout import Pos, Dim, min0
 
+class WIN:
+    MAIN = "MAIN"
+    TEXT = "MESSAGE"
+    MAZE = "MAZE"
+    STATS = "STATS"
 
 def printe(s):
     sys.stderr.write(s + "\n")
@@ -295,9 +300,9 @@ class PlayerStatsScreen(Screen):
             ])
 
 def create_win(parent, name, params):
-    wintype = params.get('wintype', WIN.FIXED)
+    wintype = params.get('wintype', WIN.TEXT)
 
-    if wintype == WIN.FIXED:
+    if wintype == WIN.MAIN:
         ret = Screen(name, params)
     elif wintype == WIN.TEXT:
         ret = TextScreen(name, params)
