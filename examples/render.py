@@ -92,13 +92,13 @@ class Handler:
             root.data.scr.clear()
             root.data.rebuild_screens()
 
-            leftwin = root.info.win_by_name['leftwin']
+            leftwin = root.info.comp_by_name['leftwin']
             if leftwin.data.scr:
                 leftwin.data.scr.addstr(2,2, "term_size: {}".format(leftwin.dim))
-            rightwin = root.info.win_by_name['rightwin']
+            rightwin = root.info.comp_by_name['rightwin']
             if rightwin.data.scr:
                 rightwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
-            lowerwin = root.info.win_by_name['lowerwin']
+            lowerwin = root.info.comp_by_name['lowerwin']
             if lowerwin.data.scr:
                 lowerwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
 

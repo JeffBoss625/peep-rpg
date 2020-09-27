@@ -5,11 +5,17 @@ from lib.screen import create_win, WIN
 from lib.dummy_curses import DummyCurses
 import os
 
-def create_root(dim, out=None, scr=None):
+def create_root(dim=None, out=None, scr=None):
     if scr:
+        if dim:
+            raise ValueError('when scr is specified, dim is not supported')
         curseslib = curses
         curses.get_terminal_size = os.get_terminal_size
+        w, h = os.get_terminal_size()
+        dim = Dim(h, w)
     else:
+        if not dim:
+            dim = Dim(40,120)
         curseslib = DummyCurses(dim)
         scr = curseslib.term
 
@@ -24,9 +30,7 @@ def create_root(dim, out=None, scr=None):
 # callback using curses.wrapper and providing an initialized root layout component to simplify
 # startup.
 def curses_wrapper(fn, out=None):
-    w, h = os.get_terminal_size()
-    dim = Dim(h, w)
-    curses.wrapper(lambda scr: fn(create_root(dim, out, scr)))
+    curses.wrapper(lambda scr: fn(create_root(out=out, scr=scr)))
 
 
 # note - to set terminal size on windows machines: os.system("mode con cols=120 lines=40")

@@ -1,6 +1,5 @@
-import lib.dummy_curses as dcurses
 from lib.model import TextModel
-from lib.screen import sync_delegates
+from lib.screen import sync_delegates, WIN
 from lib.screen_layout import *
 import sys
 
@@ -40,7 +39,7 @@ def test_addcol():
 # when variables are resolved, so we call "cpos = col.pos()..." as separate steps reveal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
     root = create_root(rootdim)
-    col = root.panel(Orient.VERT, colpos, colcon)
+    col = root.panel('pan1', Orient.VERT, colpos, colcon)
     root.do_layout()
 
     ccon = col.con
@@ -130,7 +129,7 @@ def test_layout_horizontal():
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = create_root(dim)
     root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
-    panel = root.panel(orient, pos, con)
+    panel = root.panel('root-pan', orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
 
@@ -178,10 +177,10 @@ def test_paint():
     root = create_root(Dim(15, 100))
     hpan = root.panel('root-panel', Orient.HORI, None, None)
 
-    w1 = hpan.window('w1', Con(4, 10, 5, 20), type=WIN.TEXT)
-    w2 = hpan.window('w2', Con(3,5,8,10), type=WIN.TEXT)
+    w1 = hpan.window('w1', Con(4, 10, 5, 20), wintype=WIN.TEXT)
+    w2 = hpan.window('w2', Con(3,5,8,10), wintype=WIN.TEXT)
     root.do_layout()
-    sync_delegates(root, root.curses)
+    sync_delegates(root)
 
     w1.data.model = TextModel('model 1', 'window 1')
     w2.data.model = TextModel('model 2')
@@ -192,9 +191,9 @@ def test_paint():
     root.data.doupdate()
     # print_win(root)
 
-    assert root.info.win_by_name['w1'].name == 'w1'
-    assert root.info.win_by_name['w2'].name == 'w2'
-    assert root.info.win_by_name['root'].name == 'root'
+    assert root.info.comp_by_name['w1'].name == 'w1'
+    assert root.info.comp_by_name['w2'].name == 'w2'
+    assert root.info.comp_by_name['root'].name == 'root'
     assert hpan.con == Con(4,15,8,30)
 
     root.clear_layout()

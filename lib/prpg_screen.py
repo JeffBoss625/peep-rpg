@@ -39,7 +39,6 @@ class PrpgScreen:
         sync_delegates(root)
         self.connect_models()
         root.data.rebuild_screens()
-        root.data.curses.curs_set(0)
 
     def connect_models(self):
         # connect models to screens

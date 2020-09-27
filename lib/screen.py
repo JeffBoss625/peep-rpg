@@ -167,8 +167,7 @@ class Screen:
         self.needs_paint = False
 
     def do_paint(self):
-        pass
-        # raise NotImplementedError()
+        raise NotImplementedError()
 
     def paint_all(self, force=False):
         self.paint(force=force)
@@ -299,11 +298,27 @@ class PlayerStatsScreen(Screen):
             'speed: ' + str(p.speed),
             ])
 
-def create_win(parent, name, params):
-    wintype = params.get('wintype', WIN.TEXT)
+class BlankScreen(Screen):
+    def __init__(self, name, params):
+        super().__init__(name, params)
 
-    if wintype == WIN.MAIN:
-        ret = Screen(name, params)
+    def do_paint(self):
+        pass
+
+class MainScreen(Screen):
+    def __init__(self, name, params):
+        super().__init__(name, params)
+
+    def do_paint(self):
+        pass
+
+def create_win(parent, name, params):
+    wintype = params.get('wintype', None)
+
+    if wintype is None:
+        ret = BlankScreen(name, params)
+    elif wintype == WIN.MAIN:
+        ret = MainScreen(name, params)
     elif wintype == WIN.TEXT:
         ret = TextScreen(name, params)
     elif wintype == WIN.MAZE:

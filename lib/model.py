@@ -213,7 +213,7 @@ class TextModel(PubSub):
         slines = []
         for s in lines: slines.extend(s.split('\n'))
         self.text.extend(slines)
-        self.publish(self, 'update', added=slines)
+        self.publish_update(None, lines)
 
 #
 # YAML Serialization Functions
