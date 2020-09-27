@@ -1,14 +1,14 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import time
 import sys
+from dataclasses import dataclass, field
 
 from lib.constants import Color, Side
-from lib.logger import Logger
 from lib.screen_layout import Pos, Dim, min0
 
-class WIN:
+class WinType:
     MAIN = "MAIN"
-    TEXT = "MESSAGE"
+    TEXT = "TEXT"
     MAZE = "MAZE"
     STATS = "STATS"
 
@@ -19,9 +19,14 @@ IGNORED_KEYS = {
     'KEY_RESIZE': 1,
 }
 
+@dataclass
+class RootInfo:
+    win_count: int = 0
+    win_by_name: dict = field(default_factory=dict)
+
 # abstraction wrapping a curses screen.
 class Screen:
-    def __init__(self, name, params):
+    def __init__(self, name, parent, params):
         self.name = name
         self.params = params
         self.parent = None
@@ -41,6 +46,25 @@ class Screen:
         # self.pos = None     # todo: manage these from layout manager
 
         self.logger = None
+
+        # store consolidated window information in the root object
+        if parent:
+            root = parent
+            while root.parent:
+                root = root.parent
+        else:
+            self.info = RootInfo()
+            root = self
+
+        root.info.win_count += 1
+        self.id = root.info.win_count
+        if not self.name:
+            self.name = f'comp{self.id}'
+        if hasattr(root.info.win_by_name, self.name):
+            raise ValueError(f'multiple components with the same name: "{self.name}"')
+
+        root.info.win_by_name[self.name] = self
+
 
     def __repr__(self):
         return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
@@ -243,15 +267,15 @@ def align_y_offset(align_y, margin_y, nlines, max_h):
 
 
 class TextScreen(Screen):
-    def __init__(self, name, params):
-        super().__init__(name, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
 
     def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
 class MazeScreen(Screen):
-    def __init__(self, name, params):
-        super().__init__(name, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
 
     def do_paint(self):
         text_h = len(self.model.walls.text)
@@ -263,8 +287,8 @@ class MazeScreen(Screen):
             self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
 class PlayerStatsScreen(Screen):
-    def __init__(self, name, params):
-        super().__init__(name, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
 
     def do_paint(self):
         p = self.model.player
@@ -275,12 +299,22 @@ class PlayerStatsScreen(Screen):
             ])
 
 class BlankScreen(Screen):
-    def __init__(self, name, params):
-        super().__init__(name, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+
+# windows
+class Win:
+    STATS = 'stats'
+    MAZE = 'maze'
+    MESSAGES = 'messages'
+    MAIN = 'main'
+    LOG = 'log'
+    BANNER = 'banner'
 
 class MainScreen(Screen):
-    def __init__(self, name, params):
-        super().__init__(name, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
 
@@ -305,19 +339,30 @@ class MainScreen(Screen):
         self.dim = Dim(h, w)
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
 
+    def __setattr__(self, k, v):
+        object.__setattr__(self, k, v)
+        if v and k == 'model':
+            by_name = self.info.win_by_name
+            by_name[Win.MESSAGES].model = self.model.message_model
+            by_name[Win.LOG].model = self.model.log_model
+            by_name[Win.MAZE].model = self.model.maze
+            by_name[Win.STATS].model = self.model.maze
+            by_name[Win.BANNER].model = self.model.banner
+
+
 def create_win(parent, name, params):
     wintype = params.get('wintype', None)
 
     if wintype is None:
-        ret = BlankScreen(name, params)
-    elif wintype == WIN.MAIN:
-        ret = MainScreen(name, params)
-    elif wintype == WIN.TEXT:
-        ret = TextScreen(name, params)
-    elif wintype == WIN.MAZE:
-        ret = MazeScreen(name, params)
-    elif wintype == WIN.STATS:
-        ret = PlayerStatsScreen(name, params)
+        ret = BlankScreen(name, parent, params)
+    elif wintype == WinType.MAIN:
+        ret = MainScreen(name, parent, params)
+    elif wintype == WinType.TEXT:
+        ret = TextScreen(name, parent, params)
+    elif wintype == WinType.MAZE:
+        ret = MazeScreen(name, parent, params)
+    elif wintype == WinType.STATS:
+        ret = PlayerStatsScreen(name, parent, params)
     else:
         raise ValueError('unknown wintype "{}"'.format(wintype))
 

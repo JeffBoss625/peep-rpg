@@ -1,7 +1,8 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
 
 # Size and location of a Comp(ononent) in it's parent window.
 @dataclass
@@ -167,7 +168,7 @@ class Layout:
         root.info.comp_count += 1
         self.id = root.info.comp_count
         if not self.name:
-            self.name = 'comp{}'.format(self.id)
+            self.name = f'comp{self.id}'
         if hasattr(root.info.comp_by_name, self.name):
             raise ValueError(f'multiple components with the same name: "{self.name}"')
 
@@ -225,7 +226,7 @@ class Layout:
 @dataclass
 class RootInfo:
     comp_count: int = 0
-    comp_by_name = {}
+    comp_by_name: dict = field(default_factory=dict)
 
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
