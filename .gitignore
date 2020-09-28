@@ -3,4 +3,5 @@ game.iml
 inspectionProfiles
 *.xml
 *.iml
+*.log
 venv
