@@ -4,6 +4,9 @@
 #    curses.COLOR_BLUE
 #    etc...
 #
+from dataclasses import dataclass
+
+
 class Color:
     BLACK = 'BLACK'
     BLUE = 'BLUE'
@@ -26,7 +29,7 @@ class Side:
     RIGHT = 'RIGHT'
     CENTER = 'CENTER'
 
-# ITEM SLOTS
+# BODY SLOTS for wearing items
 class Slot:
     # Upper Bodywear
     HEAD: 'HEAD'                    # helmet, crown, hood, hat, ...

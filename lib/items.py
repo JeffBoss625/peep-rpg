@@ -3,19 +3,6 @@ from dataclasses import dataclass, field
 from lib.constants import Color
 from lib.model import DataModel
 
-# specialized holding capacity for specific item types (scabbards, knife-belts, quivers...)
-class SlotType:
-    DART = 'DART'
-    KNIFE = 'KNIFE'
-    SWORD = 'SWORD'
-    ARROW = 'ARROW'
-    BOW = 'BOW'          # e.g. bow or crossbow shoulder-sling or belt-sling
-    BOLT = 'BOLT'
-    PELLET = 'PELLET'
-    AXE = 'AXE'          # includes pickaxe
-    WAND = 'WAND'
-    VIAL = 'VIAL'        # small potions, liquids
-    CANTEEN = 'CANTEEN'  # e.g. belt clip that holds a large liquid container, wineskin, ... (multi-dose)
 
 @dataclass
 class Item(DataModel):
@@ -45,7 +32,7 @@ class GeneralContainer(Item):
     # QUIVER: 'QUIVER'                # on back: bolts, arrows, ...
     # BELT_UPPER: 'BELT_UPPER'        # on waist: throwing knives, sword, darts, pick-axe, throwing axes, bag of sling shot, ...
     # BELT_LOWER: 'BELT_LOWER'        # on waist: throwing knives, sword, darts, pick-axe, throwing axes, bag of sling shot, ...
-    # WEAPON_SLOT: 'WEAPON_SLOT'      # wielding: sword that shoots small blades, double-crossbow with 2 loaded rounds
+    # WEAPON_SLOT: 'WEAPON_SLOT'      # wielding: sword that fires small blades, double-crossbow with 2 loaded rounds
     # POCKET: 'POCKET'                # pants and jackets may have pockets that can hold rings, shot, etc.
     #
     # # STORAGE
@@ -53,9 +40,35 @@ class GeneralContainer(Item):
     # BAG: 'BAG'                      # hold in hand, holds multiple items at ready
     # LARGE_SACK: 'LARGE_SACK'        # hold in 1 hand AND on back (2 slots). holds more stuff
 
+
+# slots for items that match them with holsters (scabbards, knife-belts, quivers...)
+@dataclass
+class HolsterSlotType:
+    name: str = ''
+
+
+HOLSTER_SLOTS = [
+    'dart',
+    'knife',
+    'sword',
+    'arrow',
+    'bow',          # e.g. bow or crossbow shoulder-sling or belt-sling
+    'bolt',
+    'pellet',
+    'axe',          # handled tool such as axe, pickaxe, or hammer
+    'wand',
+    'vial',         # small potions, liquids
+    'canteen',      # large liquid container, wineskin, ... (multi-dose)
+]
+
+# slots for wearing/wielding items
+BODY_SLOTS = [
+    'head'
+]
+
 # A specialized slot that holds a single item
 @dataclass
-class ItemSlot:
+class HolsterSlot:
     holds_slot_type: str = ''
     weight_cap: int = 0
     size_cap: tuple = field(default_factory=tuple)  # volume holding capacity width, length, height in inches
@@ -64,22 +77,22 @@ class ItemSlot:
 class Holster(Item):
     slots: tuple = field(default_factory=tuple)     # item slots supported
 
-# A weapon that shoots Ammo
+# A weapon that launches items at higher speed than could be simply thrown
 @dataclass
 class Shooter(Item):
-    shoots_slot_type: str = ''
-    shoot_speed: int = 0
-    shoot_thaco: int = 0
-    acceleration: int = 0       # 1/10,000 percent change in speed per square traveled (negative is deceleration)
+    shot_slot_type: str = ''
+    shot_speed: int = 0
+    shot_thaco: int = 0
+    shot_deceleration: int = 0       # 1/10,000 percent change in speed per square traveled (negative is deceleration)
 
 # A Shooter transfers velocity
 @dataclass
 class Bow(Shooter):
     def __post_init__(self):
-        self.shoots_slot_type = SlotType.ARROW
-        self.shoot_speed = 100      # deceleration: speed += distance * (acceleration/10,000)
-        self.acceleration = -100    # 1% speed loss per square
-        self.shoot_thaco = 20       # could replace this with distance tables. should be affected by armor type.
+        self.shot_slot_type = HolsterSlotType.ARROW
+        self.shot_speed = 100           # speed -= distance * (deceleration/10,000)
+        self.shot_deceleration = 100    # 1% speed loss per square
+        self.shot_thaco = 20            # could replace this with distance tables. should be affected by armor type.
 
 @dataclass
 class Ammo(Item):
@@ -101,5 +114,5 @@ class Ammo(Item):
 if __name__ == '__main__':
     s = Bow('short bow', '}')
     print(s)
-    a = Ammo('dart', '/', slot_type=SlotType.DART)
+    a = Ammo('dart', '/', slot_type=HolsterSlotType.DART)
     print(a)

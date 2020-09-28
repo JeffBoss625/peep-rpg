@@ -1,11 +1,25 @@
 from dataclasses import dataclass, field, MISSING
-from typing import List, Dict
+from typing import Dict, Tuple, List
 
 from lib.constants import Color
 from lib.items import Ammo
 from lib.model import DataModel, ModelDict, register_yaml, PubSub
 from yaml import dump
 
+@dataclass
+class BodyPart:
+    name: str = ''
+    size: Tuple[int] = field(default=(0,0,0))
+    weight: int = 0
+
+
+class Body(DataModel):
+    parts: Tuple[BodyPart] = field(default=())      # BodyParts in order top to bottom
+    weight: int = 0
+    size: Tuple[int] = field(default=(0,0,0))
+
+    def __post_init__(self):
+        self.weight = sum(p.weight for p in self.parts)
 
 @dataclass
 class Attack(DataModel):
@@ -44,16 +58,11 @@ class Peep(DataModel):
     _yaml_ignore = {'tics', 'pos'}
 
 
-def init_cls():
-    for cls in [Peep, Ammo, Attack]:
-        register_yaml(cls)
-
-
 def printargs(model, msg, **args):
     print(model.__class__.__name__, model.name, msg, args)
 
 
-init_cls()
+register_yaml((Peep, Ammo, Attack))
 
 if __name__ == '__main__':
     p = Peep('bill')
@@ -62,6 +71,7 @@ if __name__ == '__main__':
     p.name = 'bbb'
     p.hp = 2
     p.hp = 2
+    p.pos = (3,4)
     p.attacks['bite'] = Attack(damage='3d6')
 
     print('DUMP:')

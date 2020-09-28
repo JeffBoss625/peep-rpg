@@ -1,8 +1,8 @@
 # Data model for
 
-from dataclasses import dataclass, field, MISSING
-from lib.constants import Color
+from dataclasses import dataclass, field, MISSING, astuple
 import yaml
+import re
 
 # special value (used simply as a class, not instance) to indicate non-existent items with obj.get(key, default)
 class NotSet:
@@ -136,9 +136,6 @@ class DataModel(PubSub):
                 ret.append(v)
         return ret
 
-    @classmethod
-    def model_name(cls):
-        return cls.__name__.lower()
 
 def yaml_friendly(v):
     if hasattr(v, '__getstate__'):
@@ -171,7 +168,7 @@ class TextModel(PubSub):
         self.text.extend(slines)
         self.publish_update(None, lines)
 
-
+# return only values that are different from field defaults
 def _datamodel_getstate(self):
     sdict = self.__dict__
     fields = self.__class__.__dataclass_fields__
@@ -203,10 +200,61 @@ def _from_yaml(cls):
         return ldr.construct_yaml_object(node, cls)
     return fn
 
-def register_yaml(cls):
-    tag = '!' + cls.model_name()
+def default_model_name(cls):
+    return cls.__name__.lower()
 
-    yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
-    yaml.Loader.add_constructor(tag, _from_yaml(cls))
+def register_yaml(classes):
+    for cls in classes:
+        cls.model_name = default_model_name
+        tag = '!' + cls.model_name(cls)
 
-    cls.__getstate__ = _datamodel_getstate
+        yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
+        yaml.Loader.add_constructor(tag, _from_yaml(cls))
+
+        # cls.__getstate__ = _datamodel_getstate
+
+@dataclass
+class Size:
+    wid: int = 0
+    hgt: int = 0
+    len: int = 0
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        v = loader.construct_scalar(node)
+        w,h,l = map(int, v.split('x'))
+        return Size(w,h,l)
+
+    @classmethod
+    def to_yaml(cls, dumper, v):
+        return dumper.represent_scalar('!size', f'{v.wid}x{v.hgt}x{v.len}')
+
+    @classmethod
+    def yaml_pattern(cls):
+        return re.compile(r'^\d+x\d+x\d+$')
+
+# register_yaml([Size])
+
+
+if __name__ == '__main__':
+
+    sre = re.compile(r'^\d+,\d+,\d+\$')
+    m = sre.match('sz(3,55,2)')
+    yaml.add_implicit_resolver('!size', Size.yaml_pattern())
+    yaml.add_representer(Size, Size.to_yaml)
+    yaml.add_constructor('!size', Size.from_yaml)
+
+
+    s = Size(3,4,5)
+    sstr = yaml.dump({'xxx': s}, default_flow_style=False)
+    print(sstr)
+    s = yaml.load(sstr, Loader=yaml.Loader)
+    print(s)
+
+
+
+    # yaml.add_representer(Size, size_repr)
+    # pattern = re.compile(r'^sz\(\d+,\d+,\d+\)$')
+    # yaml.add_implicit_resolver('!size', pattern)
+    # s = Size(2, -3, 4)
+    # print(yaml.dump({'xxx': s}))
