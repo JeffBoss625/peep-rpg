@@ -3,20 +3,25 @@ from typing import Dict, Tuple, List
 
 from lib.constants import Color
 from lib.items import Ammo
-from lib.model import DataModel, ModelDict, register_yaml, PubSub
+from lib.model import DataModel, ModelDict, register_yaml, PubSub, Size
 from yaml import dump
+
+@dataclass
+class BodySlot:
+    name: str = ''
 
 @dataclass
 class BodyPart:
     name: str = ''
-    size: Tuple[int] = field(default=(0,0,0))
+    size: Size = field(default=Size())
     weight: int = 0
+    slot: BodySlot = field(default=BodySlot())
 
 
 class Body(DataModel):
     parts: Tuple[BodyPart] = field(default=())      # BodyParts in order top to bottom
     weight: int = 0
-    size: Tuple[int] = field(default=(0,0,0))
+    size: Size = field(default=Size())
 
     def __post_init__(self):
         self.weight = sum(p.weight for p in self.parts)

@@ -208,8 +208,15 @@ def register_yaml(classes):
         cls.model_name = default_model_name
         tag = '!' + cls.model_name(cls)
 
-        yaml.Dumper.add_representer(cls, _to_yaml(tag, cls))
-        yaml.Loader.add_constructor(tag, _from_yaml(cls))
+        to_yaml = getattr(cls, 'to_yaml', _to_yaml(tag, cls))
+        yaml.Dumper.add_representer(cls, to_yaml)
+
+        from_yaml = getattr(cls, 'from_yaml', _from_yaml(cls))
+        yaml.Loader.add_constructor(tag, from_yaml)
+
+        pat = getattr(cls, 'yaml_pattern', None)
+        if pat:
+            yaml.add_implicit_resolver(tag, pat())
 
         # cls.__getstate__ = _datamodel_getstate
 
@@ -233,28 +240,14 @@ class Size:
     def yaml_pattern(cls):
         return re.compile(r'^\d+x\d+x\d+$')
 
-# register_yaml([Size])
 
 
 if __name__ == '__main__':
 
-    sre = re.compile(r'^\d+,\d+,\d+\$')
-    m = sre.match('sz(3,55,2)')
-    yaml.add_implicit_resolver('!size', Size.yaml_pattern())
-    yaml.add_representer(Size, Size.to_yaml)
-    yaml.add_constructor('!size', Size.from_yaml)
-
+    register_yaml([Size])
 
     s = Size(3,4,5)
     sstr = yaml.dump({'xxx': s}, default_flow_style=False)
     print(sstr)
     s = yaml.load(sstr, Loader=yaml.Loader)
-    print(s)
-
-
-
-    # yaml.add_representer(Size, size_repr)
-    # pattern = re.compile(r'^sz\(\d+,\d+,\d+\)$')
-    # yaml.add_implicit_resolver('!size', pattern)
-    # s = Size(2, -3, 4)
-    # print(yaml.dump({'xxx': s}))
+    print('loaded:', s)
