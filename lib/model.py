@@ -243,11 +243,4 @@ class Size:
 
 
 if __name__ == '__main__':
-
-    register_yaml([Size])
-
-    s = Size(3,4,5)
-    sstr = yaml.dump({'xxx': s}, default_flow_style=False)
-    print(sstr)
-    s = yaml.load(sstr, Loader=yaml.Loader)
-    print('loaded:', s)
+    Size(3,4,5)

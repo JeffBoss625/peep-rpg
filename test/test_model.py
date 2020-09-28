@@ -42,3 +42,10 @@ def test_model_list():
     brog.hp = 111
 
     a.unsubscribe(hec1.collect)
+
+def test_yaml():
+    register_yaml([Size])
+
+    s = Size(3,4,5)
+    sstr = yaml.dump({'xxx': s})
+    assert sstr == 'xxx: 3x4x5\n'
