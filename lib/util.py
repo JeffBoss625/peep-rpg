@@ -4,6 +4,9 @@ import yaml
 
 
 class DotDict(dict):
+    def __init__(self, *args, **kwds):
+        super().__init__(*args, **kwds)
+
     def __getattr__(self, k):
         if k[0] == '_':
             return object.__getattribute__(self, k)
