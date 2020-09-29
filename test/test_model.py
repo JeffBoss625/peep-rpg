@@ -66,7 +66,7 @@ def test_list():
 def test_dict():
     a = ModelDict()
     a['a'] = 1
-    a['b'] = 2
+    a.b = 2
     a['c'] = 3
     astr = yaml.dump(a, Dumper=yaml.Dumper, default_flow_style=True)
     assert astr == '{a: 1, b: 2, c: 3}\n'
