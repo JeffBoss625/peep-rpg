@@ -1,5 +1,5 @@
 from lib.model import TextModel
-from lib.screen import sync_delegates, WinType
+from lib.screen import sync_delegates, TextScreen
 from lib.screen_layout import *
 import sys
 
@@ -177,8 +177,8 @@ def test_paint():
     root = create_root(Dim(15, 100))
     hpan = root.panel('root-panel', Orient.HORI, None, None)
 
-    w1 = hpan.window('w1', Con(4, 10, 5, 20), wintype=WinType.TEXT)
-    w2 = hpan.window('w2', Con(3,5,8,10), wintype=WinType.TEXT)
+    w1 = hpan.window('w1', Con(4, 10, 5, 20), wintype=TextScreen)
+    w2 = hpan.window('w2', Con(3,5,8,10), wintype=TextScreen)
     root.do_layout()
     sync_delegates(root)
 
@@ -187,7 +187,7 @@ def test_paint():
     w2.data.model.print('window 2')
 
     root.data.rebuild_screens()
-    root.data.paint_all()
+    root.data.paint()
     root.data.doupdate()
     # print_win(root)
 

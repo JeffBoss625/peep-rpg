@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from lib.model import *
 from lib.monsters import *
 
@@ -51,10 +49,9 @@ def test_yaml():
     assert sstr == 's: 3x4x5\n'
 
     a = ModelList()
-    a.append([1,2,3])
-    astr = yaml.dump({''})
-    print(astr)
-    assert astr == 'a: (1,2,3)'
+    a.extend([1,2,3])
+    astr = yaml.dump({'a': a}, default_flow_style=True)
+    assert astr == '{a: [1, 2, 3]}\n'
 
 def test_list():
     a = ModelList()

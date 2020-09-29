@@ -6,14 +6,9 @@ from dataclasses import dataclass, field
 from lib.constants import Color, Side
 from lib.screen_layout import Pos, Dim, min0
 
-class WinType:
-    MAIN = "MAIN"
-    TEXT = "TEXT"
-    MAZE = "MAZE"
-    STATS = "STATS"
-
 def printe(s):
     sys.stderr.write(s + "\n")
+
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
