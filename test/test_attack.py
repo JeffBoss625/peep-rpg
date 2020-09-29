@@ -1,5 +1,6 @@
 import lib.attack as attacklib
-from lib.model import Peep, Attack
+from lib.peeps import Attack, Peep
+
 
 class Out:
     def __init__(self):
