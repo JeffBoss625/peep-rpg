@@ -76,18 +76,6 @@ class ModelDict(dict, PubSub):
         super().__setitem__(k, v)
         self.publish_update(prev, v, key=k)
 
-    def __getattr__(self, k):
-        if k[0] == '_':
-            return object.__getattribute__(self, k)
-        else:
-            return self.__getitem__(k)
-
-    def __setattr__(self, k, v):
-        if k[0] == '_':
-            object.__setattr__(self, k, v)
-        else:
-            self.__setitem__(k, v)
-
     def submodels(self):
         return self.values()
 
