@@ -20,13 +20,13 @@ class PrpgScreen:
         center = main_panel.panel('center_panel', Orient.HORI, None)
         left_center = center.panel('leftcenter_panel', Orient.VERT, None)
 
-        left_center.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=Side.TOP)
-        left_center.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=Side.CENTER, align_y = Side.CENTER)
+        left_center.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=SIDE.TOP)
+        left_center.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y = SIDE.CENTER)
 
-        center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=Side.TOP)
+        center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
 
         # Bottom Row
-        main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=Side.TOP)
+        main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
 
         self.size_and_rebuild()         # builds curses windows
         root.data.model = model         # links curses windows to submodels

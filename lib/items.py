@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from lib.constants import Color
+from lib.constants import COLOR
 from lib.model import DataModel
 
 
@@ -14,8 +14,8 @@ class Item(DataModel):
     weight: int = 1
     slot_type: str = ''
 
-    fgcolor: str = Color.WHITE
-    bgcolor: str = Color.BLACK
+    fgcolor: str = COLOR.WHITE
+    bgcolor: str = COLOR.BLACK
 
 # Containers that hold multiple small items up to a given size and weight (bag, sack, box, chest, ...)
 # It is possible for magical containers and holsters to have a greater size_cap(acity) than their size, and a lower

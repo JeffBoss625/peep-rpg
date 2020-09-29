@@ -3,7 +3,7 @@ import time
 import sys
 from dataclasses import dataclass, field
 
-from lib.constants import Color, Side
+from lib.constants import COLOR, SIDE, curses_color
 from lib.screen_layout import Pos, Dim, min0
 
 def printe(s):
@@ -131,10 +131,10 @@ class Screen:
         self.logger.log(s)
 
     def write_lines(self, lines, **params):
-        trunc_x = params.get('trunc_x', Side.RIGHT)
-        trunc_y = params.get('trunc_y', Side.BOTTOM)
-        align_x = params.get('align_x', Side.LEFT)
-        align_y = params.get('align_y', Side.TOP)
+        trunc_x = params.get('trunc_x', SIDE.RIGHT)
+        trunc_y = params.get('trunc_y', SIDE.BOTTOM)
+        align_x = params.get('align_x', SIDE.LEFT)
+        align_y = params.get('align_y', SIDE.TOP)
         text_w = params.get('text_w', 0)    # if set, use this as the fixed text width for alignment and truncation
 
         if not len(lines):
@@ -146,7 +146,7 @@ class Screen:
 
         nlines = len(lines)
         if nlines > max_h:
-            if trunc_y == Side.BOTTOM:
+            if trunc_y == SIDE.BOTTOM:
                 lines = lines[:max_h]
             else: # Side.TOP
                 lines = lines[nlines - max_h:]
@@ -156,7 +156,7 @@ class Screen:
         scr = self.scr
         for i, line in enumerate(lines):
             if len(line) > trunc_w:
-                if trunc_x == Side.RIGHT:
+                if trunc_x == SIDE.RIGHT:
                     line = line[0:trunc_w - 1]
                 else: # Side.LEFT
                     line = line[len(line) - max_w:]
@@ -214,13 +214,13 @@ class Screen:
                 # )
                 pass        # ignore interrupts to getkey() following resize events etc.
 
-    def write_char(self, x, y, char, fg=Color.WHITE, bg=Color.BLACK, **params):
+    def write_char(self, x, y, char, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
         max_w, max_h = self.getmax_wh()
         if x >= max_w or y >= max_h:
             return
 
-        align_x = params.get('align_x', Side.LEFT)
-        align_y = params.get('align_y', Side.TOP)
+        align_x = params.get('align_x', SIDE.LEFT)
+        align_y = params.get('align_y', SIDE.TOP)
         text_w = min(params.get('text_w', 1), max_w)
         text_h = min(params.get('text_h', 1), max_h)
 
@@ -236,8 +236,8 @@ class Screen:
         key = (fg, bg)
         if key not in self.color_pairs:
             self.color_pair_count += 1
-            fgc = getattr(curses, Color.curses_color(fg))
-            bgc = getattr(curses, Color.curses_color(bg))
+            fgc = getattr(curses, curses_color(fg))
+            bgc = getattr(curses, curses_color(bg))
             curses.init_pair(self.color_pair_count, fgc, bgc)
             self.color_pairs[key] = curses.color_pair(self.color_pair_count)
 
@@ -245,21 +245,21 @@ class Screen:
 
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):
-    if align_x == Side.LEFT:
+    if align_x == SIDE.LEFT:
         return margin_x
-    elif align_x == Side.RIGHT:
+    elif align_x == SIDE.RIGHT:
         return max_w - linelen
-    elif align_x == Side.CENTER:
+    elif align_x == SIDE.CENTER:
         return margin_x + int(max_w/2) - int(linelen/2)
     else:
         raise ValueError(f'illegal value for align_x: "{align_x}"')
 
 def align_y_offset(align_y, margin_y, nlines, max_h):
-    if align_y == Side.TOP:
+    if align_y == SIDE.TOP:
         return margin_y
-    elif align_y == Side.BOTTOM:
+    elif align_y == SIDE.BOTTOM:
         return max_h - nlines
-    elif align_y == Side.CENTER:
+    elif align_y == SIDE.CENTER:
         return margin_y + int(max_h/2) - int(nlines/2)
     else:
         raise ValueError(f'illegal value for align_y: "{align_y}"')

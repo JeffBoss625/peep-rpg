@@ -1,5 +1,5 @@
 from lib.peeps import Peep, Attack
-from lib.constants import Color
+from lib.constants import COLOR, COLOR
 import yaml
 
 MONSTERS = [
@@ -8,7 +8,7 @@ MONSTERS = [
         name='Thark',
         type='goblin',
         char='g',
-        fgcolor=Color.GREEN,
+        fgcolor=COLOR.GREEN,
         maxhp=10,
         thaco=18,
         speed=13,
@@ -25,7 +25,7 @@ MONSTERS = [
         name='Giant Rat',
         type='rat',
         char='g',
-        fgcolor=Color.YELLOW,
+        fgcolor=COLOR.YELLOW,
         maxhp=5,
         thaco=19,
         speed=13,
@@ -41,8 +41,8 @@ MONSTERS = [
         name='Big Bird',
         type='bird',
         char='g',
-        fgcolor=Color.WHITE,
-        bgcolor=Color.BLACK,
+        fgcolor=COLOR.WHITE,
+        bgcolor=COLOR.BLACK,
         maxhp=15,
         thaco=17,
         speed=19,
@@ -59,8 +59,8 @@ MONSTERS = [
         name='Spark',
         type='red dragon',
         char='D',
-        fgcolor= Color.RED,
-        bgcolor= Color.BLACK,
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
         maxhp=50,
         thaco=10,
         speed=20,
@@ -77,8 +77,8 @@ MONSTERS = [
         name='Brog',
         type='black dragon',
         char='D',
-        fgcolor=Color.BLUE,
-        bgcolor=Color.BLACK,
+        fgcolor=COLOR.BLUE,
+        bgcolor=COLOR.BLACK,
         maxhp=200,
         thaco=3,
         speed=75,

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, MISSING
 from typing import Dict, Tuple, List
 
-from lib.constants import Color
+from lib.constants import COLOR
 from lib.items import Ammo
 from lib.model import DataModel, ModelDict, register_yaml, PubSub, Size
 from yaml import dump
@@ -44,8 +44,8 @@ class Peep(DataModel):
     name: str = ''
     type: str = ''
     char: str = '?'
-    fgcolor: str = Color.WHITE
-    bgcolor: str = Color.BLACK
+    fgcolor: str = COLOR.WHITE
+    bgcolor: str = COLOR.BLACK
 
     # todo: maintain two structures, the resting/normal state and the current state (hp, speed... enhanced from potions etc)
     # todo: lazy-calculate values such as "speed" and "ac" from equipment, dexterity, etc...

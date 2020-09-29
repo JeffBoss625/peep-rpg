@@ -1,6 +1,6 @@
 from lib.items import Ammo
 from lib.peeps import Attack
-from lib.constants import Color
+from lib.constants import COLOR
 
 
 def create_projectile(name, pos=(0,0), hp=0, direct=0):
@@ -9,7 +9,7 @@ def create_projectile(name, pos=(0,0), hp=0, direct=0):
         ret = Ammo(
             name='arrow',
             char='-',
-            fgcolor=Color.YELLOW,
+            fgcolor=COLOR.YELLOW,
             thaco=20,
             speed=200,
             ac=2,
