@@ -47,5 +47,27 @@ def test_yaml():
     register_yaml([Size])
 
     s = Size(3,4,5)
-    sstr = yaml.dump({'xxx': s})
-    assert sstr == 'xxx: 3x4x5\n'
+    sstr = yaml.dump({'s': s})
+    assert sstr == 's: 3x4x5\n'
+
+    a = ModelList()
+    a.append([1,2,3])
+    astr = yaml.dump({''})
+    print(astr)
+    assert astr == 'a: (1,2,3)'
+
+def test_list():
+    a = ModelList()
+    a.extend([1,2,3])
+    a.append(4)
+    astr = yaml.dump(a, Dumper=yaml.Dumper, default_flow_style=True)
+    assert astr == '[1, 2, 3, 4]\n'
+
+def test_dict():
+    a = ModelDict()
+    a['a'] = 1
+    a['b'] = 2
+    a['c'] = 3
+    astr = yaml.dump(a, Dumper=yaml.Dumper, default_flow_style=True)
+    assert astr == '{a: 1, b: 2, c: 3}\n'
+

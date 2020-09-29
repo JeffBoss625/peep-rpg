@@ -27,12 +27,22 @@ class PubSub:
             fn(model, msg, **kwds)
 
     def publish_update(self, prev_val, new_val, **kwds):
-        if prev_val and isinstance(prev_val, PubSub):
-            for s in self._subscribers:
-                prev_val.unsubscribe(s)
-        if new_val and isinstance(new_val, PubSub):
-            for s in self._subscribers:
-                new_val.subscribe(s)
+        vlen = getattr(kwds, 'len', 1)  # len indicates multiple values were changed (prev and new are lists)
+        prev_list = []
+        new_list = []
+        if prev_val:
+            prev_list = [prev_val] if vlen == 1 else prev_val
+        if new_val:
+            new_list = [new_val] if vlen == 1 else new_val
+
+        for s in self._subscribers:
+            for pv in prev_list:
+                if pv and isinstance(pv, PubSub):
+                    pv.unsubscribe(s)
+
+            for nv in new_list:
+                if nv and isinstance(nv, PubSub):
+                    nv.subscribe(s)
 
         self.publish(self, 'update', prev=prev_val, new=new_val, **kwds)
 
@@ -65,9 +75,6 @@ class ModelDict(dict, PubSub):
         super().__setitem__(k, v)
         self.publish_update(prev, v, key=k)
 
-    def __getstate__(self):
-        return self.copy()
-
     def submodels(self):
         return self.values()
 
@@ -89,8 +96,21 @@ class ModelList(list, PubSub):
         self.publish_update(prev, v, i=i)
 
     def append(self, v):
-        super().append(v)
-        self.publish_update(None, v, i=len(self)-1)
+        self.extend([v])
+
+    def extend(self, v):
+        kwds = {'i': len(self)}
+        vlen = len(v)
+        if vlen == 0:
+            return
+        super().extend(v)
+        if vlen == 1:
+            # one item added publish the value, not the array
+            v = v[0]
+        else:
+            # multiple items added, set len property and publish array
+            kwds['len'] = vlen
+        self.publish_update(None, v, **kwds)   # v is an array or tuple
 
     def remove(self, v):
         super().remove(v)
@@ -108,6 +128,16 @@ class ModelList(list, PubSub):
 
     def submodels(self):
         return self
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        v = loader.construct_scalar(node)
+        w,h,l = map(int, v.split('x'))
+        return Size(w,h,l)
+
+    @classmethod
+    def to_yaml(cls, dumper, v):
+        return dumper.represent_scalar('!size', f'{v.wid}x{v.hgt}x{v.len}')
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
@@ -168,6 +198,26 @@ class TextModel(PubSub):
         self.text.extend(slines)
         self.publish_update(None, lines)
 
+@dataclass
+class Size:
+    wid: int = 0
+    hgt: int = 0
+    len: int = 0
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        v = loader.construct_scalar(node)
+        w,h,l = map(int, v.split('x'))
+        return Size(w,h,l)
+
+    @classmethod
+    def to_yaml(cls, dumper, v):
+        return dumper.represent_scalar('!size', f'{v.wid}x{v.hgt}x{v.len}')
+
+    @classmethod
+    def yaml_pattern(cls):
+        return re.compile(r'^\d+x\d+x\d+$')
+
 # return only values that are different from field defaults
 def _datamodel_getstate(self):
     sdict = self.__dict__
@@ -218,28 +268,13 @@ def register_yaml(classes):
         if pat:
             yaml.add_implicit_resolver(tag, pat())
 
-        # cls.__getstate__ = _datamodel_getstate
+        if not hasattr(cls, '__getstate__'):
+            cls.__getstate__ = _datamodel_getstate
 
-@dataclass
-class Size:
-    wid: int = 0
-    hgt: int = 0
-    len: int = 0
 
-    @classmethod
-    def from_yaml(cls, loader, node):
-        v = loader.construct_scalar(node)
-        w,h,l = map(int, v.split('x'))
-        return Size(w,h,l)
-
-    @classmethod
-    def to_yaml(cls, dumper, v):
-        return dumper.represent_scalar('!size', f'{v.wid}x{v.hgt}x{v.len}')
-
-    @classmethod
-    def yaml_pattern(cls):
-        return re.compile(r'^\d+x\d+x\d+$')
-
+register_yaml([Size])
+yaml.add_representer(ModelList, yaml.Dumper.yaml_representers[list], yaml.Dumper)
+yaml.add_representer(ModelDict, yaml.Dumper.yaml_representers[dict], yaml.Dumper)
 
 
 if __name__ == '__main__':
