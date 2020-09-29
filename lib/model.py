@@ -244,13 +244,13 @@ def _from_yaml(cls):
         return ldr.construct_yaml_object(node, cls)
     return fn
 
-def default_model_name(cls):
+def default_model_name_fn(cls):
     return cls.__name__.lower()
 
 def register_yaml(classes):
     for cls in classes:
-        cls.model_name = default_model_name
-        tag = '!' + cls.model_name(cls)
+        cls.model_name = default_model_name_fn
+        tag = getattr(cls, 'yaml_tag', '!' + cls.model_name(cls))
 
         to_yaml = getattr(cls, 'to_yaml', _to_yaml(tag, cls))
         yaml.Dumper.add_representer(cls, to_yaml)

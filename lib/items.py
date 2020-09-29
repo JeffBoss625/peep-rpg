@@ -1,7 +1,10 @@
 from dataclasses import dataclass, field
 
+import yaml
+
 from lib.constants import COLOR
-from lib.model import DataModel
+from lib.model import DataModel, register_yaml
+from lib.util import DotDict
 
 
 @dataclass
@@ -45,9 +48,10 @@ class GeneralContainer(Item):
 @dataclass
 class HolsterSlotType:
     name: str = ''
+    yaml_tag: str = '!hslot'
 
 
-HOLSTER_SLOTS = [
+HOLSTER_SLOT_NAMES = [
     'dart',
     'knife',
     'sword',
@@ -60,6 +64,8 @@ HOLSTER_SLOTS = [
     'vial',         # small potions, liquids
     'canteen',      # large liquid container, wineskin, ... (multi-dose)
 ]
+
+HolsterSlotTypes = DotDict((n, HolsterSlotType(n)) for n in HOLSTER_SLOT_NAMES)
 
 # slots for wearing/wielding items
 BODY_SLOTS = [
@@ -89,7 +95,7 @@ class Shooter(Item):
 @dataclass
 class Bow(Shooter):
     def __post_init__(self):
-        self.shot_slot_type = HolsterSlotType.ARROW
+        self.shot_slot_type = HolsterSlotTypes.arrow
         self.shot_speed = 100           # speed -= distance * (deceleration/10,000)
         self.shot_deceleration = 100    # 1% speed loss per square
         self.shot_thaco = 20            # could replace this with distance tables. should be affected by armor type.
@@ -111,8 +117,15 @@ class Ammo(Item):
     slot_type: str = ''
 
 
+register_yaml([Ammo, Bow, Holster, HolsterSlot, HolsterSlotType])
+
 if __name__ == '__main__':
     s = Bow('short bow', '}')
+    sstr = yaml.dump(s)
     print(s)
-    a = Ammo('dart', '/', slot_type=HolsterSlotType.DART)
+    print(sstr)
+
+    a = Ammo('dart', '/', slot_type=HolsterSlotTypes.dart)
+    astr = yaml.dump(a)
     print(a)
+    print(astr)
