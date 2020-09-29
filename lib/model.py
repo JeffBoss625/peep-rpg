@@ -5,6 +5,9 @@ import yaml
 import re
 
 # special value (used simply as a class, not instance) to indicate non-existent items with obj.get(key, default)
+from lib.util import DotDict
+
+
 class NotSet:
     pass
 
@@ -59,7 +62,7 @@ class PubSub:
 #   del dict[key]
 #
 #
-class ModelDict(dict, PubSub):
+class ModelDict(DotDict, PubSub):
     def __init__(self):
         super().__init__()
         PubSub.__init__(self)
