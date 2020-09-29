@@ -49,8 +49,9 @@ class PubSub:
     def submodels(self):
         return []
 
-# a dictionary containing models for which we will publish events when dictionary models are
-# added (publishes "add" message) or removed (publishes "remove" message).
+# A dictionary that subscribes to any models put in and unsubscribes to models removed, propagating update events
+# to a managed set of subscribers.
+#
 #
 # NOTE: the dict extension only handles set and delete operations, not constructors, update etc.
 # To propogate changes, callers need to confine updates to simply:
