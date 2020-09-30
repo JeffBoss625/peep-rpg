@@ -194,8 +194,8 @@ class TextModel(PubSub):
 
 @dataclass
 class Size:
-    wid: int = 0
     hgt: int = 0
+    wid: int = 0
     len: int = 0
 
     @classmethod
