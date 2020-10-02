@@ -1,24 +1,72 @@
 from dataclasses import dataclass, field
+from typing import Tuple
 
 import yaml
 
 from lib.constants import COLOR
-from lib.model import DataModel, register_yaml
+from lib.model import register_yaml
 from lib.util import DotDict
 
+# item slots on the body (armor, rings, held weapons...)
+BODY_SLOT = DotDict(
+    HEAD='head',
+    NECK='neck',
+    TORSO_UNDER='torso_under',
+    TORSO_OVER='torso_over',
+    GARMENT_OUTER='garment_outer',
+    ON_BACK='on_back',
+    ON_SHOULDER='on_shoulder',
+    WAIST_UPPER='waist_upper',
+    WAIST_LOWER='waist_lower',
+    # todo: consider upper-arm, lower-arm, arm-holster...
+    R_HAND='r_hand',
+    R_HAND_HOLDING='r_hand_holding',
+    L_HAND='l_hand',
+    L_HAND_HOLDING='l_hand_holding',
+    R_FINGER1='r_finger1',
+    R_FINGER2='r_finger2',
+    R_FINGER3='r_finger3',
+    R_FINGER4='r_finger4',
+    L_FINGER1='r_finger1',
+    L_FINGER2='r_finger2',
+    L_FINGER3='r_finger3',
+    L_FINGER4='r_finger4',
+    # todo: consider top and bottom legs (shin guards...)
+    LEGS_INNER='legs_inner',
+    LEGS_OUTER='legs_outer',
+    FOOT_INNER='foot_inner',
+    FOOT_OUTER='foot_outer',
+)
+
+# item slots within other items (scabbards, knife-belts, quivers, bags, sacks...)
+ITEM_SLOT = DotDict(
+    DART='dart',
+    KNIFE='knife',
+    SWORD='sword',
+    ARROW='arrow',
+    BOW='bow',  # e.g. bow or crossbow shoulder-sling or belt-sling
+    BOLT='bolt',
+    PELLET='pellet',
+    AXE='axe',  # handled tool such as axe, pickaxe, or hammer
+    WAND='wand',
+    VIAL='vial',  # small potions, liquids
+    CANTEEN='canteen',  # large liquid container, wineskin, ... (multi-dose)
+    BAG='bag',          # bag, sack, ...
+    BOX='box',          # box, chest, ...
+)
 
 @dataclass
-class Item(DataModel):
-    def __post_init__(self):
-        super().__init__()
+class Item:
     name: str = ''
     char: str = '?'
+    material: str = ''
     size: tuple = field(default_factory=tuple)  # width, length, height in inches ** when placed in storage or slot **
     weight: int = 1
     slot_type: str = ''
 
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK
+
 
 # Containers that hold multiple small items up to a given size and weight (bag, sack, box, chest, ...)
 # It is possible for magical containers and holsters to have a greater size_cap(acity) than their size, and a lower
@@ -27,7 +75,6 @@ class Item(DataModel):
 class GeneralContainer(Item):
     weight_cap: int = 0
     size_cap: tuple = field(default_factory=tuple)  # volume holding capacity width, length, height in inches
-
 
     # # EQUIPMENT SLOTS
     #
@@ -43,35 +90,6 @@ class GeneralContainer(Item):
     # BAG: 'BAG'                      # hold in hand, holds multiple items at ready
     # LARGE_SACK: 'LARGE_SACK'        # hold in 1 hand AND on back (2 slots). holds more stuff
 
-
-# slots for items that match them with holsters (scabbards, knife-belts, quivers...)
-@dataclass
-class HolsterSlotType:
-    name: str = ''
-    yaml_tag: str = '!hslot'
-
-
-HOLSTER_SLOT_NAMES = [
-    'dart',
-    'knife',
-    'sword',
-    'arrow',
-    'bow',          # e.g. bow or crossbow shoulder-sling or belt-sling
-    'bolt',
-    'pellet',
-    'axe',          # handled tool such as axe, pickaxe, or hammer
-    'wand',
-    'vial',         # small potions, liquids
-    'canteen',      # large liquid container, wineskin, ... (multi-dose)
-]
-
-HolsterSlotTypes = DotDict((n, HolsterSlotType(n)) for n in HOLSTER_SLOT_NAMES)
-
-# slots for wearing/wielding items
-BODY_SLOTS = [
-    'head'
-]
-
 # A specialized slot that holds a single item
 @dataclass
 class HolsterSlot:
@@ -79,9 +97,11 @@ class HolsterSlot:
     weight_cap: int = 0
     size_cap: tuple = field(default_factory=tuple)  # volume holding capacity width, length, height in inches
 
+
 # Containers that hold specific subset of item types such as darts, arrows, knives, a sword, axes...
 class Holster(Item):
-    slots: tuple = field(default_factory=tuple)     # item slots supported
+    slots: Tuple[HolsterSlot] = field(default_factory=tuple)  # item slots supported
+
 
 # A weapon that launches items at higher speed than could be simply thrown
 @dataclass
@@ -89,16 +109,19 @@ class Shooter(Item):
     shot_slot_type: str = ''
     shot_speed: int = 0
     shot_thaco: int = 0
-    shot_deceleration: int = 0       # 1/10,000 percent change in speed per square traveled (negative is deceleration)
+    shot_deceleration: int = 0  # 1/10,000 percent change in speed per square traveled (negative is deceleration)
+
 
 # A Shooter transfers velocity
 @dataclass
 class Bow(Shooter):
     def __post_init__(self):
-        self.shot_slot_type = HolsterSlotTypes.arrow
-        self.shot_speed = 100           # speed -= distance * (deceleration/10,000)
-        self.shot_deceleration = 100    # 1% speed loss per square
-        self.shot_thaco = 20            # could replace this with distance tables. should be affected by armor type.
+        self.shot_slot_type = ITEM_SLOT.ARROW
+        self.shot_speed = 100  # speed -= distance * (deceleration/10,000)
+        self.shot_deceleration = 100  # 1% speed loss per square
+        self.shot_thaco = 20  # could replace this with distance tables. should be affected by armor type.
+        self.slot_type = BODY_SLOT.ON_SHOULDER
+
 
 @dataclass
 class Ammo(Item):
@@ -106,7 +129,7 @@ class Ammo(Item):
     maxhp: int = 1
     thaco: int = 20
     move_tactic: str = 'straight'
-    distance: int = 0   # track distance travelled, 10 per square.
+    distance: int = 0  # track distance travelled, 10 per square.
 
     # temp state
     tics: int = 0
@@ -117,7 +140,7 @@ class Ammo(Item):
     slot_type: str = ''
 
 
-register_yaml([Ammo, Bow, Holster, HolsterSlot, HolsterSlotType])
+register_yaml([Ammo, Bow, Holster, HolsterSlot])
 
 if __name__ == '__main__':
     s = Bow('short bow', '}')
@@ -125,7 +148,7 @@ if __name__ == '__main__':
     print(s)
     print(sstr)
 
-    a = Ammo('dart', '/', slot_type=HolsterSlotTypes.dart)
+    a = Ammo('dart', '/', slot_type=ITEM_SLOT.DART)
     astr = yaml.dump(a)
     print(a)
     print(astr)

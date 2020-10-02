@@ -80,7 +80,7 @@ class ModelDict(DotDict, PubSub):
         self.publish_update(prev, v, key=k)
 
     def submodels(self):
-        return self.values()
+        return list(v for v in self.values() if isinstance(v, PubSub))
 
 class ModelList(list, PubSub):
     def __init__(self):
@@ -131,7 +131,7 @@ class ModelList(list, PubSub):
         self.publish_update(prev, None, i=i )
 
     def submodels(self):
-        return self
+        return list(v for v in self if isinstance(v, PubSub))
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
@@ -194,9 +194,12 @@ class TextModel(PubSub):
 
 @dataclass
 class Size:
-    hgt: int = 0
-    wid: int = 0
-    len: int = 0
+    h: int = 0
+    w: int = 0
+    d: int = 0
+
+    def volume(self):
+        return self.h * self.w * self.d
 
     @classmethod
     def from_yaml(cls, loader, node):
@@ -206,7 +209,7 @@ class Size:
 
     @classmethod
     def to_yaml(cls, dumper, v):
-        return dumper.represent_scalar('!size', f'{v.wid}x{v.hgt}x{v.len}')
+        return dumper.represent_scalar('!size', f'{v.h}x{v.w}x{v.d}')
 
     @classmethod
     def yaml_pattern(cls):
