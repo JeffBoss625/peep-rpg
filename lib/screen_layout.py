@@ -221,8 +221,24 @@ class Layout:
 
         self.calc_child_dim()
 
+        self.sync_delegates()
+
+    # After root layout and all children are defined, call sync_delegates() on root layout to
+    # build and/or refresh delegate screen dimensions
+    def sync_delegates(self):
+        self.data.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w), self.logger)
+        for c in self.children:
+            c.iterate_win(assign_win)
+
     def calc_child_dim(self):
         raise NotImplementedError()
+
+# initialize window delegates of children
+def assign_win(layout, _v, _d):
+    if not layout.data:
+        layout.data = layout.winparent.data.create_child_window(layout.name, layout.params)
+
+    layout.data.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
 
 @dataclass
 class RootInfo:

@@ -152,7 +152,6 @@ class PrpgControl:
         root.dim = Dim(h,w)
         root.con = Con(h,w,h,w)
         root.do_layout()
-        sync_delegates(root)
 
         root.data.rebuild_screens()
 
