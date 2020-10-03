@@ -99,7 +99,8 @@ class Screen:
             if c.scr:
                 del c.scr
                 c.scr = None
-            c.scr = self.derwin(c.dim, c.pos)
+            if c.dim.w and c.dim.h:
+                c.scr = self.derwin(c.dim, c.pos)
             c.rebuild_screens()
 
     #
@@ -178,6 +179,8 @@ class Screen:
             return
         if self.parent and not self.model:
             raise RuntimeError('no model to paint in {}'.format(self.name))
+        if self.dim.w == 0 or self.dim.h == 0:
+            return
         # if not self.needs_paint and not force:
         #     return
 
@@ -285,7 +288,7 @@ class MazeScreen(Screen):
         for p in self.model.peeps:
             self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-class PlayerStatsScreen(Screen):
+class TitleBarScreen(Screen):
     def __init__(self, name, parent, params):
         super().__init__(name, parent, params)
 
@@ -293,9 +296,35 @@ class PlayerStatsScreen(Screen):
         p = self.model.player
         self.write_lines([
             p.name,
-            'hp:    ' + str(p.hp) + '/' + str(p.maxhp),
-            'speed: ' + str(p.speed),
+            # class
+            # level
+            # height
+            # age
+        ])
+
+class StatsScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            p.name,
+            'hp:     ' + str(p.hp) + '/' + str(p.maxhp),
+            # 'speed:  ' + str(p.speed),
+            # 'height: ' + str(p.body.size.h)
             ])
+
+class EquipScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            'equip',
+        ])
+
 
 class BlankScreen(Screen):
     def __init__(self, name, parent, params):
@@ -304,7 +333,9 @@ class BlankScreen(Screen):
 
 # windows
 class Win:
+    TITLE_BAR = 'title_bar'
     STATS = 'stats'
+    EQUIP = 'equip'
     MAZE = 'maze'
     MESSAGES = 'messages'
     MAIN = 'main'
@@ -345,8 +376,10 @@ class MainScreen(Screen):
             by_name[Win.MESSAGES].model = self.model.message_model
             by_name[Win.LOG].model = self.model.log_model
             by_name[Win.MAZE].model = self.model.maze
-            by_name[Win.STATS].model = self.model.maze
+            by_name[Win.TITLE_BAR].model = self.model.maze
             by_name[Win.BANNER].model = self.model.banner
+            by_name[Win.STATS].model = self.model.maze
+            by_name[Win.EQUIP].model = self.model.equip
 
 
 def create_win(parent, name, params):

@@ -9,6 +9,10 @@ from lib.model import DataModel, ModelDict, register_yaml, PubSub, Size
 
 from lib.util import DotDict
 
+RACE = DotDict(
+    HUMAN='human'
+)
+
 @dataclass
 class BodySlot:
     name: str = ''
@@ -26,6 +30,9 @@ class BodyPart:
 
 @dataclass
 class Body(DataModel):
+    def __post_init__(self):
+        super().__init__()
+
     name: str = ''
     size: Size = None
     weight: int = 0
@@ -206,6 +213,8 @@ class Peep(DataModel):
     pos: tuple = field(default=(0,0))
     attacks: Dict[str, PubSub] = field(default_factory=ModelDict)
 
+    body: Body = None
+
     _yaml_ignore = {'tics', 'pos'}
 
 
@@ -218,7 +227,7 @@ register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
 
-    bill = create_humanoid('human', 200, 100, 7.5)
+    bill = create_humanoid(RACE.HUMAN, 200, 100, 7.5)
     bs = bill.body_slots()
     bs.torso.on_shoulder.item = Bow()
     print(dump(bill))

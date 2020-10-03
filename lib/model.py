@@ -135,7 +135,7 @@ class ModelList(list, PubSub):
 
 # dataclass models with change-tracking
 class DataModel(PubSub):
-    # ** NOTE ** __init__() must be called by @dataclass __postinit__()
+    # ** NOTE ** __init__() must be called by @dataclass __post_init__()
     def __init__(self):
         super().__init__()
 

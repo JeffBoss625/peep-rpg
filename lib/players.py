@@ -1,4 +1,4 @@
-from lib.peeps import Peep, Attack
+from lib.peeps import Peep, Attack, create_humanoid, RACE
 
 _PEEPS = [
     Peep(
@@ -14,7 +14,8 @@ _PEEPS = [
             'teeth': Attack('1d10'),
             'tail': Attack('3d5'),
             'scratch': Attack('2d7'),
-        }
+        },
+        body=create_humanoid(RACE.HUMAN, 200, 100, 7.5)
     ),
 
 

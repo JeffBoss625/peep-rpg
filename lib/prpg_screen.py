@@ -11,17 +11,21 @@ class PrpgScreen:
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.STATS, Con(6, 40, 6, 0), wintype=PlayerStatsScreen)
+        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0), wintype=TitleBarScreen)
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
         maze_w = len(model.maze.walls.text[0]) + 2
         banner_h = 4
         center = main_panel.panel('center_panel', Orient.HORI, None)
-        left_center = center.panel('leftcenter_panel', Orient.VERT, None)
 
-        left_center.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=SIDE.TOP)
-        left_center.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y = SIDE.CENTER)
+        center_col1 = center.panel('center_col1', Orient.VERT, None)
+        center_col1.window(Win.STATS, Con(10,30,10,30), wintype=StatsScreen)
+        center_col1.window(Win.EQUIP, Con(20,30,0,30), wintype=EquipScreen)
+
+        center_col2 = center.panel('center_col2', Orient.VERT, None)
+        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=SIDE.TOP)
+        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y = SIDE.CENTER)
 
         center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
 
