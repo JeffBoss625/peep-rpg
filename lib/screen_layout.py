@@ -211,6 +211,7 @@ class Layout:
     # This is called from root down after clear_layout(). Panel instances override this to layout children
     # and update their own dimension and constraints
     def do_layout(self):
+        self.clear_layout()
         # calculate missing constraints (bottom-up)
         def calc_con(comp, _v):
             if not comp.con:

@@ -82,6 +82,11 @@ class Screen:
                 m.subscribe(update_fn)
                 self.needs_paint = True
 
+    def update_layout(self, pos, dim, logger):
+        self.pos = pos
+        self.dim = dim
+        self.logger = logger
+
     #
     # TREE Navigation/Initialization functions
     #
@@ -245,6 +250,14 @@ class Screen:
 
         return self.color_pairs[key]
 
+    def create_win(self, name, params):
+        wintype = params.get('wintype', None)
+
+        if wintype is None:
+            wintype = BlankScreen
+        return wintype(name, self, params)
+
+
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):
     if align_x == SIDE.LEFT:
@@ -279,24 +292,15 @@ class BlankScreen(Screen):
         super().__init__(name, parent, params)
 
 
-def create_win(parent, name, params):
-    wintype = params.get('wintype', None)
-
-    if wintype is None:
-        wintype = BlankScreen
-    return wintype(name, parent, params)
-
 # After root layout and all children are defined, call sync_delegates() on root layout to
 # build and/or refresh delegate screen dimensions
 def sync_delegates(root):
-    root.data.dim = Dim(root.dim.h, root.dim.w)
-    root.data.pos = Pos(0,0)
-    root.data.logger = root.logger
+    root.data.update_layout(Pos(0,0), Dim(root.dim.h, root.dim.w), root.logger)
 
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
-            layout.data = create_win(layout.winparent.data, layout.name, layout.params)
+            layout.data = layout.winparent.data.create_win(layout.name, layout.params)
 
         layout.data.dim = Dim(layout.dim.h, layout.dim.w)
         layout.data.pos = Pos(layout.pos.y, layout.pos.x)

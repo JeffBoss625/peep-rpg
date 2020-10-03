@@ -107,7 +107,6 @@ class PrpgScreen:
     def __init__(self, root, model):
         self.root = root
         self.model = model
-        self.term_size = None
 
         main_panel = root.panel('main_panel', Orient.VERT, None, None)
 
@@ -150,7 +149,6 @@ class PrpgScreen:
         w = win.dim.w
         self.root.dim = Dim(h,w)
         self.root.con = Con(h,w,h,w)
-        self.root.clear_layout()
         self.root.do_layout()
         sync_delegates(self.root)
 
