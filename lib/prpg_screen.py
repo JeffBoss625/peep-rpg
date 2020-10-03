@@ -159,10 +159,6 @@ class PrpgScreen:
         self.root.data.paint()
         return self.root.data.get_key()
 
-    # paint the entire screen - all that is visible
-    def paint(self, force=False):
-        self.root.data.paint(force=force)
-
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
 #     screen = PrpgScreen(None, model)
