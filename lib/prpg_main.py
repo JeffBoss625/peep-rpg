@@ -4,7 +4,7 @@ from lib.constants import Key
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
-from lib.prpg_screen import PrpgScreen
+from lib.prpg_screen import PrpgControl
 from lib.prpg_model import PrpgModel
 import random
 import time
@@ -125,7 +125,7 @@ def monster_turn(model, monster):
 def main(root):
     root.data.curses.raw()
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
-    screen = PrpgScreen(root, model)
+    screen = PrpgControl(root, model)
 
     def resize_handler(_signum, _frame):
         screen.handle_resize()

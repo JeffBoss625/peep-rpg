@@ -90,25 +90,15 @@ class MainScreen(Screen):
         self.dim = Dim(h, w)
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
 
-    def __setattr__(self, k, v):
-        object.__setattr__(self, k, v)
-        if v and k == 'model':
-            by_name = self.info.win_by_name
-            by_name[Win.MESSAGES].model = self.model.message_model
-            by_name[Win.LOG].model = self.model.log_model
-            by_name[Win.MAZE].model = self.model.maze
-            by_name[Win.TITLE_BAR].model = self.model.maze
-            by_name[Win.BANNER].model = self.model.banner_model
-            by_name[Win.STATS].model = self.model.maze
-            by_name[Win.EQUIP].model = self.model.equip
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
-class PrpgScreen:
-    def __init__(self, root, model):
-        self.root = root
+class PrpgControl:
+    def __init__(self, root_layout, model):
+        self.root_layout = root_layout
+        self.main_screen = root_layout.data
         self.model = model
 
-        main_panel = root.panel('main_panel', Orient.VERT, None, None)
+        main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
         main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0), wintype=TitleBarScreen)
@@ -124,16 +114,16 @@ class PrpgScreen:
         center_col1.window(Win.EQUIP, Con(20,30,0,30), wintype=EquipScreen)
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
-        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=SIDE.TOP)
-        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h, 60), wintype=TextScreen, trunc_y=SIDE.TOP)
+        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,      60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
         center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
 
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
 
-        self.handle_resize()         # builds curses windows
-        root.data.model = model         # links curses windows to submodels
+        self.handle_resize()                    # builds curses windows
+        self.connect_models(self.main_screen, self.model)
 
         def log_event_fn(m, msg, **kwds):
             name = getattr(m, '"name" ', '')
@@ -141,8 +131,19 @@ class PrpgScreen:
 
         model.maze.subscribe(log_event_fn)
 
+    @staticmethod
+    def connect_models(main_screen, model):
+        by_name = main_screen.info.win_by_name
+        by_name[Win.MESSAGES].model = model.message_model
+        by_name[Win.LOG].model = model.log_model
+        by_name[Win.MAZE].model = model.maze
+        by_name[Win.TITLE_BAR].model = model.maze
+        by_name[Win.BANNER].model = model.banner_model
+        by_name[Win.STATS].model = model.maze
+        by_name[Win.EQUIP].model = model.equip
+
     def handle_resize(self):
-        root = self.root
+        root = self.root_layout
 
         root.data.handle_resize()
 
@@ -156,8 +157,8 @@ class PrpgScreen:
         root.data.rebuild_screens()
 
     def get_key(self):
-        self.root.data.paint()
-        return self.root.data.get_key()
+        self.root_layout.data.paint()
+        return self.root_layout.data.get_key()
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
