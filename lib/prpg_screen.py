@@ -69,7 +69,10 @@ class MainScreen(Screen):
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
 
-    def handle_resize(self):
+    # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
+    # using a time interval to skip overly-rapid changes.
+    # Return the final size of the terminal as a Dim() instance.
+    def handle_resizing(self):
         curses = self.curses
         term_size = (self.dim.w, self.dim.h)
         if term_size == curses.get_terminal_size():
@@ -124,7 +127,7 @@ class PrpgControl:
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
 
-        self.handle_resize()                    # builds curses windows
+        root_layout.size_to_terminal()           # reset layouts to current terminal size and builds curses windows
         self.connect_models(self.main_screen, self.model)
 
         def log_event_fn(m, msg, **kwds):
@@ -143,13 +146,6 @@ class PrpgControl:
         by_name[Win.BANNER].model = model.banner_model
         by_name[Win.STATS].model = model.maze
         by_name[Win.EQUIP].model = model.equip
-
-    def handle_resize(self):
-        root = self.root_layout
-
-        root.dim = root.data.handle_resize()
-        root.con = Con(root.dim.h,root.dim.w,root.dim.h,root.dim.w)
-        root.do_layout()
 
     def get_key(self):
         self.root_layout.data.paint()

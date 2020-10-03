@@ -128,7 +128,7 @@ def main(root):
     control = PrpgControl(root, model)
 
     def resize_handler(_signum, _frame):
-        control.handle_resize()
+        control.root_layout.size_to_terminal()
 
     signal.signal(signal.SIGWINCH, resize_handler)
 

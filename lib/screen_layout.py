@@ -315,6 +315,12 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
+    def size_to_terminal(self):
+        self.dim = self.data.handle_resizing()
+        self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
+        self.do_layout()
+
+
 
 
 # A FlowLayout positions child components adjacent to each other horizontally (Orient.HORI) or
