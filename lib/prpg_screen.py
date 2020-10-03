@@ -69,7 +69,7 @@ class MainScreen(Screen):
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
 
-    def size_to_terminal(self):
+    def handle_resize(self):
         curses = self.curses
         term_size = (self.dim.w, self.dim.h)
         if term_size == curses.get_terminal_size():
@@ -98,7 +98,7 @@ class MainScreen(Screen):
             by_name[Win.LOG].model = self.model.log_model
             by_name[Win.MAZE].model = self.model.maze
             by_name[Win.TITLE_BAR].model = self.model.maze
-            by_name[Win.BANNER].model = self.model.banner
+            by_name[Win.BANNER].model = self.model.banner_model
             by_name[Win.STATS].model = self.model.maze
             by_name[Win.EQUIP].model = self.model.equip
 
@@ -132,7 +132,7 @@ class PrpgScreen:
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
 
-        self.size_and_rebuild()         # builds curses windows
+        self.handle_resize()         # builds curses windows
         root.data.model = model         # links curses windows to submodels
 
         def log_event_fn(m, msg, **kwds):
@@ -141,18 +141,19 @@ class PrpgScreen:
 
         model.maze.subscribe(log_event_fn)
 
-    def size_and_rebuild(self):
-        win = self.root.data
-        win.size_to_terminal()
+    def handle_resize(self):
+        root = self.root
 
-        h = win.dim.h
-        w = win.dim.w
-        self.root.dim = Dim(h,w)
-        self.root.con = Con(h,w,h,w)
-        self.root.do_layout()
-        sync_delegates(self.root)
+        root.data.handle_resize()
 
-        win.rebuild_screens()
+        h = root.data.dim.h
+        w = root.data.dim.w
+        root.dim = Dim(h,w)
+        root.con = Con(h,w,h,w)
+        root.do_layout()
+        sync_delegates(root)
+
+        root.data.rebuild_screens()
 
     def get_key(self):
         self.root.data.paint()

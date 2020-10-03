@@ -25,7 +25,7 @@ class PrpgModel(DataModel):
         self.maze = MazeModel(walls, peeps, player)
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
-        self.banner = TextModel('banner')
+        self.banner_model = TextModel('banner')
         self.stats = self.maze
         self.equip = self.maze
         self.seed = seed
@@ -40,7 +40,7 @@ class PrpgModel(DataModel):
         self.log_model.print(*args)
 
     def banner(self, *args):
-        self.banner.print(*args)
+        self.banner_model.print(*args)
 
     def is_player(self, peep):
         return peep == self.maze.player

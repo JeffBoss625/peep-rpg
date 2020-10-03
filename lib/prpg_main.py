@@ -128,11 +128,9 @@ def main(root):
     screen = PrpgScreen(root, model)
 
     def resize_handler(_signum, _frame):
-        screen.size_and_rebuild()
-        screen.paint(force=True)
+        screen.handle_resize()
 
     signal.signal(signal.SIGWINCH, resize_handler)
-    screen.paint()
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
@@ -148,7 +146,6 @@ def main(root):
                 if peep.hp <= 0:
                     continue
                 if model.is_player(peep):
-                    screen.paint()
                     if player_turn(screen) == 'q':
                         return 0     # QUIT GAME
                     # elif key_input in ('=','+'):
@@ -158,9 +155,9 @@ def main(root):
                     #     screen.size_to_terminal()
                 else:
                     if monster_turn(model, peep) == 'q':
-                        model.banner('YOU DIED')
-                        screen.paint()
-                        time.sleep(3)
+                        model.banner('  YOU DIED! (press "q" to exit)')
+                        while screen.get_key() not in ('q', Key.CTRL_Q):
+                            pass
                         return 0
 
                 # update peeps list to living peeps

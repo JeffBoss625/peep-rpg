@@ -250,7 +250,8 @@ class Screen:
 
         return self.color_pairs[key]
 
-    def create_win(self, name, params):
+    # required factory function for layout interface
+    def create_child_window(self, name, params):
         wintype = params.get('wintype', None)
 
         if wintype is None:
@@ -300,7 +301,7 @@ def sync_delegates(root):
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
-            layout.data = layout.winparent.data.create_win(layout.name, layout.params)
+            layout.data = layout.winparent.data.create_child_window(layout.name, layout.params)
 
         layout.data.dim = Dim(layout.dim.h, layout.dim.w)
         layout.data.pos = Pos(layout.pos.y, layout.pos.x)
