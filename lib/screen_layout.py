@@ -1,6 +1,6 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
-
+from abc import ABC
 from dataclasses import dataclass, field
 
 
@@ -305,6 +305,11 @@ class WinLayout(Layout):
 
         for c in self.children:
             c.clear_layout()
+
+    def calc_constraints(self):
+        raise NotImplementedError("constraints for non-panels should be set explicitly")
+
+
 
 # A FlowLayout positions child components adjacent to each other horizontally (Orient.HORI) or
 # vertically (Orient.VERT). In the stacked direction, child components are assigned wmin size plus
