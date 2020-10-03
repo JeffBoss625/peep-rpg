@@ -82,10 +82,11 @@ class Screen:
                 m.subscribe(update_fn)
                 self.needs_paint = True
 
-    def update_layout(self, pos, dim, logger):
+    def layout_change(self, pos, dim, logger=None):
         self.pos = pos
         self.dim = dim
-        self.logger = logger
+        if logger:
+            self.logger = logger
 
     #
     # TREE Navigation/Initialization functions
@@ -296,18 +297,16 @@ class BlankScreen(Screen):
 # After root layout and all children are defined, call sync_delegates() on root layout to
 # build and/or refresh delegate screen dimensions
 def sync_delegates(root):
-    root.data.update_layout(Pos(0,0), Dim(root.dim.h, root.dim.w), root.logger)
+    root.data.layout_change(Pos(0, 0), Dim(root.dim.h, root.dim.w), root.logger)
 
     # initialize window delegates of children
     def assign_win(layout, _v, _d):
         if not layout.data:
             layout.data = layout.winparent.data.create_child_window(layout.name, layout.params)
 
-        layout.data.dim = Dim(layout.dim.h, layout.dim.w)
-        layout.data.pos = Pos(layout.pos.y, layout.pos.x)
+        layout.data.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
     for c in root.children:
         c.iterate_win(assign_win)
 
-    return root
 
 
