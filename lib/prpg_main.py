@@ -58,7 +58,6 @@ DIRECTION_KEYS = {
 def player_turn(screen):
     while True:
         model = screen.model
-        screen.paint()  # update messages
         input_key = screen.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
@@ -80,21 +79,17 @@ def player_turn(screen):
                 model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
             model.message('Where do you want to shoot?')
-            screen.paint()
             sec_input_key = screen.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 sec_input_key = screen.get_key()
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
-                screen.paint()
             direct = DIRECTION_KEYS[sec_input_key]
             alib.create_projectile(direct, model)
             model.message('Projectile shot')
-            screen.paint()
         else:
             model.message('unknown command: "{}"'.format(input_key))
 
-        screen.paint()  # update messages
         # continue with loop to get more input
 
 

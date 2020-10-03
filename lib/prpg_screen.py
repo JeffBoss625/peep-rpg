@@ -155,6 +155,7 @@ class PrpgScreen:
         win.rebuild_screens()
 
     def get_key(self):
+        self.root.data.paint()
         return self.root.data.get_key()
 
     # paint the entire screen - all that is visible
