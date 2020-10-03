@@ -212,6 +212,7 @@ class Layout:
     # and update their own dimension and constraints
     def do_layout(self):
         self.clear_layout()
+
         # calculate missing constraints (bottom-up)
         def calc_con(comp, _v):
             if not comp.con:
@@ -223,7 +224,9 @@ class Layout:
 
         self.sync_delegates()
 
-    # After root layout and all children are defined, call sync_delegates() on root layout to
+        self.data.rebuild_screens()
+
+# After root layout and all children are defined, call sync_delegates() on root layout to
     # build and/or refresh delegate screen dimensions
     def sync_delegates(self):
         self.data.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w), self.logger)

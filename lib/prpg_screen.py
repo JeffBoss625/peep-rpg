@@ -153,8 +153,6 @@ class PrpgControl:
         root.con = Con(h,w,h,w)
         root.do_layout()
 
-        root.data.rebuild_screens()
-
     def get_key(self):
         self.root_layout.data.paint()
         return self.root_layout.data.get_key()
