@@ -1,5 +1,106 @@
 from lib.screen_layout import *
 from lib.screen import *
+import time
+
+class MazeScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        text_h = len(self.model.walls.text)
+        text_w = len(self.model.walls.text[0])
+        params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
+        self.write_lines(self.model.walls.text, **params)
+
+        for p in self.model.peeps:
+            self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
+
+class TitleBarScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            p.name,
+            # class
+            # level
+            # height
+            # age
+        ])
+
+class StatsScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            p.name,
+            'hp:     ' + str(p.hp) + '/' + str(p.maxhp),
+            # 'speed:  ' + str(p.speed),
+            # 'height: ' + str(p.body.size.h)
+        ])
+
+class EquipScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+
+    def do_paint(self):
+        p = self.model.player
+        self.write_lines([
+            'equip',
+        ])
+
+# windows
+class Win:
+    TITLE_BAR = 'title_bar'
+    STATS = 'stats'
+    EQUIP = 'equip'
+    MAZE = 'maze'
+    MESSAGES = 'messages'
+    MAIN = 'main'
+    LOG = 'log'
+    BANNER = 'banner'
+
+class MainScreen(Screen):
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
+        w, h = self.curses.get_terminal_size()
+        self.dim = Dim(h, w)
+
+    def size_to_terminal(self):
+        curses = self.curses
+        term_size = (self.dim.w, self.dim.h)
+        if term_size == curses.get_terminal_size():
+            return
+
+        # wait for resize changes to stop for a moment before resizing
+        t0 = time.time()
+        term_size = curses.get_terminal_size()
+        while time.time() - t0 < 0.3:
+            time.sleep(0.1)
+            if term_size != curses.get_terminal_size():
+                # size changed, reset timer
+                term_size = curses.get_terminal_size()
+                t0 = time.time()
+
+        w, h = term_size
+        curses.resizeterm(h, w)
+        self.dim = Dim(h, w)
+        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
+
+    def __setattr__(self, k, v):
+        object.__setattr__(self, k, v)
+        if v and k == 'model':
+            by_name = self.info.win_by_name
+            by_name[Win.MESSAGES].model = self.model.message_model
+            by_name[Win.LOG].model = self.model.log_model
+            by_name[Win.MAZE].model = self.model.maze
+            by_name[Win.TITLE_BAR].model = self.model.maze
+            by_name[Win.BANNER].model = self.model.banner
+            by_name[Win.STATS].model = self.model.maze
+            by_name[Win.EQUIP].model = self.model.equip
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
 class PrpgScreen:

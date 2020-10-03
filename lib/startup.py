@@ -1,7 +1,8 @@
 import curses
 from lib.logger import Logger
+from lib.prpg_screen import MainScreen
 from lib.screen_layout import WinLayout, Pos, Con, Dim
-from lib.screen import create_win, MainScreen
+from lib.screen import create_win
 from lib.dummy_curses import DummyCurses
 import os
 
