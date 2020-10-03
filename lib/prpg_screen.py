@@ -126,7 +126,7 @@ class PrpgScreen:
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
         center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h,    60), wintype=TextScreen, trunc_y=SIDE.TOP)
-        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y = SIDE.CENTER)
+        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,             60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
         center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
 
