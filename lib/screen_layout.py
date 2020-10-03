@@ -56,6 +56,9 @@ class Dim:
         # printd('...Dim.child_dim() return', ret)
         return ret
 
+    def copy(self):
+        return Dim(self.h, self.w)
+
 
 # Constraint application strategy - dictates how constraints are merged
 class ConApply:

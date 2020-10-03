@@ -125,10 +125,10 @@ def monster_turn(model, monster):
 def main(root):
     root.data.curses.raw()
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
-    screen = PrpgControl(root, model)
+    control = PrpgControl(root, model)
 
     def resize_handler(_signum, _frame):
-        screen.handle_resize()
+        control.handle_resize()
 
     signal.signal(signal.SIGWINCH, resize_handler)
 
@@ -146,7 +146,7 @@ def main(root):
                 if peep.hp <= 0:
                     continue
                 if model.is_player(peep):
-                    if player_turn(screen) == 'q':
+                    if player_turn(control) == 'q':
                         return 0     # QUIT GAME
                     # elif key_input in ('=','+'):
                     #     term = root.data.curses.term
@@ -156,7 +156,7 @@ def main(root):
                 else:
                     if monster_turn(model, peep) == 'q':
                         model.banner('  YOU DIED! (press "q" to exit)')
-                        while screen.get_key() not in ('q', Key.CTRL_Q):
+                        while control.get_key() not in ('q', Key.CTRL_Q):
                             pass
                         return 0
 

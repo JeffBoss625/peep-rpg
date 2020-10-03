@@ -73,7 +73,7 @@ class MainScreen(Screen):
         curses = self.curses
         term_size = (self.dim.w, self.dim.h)
         if term_size == curses.get_terminal_size():
-            return
+            return self.dim.copy()
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
@@ -88,7 +88,9 @@ class MainScreen(Screen):
         w, h = term_size
         curses.resizeterm(h, w)
         self.dim = Dim(h, w)
+        return self.dim.copy()
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
+
 
 
 # An abstraction of a terminal game screen with controls to refresh and update what is shown
@@ -145,12 +147,8 @@ class PrpgControl:
     def handle_resize(self):
         root = self.root_layout
 
-        root.data.handle_resize()
-
-        h = root.data.dim.h
-        w = root.data.dim.w
-        root.dim = Dim(h,w)
-        root.con = Con(h,w,h,w)
+        root.dim = root.data.handle_resize()
+        root.con = Con(root.dim.h,root.dim.w,root.dim.h,root.dim.w)
         root.do_layout()
 
     def get_key(self):
