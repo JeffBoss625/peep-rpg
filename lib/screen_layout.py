@@ -154,9 +154,9 @@ class Layout:
         self.con = con        # constraints used to calculate dim
         self.params = params if params else {}
 
-        self.dim = None       # managed by parent panel and constrained by parent dim - see do_layout()
+        self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
         self.children = []
-        self.logger = None
+        self._logger = params.get('logger', None)
         self.data = None      # externally-managed data (e.g. corresponding curses window)
 
         # store consolidated window information in the root object
@@ -190,11 +190,13 @@ class Layout:
             p = p.parent
         return p
 
-    def log(self, s):
-        if not self.logger:
-            self.logger = self.root().logger
+    def logger(self):
+        if not self._logger:
+            self._logger = self.root()._logger
+        return self._logger
 
-        self.logger.log(s)
+    def log(self, s):
+        self.logger().log(s)
 
     def apply_ddf(self, fn, v=None):
         for c in self.children:
@@ -214,6 +216,7 @@ class Layout:
     # This is called from root down after clear_layout(). Panel instances override this to layout children
     # and update their own dimension and constraints
     def do_layout(self):
+        self.log(f'do_layout({self.name}, {self.dim})')
         self.clear_layout()
 
         # calculate missing constraints (bottom-up)
@@ -229,10 +232,10 @@ class Layout:
 
         self.data.rebuild_screens()
 
-# After root layout and all children are defined, call sync_delegates() on root layout to
+    # After root layout and all children are defined, call sync_delegates() on root layout to
     # build and/or refresh delegate screen dimensions
     def sync_delegates(self):
-        self.data.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w), self.logger)
+        self.data.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
         for c in self.children:
             c.iterate_win(assign_win)
 
@@ -316,9 +319,12 @@ class WinLayout(Layout):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
     def size_to_terminal(self):
-        self.dim = self.data.handle_resizing()
-        self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
-        self.do_layout()
+        self.log(f'size_to_terminal({self})')
+        dim = self.data.handle_resizing()
+        if dim:
+            self.dim = dim
+            self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
+            self.do_layout()
 
 
 

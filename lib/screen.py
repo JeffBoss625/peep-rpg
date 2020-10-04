@@ -39,7 +39,7 @@ class Screen:
         # self.dim = None
         # self.pos = None     # todo: manage these from layout manager
 
-        self.logger = None
+        self._logger = params.get('logger', None)
 
         if parent:
             self.curses = parent.curses
@@ -82,11 +82,9 @@ class Screen:
                 m.subscribe(update_fn)
                 self.needs_paint = True
 
-    def layout_change(self, pos, dim, logger=None):
+    def layout_change(self, pos, dim):
         self.pos = pos
         self.dim = dim
-        if logger:
-            self.logger = logger
 
     #
     # TREE Navigation/Initialization functions
@@ -130,11 +128,13 @@ class Screen:
 
         return max_w, max_h
 
-    def log(self, s):
-        if not self.logger:
-            self.logger = self.root().logger
+    def logger(self):
+        if not self._logger:
+            self._logger = self.root()._logger
+        return self._logger
 
-        self.logger.log(s)
+    def log(self, s):
+        self.logger().log(s)
 
     def write_lines(self, lines, **params):
         trunc_x = params.get('trunc_x', SIDE.RIGHT)

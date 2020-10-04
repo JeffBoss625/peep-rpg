@@ -73,10 +73,11 @@ class MainScreen(Screen):
     # using a time interval to skip overly-rapid changes.
     # Return the final size of the terminal as a Dim() instance.
     def handle_resizing(self):
+        self.log(f'handle_resizing({self})')
         curses = self.curses
         term_size = (self.dim.w, self.dim.h)
         if term_size == curses.get_terminal_size():
-            return self.dim.copy()
+            return None
 
         # wait for resize changes to stop for a moment before resizing
         t0 = time.time()
@@ -127,7 +128,7 @@ class PrpgControl:
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
 
-        root_layout.size_to_terminal()           # reset layouts to current terminal size and builds curses windows
+        root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
         self.connect_models(self.main_screen, self.model)
 
         def log_event_fn(m, msg, **kwds):
