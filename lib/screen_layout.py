@@ -157,7 +157,6 @@ class Layout:
         self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
         self.children = []
         self._logger = params.get('logger', None)
-        self.data = None      # externally-managed data (e.g. corresponding curses window)
 
         # store consolidated window information in the root object
         if parent:
@@ -262,8 +261,9 @@ class WinLayout(Layout):
         if con is None:
             con = Con()
         super().__init__(parent, name, pos, con, **params)
+        self.data = None      # externally-managed data (e.g. corresponding curses window)
 
-        # store parent window
+    # store parent window
         wp = parent
         while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
