@@ -7,7 +7,7 @@ from lib.players import player_by_name
 from lib.prpg_screen import PrpgControl
 from lib.prpg_model import PrpgModel
 import random
-import time
+import sys
 import signal
 
 MAZE = [
@@ -135,7 +135,8 @@ def main(root):
         except Exception as e:
             control.root_layout.log(e)
 
-    signal.signal(signal.SIGWINCH, resize_handler)
+    if sys.platform != "win32":
+        signal.signal(signal.SIGWINCH, resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
