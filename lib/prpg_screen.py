@@ -64,8 +64,8 @@ class Win:
     BANNER = 'banner'
 
 class MainScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, **params):
+        super().__init__('main', None, params)
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
 
@@ -121,9 +121,9 @@ class PrpgControl:
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
         center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h, 60), wintype=TextScreen, trunc_y=SIDE.TOP)
-        center_col2.window(Win.MAZE, Con(maze_h,      maze_w,  30,      60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+        center_col2.window(Win.MAZE, Con(maze_h, maze_w, 0, 60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
-        center.window(Win.MESSAGES, Con(6,           maze_w,  30+banner_h, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
+        center.window(Win.MESSAGES, Con(6,       maze_w, 0, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
 
         # Bottom Row
         main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)

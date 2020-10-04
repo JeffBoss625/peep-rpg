@@ -319,13 +319,18 @@ class WinLayout(Layout):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
     def size_to_terminal(self):
-        self.log(f'size_to_terminal({self})')
+        # self.log(f'size_to_terminal({self.data.curses.get_terminal_size()})')
+        if getattr(self, '_is_resizing', False):
+            return False
+        self._is_resizing = True
         dim = self.data.handle_resizing()
         if dim:
             self.dim = dim
             self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
             self.do_layout()
 
+        self._is_resizing = False
+        return True
 
 
 

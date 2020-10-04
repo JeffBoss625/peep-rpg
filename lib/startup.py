@@ -23,7 +23,7 @@ def create_root(dim=None, out=None, scr=None, name='root'):
     root = WinLayout(None, name, Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), logger=logger)
     root.dim = dim
 
-    root.data = MainScreen(root.name, None, {'border': 0, 'scr': scr, 'curses': curseslib, 'logger': logger})
+    root.data = MainScreen(border=0, scr=scr, curses=curseslib, logger=logger)
     root.data.term_size = dim.w, dim.h
     return root
 

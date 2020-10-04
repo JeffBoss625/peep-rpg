@@ -128,7 +128,12 @@ def main(root):
     control = PrpgControl(root, model)
 
     def resize_handler(_signum, _frame):
-        control.root_layout.size_to_terminal()
+        try:
+            if control.root_layout.size_to_terminal():
+                control.main_screen.paint(force=True)
+
+        except Exception as e:
+            control.root_layout.log(e)
 
     signal.signal(signal.SIGWINCH, resize_handler)
 
