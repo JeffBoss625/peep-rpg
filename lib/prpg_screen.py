@@ -68,6 +68,8 @@ class MainScreen(Screen):
         super().__init__('main', None, params)
         w, h = self.curses.get_terminal_size()
         self.dim = Dim(h, w)
+        self.con = Con(h,w,h,w)
+        self.term_size = w, h
 
     # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
     # using a time interval to skip overly-rapid changes.

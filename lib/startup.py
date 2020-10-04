@@ -1,7 +1,7 @@
 import curses
 from lib.logger import Logger
 from lib.prpg_screen import MainScreen
-from lib.screen_layout import WinLayout, Pos, Con, Dim
+from lib.screen_layout import WinLayout, Pos, Con, Dim, RootLayout
 from lib.dummy_curses import DummyCurses
 import os
 
@@ -20,11 +20,9 @@ def create_root(dim=None, out=None, scr=None, name='root'):
         scr = curseslib.term
 
     logger = Logger(out)
-    root = WinLayout(None, name, Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), logger=logger)
-    root.dim = dim
+    root = RootLayout(dim, logger=logger)
 
     root.window = MainScreen(border=0, scr=scr, curses=curseslib, logger=logger)
-    root.window.term_size = dim.w, dim.h
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify

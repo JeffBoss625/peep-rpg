@@ -1,3 +1,4 @@
+import curses
 import signal
 import time
 import traceback

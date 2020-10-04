@@ -140,7 +140,7 @@ def main(root):
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
-        peeps = [p for p in model.maze.peeps]
+        peeps = tuple(p for p in model.maze.peeps)
         turns = mlib.calc_turn_sequence(model.maze.peeps)
 
         for peep_indexes in turns:

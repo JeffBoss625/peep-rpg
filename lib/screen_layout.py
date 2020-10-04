@@ -237,7 +237,6 @@ class Window:
     def update_layout(self, pos, dim):
         raise NotImplementedError()
 
-
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
 class WinLayout(Layout):
@@ -246,8 +245,8 @@ class WinLayout(Layout):
         if con is None:
             con = Con()
         super().__init__(parent, name, pos, con, **params)
-        self.window = None  # externally-managed window (e.g. curses window)
-        self._is_resizing = False
+        self.window = None              # externally-managed window (e.g. curses window)
+        self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
         # store parent window
         wp = parent
@@ -295,9 +294,7 @@ class WinLayout(Layout):
             c.calc_child_dim()
 
     def clear_layout(self):
-        if self.parent:  # root dim is unchanged here (managed elsewhere), only child dim is calculated from constraints
-            self.dim = None
-
+        self.dim = None
         for c in self.children:
             c.clear_layout()
 
@@ -323,6 +320,28 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
+    # After root layout and all children are defined, call sync_delegates() on root layout to
+    # build and/or refresh delegate screen dimensions
+    def sync_delegates(self):
+        self.window.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
+        for c in self.children:
+            c.iterate_win(assign_win)
+
+
+class RootLayout(WinLayout):
+    def __init__(self, dim, **params):
+        super().__init__(None, 'main', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
+        self.dim = dim
+        self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
+
+    def clear_layout(self):
+        # root dim does not change
+        for c in self.children:
+            c.clear_layout()
+
+    def calc_constraints(self):
+        raise NotImplementedError("window constraints should be set explicitly")
+
     def size_to_terminal(self):
         # self.log(f'size_to_terminal({self.window.curses.get_terminal_size()})')
         if self._is_resizing:
@@ -337,14 +356,6 @@ class WinLayout(Layout):
 
         self._is_resizing = False
         return True
-
-    # After root layout and all children are defined, call sync_delegates() on root layout to
-    # build and/or refresh delegate screen dimensions
-    def sync_delegates(self):
-        self.window.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
-        for c in self.children:
-            c.iterate_win(assign_win)
-
 
 # A FlowLayout positions child components adjacent to each other horizontally (Orient.HORI) or
 # vertically (Orient.VERT). In the stacked direction, child components are assigned wmin size plus
@@ -407,7 +418,7 @@ class FlowLayout(Layout):
         self.dim = None
         self.con = None
         for c in self.children:
-            c.pos = None
+            c.pos = None        # manage child positions
             c.clear_layout()
 
     # First calculate constraints based on child constraints (set from bottom-up) and panel_con.
