@@ -146,11 +146,6 @@ def main(root):
                 if model.is_player(peep):
                     if player_turn(control) == 'q':
                         return 0     # QUIT GAME
-                    # elif key_input in ('=','+'):
-                    #     term = root.window.curses.term
-                    #     term.dim.w += 5
-                    #     term.dim.h += 2
-                    #     screen.size_to_terminal()
                 else:
                     if monster_turn(model, peep) == 'q':
                         model.banner('  YOU DIED! (press "q" to exit)')

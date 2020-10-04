@@ -1,6 +1,5 @@
 from lib.screen_layout import *
 from lib.screen import *
-import time
 
 class MazeScreen(Screen):
     def __init__(self, name, parent, params):
@@ -63,43 +62,7 @@ class Win:
     LOG = 'log'
     BANNER = 'banner'
 
-class MainScreen(Screen):
-    def __init__(self, **params):
-        super().__init__('main', None, params)
-        w, h = self.curses.get_terminal_size()
-        self.dim = Dim(h, w)
-        self.con = Con(h,w,h,w)
-        self.term_size = w, h
-
-    # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
-    # using a time interval to skip overly-rapid changes.
-    # Return the final size of the terminal as a Dim() instance.
-    def handle_resizing(self):
-        self.log(f'handle_resizing({self})')
-        curses = self.curses
-        term_size = (self.dim.w, self.dim.h)
-        if term_size == curses.get_terminal_size():
-            return None
-
-        # wait for resize changes to stop for a moment before resizing
-        t0 = time.time()
-        term_size = curses.get_terminal_size()
-        while time.time() - t0 < 0.3:
-            time.sleep(0.1)
-            if term_size != curses.get_terminal_size():
-                # size changed, reset timer
-                term_size = curses.get_terminal_size()
-                t0 = time.time()
-
-        w, h = term_size
-        curses.resizeterm(h, w)
-        self.dim = Dim(h, w)
-        return self.dim.copy()
-        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
-
-
-
-# An abstraction of a terminal game screen with controls to refresh and update what is shown
+#
 class PrpgControl:
     def __init__(self, root_layout, model):
         self.root_layout = root_layout

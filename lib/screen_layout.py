@@ -1,6 +1,5 @@
 # Simple window and layout support over the curses library making it easy to
 # layout resizing windows in terminal output.
-from abc import ABC
 from dataclasses import dataclass, field
 
 
