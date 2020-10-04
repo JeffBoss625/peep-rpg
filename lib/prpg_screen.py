@@ -101,7 +101,7 @@ class MainScreen(Screen):
 class PrpgControl:
     def __init__(self, root_layout, model):
         self.root_layout = root_layout
-        self.main_screen = root_layout.data
+        self.main_screen = root_layout.window
         self.model = model
 
         main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
@@ -149,8 +149,8 @@ class PrpgControl:
         by_name[Win.EQUIP].model = model.equip
 
     def get_key(self):
-        self.root_layout.data.paint()
-        return self.root_layout.data.get_key()
+        self.root_layout.window.paint()
+        return self.root_layout.window.get_key()
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])

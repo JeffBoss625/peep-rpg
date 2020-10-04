@@ -153,7 +153,7 @@ def print_win(root):
 
 def print_one_win(win, buf, xoff, yoff, depth):
     # printe('print_one_win({}, off:[{}, {}], depth:{}'.format(win, xoff, yoff, depth))
-    if not win.data.border:
+    if not win.window.border:
         return buf
 
     dim = win.dim
@@ -182,13 +182,13 @@ def test_paint():
     root.do_layout()
     sync_delegates(root)
 
-    w1.data.model = TextModel('model 1', 'window 1')
-    w2.data.model = TextModel('model 2')
-    w2.data.model.print('window 2')
+    w1.window.model = TextModel('model 1', 'window 1')
+    w2.window.model = TextModel('model 2')
+    w2.window.model.print('window 2')
 
-    root.data.rebuild_screens()
-    root.data.paint()
-    root.data.doupdate()
+    root.window.rebuild_screens()
+    root.window.paint()
+    root.window.doupdate()
     # print_win(root)
 
     assert root.info.comp_by_name['w1'].name == 'w1'

@@ -229,29 +229,26 @@ class Layout:
 
         self.sync_delegates()
 
-        self.data.rebuild_screens()
-
-    # After root layout and all children are defined, call sync_delegates() on root layout to
-    # build and/or refresh delegate screen dimensions
-    def sync_delegates(self):
-        self.data.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
-        for c in self.children:
-            c.iterate_win(assign_win)
+        self.window.rebuild_screens()
 
     def calc_child_dim(self):
         raise NotImplementedError()
 
 # initialize window delegates of children
 def assign_win(layout, _v, _d):
-    if not layout.data:
-        layout.data = layout.winparent.data.create_child_window(layout.name, layout.params)
+    if not layout.window:
+        layout.window = layout.winparent.window.create_child_window(layout.name, layout.params)
 
-    layout.data.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
+    layout.window.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
 
 @dataclass
 class RootInfo:
     comp_count: int = 0
     comp_by_name: dict = field(default_factory=dict)
+
+class Window:
+    def update_layout(self, pos, dim):
+        raise NotImplementedError()
 
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
@@ -261,7 +258,7 @@ class WinLayout(Layout):
         if con is None:
             con = Con()
         super().__init__(parent, name, pos, con, **params)
-        self.data = None      # externally-managed data (e.g. corresponding curses window)
+        self.window = None      # externally-managed window (e.g. curses window)
 
     # store parent window
         wp = parent
@@ -319,11 +316,11 @@ class WinLayout(Layout):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
     def size_to_terminal(self):
-        # self.log(f'size_to_terminal({self.data.curses.get_terminal_size()})')
+        # self.log(f'size_to_terminal({self.window.curses.get_terminal_size()})')
         if getattr(self, '_is_resizing', False):
             return False
         self._is_resizing = True
-        dim = self.data.handle_resizing()
+        dim = self.window.handle_resizing()
         if dim:
             self.dim = dim
             self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
@@ -331,6 +328,13 @@ class WinLayout(Layout):
 
         self._is_resizing = False
         return True
+
+    # After root layout and all children are defined, call sync_delegates() on root layout to
+    # build and/or refresh delegate screen dimensions
+    def sync_delegates(self):
+        self.window.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
+        for c in self.children:
+            c.iterate_win(assign_win)
 
 
 

@@ -23,8 +23,8 @@ def create_root(dim=None, out=None, scr=None, name='root'):
     root = WinLayout(None, name, Pos(0, 0), Con(dim.h, dim.w, dim.h, dim.w), logger=logger)
     root.dim = dim
 
-    root.data = MainScreen(border=0, scr=scr, curses=curseslib, logger=logger)
-    root.data.term_size = dim.w, dim.h
+    root.window = MainScreen(border=0, scr=scr, curses=curseslib, logger=logger)
+    root.window.term_size = dim.w, dim.h
     return root
 
 # callback using curses.wrapper and providing an initialized root layout component to simplify

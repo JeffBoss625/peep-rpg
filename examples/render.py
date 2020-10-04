@@ -38,11 +38,11 @@ Robert Frost
 # def create_windows(comp, v, xoff, yoff, depth):
 #     for c in comp.children:
 #         if isinstance(c, WinInfo):
-#             del c.data.scr
-#             c.data.scr = None
+#             del c.window.scr
+#             c.window.scr = None
 #             if c.dim.h > 2 and c.dim.w > 2:
 #                 comp.log('derwin({}, {})'.format(c.dim, c.pos))
-#                 c.data = c.winparent.data.derwin(c.dim, c.pos)
+#                 c.window = c.winparent.window.derwin(c.dim, c.pos)
 #
 #         v = create_windows(c, v, 0, 0, depth + 1)
 #     return v
@@ -64,8 +64,8 @@ class Handler:
 
         root.do_layout()
         sync_delegates(root)
-        root.data.rebuild_screens()
-        root.data.scr.refresh()
+        root.window.rebuild_screens()
+        root.window.scr.refresh()
 
     def size_to_term(self, force=False):
         if not force and self.term_size == os.get_terminal_size():
@@ -89,20 +89,20 @@ class Handler:
             root.clear_layout()
             root.do_layout()
 
-            root.data.scr.clear()
-            root.data.rebuild_screens()
+            root.window.scr.clear()
+            root.window.rebuild_screens()
 
             leftwin = root.info.comp_by_name['leftwin']
-            if leftwin.data.scr:
-                leftwin.data.scr.addstr(2,2, "term_size: {}".format(leftwin.dim))
+            if leftwin.window.scr:
+                leftwin.window.scr.addstr(2,2, "term_size: {}".format(leftwin.dim))
             rightwin = root.info.comp_by_name['rightwin']
-            if rightwin.data.scr:
-                rightwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
+            if rightwin.window.scr:
+                rightwin.window.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
             lowerwin = root.info.comp_by_name['lowerwin']
-            if lowerwin.data.scr:
-                lowerwin.data.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
+            if lowerwin.window.scr:
+                lowerwin.window.scr.addstr(2,2, "term_size: {}".format(rightwin.dim))
 
-            root.data.scr.refresh()
+            root.window.scr.refresh()
 
         except Exception as e:
             raise RuntimeError('resize failed: ' + str(e) + ''.join(traceback.format_tb(e.__traceback__)))

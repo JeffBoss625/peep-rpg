@@ -123,7 +123,7 @@ def monster_turn(model, monster):
             rotation += 1
 
 def main(root):
-    root.data.curses.raw()
+    root.window.curses.raw()
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
     control = PrpgControl(root, model)
 
@@ -154,7 +154,7 @@ def main(root):
                     if player_turn(control) == 'q':
                         return 0     # QUIT GAME
                     # elif key_input in ('=','+'):
-                    #     term = root.data.curses.term
+                    #     term = root.window.curses.term
                     #     term.dim.w += 5
                     #     term.dim.h += 2
                     #     screen.size_to_terminal()

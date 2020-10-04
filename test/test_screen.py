@@ -10,21 +10,21 @@ def test_message_screen():
     msg = pan.window('win2', Con(4,8,9,11), wintype=TextScreen)
     root.do_layout()
     sync_delegates(root)
-    root.data.rebuild_screens()
-    msg.data.model = TextModel('test-model')
+    root.window.rebuild_screens()
+    msg.window.model = TextModel('test-model')
     call_info = []
-    msg.data.model.subscribe(lambda model, msg, **params: call_info.append((model.model_name, msg, params['new'])))
-    msg.data.model.print('hi there', 'you')
+    msg.window.model.subscribe(lambda model, msg, **params: call_info.append((model.model_name, msg, params['new'])))
+    msg.window.model.print('hi there', 'you')
     assert call_info == [('test-model', 'update', ['hi there you'])]
-    assert msg.data.model.text == ['hi there you']
-    msg.data.paint()
-    msg.data.model.print('hi 1234567890')
-    msg.data.model.print('hi 1234567890')
-    msg.data.model.print('hi 1234567890')
-    msg.data.model.print('hi 1234567890')
-    msg.data.model.print('hi 1234567890')
-    msg.data.model.print('hi 1234567890')
-    msg.data.paint()
-    root.data.curses.doupdate()
+    assert msg.window.model.text == ['hi there you']
+    msg.window.paint()
+    msg.window.model.print('hi 1234567890')
+    msg.window.model.print('hi 1234567890')
+    msg.window.model.print('hi 1234567890')
+    msg.window.model.print('hi 1234567890')
+    msg.window.model.print('hi 1234567890')
+    msg.window.model.print('hi 1234567890')
+    msg.window.paint()
+    root.window.curses.doupdate()
 
 
