@@ -21,6 +21,7 @@ class Pos:
     def invert(self):
         return Pos(self.x, self.y)
 
+
 # Width and Height of a Comp(onent).
 @dataclass
 class Dim:
@@ -62,9 +63,10 @@ class Dim:
 
 # Constraint application strategy - dictates how constraints are merged
 class ConApply:
-    STACK = 'stack',       # add the applied constraint, as with width constraints added horizontally across
-    CONTAIN = 'contain',   # create the most constraining result of the two, as with a parent and it's content constraints
-    ADJACENT = 'adjacent', # use the greatest of lower bound and upper bound, as with height constraints of adjacent components
+    STACK = 'stack',  # add the applied constraint, as with width constraints added horizontally across
+    CONTAIN = 'contain',  # create the most constraining result of the two, as with a parent and it's content constraints
+    ADJACENT = 'adjacent',  # use the greatest of lower bound and upper bound, as with height constraints of adjacent components
+
 
 class Orient:
     VERT = 'VERT'
@@ -75,6 +77,7 @@ class Orient:
         if orient == Orient.HORI: return Orient.VERT
         if orient == Orient.VERT: return Orient.HORI
         raise ValueError("unknown orientation: " + orient)
+
 
 # Constraint defines Comp(onent) min and max width and height. It us used for calculating
 # Comp(ononet) Dim(ensions) in flow layouts
@@ -116,7 +119,7 @@ class Con:
     def apply(self, con, h_apply, w_apply):
         if h_apply == ConApply.CONTAIN:
             self.hmin = max(self.hmin, con.hmin)
-            self.hmax = max(self.hmax, con.hmax) if self.hmax==0 or con.hmax==0 else min(self.hmax, con.hmax)
+            self.hmax = max(self.hmax, con.hmax) if self.hmax == 0 or con.hmax == 0 else min(self.hmax, con.hmax)
         elif h_apply == ConApply.ADJACENT:
             self.hmin = max(self.hmin, con.hmin)
             self.hmax = 0 if self.hmax == 0 or con.hmax == 0 else max(self.hmax, con.hmax)
@@ -128,7 +131,7 @@ class Con:
 
         if w_apply == ConApply.CONTAIN:
             self.wmin = max(self.wmin, con.wmin)
-            self.wmax = max(self.wmax, con.wmax) if self.wmax==0 or con.wmax==0 else min(self.wmax, con.wmax)
+            self.wmax = max(self.wmax, con.wmax) if self.wmax == 0 or con.wmax == 0 else min(self.wmax, con.wmax)
         elif w_apply == ConApply.ADJACENT:
             self.wmin = max(self.wmin, con.wmin)
             self.wmax = 0 if self.wmax == 0 or con.wmax == 0 else max(self.wmax, con.wmax)
@@ -150,8 +153,8 @@ class Layout:
     def __init__(self, parent, name, pos, con, **params):
         self.parent = parent
         self.name = name
-        self.pos = pos        # position within parent. children of panels have this managed by parent.do_layout()
-        self.con = con        # constraints used to calculate dim
+        self.pos = pos  # position within parent. children of panels have this managed by parent.do_layout()
+        self.con = con  # constraints used to calculate dim
         self.params = params if params else {}
 
         self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
@@ -212,27 +215,9 @@ class Layout:
 
         return v
 
-    # This is called from root down after clear_layout(). Panel instances override this to layout children
-    # and update their own dimension and constraints
-    def do_layout(self):
-        self.log(f'do_layout({self.name}, {self.dim})')
-        self.clear_layout()
-
-        # calculate missing constraints (bottom-up)
-        def calc_con(comp, _v):
-            if not comp.con:
-                comp.calc_constraints()
-
-        self.apply_ddf(calc_con)
-
-        self.calc_child_dim()
-
-        self.sync_delegates()
-
-        self.window.rebuild_screens()
-
     def calc_child_dim(self):
         raise NotImplementedError()
+
 
 # initialize window delegates of children
 def assign_win(layout, _v, _d):
@@ -241,14 +226,17 @@ def assign_win(layout, _v, _d):
 
     layout.window.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
 
+
 @dataclass
 class RootInfo:
     comp_count: int = 0
     comp_by_name: dict = field(default_factory=dict)
 
+
 class Window:
     def update_layout(self, pos, dim):
         raise NotImplementedError()
+
 
 # a component with fixed position children (relative to parent).
 # Windows also have an id counter and an assignable name.
@@ -258,9 +246,10 @@ class WinLayout(Layout):
         if con is None:
             con = Con()
         super().__init__(parent, name, pos, con, **params)
-        self.window = None      # externally-managed window (e.g. curses window)
+        self.window = None  # externally-managed window (e.g. curses window)
+        self._is_resizing = False
 
-    # store parent window
+        # store parent window
         wp = parent
         while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
@@ -271,14 +260,14 @@ class WinLayout(Layout):
 
     def window(self, name, pos, con, **kwds):
         if not pos:
-            pos = Pos(0,0)
+            pos = Pos(0, 0)
         ret = WinLayout(self, name, pos, con, **kwds)
         self.children.append(ret)
         return ret
 
     def panel(self, name, orient, pos, con):
         if not pos:
-            pos = Pos(0,0)
+            pos = Pos(0, 0)
         ret = FlowLayout(self, name, orient, pos, con)
         self.children.append(ret)
         return ret
@@ -306,19 +295,39 @@ class WinLayout(Layout):
             c.calc_child_dim()
 
     def clear_layout(self):
-        if self.parent:       # root dim is unchanged here (managed elsewhere), only child dim is calculated from constraints
+        if self.parent:  # root dim is unchanged here (managed elsewhere), only child dim is calculated from constraints
             self.dim = None
 
         for c in self.children:
             c.clear_layout()
+
+    # This is called from root down after clear_layout(). Panel instances override this to layout children
+    # and update their own dimension and constraints
+    def do_layout(self):
+        self.log(f'do_layout({self.name}, {self.dim})')
+        self.clear_layout()
+
+        # calculate missing constraints (bottom-up)
+        def calc_con(comp, _v):
+            if not comp.con:
+                comp.calc_constraints()
+
+        self.apply_ddf(calc_con)
+
+        self.calc_child_dim()
+
+        self.sync_delegates()
+
+        self.window.rebuild_screens()
 
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
     def size_to_terminal(self):
         # self.log(f'size_to_terminal({self.window.curses.get_terminal_size()})')
-        if getattr(self, '_is_resizing', False):
+        if self._is_resizing:
             return False
+
         self._is_resizing = True
         dim = self.window.handle_resizing()
         if dim:
@@ -335,7 +344,6 @@ class WinLayout(Layout):
         self.window.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
         for c in self.children:
             c.iterate_win(assign_win)
-
 
 
 # A FlowLayout positions child components adjacent to each other horizontally (Orient.HORI) or
@@ -383,7 +391,7 @@ class WinLayout(Layout):
 #
 class FlowLayout(Layout):
     def __init__(self, parent, name, orient, pos, panel_con):
-        super().__init__(parent, name, pos, None) # con is calculated from children do_layout()
+        super().__init__(parent, name, pos, None)  # con is calculated from children do_layout()
 
         if not panel_con:
             panel_con = Con()
@@ -413,7 +421,7 @@ class FlowLayout(Layout):
             h_apply = ConApply.ADJACENT
             w_apply = ConApply.STACK
 
-        self.con = self._calc_constraints(h_apply, w_apply)     # calculate AND SET child constraints (bottom up)
+        self.con = self._calc_constraints(h_apply, w_apply)  # calculate AND SET child constraints (bottom up)
         # self.log('...calc_constraints({})'.format(self))
 
     # calculate constraints from bottom-up for all constraints that are not set
@@ -467,10 +475,10 @@ class FlowLayout(Layout):
             c_size = c_sizes[i]
             c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
             if orient == Orient.HORI:
-                c.pos = Pos(offset_fixed,offset_flow)
+                c.pos = Pos(offset_fixed, offset_flow)
                 c.dim = Dim(c_size_fixed, c_size)
             elif orient == Orient.VERT:
-                c.pos = Pos(offset_flow,offset_fixed)
+                c.pos = Pos(offset_flow, offset_fixed)
                 c.dim = Dim(c_size, c_size_fixed)
             else:
                 raise ValueError("unknown orientation: " + orient)
@@ -479,6 +487,7 @@ class FlowLayout(Layout):
 
         for c in self.children:
             c.calc_child_dim()
+
 
 def min0(*a):
     ret = a[0]
@@ -489,6 +498,7 @@ def min0(*a):
             ret = v
     return ret
 
+
 def sum_max0(a):
     ret = 0
     for v in a:
@@ -496,6 +506,7 @@ def sum_max0(a):
             return 0
         ret += v
     return ret
+
 
 # place min-sized childrent and truncate the last child and children to fit
 def flow_calc_size_trunc(avail, ccon_mins):
@@ -516,10 +527,11 @@ def flow_calc_size_trunc(avail, ccon_mins):
 
     return ret
 
+
 # expand children from min size to evenly distribute extra allowed space to children
 def flow_calc_size_fill(required, avail, ccon_mins, ccon_maxs):
     ret = []
-    extra = avail - required    # extra space to distribute among children
+    extra = avail - required  # extra space to distribute among children
     num_children = len(ccon_mins)
     for ci, c_min in enumerate(ccon_mins):
         c_max = min0(ccon_maxs[ci], c_min + extra)
@@ -533,12 +545,13 @@ def flow_calc_size_fill(required, avail, ccon_mins, ccon_maxs):
 
     return ret
 
+
 # calculate dimension size in a flow layout (e.g. left-to-right or top-to-bottom) for
 # a given list of min and max constraints in an available amount of space.
 # Return the list of sizes, one per constraint pair
 def flow_calc_sizes(avail, mins, maxs):
-    required_space = sum(mins)                  # min space required
-    avail_space = min0(sum_max0(maxs), avail)   # ...bound by panel and dim
+    required_space = sum(mins)  # min space required
+    avail_space = min0(sum_max0(maxs), avail)  # ...bound by panel and dim
 
     if avail_space < required_space:
         c_sizes = flow_calc_size_trunc(avail_space, mins)
@@ -546,4 +559,3 @@ def flow_calc_sizes(avail, mins, maxs):
         c_sizes = flow_calc_size_fill(required_space, avail_space, mins, maxs)
 
     return c_sizes
-
