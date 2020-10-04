@@ -127,16 +127,8 @@ def main(root):
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
     control = PrpgControl(root, model)
 
-    def resize_handler(_signum, _frame):
-        try:
-            if control.root_layout.size_to_terminal():
-                control.main_screen.paint(force=True)
-
-        except Exception as e:
-            control.root_layout.log(e)
-
     if sys.platform != "win32":
-        signal.signal(signal.SIGWINCH, resize_handler)
+        register_resize_handler(control)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
@@ -170,3 +162,14 @@ def main(root):
                 model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
 
                 # model.undirty()
+
+def register_resize_handler(control):
+    def resize_handler(_signum, _frame):
+        try:
+            if control.root_layout.size_to_terminal():
+                control.main_screen.paint(force=True)
+
+        except Exception as e:
+            control.root_layout.log(e)
+
+    signal.signal(signal.SIGWINCH, resize_handler)
