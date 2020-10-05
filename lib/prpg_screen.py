@@ -118,7 +118,7 @@ def init_windows(root_layout, model, scr, curses):
         layout.window = constructor(layout.name, pwin, model=m, **params)
 
     # custom windows
-    init(Win.MAIN,      MainScreen, model, scr=scr, curses=curses, border=0, logger=root_layout.logger())
+    init(Win.MAIN,      MainScreen, model, dim=root_layout.dim, scr=scr, curses=curses, border=0, logger=root_layout.logger())
     init(Win.STATS,     StatsScreen, model.maze)
     init(Win.EQUIP,     EquipScreen, model.equip)
     init(Win.MAZE,      MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)

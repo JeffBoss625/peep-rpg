@@ -274,10 +274,8 @@ class BlankScreen(Screen):
 class MainScreen(Screen):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
-        w, h = self.curses.get_terminal_size()
         self.pos = Pos(0,0)
-        self.dim = Dim(h, w)
-        self.con = Con(h,w,h,w)
+        self.dim = params.get('dim')
 
     def handle_resizing(self, w, h):
         self.curses.resizeterm(w, h)

@@ -160,7 +160,7 @@ def main(root_layout, scr, curses):
 def register_resize_handler(control):
     def resize_handler(_signum, _frame):
         try:
-            if control.root_layout.size_to_terminal():
+            if control.root_layout.handle_resizing():
                 control.main_screen.paint(force=True)
 
         except Exception as e:

@@ -321,31 +321,19 @@ class RootLayout(WinLayout):
     def calc_constraints(self):
         raise NotImplementedError("window constraints should be set explicitly")
 
-    # todo: move this out to screen_layout
     # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
-    # using a time interval to skip overly-rapid changes.
-    # Return the final size of the terminal as a Dim() instance.
     def handle_resizing(self):
-        # self.log(f'handle_resizing({self})')
-        term_size = os.get_terminal_size()
-        if term_size == (self.dim.w, self.dim.h):
-            return None
-        w, h = term_size
-        self.window.handle_resizing(h, w)
-        self.dim = Dim(h, w)
-        return self.dim
-        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
-
-    def size_to_terminal(self):
-        # self.log(f'size_to_terminal({self.window.curses.get_terminal_size()})')
         if self._is_resizing:
             return False
 
         self._is_resizing = True
-        dim = self.handle_resizing()
-        if dim:
-            self.dim = dim.dup()
-            self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
+        term_size = os.get_terminal_size()
+        # self.log(f'handle_resizing({os.get_terminal_size()})')
+        if term_size != (self.dim.w, self.dim.h):
+            w, h = term_size
+            self.window.handle_resizing(h, w)
+            self.dim = Dim(h, w)
+            self.con = Con(h, w, h, w)
             self.do_layout()
 
         self._is_resizing = False
