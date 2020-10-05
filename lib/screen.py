@@ -78,25 +78,16 @@ class Screen:
     # delete and rebuild curses screens using layout information (recursive on children. root screen
     # is kept intact.)
     def layout_change(self, parent, pos, dim):
-        is_changed = self.pos != pos or self.dim != dim
         if parent is None:
-            if is_changed:
-                raise ValueError('root changes to pos and dim not supported')
-            return
-        if is_changed:
-            self.pos = pos
-            self.dim = dim
-            if self.scr:
-                del self.scr
-                self.scr = None
-            # ... build scr
-        else:
-            if self.scr:
-                return   # nothing to do
-            # ... build scr
+            raise ValueError('root changes to pos and dim not supported')
+        self.pos = pos
+        self.dim = dim
+        if self.scr:
+            del self.scr
+            self.scr = None
 
-        if self.dim.w and self.dim.h:
-            self.scr = parent.derwin(self.dim, self.pos)
+        if dim.w and dim.h:
+            self.scr = parent.derwin(dim, pos)
 
     #
     # TREE Navigation/Initialization functions

@@ -284,7 +284,7 @@ class WinLayout(Layout):
     # This is called from root down after clear_layout(). Panel instances override this to layout children
     # and update their own dimension and constraints
     def do_layout(self):
-        self.log(f'do_layout({self.name}, {self.dim})')
+        # self.log(f'do_layout({self.name}, {self.dim})')
         self.clear_layout()
 
         # calculate missing constraints (bottom-up)
@@ -296,7 +296,8 @@ class WinLayout(Layout):
 
         self.calc_child_dim()
 
-        self.iterate_win(update_win_layout)
+        for c in self.children:
+            c.iterate_win(update_win_layout)
 
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
@@ -304,7 +305,7 @@ class WinLayout(Layout):
 # initialize window delegates of children
 def update_win_layout(layout, _v, _d):
     pwin = layout.winparent.window if layout.winparent else None
-    layout.window.layout_change(pwin, layout.pos, layout.dim)
+    layout.window.layout_change(pwin, layout.pos, layout.dim)   # todo: only propogate if pos or dim actually changed
 
 class RootLayout(WinLayout):
     def __init__(self, dim, **params):
@@ -315,7 +316,7 @@ class RootLayout(WinLayout):
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
     def clear_layout(self):
-        # root dim does not change
+        # root dim does not get cleared
         for c in self.children:
             c.clear_layout()
 
