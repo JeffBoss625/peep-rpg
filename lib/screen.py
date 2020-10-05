@@ -22,7 +22,7 @@ class RootInfo:
 
 # abstraction wrapping a curses window.
 class Screen:
-    def __init__(self, name, parent, params):
+    def __init__(self, name, parent, **params):
         self.name = name
         self.params = params
         self.parent = parent
@@ -281,19 +281,19 @@ def align_y_offset(align_y, margin_y, nlines, max_h):
 
 
 class TextScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
     def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
 class BlankScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
 class MainScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
         w, h = self.curses.get_terminal_size()
         self.pos = Pos(0,0)
         self.dim = Dim(h, w)

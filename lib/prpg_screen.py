@@ -2,8 +2,8 @@ from lib.screen_layout import *
 from lib.screen import *
 
 class MazeScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
     def do_paint(self):
         text_h = len(self.model.walls.text)
@@ -15,8 +15,8 @@ class MazeScreen(Screen):
             self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
 class TitleBarScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
     def do_paint(self):
         p = self.model.player
@@ -29,8 +29,8 @@ class TitleBarScreen(Screen):
         ])
 
 class StatsScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
     def do_paint(self):
         p = self.model.player
@@ -42,8 +42,8 @@ class StatsScreen(Screen):
         ])
 
 class EquipScreen(Screen):
-    def __init__(self, name, parent, params):
-        super().__init__(name, parent, params)
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
 
     def do_paint(self):
         p = self.model.player
@@ -114,9 +114,8 @@ def init_windows(root_layout, model, scr, curses):
 
     def init(name, constructor, m, **params):
         layout = by_name[name]
-        params['model'] = m
         pwin = layout.winparent.window if layout.winparent else None
-        layout.window = constructor(layout.name, pwin, params)
+        layout.window = constructor(layout.name, pwin, model=m, **params)
 
     # custom windows
     init(Win.MAIN,      MainScreen, model, scr=scr, curses=curses, border=0, logger=root_layout.logger())
