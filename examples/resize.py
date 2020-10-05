@@ -49,7 +49,7 @@ class Handler:
         self.win4.scrollok(True)
         self.except_str = ''
 
-    def size_to_term(self, force = False):
+    def size_to_term(self, force=False):
         if not force and self.term_size == os.get_terminal_size():
             return
 
@@ -113,7 +113,7 @@ def main(scr):
     curses.raw()
     handler = Handler(scr)
 
-    def resize_handler(signum, frame):
+    def resize_handler(_signum, _frame):
         handler.size_to_term(True)
 
     signal.signal(signal.SIGWINCH, resize_handler)
