@@ -1,6 +1,5 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import sys
-import time
 from dataclasses import dataclass, field
 
 from lib.constants import COLOR, SIDE, curses_color
@@ -287,23 +286,11 @@ class MainScreen(Screen):
     # Return the final size of the terminal as a Dim() instance.
     def handle_resizing(self):
         self.log(f'handle_resizing({self})')
-        curses = self.curses
-        term_size = (self.dim.w, self.dim.h)
-        if term_size == curses.get_terminal_size():
+        term_size = self.curses.get_terminal_size()
+        if term_size == (self.dim.w, self.dim.h):
             return None
-
-        # wait for resize changes to stop for a moment before resizing
-        t0 = time.time()
-        term_size = curses.get_terminal_size()
-        while time.time() - t0 < 0.3:
-            time.sleep(0.1)
-            if term_size != curses.get_terminal_size():
-                # size changed, reset timer
-                term_size = curses.get_terminal_size()
-                t0 = time.time()
-
         w, h = term_size
-        curses.resizeterm(h, w)
+        self.curses.resizeterm(h, w)
         self.dim = Dim(h, w)
         return self.dim
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
