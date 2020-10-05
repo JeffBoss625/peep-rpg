@@ -41,11 +41,11 @@ class Screen:
         self.pos = None     # todo: manage these from layout manager
 
         self._logger = params.get('logger', None)
-        self.__model = params.get('model')
+        self.model = params.get('model')
 
         def update_fn(_model, _msg, **_kwds):
             self.needs_paint = True
-        self.__model.subscribe(update_fn)
+        self.model.subscribe(update_fn)
 
         if parent:
             self.curses = parent.curses
@@ -74,10 +74,6 @@ class Screen:
 
     def __repr__(self):
         return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
-
-    @property
-    def model(self):
-        return self.__model
 
     # delete and rebuild curses screens using layout information (recursive on children. root screen
     # is kept intact.)
