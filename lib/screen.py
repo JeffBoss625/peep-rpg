@@ -178,8 +178,6 @@ class Screen:
             return
         if self.parent and not self.model:
             raise RuntimeError('no model to paint in {}'.format(self.name))
-        if self.dim.w == 0 or self.dim.h == 0:
-            return
         # if not self.needs_paint and not force:
         #     return
 
