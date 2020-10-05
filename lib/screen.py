@@ -285,7 +285,7 @@ class MainScreen(Screen):
     # using a time interval to skip overly-rapid changes.
     # Return the final size of the terminal as a Dim() instance.
     def handle_resizing(self):
-        self.log(f'handle_resizing({self})')
+        # self.log(f'handle_resizing({self})')
         term_size = self.curses.get_terminal_size()
         if term_size == (self.dim.w, self.dim.h):
             return None
