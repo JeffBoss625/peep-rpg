@@ -114,8 +114,8 @@ class Con:
     def dup(self):
         return Con(self.hmin, self.wmin, self.hmax, self.wmax)
 
-    # adjust this constraint by applying another constraint with the given constraint rule along the given orientation
-    def constrain(self, con, rule, orient):
+    # adjust this constraint by the given rule along the specified orientation, bounding it by lo and hi bounds
+    def constrain(self, rule, orient, vmin, vmax):
         if orient == Orient.VERT:
             pmin = 'hmin'
             pmax = 'hmax'
@@ -123,19 +123,17 @@ class Con:
             pmin = 'wmin'
             pmax = 'wmax'
 
-        conmin = getattr(con, pmin)
-        conmax = getattr(con, pmax)
         slfmin = getattr(self, pmin)
         slfmax = getattr(self, pmax)
         if rule == ConApply.CONTAIN:
-            setattr(self, pmin, max(slfmin, conmin))  # constrain to least minimum
-            setattr(self, pmax, max(slfmax, conmax) if slfmax == 0 or conmax == 0 else min(slfmax, conmax)) # constrain to smallest
+            setattr(self, pmin, max(slfmin, vmin))  # constrain to least minimum
+            setattr(self, pmax, max(slfmax, vmax) if slfmax == 0 or vmax == 0 else min(slfmax, vmax)) # constrain to smallest
         elif rule == ConApply.ADJACENT:
-            setattr(self, pmin, max(slfmin, conmin))
-            setattr(self, pmax, 0 if slfmax == 0 or conmax == 0 else max(slfmax, conmax))  # expand to greatest max
+            setattr(self, pmin, max(slfmin, vmin))
+            setattr(self, pmax, 0 if slfmax == 0 or vmax == 0 else max(slfmax, vmax))  # expand to greatest max
         elif rule == ConApply.STACK:
-            setattr(self, pmin, slfmin + conmin)
-            setattr(self, pmax, 0 if slfmax == 0 or conmax == 0 else slfmax + conmax)      # no max if any is 0
+            setattr(self, pmin, slfmin + vmin)
+            setattr(self, pmax, 0 if slfmax == 0 or vmax == 0 else slfmax + vmax)      # no max if any is 0
         else:
             raise RuntimeError(f'rule {rule} not handled')
 
@@ -426,11 +424,11 @@ class FlowLayout(Layout):
 
         ret = self.children[0].con.dup()
         for c in self.children[1:]:
-            ret.constrain(c.con, vert_rule, Orient.VERT)
-            ret.constrain(c.con, hori_rule, Orient.HORI)
+            ret.constrain(vert_rule, Orient.VERT, c.con.hmin, c.con.hmax)
+            ret.constrain(hori_rule, Orient.HORI, c.con.wmin, c.con.wmax)
 
-        ret.constrain(self.panel_con, ConApply.CONTAIN, Orient.VERT)
-        ret.constrain(self.panel_con, ConApply.CONTAIN, Orient.HORI)
+        ret.constrain(ConApply.CONTAIN, Orient.VERT, self.panel_con.hmin, self.panel_con.hmax)
+        ret.constrain(ConApply.CONTAIN, Orient.HORI, self.panel_con.wmin, self.panel_con.wmax)
         return ret
 
     def window(self, name, con, **kwds):
