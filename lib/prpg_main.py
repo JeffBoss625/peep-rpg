@@ -122,10 +122,9 @@ def monster_turn(model, monster):
                 return
             rotation += 1
 
-def main(root):
-    root.window.curses.raw()
+def main(root_layout, scr, curses):
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
-    control = PrpgControl(root, model)
+    control = PrpgControl(root_layout, model, scr, curses)
 
     if sys.platform != "win32":
         register_resize_handler(control)

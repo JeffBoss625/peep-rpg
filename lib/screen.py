@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass, field
 
 from lib.constants import COLOR, SIDE, curses_color
-from lib.screen_layout import Dim, min0, Con
+from lib.screen_layout import Dim, min0, Con, Pos
 
 
 def printe(s):
@@ -36,16 +36,22 @@ class Screen:
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
-        self.model = None
         self.needs_paint = True
-        # self.dim = None
-        # self.pos = None     # todo: manage these from layout manager
+        self.dim = None
+        self.pos = None     # todo: manage these from layout manager
 
         self._logger = params.get('logger', None)
+        self.__model = params.get('model')
+
+        def update_fn(_model, _msg, **_kwds):
+            self.needs_paint = True
+        self.__model.subscribe(update_fn)
 
         if parent:
             self.curses = parent.curses
             parent.children.append(self)
+        else:
+            self.curses = params.get('curses')
 
         # store consolidated window information in the root object
         if parent:
@@ -73,20 +79,28 @@ class Screen:
     def model(self):
         return self.__model
 
-    @model.setter
-    def model(self, m):
-        if not hasattr(self, '__model') or m != getattr(self, '__model', None):
-            self.__model = m
+    # delete and rebuild curses screens using layout information (recursive on children. root screen
+    # is kept intact.)
+    def layout_change(self, parent, pos, dim):
+        is_changed = self.pos != pos or self.dim != dim
+        if parent is None:
+            if is_changed:
+                raise ValueError('root changes to pos and dim not supported')
+            return
+        if is_changed:
+            self.pos = pos
+            self.dim = dim
+            if self.scr:
+                del self.scr
+                self.scr = None
+            # ... build scr
+        else:
+            if self.scr:
+                return   # nothing to do
+            # ... build scr
 
-            if m:
-                def update_fn(_model, _msg, **_kwds):
-                    self.needs_paint = True
-                m.subscribe(update_fn)
-                self.needs_paint = True
-
-    def layout_change(self, pos, dim):
-        self.pos = pos
-        self.dim = dim
+        if self.dim.w and self.dim.h:
+            self.scr = parent.derwin(self.dim, self.pos)
 
     #
     # TREE Navigation/Initialization functions
@@ -97,18 +111,8 @@ class Screen:
             ret = ret.parent
         return ret
 
-    # delete and rebuild curses screens using layout information (recursive on children. root screen
-    # is kept intact.)
-    def rebuild_screens(self):
-        for c in self.children:
-            if c.scr:
-                del c.scr
-                c.scr = None
-            if c.dim.w and c.dim.h:
-                c.scr = self.derwin(c.dim, c.pos)
-            c.rebuild_screens()
 
- #
+    #
     # CURSES Interface
     #
     def clear(self):
@@ -130,6 +134,7 @@ class Screen:
 
         return max_w, max_h
 
+    # todo: move _logger to root
     def logger(self):
         if not self._logger:
             self._logger = self.root()._logger
@@ -253,15 +258,6 @@ class Screen:
 
         return self.color_pairs[key]
 
-    # required factory function for layout interface
-    def create_child_window(self, name, params):
-        wintype = params.get('wintype', None)
-
-        if wintype is None:
-            wintype = BlankScreen
-        return wintype(name, self, params)
-
-
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):
     if align_x == SIDE.LEFT:
@@ -296,13 +292,15 @@ class BlankScreen(Screen):
         super().__init__(name, parent, params)
 
 class MainScreen(Screen):
-    def __init__(self, **params):
-        super().__init__('main', None, params)
+    def __init__(self, name, parent, params):
+        super().__init__(name, parent, params)
         w, h = self.curses.get_terminal_size()
+        self.pos = Pos(0,0)
         self.dim = Dim(h, w)
         self.con = Con(h,w,h,w)
         self.term_size = w, h
 
+    # todo: move this out to screen_layout
     # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
     # using a time interval to skip overly-rapid changes.
     # Return the final size of the terminal as a Dim() instance.

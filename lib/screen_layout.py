@@ -161,14 +161,7 @@ class Layout:
         self._logger = params.get('logger', None)
 
         # store consolidated window information in the root object
-        if parent:
-            root = parent
-            while root.parent:
-                root = root.parent
-        else:
-            self.info = RootInfo()
-            root = self
-
+        root = self.root()
         root.info.comp_count += 1
         self.id = root.info.comp_count
         if not self.name:
@@ -216,15 +209,6 @@ class Layout:
 
     def calc_child_dim(self):
         raise NotImplementedError()
-
-
-# initialize window delegates of children
-def assign_win(layout, _v, _d):
-    if not layout.window:
-        layout.window = layout.winparent.window.create_child_window(layout.name, layout.params)
-
-    layout.window.layout_change(Pos(layout.pos.y, layout.pos.x), Dim(layout.dim.h, layout.dim.w))
-
 
 @dataclass
 class RootInfo:
@@ -312,24 +296,21 @@ class WinLayout(Layout):
 
         self.calc_child_dim()
 
-        self.sync_delegates()
-
-        self.window.rebuild_screens()
+        self.iterate_win(update_win_layout)
 
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
-    # After root layout and all children are defined, call sync_delegates() on root layout to
-    # build and/or refresh delegate screen dimensions
-    def sync_delegates(self):
-        self.window.layout_change(Pos(0, 0), Dim(self.dim.h, self.dim.w))
-        for c in self.children:
-            c.iterate_win(assign_win)
-
+# initialize window delegates of children
+def update_win_layout(layout, _v, _d):
+    pwin = layout.winparent.window if layout.winparent else None
+    layout.window.layout_change(pwin, layout.pos, layout.dim)
 
 class RootLayout(WinLayout):
     def __init__(self, dim, **params):
+        self.info = RootInfo()          # info needs to be in place for super() init to register name
         super().__init__(None, 'main', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
+
         self.dim = dim
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 

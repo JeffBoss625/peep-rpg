@@ -1,5 +1,8 @@
+from lib.dummy_curses import DummyCurses
+from lib.logger import Logger
 from lib.prpg_main import main
-from lib.screen_layout import Dim
-from lib.startup import create_root
+from lib.screen_layout import Dim, RootLayout
 
-main(create_root(name='main', dim=Dim(40, 120)))
+dim = Dim(40, 120)
+curseslib = DummyCurses(dim)
+main(RootLayout(dim.copy(), logger=Logger('dbg.py')), curseslib.term, curseslib)

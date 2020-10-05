@@ -64,15 +64,14 @@ class Win:
 
 #
 class PrpgControl:
-    def __init__(self, root_layout, model):
+    def __init__(self, root_layout, model, scr, curses):
         self.root_layout = root_layout
-        self.main_screen = root_layout.window
         self.model = model
 
         main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0), wintype=TitleBarScreen)
+        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0))
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
@@ -81,41 +80,55 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(Win.STATS, Con(10,30,10,30), wintype=StatsScreen)
-        center_col1.window(Win.EQUIP, Con(20,30,0,30), wintype=EquipScreen)
+        center_col1.window(Win.STATS, Con(10,30,10,30))
+        center_col1.window(Win.EQUIP, Con(20,30,0,30))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
-        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h, 60), wintype=TextScreen, trunc_y=SIDE.TOP)
-        center_col2.window(Win.MAZE, Con(maze_h, maze_w, 0, 60), wintype=MazeScreen, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h, 60))
+        center_col2.window(Win.MAZE, Con(maze_h, maze_w, 0, 60))
 
-        center.window(Win.MESSAGES, Con(6,       maze_w, 0, 0), wintype=TextScreen, trunc_y=SIDE.TOP)
+        center.window(Win.MESSAGES, Con(6, maze_w, 0, 0))
 
         # Bottom Row
-        main_panel.window(Win.LOG, Con(4,30), wintype=TextScreen, trunc_y=SIDE.TOP)
+        main_panel.window(Win.LOG, Con(4,30))
+
+        init_windows(root_layout, model, scr, curses)
+        self.main_screen = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
-        self.connect_models(self.main_screen, self.model)
 
         def log_event_fn(m, msg, **kwds):
             name = getattr(m, '"name" ', '')
             model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
         model.maze.subscribe(log_event_fn)
-
-    @staticmethod
-    def connect_models(main_screen, model):
-        by_name = main_screen.info.win_by_name
-        by_name[Win.MESSAGES].model = model.message_model
-        by_name[Win.LOG].model = model.log_model
-        by_name[Win.MAZE].model = model.maze
-        by_name[Win.TITLE_BAR].model = model.maze
-        by_name[Win.BANNER].model = model.banner_model
-        by_name[Win.STATS].model = model.maze
-        by_name[Win.EQUIP].model = model.equip
+        self.main_screen.curses.raw()
+        self.main_screen.curses.curs_set(0)
 
     def get_key(self):
         self.root_layout.window.paint()
         return self.root_layout.window.get_key()
+
+def init_windows(root_layout, model, scr, curses):
+    by_name = root_layout.info.comp_by_name
+
+    def init(name, constructor, m, **params):
+        layout = by_name[name]
+        params['model'] = m
+        pwin = layout.winparent.window if layout.winparent else None
+        layout.window = constructor(layout.name, pwin, params)
+
+    # custom windows
+    init(Win.MAIN,      MainScreen, model, scr=scr, curses=curses, border=0, logger=root_layout.logger())
+    init(Win.STATS,     StatsScreen, model.maze)
+    init(Win.EQUIP,     EquipScreen, model.equip)
+    init(Win.MAZE,      MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+
+    # standard windows
+    init(Win.TITLE_BAR, TextScreen, model.title_bar, trunc_y=SIDE.TOP)
+    init(Win.BANNER,    TextScreen, model.banner_model, trunc_y=SIDE.TOP)
+    init(Win.MESSAGES,  TextScreen, model.message_model, trunc_y=SIDE.TOP)
+    init(Win.LOG,       TextScreen, model.log_model, trunc_y=SIDE.TOP)
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
