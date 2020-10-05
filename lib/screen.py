@@ -277,6 +277,7 @@ class MainScreen(Screen):
         self.pos = Pos(0,0)
         self.dim = params.get('dim')
 
+    # called after main terminal window is resized by a user, but before layouts are recalculated.
     def handle_resizing(self, w, h):
         self.curses.resizeterm(w, h)
 

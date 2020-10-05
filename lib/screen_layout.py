@@ -228,12 +228,14 @@ class WinLayout(Layout):
         super().__init__(parent, name, pos, con, **params)
         self.window = None              # externally-managed window (e.g. curses window)
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
+        self._last_layout_update = (self.pos, self.dim)   # track last published pos/dim for this layout
 
         # store parent window
         wp = parent
         while wp and not isinstance(wp, WinLayout):
             wp = wp.parent
         self.winparent = wp
+
 
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
@@ -300,10 +302,15 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
-# initialize window delegates of children
+# initialize window delegates of children of position or dimension changes
 def update_win_layout(layout, _v, _d):
+    posdim = (layout.pos, layout.dim)
+    if posdim == layout._last_layout_update:
+        return  # no change
+
     pwin = layout.winparent.window if layout.winparent else None
-    layout.window.layout_change(pwin, layout.pos, layout.dim)   # todo: only propogate if pos or dim actually changed
+    layout._last_layout_update = posdim
+    layout.window.layout_change(pwin, layout.pos, layout.dim)
 
 class RootLayout(WinLayout):
     def __init__(self, dim, **params):
@@ -331,9 +338,9 @@ class RootLayout(WinLayout):
         # self.log(f'handle_resizing({os.get_terminal_size()})')
         if term_size != (self.dim.w, self.dim.h):
             w, h = term_size
-            self.window.handle_resizing(h, w)
             self.dim = Dim(h, w)
             self.con = Con(h, w, h, w)
+            self.window.handle_resizing(h, w)
             self.do_layout()
 
         self._is_resizing = False
