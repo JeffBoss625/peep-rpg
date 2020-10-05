@@ -279,20 +279,8 @@ class MainScreen(Screen):
         self.dim = Dim(h, w)
         self.con = Con(h,w,h,w)
 
-    # todo: move this out to screen_layout
-    # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
-    # using a time interval to skip overly-rapid changes.
-    # Return the final size of the terminal as a Dim() instance.
-    def handle_resizing(self):
-        # self.log(f'handle_resizing({self})')
-        term_size = self.curses.get_terminal_size()
-        if term_size == (self.dim.w, self.dim.h):
-            return None
-        w, h = term_size
-        self.curses.resizeterm(h, w)
-        self.dim = Dim(h, w)
-        return self.dim
-        # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
+    def handle_resizing(self, w, h):
+        self.curses.resizeterm(w, h)
 
 
 
