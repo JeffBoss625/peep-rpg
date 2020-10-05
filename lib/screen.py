@@ -37,8 +37,6 @@ class Screen:
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.needs_paint = True
-        self.dim = None
-        self.pos = None     # todo: manage these from layout manager
 
         self._logger = params.get('logger', None)
         self.model = params.get('model')
@@ -80,8 +78,6 @@ class Screen:
     def layout_change(self, parent, pos, dim):
         if parent is None:
             raise ValueError('root changes to pos and dim not supported')
-        self.pos = pos
-        self.dim = dim
         if self.scr:
             del self.scr
             self.scr = None
