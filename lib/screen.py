@@ -3,7 +3,7 @@ import sys
 from dataclasses import dataclass, field
 
 from lib.constants import COLOR, SIDE, curses_color
-from lib.screen_layout import Dim, min0, Con, Pos
+from lib.screen_layout import min0
 
 
 def printe(s):
@@ -27,9 +27,9 @@ class Screen:
         self.parent = parent
         self.children = []
 
-        self.border = params.get('border', 1)
-        self.x_margin = params.get('x_margin', 1)
-        self.y_margin = params.get('y_margin', 1)
+        self.border = params.get('border')
+        self.x_margin = params.get('x_margin')
+        self.y_margin = params.get('y_margin')
         self.curses = params.get('curses', None)        # curses library or instance of lib.DummyCurses
         self.scr = params.get('scr', None)              # curses root window or instance of lib.DummyWin
 
@@ -38,11 +38,12 @@ class Screen:
         self.needs_paint = True
 
         self._logger = params.get('logger', None)
-        self.model = params.get('model')
+        self.model = params.get('model', None)
 
-        def update_fn(_model, _msg, **_kwds):
-            self.needs_paint = True
-        self.model.subscribe(update_fn)
+        if self.model:
+            def update_fn(_model, _msg, **_kwds):
+                self.needs_paint = True
+            self.model.subscribe(update_fn)
 
         if parent:
             self.curses = parent.curses
@@ -93,11 +94,11 @@ class Screen:
             ret = ret.parent
         return ret
 
-
     #
     # CURSES Interface
     #
     def clear(self):
+        self.log(f'clear({self}')
         self.scr.clear()
 
     def derwin(self, dim, pos):
@@ -168,20 +169,22 @@ class Screen:
     # calling on all subwindows.
     # Call window.paint() and then curses.doupdate() from the main screen loop instead.
     def paint(self, force=False):
+        self.log(f'paint({self}, {force})')
         if not self.scr:
-            printe('no scr to paint in {}'.format(self.name))
+            self.log(f'no scr to paint in {self.name}')
             return
         if self.parent and not self.model:
             raise RuntimeError('no model to paint in {}'.format(self.name))
-        # if not self.needs_paint and not force:
-        #     return
 
-        self.clear()
+        if self.needs_paint or force:
+            self.clear()
+            if self.border:
+                self.scr.border()
+            force = True    # force children to paint
+
         for c in self.children:
             c.paint(force)
 
-        if self.border:
-            self.scr.border()
         self.do_paint()
         # self.write_lines([' "' + self.winfo.name + '" '])
         self.scr.noutrefresh()
@@ -267,15 +270,9 @@ class TextScreen(Screen):
     def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
-class BlankScreen(Screen):
-    def __init__(self, name, parent, **params):
-        super().__init__(name, parent, **params)
-
 class MainScreen(Screen):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
-        self.pos = Pos(0,0)
-        self.dim = params.get('dim')
 
     # called after main terminal window is resized by a user, but before layouts are recalculated.
     def handle_resizing(self, w, h):

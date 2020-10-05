@@ -153,8 +153,13 @@ class Layout:
         self.pos = pos  # position within parent. children of panels have this managed by parent.do_layout()
         self.con = con  # constraints used to calculate dim
         self.params = params if params else {}
-
         self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
+
+        # border and margins are used in both layouts and in window delegates
+        self.border = params.get('border', 1)
+        self.x_margin = params.get('x_margin', self.border)
+        self.y_margin = params.get('y_margin', self.border)
+
         self.children = []
         self._logger = params.get('logger', None)
 
