@@ -278,7 +278,6 @@ class MainScreen(Screen):
         self.pos = Pos(0,0)
         self.dim = Dim(h, w)
         self.con = Con(h,w,h,w)
-        self.term_size = w, h
 
     # todo: move this out to screen_layout
     # Handle a series of resizing calls (rubber-banding like calls as the user drags the terminal window boundary),
