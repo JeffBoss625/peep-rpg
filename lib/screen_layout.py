@@ -114,31 +114,30 @@ class Con:
     def dup(self):
         return Con(self.hmin, self.wmin, self.hmax, self.wmax)
 
-    # add the given constraints resulting in most constrained value: greatest minimum and least maximum
-    def apply(self, con, h_apply, w_apply):
-        if h_apply == ConApply.CONTAIN:
-            self.hmin = max(self.hmin, con.hmin)
-            self.hmax = max(self.hmax, con.hmax) if self.hmax == 0 or con.hmax == 0 else min(self.hmax, con.hmax)
-        elif h_apply == ConApply.ADJACENT:
-            self.hmin = max(self.hmin, con.hmin)
-            self.hmax = 0 if self.hmax == 0 or con.hmax == 0 else max(self.hmax, con.hmax)
-        elif h_apply == ConApply.STACK:
-            self.hmin += con.hmin
-            self.hmax = 0 if self.hmax == 0 or con.hmax == 0 else self.hmax + con.hmax
+    # adjust this constraint by applying another constraint with the given constraint rule along the given orientation
+    def constrain(self, con, rule, orient):
+        if orient == Orient.VERT:
+            pmin = 'hmin'
+            pmax = 'hmax'
         else:
-            raise RuntimeError(str(h_apply) + ' not handled')
+            pmin = 'wmin'
+            pmax = 'wmax'
 
-        if w_apply == ConApply.CONTAIN:
-            self.wmin = max(self.wmin, con.wmin)
-            self.wmax = max(self.wmax, con.wmax) if self.wmax == 0 or con.wmax == 0 else min(self.wmax, con.wmax)
-        elif w_apply == ConApply.ADJACENT:
-            self.wmin = max(self.wmin, con.wmin)
-            self.wmax = 0 if self.wmax == 0 or con.wmax == 0 else max(self.wmax, con.wmax)
-        elif w_apply == ConApply.STACK:
-            self.wmin += con.wmin
-            self.wmax = 0 if self.wmax == 0 or con.wmax == 0 else self.wmax + con.wmax
+        conmin = getattr(con, pmin)
+        conmax = getattr(con, pmax)
+        slfmin = getattr(self, pmin)
+        slfmax = getattr(self, pmax)
+        if rule == ConApply.CONTAIN:
+            setattr(self, pmin, max(slfmin, conmin))  # constrain to least minimum
+            setattr(self, pmax, max(slfmax, conmax) if slfmax == 0 or conmax == 0 else min(slfmax, conmax)) # constrain to smallest
+        elif rule == ConApply.ADJACENT:
+            setattr(self, pmin, max(slfmin, conmin))
+            setattr(self, pmax, 0 if slfmax == 0 or conmax == 0 else max(slfmax, conmax))  # expand to greatest max
+        elif rule == ConApply.STACK:
+            setattr(self, pmin, slfmin + conmin)
+            setattr(self, pmax, 0 if slfmax == 0 or conmax == 0 else slfmax + conmax)      # no max if any is 0
         else:
-            raise RuntimeError(str(w_apply) + ' not handled')
+            raise RuntimeError(f'rule {rule} not handled')
 
 
 # Base component class.
@@ -407,17 +406,17 @@ class FlowLayout(Layout):
     def calc_constraints(self):
         # self.log('calc_constraints({})'.format(self))
         if self.orient == Orient.VERT:
-            h_apply = ConApply.STACK
-            w_apply = ConApply.ADJACENT
+            vert_rule = ConApply.STACK
+            hori_rule = ConApply.ADJACENT
         else:
-            h_apply = ConApply.ADJACENT
-            w_apply = ConApply.STACK
+            vert_rule = ConApply.ADJACENT
+            hori_rule = ConApply.STACK
 
-        self.con = self._calc_constraints(h_apply, w_apply)  # calculate AND SET child constraints (bottom up)
+        self.con = self._calc_constraints(vert_rule, hori_rule)  # calculate AND SET child constraints (bottom up)
         # self.log('...calc_constraints({})'.format(self))
 
     # calculate constraints from bottom-up for all constraints that are not set
-    def _calc_constraints(self, h_apply, w_apply):
+    def _calc_constraints(self, vert_rule, hori_rule):
         if not self.children:
             return self.panel_con
 
@@ -427,9 +426,11 @@ class FlowLayout(Layout):
 
         ret = self.children[0].con.dup()
         for c in self.children[1:]:
-            ret.apply(c.con, h_apply, w_apply)
+            ret.constrain(c.con, vert_rule, Orient.VERT)
+            ret.constrain(c.con, hori_rule, Orient.HORI)
 
-        ret.apply(self.panel_con, ConApply.CONTAIN, ConApply.CONTAIN)
+        ret.constrain(self.panel_con, ConApply.CONTAIN, Orient.VERT)
+        ret.constrain(self.panel_con, ConApply.CONTAIN, Orient.HORI)
         return ret
 
     def window(self, name, con, **kwds):
