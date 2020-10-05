@@ -305,7 +305,7 @@ class MainScreen(Screen):
         w, h = term_size
         curses.resizeterm(h, w)
         self.dim = Dim(h, w)
-        return self.dim.copy()
+        return self.dim
         # self.log(f'size_to_terminal: screen "{self.name}" updated to {self.dim}')
 
 

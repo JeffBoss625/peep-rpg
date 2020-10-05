@@ -56,7 +56,7 @@ class Dim:
         # printd('...Dim.child_dim() return', ret)
         return ret
 
-    def copy(self):
+    def dup(self):
         return Dim(self.h, self.w)
 
 
@@ -331,7 +331,7 @@ class RootLayout(WinLayout):
         self._is_resizing = True
         dim = self.window.handle_resizing()
         if dim:
-            self.dim = dim
+            self.dim = dim.dup()
             self.con = Con(self.dim.h, self.dim.w, self.dim.h, self.dim.w)
             self.do_layout()
 
