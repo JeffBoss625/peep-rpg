@@ -154,9 +154,7 @@ class Layout:
         self.con = con  # constraints used to calculate dim
         self.params = params if params else {}
         self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
-
-        # border and margins are used in both layouts and in window delegates
-        self.border = params.get('border', 1)
+        self.border = params.get('border', 0)
         self.x_margin = params.get('x_margin', self.border)
         self.y_margin = params.get('y_margin', self.border)
 
@@ -228,9 +226,11 @@ class Window:
 class WinLayout(Layout):
     # if not passed in, scr is created later when dimensions are known.
     def __init__(self, parent, name, pos, con, **params):
-        if con is None:
-            con = Con()
+        con = con if con else Con()
+        params['border'] = params.get('border', 1)
         super().__init__(parent, name, pos, con, **params)
+        # border and margins are used in both layouts and in window delegates
+
         self.window = None              # externally-managed window (e.g. curses window)
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
         self._last_layout_update = (self.pos, self.dim)   # track last published pos/dim for this layout
@@ -241,20 +241,19 @@ class WinLayout(Layout):
             wp = wp.parent
         self.winparent = wp
 
-
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
     def window(self, name, pos, con, **kwds):
         if not pos:
-            pos = Pos(0, 0)
+            pos = Pos(self.y_margin, self.x_margin)
         ret = WinLayout(self, name, pos, con, **kwds)
         self.children.append(ret)
         return ret
 
     def panel(self, name, orient, pos, con):
         if not pos:
-            pos = Pos(0, 0)
+            pos = Pos(self.y_margin, self.x_margin)
         ret = FlowLayout(self, name, orient, pos, con)
         self.children.append(ret)
         return ret
@@ -278,7 +277,9 @@ class WinLayout(Layout):
     #      +--------------------+        ---
     def calc_child_dim(self):
         for c in self.children:
-            c.dim = self.dim.child_dim(c.con, c.pos)
+            # child position is already indented by +(x_margin,y_margin), so constraint by 1 x (x_margin,y_margin)
+            dim = Dim(self.dim.h - self.y_margin, self.dim.w - self.x_margin)
+            c.dim = dim.child_dim(c.con, c.pos)
             c.calc_child_dim()
 
     def clear_layout(self):
@@ -319,9 +320,8 @@ def update_win_layout(layout, _v, _d):
 
 class RootLayout(WinLayout):
     def __init__(self, dim, **params):
-        self.info = RootInfo()          # info needs to be in place for super() init to register name
+        self.info = RootInfo()                      # info needs to be in place for super() init to register name
         super().__init__(None, 'main', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
-
         self.dim = dim
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
@@ -462,6 +462,7 @@ class FlowLayout(Layout):
         return ret
 
     def calc_child_dim(self):
+        # self.log(f'calc_child_dim({self})')
         orient = self.orient
         con = self.con
         dim = self.dim
@@ -490,6 +491,7 @@ class FlowLayout(Layout):
             else:
                 raise ValueError("unknown orientation: " + orient)
 
+            # self.log(f'  ...{c.name}: pos:{c.pos}, dim:{c.dim}')
             offset_flow += c_size
 
         for c in self.children:

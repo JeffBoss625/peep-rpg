@@ -71,7 +71,7 @@ class PrpgControl:
         main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0), border=1)
+        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0))
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
