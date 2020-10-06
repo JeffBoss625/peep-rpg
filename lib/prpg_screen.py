@@ -14,7 +14,7 @@ class MazeScreen(Screen):
         for p in self.model.peeps:
             self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-class TitleBarScreen(Screen):
+class TitleScreen(Screen):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
@@ -53,7 +53,7 @@ class EquipScreen(Screen):
 
 # windows
 class Win:
-    TITLE_BAR = 'title_bar'
+    TITLE = 'title'
     STATS = 'stats'
     EQUIP = 'equip'
     MAZE = 'maze'
@@ -71,7 +71,7 @@ class PrpgControl:
         main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.TITLE_BAR, Con(3, 40, 3, 0))
+        main_panel.window(Win.TITLE, Con(3, 40, 3, 0))
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
@@ -127,12 +127,12 @@ def init_windows(root_layout, model, scr, curses):
 
     # custom windows
     init(Win.MAIN,      MainScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
+    init(Win.TITLE,     TitleScreen, model.title, trunc_y=SIDE.TOP)
     init(Win.STATS,     StatsScreen, model.maze)
     init(Win.EQUIP,     EquipScreen, model.equip)
     init(Win.MAZE,      MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    init(Win.TITLE_BAR, TextScreen, model.title_bar, trunc_y=SIDE.TOP)
     init(Win.BANNER,    TextScreen, model.banner_model, trunc_y=SIDE.TOP)
     init(Win.MESSAGES,  TextScreen, model.message_model, trunc_y=SIDE.TOP)
     init(Win.LOG,       TextScreen, model.log_model, trunc_y=SIDE.TOP)

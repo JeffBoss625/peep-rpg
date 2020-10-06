@@ -23,7 +23,7 @@ class PrpgModel(DataModel):
     def __init__(self, walls=None, peeps=None, player=None, seed=0):
         super().__init__()
         self.maze = MazeModel(walls, peeps, player)
-        self.title_bar = TextModel('title_bar')
+        self.title = self.maze
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
