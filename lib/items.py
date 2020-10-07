@@ -4,56 +4,57 @@ from typing import Tuple
 import yaml
 
 from lib.constants import COLOR
-from lib.model import register_yaml
-from lib.util import DotDict
+from lib.model import Size
+
 
 # item slots on the body (armor, rings, held weapons...)
-BODY_SLOT = DotDict(
-    HEAD='head',
-    NECK='neck',
-    TORSO_UNDER='torso_under',
-    TORSO_OVER='torso_over',
-    GARMENT_OUTER='garment_outer',
-    ON_BACK='on_back',
-    ON_SHOULDER='on_shoulder',
-    WAIST_UPPER='waist_upper',
-    WAIST_LOWER='waist_lower',
-    # todo: consider upper-arm, lower-arm, arm-holster...
-    R_HAND='r_hand',
-    R_HAND_HOLDING='r_hand_holding',
-    L_HAND='l_hand',
-    L_HAND_HOLDING='l_hand_holding',
-    R_FINGER1='r_finger1',
-    R_FINGER2='r_finger2',
-    R_FINGER3='r_finger3',
-    R_FINGER4='r_finger4',
-    L_FINGER1='r_finger1',
-    L_FINGER2='r_finger2',
-    L_FINGER3='r_finger3',
-    L_FINGER4='r_finger4',
+
+class BODY_SLOT:
+    HEAD = 'head'
+    NECK = 'neck'
+    TORSO_UNDER = 'torso_under'
+    TORSO_OVER = 'torso_over'
+    GARMENT_OUTER = 'garment_outer'
+    ON_BACK = 'on_back'
+    ON_SHOULDER = 'on_shoulder'
+    WAIST_UPPER = 'waist_upper'
+    WAIST_LOWER = 'waist_lower'
+    # todo: consider upper-arm lower-arm arm-holster...
+    R_HAND = 'r_hand'
+    R_HAND_HOLDING = 'r_hand_holding'
+    L_HAND = 'l_hand'
+    L_HAND_HOLDING = 'l_hand_holding'
+    R_FINGER1 = 'r_finger1'
+    R_FINGER2 = 'r_finger2'
+    R_FINGER3 = 'r_finger3'
+    R_FINGER4 = 'r_finger4'
+    L_FINGER1 = 'r_finger1'
+    L_FINGER2 = 'r_finger2'
+    L_FINGER3 = 'r_finger3'
+    L_FINGER4 = 'r_finger4'
     # todo: consider top and bottom legs (shin guards...)
-    LEGS_INNER='legs_inner',
-    LEGS_OUTER='legs_outer',
-    FOOT_INNER='foot_inner',
-    FOOT_OUTER='foot_outer',
-)
+    LEGS_INNER = 'legs_inner'
+    LEGS_OUTER = 'legs_outer'
+    FOOT_INNER = 'foot_inner'
+    FOOT_OUTER = 'foot_outer'
+
 
 # item slots within other items (scabbards, knife-belts, quivers, bags, sacks...)
-ITEM_SLOT = DotDict(
-    DART='dart',
-    KNIFE='knife',
-    SWORD='sword',
-    ARROW='arrow',
-    BOW='bow',  # e.g. bow or crossbow shoulder-sling or belt-sling
-    BOLT='bolt',
-    PELLET='pellet',
-    AXE='axe',  # handled tool such as axe, pickaxe, or hammer
-    WAND='wand',
-    VIAL='vial',  # small potions, liquids
-    CANTEEN='canteen',  # large liquid container, wineskin, ... (multi-dose)
-    BAG='bag',          # bag, sack, ...
-    BOX='box',          # box, chest, ...
-)
+class ITEM_SLOT:
+    DART = 'dart'
+    KNIFE = 'knife'
+    SWORD = 'sword'
+    ARROW = 'arrow'
+    BOW = 'bow'  # e.g. bow or crossbow shoulder-sling or belt-sling
+    BOLT = 'bolt'
+    PELLET = 'pellet'
+    AXE = 'axe'  # handled tool such as axe, pickaxe, or hammer
+    WAND = 'wand'
+    VIAL = 'vial'  # small potions, liquids
+    CANTEEN = 'canteen'  # large liquid container, wineskin, ... (multi-dose)
+    BAG = 'bag'  # bag, sack, ...
+    BOX = 'box'  # box, chest, ...
+
 
 @dataclass
 class Item:
@@ -90,22 +91,38 @@ class GeneralContainer(Item):
     # BAG: 'BAG'                      # hold in hand, holds multiple items at ready
     # LARGE_SACK: 'LARGE_SACK'        # hold in 1 hand AND on back (2 slots). holds more stuff
 
+
 # A specialized slot that holds a single item
 @dataclass
 class HolsterSlot:
     holds_slot_type: str = ''
+    item_cap: int = 1  # max number of items
     weight_cap: int = 0
-    size_cap: tuple = field(default_factory=tuple)  # volume holding capacity width, length, height in inches
+    size_cap: Size = field(default_factory=Size)  # volume holding capacity width, length, height in inches
+    items: Tuple[Item, int] = field(default_factory=tuple)
 
+    # todo: trigger weight/size check when items are changes
 
 # Containers that hold specific subset of item types such as darts, arrows, knives, a sword, axes...
-class Holster(Item):
+@dataclass
+class Holster:
     slots: Tuple[HolsterSlot] = field(default_factory=tuple)  # item slots supported
+
+
+@dataclass
+class Quiver(Item, Holster):
+    name: str = 'quiver'
+    char: str = ']'
+    material: str = 'leather'
+    size: Size = Size(80, 10, 10)
+    weight: int = 900
+    slot_type: str = BODY_SLOT.ON_SHOULDER
+    slots: Tuple[HolsterSlot] = (HolsterSlot(ITEM_SLOT.ARROW, 20, 6000, Size(90, 10, 10)),)
 
 
 # A weapon that launches items at higher speed than could be simply thrown
 @dataclass
-class Shooter(Item):
+class Shooter:
     shot_slot_type: str = ''
     shot_speed: int = 0
     shot_thaco: int = 0
@@ -114,18 +131,17 @@ class Shooter(Item):
 
 # A Shooter transfers velocity
 @dataclass
-class Bow(Shooter):
-    def __post_init__(self):
-        self.shot_slot_type = ITEM_SLOT.ARROW
-        self.shot_speed = 100  # speed -= distance * (deceleration/10,000)
-        self.shot_deceleration = 100  # 1% speed loss per square
-        self.shot_thaco = 20  # could replace this with distance tables. should be affected by armor type.
-        self.slot_type = BODY_SLOT.ON_SHOULDER
+class Bow(Shooter, Item):
+    shot_slot_type: str = ITEM_SLOT.ARROW
+    shot_speed: int = 100  # speed -= distance * (deceleration/10,000)
+    shot_thaco: int = 20  # could replace this with distance tables. should be affected by armor type.
+    shot_deceleration: int = 100  # 1% speed loss per square
+    slot_type: str = BODY_SLOT.ON_SHOULDER
 
 
 @dataclass
-class Ammo(Item):
-    ac: int = 20
+class Ammo:
+    ac: int = 0
     maxhp: int = 1
     thaco: int = 20
     move_tactic: str = 'straight'
@@ -140,15 +156,23 @@ class Ammo(Item):
     slot_type: str = ''
 
 
-register_yaml([Ammo, Bow, Holster, HolsterSlot])
+@dataclass
+class Arrow(Ammo, Item):
+    name = 'arrow'
+    char = '-'
+    material = 'wood'
+    size = (90, 2, 2)  # cm (about 3 ft)
+    weight = 100  # grams
+    slot_type = ITEM_SLOT.ARROW
+
+# register_yaml([Ammo, Bow, Holster, HolsterSlot])
+
 
 if __name__ == '__main__':
-    s = Bow('short bow', '}')
-    sstr = yaml.dump(s)
-    print(s)
-    print(sstr)
+    pass
 
-    a = Ammo('dart', '/', slot_type=ITEM_SLOT.DART)
-    astr = yaml.dump(a)
-    print(a)
-    print(astr)
+    # s = Bow('short bow', '}')
+    # sstr = yaml.dump(s)
+    # print(s)
+    # print(sstr)
+

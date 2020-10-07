@@ -37,7 +37,7 @@ MAZE = [
 
 
 PEEPS = [
-    player_by_name('Bo Bo the Destroyer', pos=(1,2), hp=100, speed=33),
+    player_by_name('Super Dad', pos=(1,2), hp=15, speed=33),
     monster_by_name('Thark', pos=(2,2), hp=10),
     monster_by_name('Spark', pos=(24,7), hp=50),
     monster_by_name('Brog', pos=(14,20), hp=200,)

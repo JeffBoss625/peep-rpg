@@ -15,8 +15,23 @@ _PEEPS = [
             'tail': Attack('3d5'),
             'scratch': Attack('2d7'),
         },
-        body=create_humanoid(RACE.HUMAN, 200, 100, 7.5)
+        body=create_humanoid(RACE.HUMAN, 20, 8, 7.5)
     ),
+    Peep(
+        name='Super Dad',
+        type='hero',
+        char='h',
+        maxhp=15,
+        thaco=19,
+        speed=45,
+        tics=0,
+        ac=10,
+        attacks={
+            'karate-chop': Attack('5d8'),
+            'head-butt': Attack('4d4'),
+        },
+        body=create_humanoid(RACE.HUMAN, 203, 120, 8)
+    )
 
 
 ]
