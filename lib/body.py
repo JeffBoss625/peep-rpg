@@ -3,7 +3,7 @@ from typing import Tuple
 
 from yaml import dump
 
-from lib.items import Item, Quiver, Bow, Arrow
+from lib.items.item import Item, Quiver, Bow, Arrow, SoldiersBelt
 from lib.model import Size, register_yaml, DataModel
 from lib.util import DotDict
 
@@ -189,6 +189,7 @@ if __name__ == '__main__':
     # print(dump(body.parts))
     bslots = body.body_slots()
     bslots.torso.on_shoulder1.item = Bow()
+    bslots.torso.on_waist = SoldiersBelt()
     quiver = Quiver()
     slot = quiver.slots[0]
     slot.items = ((Arrow(), 20),)

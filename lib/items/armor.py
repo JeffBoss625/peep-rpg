@@ -1,8 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+from lib.constants import COLOR
 from lib.items import *
 import yaml
 
-from lib.model import register_yaml
+from lib.items.item import BODY_SLOT, Item
+from lib.model import register_yaml, Size
 
 
 @dataclass

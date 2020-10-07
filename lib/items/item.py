@@ -116,9 +116,21 @@ class Quiver(Item, Holster):
     material: str = 'leather'
     size: Size = Size(80, 10, 10)
     weight: int = 900
-    slot_type: str = BODY_SLOT.ON_SHOULDER
+    slot_type: str = (BODY_SLOT.ON_SHOULDER,)
     slots: Tuple[HolsterSlot] = (HolsterSlot(ITEM_SLOT.ARROW, 20, 6000, Size(90, 10, 10)),)
 
+@dataclass
+class Belt:
+    char: str = '_'
+    material: str = 'leater'
+    size: Size = Size(45, 45, 5)
+    weight: int = 300
+    slot_type: Tuple[BODY_SLOT] = (BODY_SLOT.WAIST_LOWER,)
+
+@dataclass
+class SoldiersBelt(Belt, Holster, Item):
+    name: str = 'soldiers-belt'
+    slots: Tuple[HolsterSlot] = (HolsterSlot(ITEM_SLOT.SWORD, 1, 42000, Size(80, 10, 2)),)
 
 # A weapon that launches items at higher speed than could be simply thrown
 @dataclass
