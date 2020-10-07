@@ -4,7 +4,7 @@ from typing import Tuple
 import yaml
 
 from lib.constants import COLOR
-from lib.model import Size
+from lib.model import Size, register_yaml
 
 
 # item slots on the body (armor, rings, held weapons...)
@@ -165,7 +165,8 @@ class Arrow(Ammo, Item):
     weight = 100  # grams
     slot_type = ITEM_SLOT.ARROW
 
-# register_yaml([Ammo, Bow, Holster, HolsterSlot])
+
+register_yaml((Ammo, Bow, Holster, HolsterSlot, Quiver))
 
 
 if __name__ == '__main__':

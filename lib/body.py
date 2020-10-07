@@ -27,15 +27,17 @@ class BodyPart:
     slots: Tuple[BodySlot] = field(default_factory=list)
 
 @dataclass
-class Body(DataModel):
+class Body:
     def __post_init__(self):
         super().__init__()
 
-    name: str = ''
-    size: Size = None
+    body_type: str = ''
+    size: Size = ()
     weight: int = 0
-    parts: Tuple[BodyPart] = None      # BodyParts in order top to bottom
+    body_to_head: int = 7.5
+    parts: Tuple[BodyPart] = field(default_factory=tuple)      # BodyParts in order top to bottom
 
+    # hide reproducable state
     def __getstate__(self):
         items_by_slot = {}
         for part in self.parts:
@@ -43,10 +45,12 @@ class Body(DataModel):
                 if slot.item:
                     items_by_slot[slot.name] = slot.item
 
+        # state arguments to create_humanoid() that will recreate this body
         return {
-            'name': self.name,
+            'body_type': self.body_type,
             'height': self.size.h,
             'weight': self.weight,
+            'body_to_head': self.body_to_head,
             'items': items_by_slot,
         }
 
@@ -172,23 +176,29 @@ def create_humanoid(body_type, height, weight, body_to_head):
         bslots = tuple(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body(body_type, Size(height, int(height/4), int(height/10)), weight, tuple(parts))
+    ret = Body(body_type, Size(height, int(height/4), int(height/10)), weight, body_to_head, tuple(parts))
     update_proportions(ret, body_to_head)
 
     return ret
 
 
-register_yaml((BodySlot, BodyPart, Body, Arrow))
+register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
-    dad = create_humanoid(RACE.HUMAN, 203, 120, 8)
-    bslots = dad.body_slots()
+    body = create_humanoid(RACE.HUMAN, 203, 120, 8)
+    # print(dump(body.parts))
+    bslots = body.body_slots()
     bslots.torso.on_shoulder1.item = Bow()
     quiver = Quiver()
     slot = quiver.slots[0]
     slot.items = ((Arrow(), 20),)
     bslots.torso.on_shoulder2.item = quiver
-    print(dump(dad))
-    print(dad.parts_by_name().head.size)
+    state = body.__getstate__()
+    print(state)
+    del state['items']
+    body2 = create_humanoid(**state)
+    print(dump(body2))
+    # print(dump(body))
+    # print(body.parts_by_name().head.size)
 
 

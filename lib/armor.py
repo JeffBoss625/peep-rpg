@@ -1,5 +1,9 @@
+from dataclasses import dataclass
 from lib.items import *
 import yaml
+
+from lib.model import register_yaml
+
 
 @dataclass
 class Protection:
@@ -12,28 +16,32 @@ class Protection:
     elec: int = 0
     fall: int = 0
 
+class PROTECTION:
+    IRON = Protection(50,70,50,5,5,20,5,10)
+
 @dataclass
 class Iron:
     material = 'iron'
     fgcolor = COLOR.BLUE
-    slot_type = 'head'
-    prot: Protection = field(default_factory=Protection)
+    prot: Protection = field(default=PROTECTION.IRON)
 
 @dataclass
 class Cap:
-    char = '^'
-    slot_type = BODY_SLOT.HEAD
+    char: str = '^'
+    slot_type: str = BODY_SLOT.HEAD
+    size: Size = ()
 
-class IronCap(Item, Cap, Iron, Protection):
-    pass
+class IronCap(Iron, Cap, Item):
+    name: str = 'iron-cap'
 
 
-# register_yaml([IronCap, Iron, Cap, Protection])
+register_yaml([IronCap, Iron, Cap, Protection])
 
 METAL_HELMS = (
     ('iron', 'cap')
 )
 
 if __name__ == '__main__':
-    mc = IronCap('iron-cap', size=())
+    mc = IronCap('iron-cap')
     print(yaml.dump(mc, sort_keys=False))
+
