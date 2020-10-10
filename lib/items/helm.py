@@ -5,28 +5,9 @@ from lib.items import *
 import yaml
 
 from lib.items.item import BODY_SLOT, Item
+from lib.items.material import Iron, Protection
 from lib.model import register_yaml, Size
 
-
-@dataclass
-class Protection:
-    pierce: int = 0
-    slash: int = 0
-    crush: int = 0
-    heat: int = 0
-    cold: int = 0
-    acid: int = 0
-    elec: int = 0
-    fall: int = 0
-
-class PROTECTION:
-    IRON = Protection(50,70,50,5,5,20,5,10)
-
-@dataclass
-class Iron:
-    material = 'iron'
-    fgcolor = COLOR.BLUE
-    prot: Protection = field(default=PROTECTION.IRON)
 
 @dataclass
 class Cap:

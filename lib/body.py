@@ -3,7 +3,10 @@ from typing import Tuple
 
 from yaml import dump
 
-from lib.items.item import Item, Quiver, Bow, Arrow, SoldiersBelt
+from lib.items.belt import SoldiersBelt
+from lib.items.bow import Arrow, Bow
+from lib.items.holster import Quiver
+from lib.items.item import Item
 from lib.model import Size, register_yaml, DataModel
 from lib.util import DotDict
 

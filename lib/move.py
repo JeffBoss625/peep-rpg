@@ -1,4 +1,4 @@
-from lib.items import Ammo
+from lib.items.item import Ammo
 from lib.peeps import Peep
 import lib.attack as attacklib
 import lib.model as modellib

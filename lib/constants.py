@@ -8,16 +8,15 @@ from dataclasses import dataclass
 
 from lib.util import DotDict
 
-COLOR = DotDict(
-    BLACK='BLACK',
-    BLUE='BLUE',
-    CYAN='CYAN',
-    GREEN='GREEN',
-    MAGENTA='MAGENTA',
-    RED='RED',
-    WHITE='WHITE',
-    YELLOW='YELLOW',
-)
+class COLOR:
+    BLACK = 'BLACK'
+    BLUE = 'BLUE'
+    CYAN = 'CYAN'
+    GREEN = 'GREEN'
+    MAGENTA = 'MAGENTA'
+    RED = 'RED'
+    WHITE = 'WHITE'
+    YELLOW = 'YELLOW'
 
 
 def curses_color(color):
@@ -31,6 +30,7 @@ SIDE = DotDict(
     RIGHT='RIGHT',
     CENTER='CENTER',
 )
+
 
 class Key:
     CTRL_Q = '\x11'
