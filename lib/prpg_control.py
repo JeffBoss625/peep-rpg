@@ -52,7 +52,7 @@ class EquipScreen(Screen):
         ])
 
 # windows
-class Win:
+class WIN:
     TITLE = 'title'
     STATS = 'stats'
     EQUIP = 'equip'
@@ -71,7 +71,7 @@ class PrpgControl:
         main_panel = root_layout.panel('root_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(Win.TITLE, Con(3, 40, 3, 0))
+        main_panel.window(WIN.TITLE, Con(3, 40, 3, 0))
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
@@ -80,17 +80,17 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(Win.STATS, Con(10,30,10,30))
-        center_col1.window(Win.EQUIP, Con(20,30,0,30))
+        center_col1.window(WIN.STATS, Con(10, 30, 10, 30))
+        center_col1.window(WIN.EQUIP, Con(20, 30, 0, 30))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
-        center_col2.window(Win.BANNER, Con(banner_h, maze_w,  banner_h, 60))
-        center_col2.window(Win.MAZE, Con(maze_h, maze_w, 0, 60))
+        center_col2.window(WIN.BANNER, Con(banner_h, maze_w, banner_h, 60))
+        center_col2.window(WIN.MAZE, Con(maze_h, maze_w, 0, 60))
 
-        center.window(Win.MESSAGES, Con(6, maze_w, 0, 0))
+        center.window(WIN.MESSAGES, Con(6, maze_w, 0, 0))
 
         # Bottom Row
-        main_panel.window(Win.LOG, Con(4,30))
+        main_panel.window(WIN.LOG, Con(4, 30))
 
         init_windows(root_layout, model, scr, curses)
         self.main_screen = root_layout.window
@@ -126,16 +126,16 @@ def init_windows(root_layout, model, scr, curses):
         by_name[name].initwin(constructor, m, **params)
 
     # custom windows
-    init(Win.ROOT,  RootScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
-    init(Win.TITLE, TitleScreen, model.title, trunc_y=SIDE.TOP)
-    init(Win.STATS, StatsScreen, model.maze)
-    init(Win.EQUIP, EquipScreen, model.equip)
-    init(Win.MAZE,  MazeScreen,  model.maze,  align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    init(WIN.ROOT, RootScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
+    init(WIN.TITLE, TitleScreen, model.title, trunc_y=SIDE.TOP)
+    init(WIN.STATS, StatsScreen, model.maze)
+    init(WIN.EQUIP, EquipScreen, model.equip)
+    init(WIN.MAZE, MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    init(Win.BANNER,    TextScreen, model.banner_model, trunc_y=SIDE.TOP)
-    init(Win.MESSAGES,  TextScreen, model.message_model, trunc_y=SIDE.TOP)
-    init(Win.LOG,       TextScreen, model.log_model, trunc_y=SIDE.TOP)
+    init(WIN.BANNER, TextScreen, model.banner_model, trunc_y=SIDE.TOP)
+    init(WIN.MESSAGES, TextScreen, model.message_model, trunc_y=SIDE.TOP)
+    init(WIN.LOG, TextScreen, model.log_model, trunc_y=SIDE.TOP)
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
