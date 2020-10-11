@@ -308,6 +308,19 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
+    def initwin(self, constructor, m, **params):
+        pwin = self.winparent.window if self.winparent else None
+        self.window = constructor(
+            self.name,
+            pwin,
+            model=m,
+            border=self.border,
+            x_margin=self.x_margin,
+            y_margin=self.y_margin,
+            **params
+        )
+
+
 # initialize window delegates of children of position or dimension changes
 def update_win_layout(layout, _v, _d):
     posdim = (layout.pos, layout.dim)

@@ -4,7 +4,7 @@ from lib.constants import Key
 from lib.move import Direction
 from lib.monsters import monster_by_name
 from lib.players import player_by_name
-from lib.prpg_screen import PrpgControl
+from lib.prpg_control import PrpgControl
 from lib.prpg_model import PrpgModel
 import random
 import sys
@@ -127,7 +127,7 @@ def main(root_layout, scr, curses):
     control = PrpgControl(root_layout, model, scr, curses)
 
     if sys.platform != "win32":
-        register_resize_handler(control)
+        signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
@@ -156,14 +156,3 @@ def main(root_layout, scr, curses):
                 model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
 
                 # model.undirty()
-
-def register_resize_handler(control):
-    def resize_handler(_signum, _frame):
-        try:
-            if control.root_layout.handle_resizing():
-                control.main_screen.paint(force=True)
-
-        except Exception as e:
-            control.root_layout.log(e)
-
-    signal.signal(signal.SIGWINCH, resize_handler)

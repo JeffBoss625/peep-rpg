@@ -109,21 +109,21 @@ class PrpgControl:
         self.root_layout.window.paint()
         return self.root_layout.window.get_key()
 
+    def resize_handler(self, _signum, _frame):
+        try:
+            if self.root_layout.handle_resizing():
+                self.main_screen.paint(force=True)
+
+        except Exception as e:
+            self.root_layout.log(e)
+
+
+
 def init_windows(root_layout, model, scr, curses):
     by_name = root_layout.info.comp_by_name
 
     def init(name, constructor, m, **params):
-        layout = by_name[name]
-        pwin = layout.winparent.window if layout.winparent else None
-        layout.window = constructor(
-            layout.name,
-            pwin,
-            model=m,
-            border=layout.border,
-            x_margin=layout.x_margin,
-            y_margin=layout.y_margin,
-            **params
-        )
+        by_name[name].initwin(constructor, m, **params)
 
     # custom windows
     init(Win.MAIN,      MainScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
