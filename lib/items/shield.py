@@ -1,17 +1,22 @@
 from dataclasses import dataclass, field
+from typing import Tuple
 
 import yaml
 
 from lib.items.item import BODY_SLOT, Item
-from lib.items.material import Iron, Protection
+from lib.items.material import Layer
 from lib.model import register_yaml, Size
 
 
 @dataclass
-class Shield:
+class Shield(Item):
     char: str = ')'
     slot_type: str = BODY_SLOT.ON_BACK
-    size: Size = ()
+    size: Size = field(default_factory=Size)
+    layers: Tuple = field(default_factory=tuple)
+
+    def __post_init__(self):
+        self.size = Size(self.size.h, self.size.w, sum(layer.thick_mm for layer in self.layers))
 
 def create_shield(layers):
     prot = layers[0].prot
@@ -24,6 +29,6 @@ METAL_HELMS = (
 )
 
 if __name__ == '__main__':
-    mc = IronCap('iron-cap')
-    print(yaml.dump(mc, sort_keys=False))
+    s = Shield(layers=(Layer('iron', 'plate', 2), Layer('oak', 'plate', 10)))
+    print(yaml.dump(s, sort_keys=False))
 
