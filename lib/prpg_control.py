@@ -122,20 +122,20 @@ class PrpgControl:
 def init_windows(root_layout, model, scr, curses):
     by_name = root_layout.info.comp_by_name
 
-    def init(name, constructor, m, **params):
-        by_name[name].initwin(constructor, m, **params)
+    def win(name):
+        return root_layout.info.comp_by_name[name]
 
     # custom windows
-    init(WIN.ROOT, RootScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
-    init(WIN.TITLE, TitleScreen, model.title, trunc_y=SIDE.TOP)
-    init(WIN.STATS, StatsScreen, model.maze)
-    init(WIN.EQUIP, EquipScreen, model.equip)
-    init(WIN.MAZE, MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    win(WIN.ROOT).initwin( RootScreen,  None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
+    win(WIN.TITLE).initwin(TitleScreen, model.title, trunc_y=SIDE.TOP)
+    win(WIN.STATS).initwin(StatsScreen, model.maze)
+    win(WIN.EQUIP).initwin(EquipScreen, model.equip)
+    win(WIN.MAZE).initwin( MazeScreen,  model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    init(WIN.BANNER, TextScreen, model.banner_model, trunc_y=SIDE.TOP)
-    init(WIN.MESSAGES, TextScreen, model.message_model, trunc_y=SIDE.TOP)
-    init(WIN.LOG, TextScreen, model.log_model, trunc_y=SIDE.TOP)
+    win(WIN.BANNER).initwin(  TextScreen, model.banner_model, trunc_y=SIDE.TOP)
+    win(WIN.MESSAGES).initwin(TextScreen, model.message_model, trunc_y=SIDE.TOP)
+    win(WIN.LOG).initwin(     TextScreen, model.log_model, trunc_y=SIDE.TOP)
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
