@@ -58,7 +58,7 @@ class Win:
     EQUIP = 'equip'
     MAZE = 'maze'
     MESSAGES = 'messages'
-    MAIN = 'main'
+    ROOT = 'root'
     LOG = 'log'
     BANNER = 'banner'
 
@@ -68,7 +68,7 @@ class PrpgControl:
         self.root_layout = root_layout
         self.model = model
 
-        main_panel = root_layout.panel('main_panel', Orient.VERT, None, None)
+        main_panel = root_layout.panel('root_panel', Orient.VERT, None, None)
 
         # Top Row
         main_panel.window(Win.TITLE, Con(3, 40, 3, 0))
@@ -126,11 +126,11 @@ def init_windows(root_layout, model, scr, curses):
         by_name[name].initwin(constructor, m, **params)
 
     # custom windows
-    init(Win.MAIN,      MainScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
-    init(Win.TITLE,     TitleScreen, model.title, trunc_y=SIDE.TOP)
-    init(Win.STATS,     StatsScreen, model.maze)
-    init(Win.EQUIP,     EquipScreen, model.equip)
-    init(Win.MAZE,      MazeScreen, model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    init(Win.ROOT,  RootScreen, None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
+    init(Win.TITLE, TitleScreen, model.title, trunc_y=SIDE.TOP)
+    init(Win.STATS, StatsScreen, model.maze)
+    init(Win.EQUIP, EquipScreen, model.equip)
+    init(Win.MAZE,  MazeScreen,  model.maze,  align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
     init(Win.BANNER,    TextScreen, model.banner_model, trunc_y=SIDE.TOP)

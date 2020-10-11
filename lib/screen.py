@@ -270,7 +270,7 @@ class TextScreen(Screen):
     def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
-class MainScreen(Screen):
+class RootScreen(Screen):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 

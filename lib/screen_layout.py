@@ -308,12 +308,12 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
-    def initwin(self, constructor, m, **params):
+    def initwin(self, constructor, model, **params):
         pwin = self.winparent.window if self.winparent else None
         self.window = constructor(
             self.name,
             pwin,
-            model=m,
+            model=model,
             border=self.border,
             x_margin=self.x_margin,
             y_margin=self.y_margin,
@@ -334,7 +334,7 @@ def update_win_layout(layout, _v, _d):
 class RootLayout(WinLayout):
     def __init__(self, dim, **params):
         self.info = RootInfo()                      # info needs to be in place for super() init to register name
-        super().__init__(None, 'main', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
+        super().__init__(None, 'root', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
         self.dim = dim
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
