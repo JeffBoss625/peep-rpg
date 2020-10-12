@@ -12,17 +12,26 @@ from lib.model import ModelList, DataModel, TextModel
 
 
 class MazeModel(DataModel):
-    def __init__(self, walls, peeps, player):
+    def __init__(self, walls, peeps, player, items):
         super().__init__()
-        self.walls = TextModel('walls', walls)
-        self.peeps = ModelList()
-        self.peeps.extend(peeps)
+        self.walls = walls
+        self.peeps = peeps
         self.player = player
+        self.items = items
 
 class PrpgModel(DataModel):
-    def __init__(self, walls=None, peeps=None, player=None, seed=0):
+    def __init__(self, walls=(), peeps=(), player=None, items=(), seed=0):
         super().__init__()
-        self.maze = MazeModel(walls, peeps, player)
+        peepmodel = ModelList()
+        peepmodel.extend(peeps)
+        itemsmodel = ModelList()
+        itemsmodel.extend(items)
+        self.maze = MazeModel(
+            TextModel('walls', walls),
+            peepmodel,
+            player,
+            itemsmodel,
+        )
         self.title = self.maze
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')

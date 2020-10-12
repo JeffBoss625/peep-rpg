@@ -37,10 +37,13 @@ MAZE = [
 
 
 PEEPS = [
-    player_by_name('Super Dad', pos=(1,2), hp=15, speed=33),
+    player_by_name('Super Dad', pos=(1,2), hp=40, speed=33),
     monster_by_name('Thark', pos=(2,2), hp=10),
     monster_by_name('Spark', pos=(24,7), hp=50),
     monster_by_name('Brog', pos=(14,20), hp=200,)
+]
+ITEMS = [
+
 ]
 
 DIRECTION_KEYS = {
@@ -123,7 +126,7 @@ def monster_turn(model, monster):
             rotation += 1
 
 def main(root_layout):
-    model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0])
+    model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0], items=ITEMS)
     control = PrpgControl(root_layout, model)
 
     if sys.platform != "win32":
