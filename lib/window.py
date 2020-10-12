@@ -271,7 +271,7 @@ class RootWindow(Window):
 
     # called after main terminal window is resized by a user, but before layouts are recalculated.
     def handle_resizing(self, w, h):
-        self.curses.resizeterm(w, h)
+        self.curses.resizeterm(h, w)    # note curses inverted h and w
 
 
 

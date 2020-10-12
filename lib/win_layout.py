@@ -374,7 +374,7 @@ class RootLayout(WinLayout):
             w, h = term_size
             self.dim = Dim(w,h)
             self.con = Con(w,h,w,h)
-            self.window.handle_resizing(h, w)
+            self.window.handle_resizing(w,h)
             self.do_layout()
 
         self._is_resizing = False
