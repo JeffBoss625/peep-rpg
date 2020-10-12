@@ -1,9 +1,4 @@
-from lib.constants import SIDE
-from lib.win_layout import *
 from lib.window import *
-
-from lib.window import TextWindow
-
 
 class MazeWindow(Window):
     def __init__(self, name, parent, **params):
