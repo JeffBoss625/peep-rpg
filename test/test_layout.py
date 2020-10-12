@@ -25,11 +25,11 @@ def test_addcol():
         [ Dim(5,12), None,     Con(2,3,4,7),  [ Con(2,3,4,7), Dim(4,7)] ],
 
         # position not enough to affect dimensions
-        [ Dim(5,12), Pos(1,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(4,7)] ],
+        [ Dim(5,12), Pos(2,1), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(4,7)] ],
 
         # position makes dimensions shrink
-        [ Dim(5,12), Pos(2,5), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,7)] ],
-        [ Dim(5,12), Pos(2,6), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,6)] ],
+        [ Dim(5,12), Pos(5,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,7)] ],
+        [ Dim(5,12), Pos(6,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,6)] ],
     ]
 
     for row in tests:
@@ -79,7 +79,7 @@ def check_flow_sizes(avail, mins, maxs, exp):
 # tests of flow layout within a 10x30 master window
 FLOW_TESTS_10_30 = [
     # addcol
-    # pos,      con           children constraints,            [ expcon,       expdim ]
+    # pos,      con           children constraints,            [ exp_parent_dim, exp_child_dims ]
 
     # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
     [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Dim(10,30), Dim(4,30), Dim(6,30)] ],
@@ -103,8 +103,12 @@ FLOW_TESTS_10_30 = [
     [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0),  Con(3,5,0,0)],  [Dim(9,29), Dim(4,29), Dim(5,29)] ],
 
     # position causes panel to shrink
-    [ Pos(2,0),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(8,29), Dim(3,29), Dim(5,28)] ],
-    [ Pos(0,2),     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28), Dim(4,28), Dim(5,28)] ],
+    [ Pos(0,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,29), Dim(4,29), Dim(5,28)] ],
+    [ Pos(2,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28), Dim(4,28), Dim(5,28)] ],
+    [ Pos(3,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,27), Dim(4,27), Dim(5,27)] ],
+    [ Pos(3,1),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,27), Dim(4,27), Dim(5,27)] ],
+    [ Pos(3,2),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(8,27), Dim(3,27), Dim(5,27)] ],
+    [ Pos(3,3),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(7,27), Dim(3,27), Dim(4,27)] ],
 ]
 
 # def test_wide():
@@ -121,19 +125,22 @@ def test_layout_horizontal():
         pos = t[0].invert() if t[0] else None
         con = t[1].invert()
         children = list(c.invert() for c in t[2])
-        expcon = t[3][0].invert()
-        expdims = list(c.invert() for c in t[3][1:])
+        exp_parent_dim = t[3][0].invert()
+        exp_child_dims = list(c.invert() for c in t[3][1:])
 
-        yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
+        yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, exp_parent_dim, exp_child_dims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = dummy_root(dim)
-    # root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
+    root.log(f'check_flow_layout({orient} dim:[{dim}] pos:[{pos}] con:[{con}] child_con:{children_con})')
     panel = root.panel('root-pan', orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
+    for c in panel.children:
+        c.initwin(TextWindow, model=TextModel(['hi']))
 
     root.do_layout()
+    root.window.paint()
 
     pdim = panel.dim
     assert pdim == exp_pdim

@@ -12,19 +12,19 @@ from lib.util import min0, sum_max0
 
 @dataclass
 class Pos:
-    y: int = 0
     x: int = 0
+    y: int = 0
 
     def __repr__(self):
-        return '{},{}'.format(self.y, self.x)
+        return '{},{}'.format(self.x, self.y)
 
-    def yx(self, orient):
+    def xy(self, orient):
         if orient == Orient.HORI: return self.x
         if orient == Orient.VERT: return self.y
         raise ValueError("unknown orientation: " + orient)
 
     def invert(self):
-        return Pos(self.x, self.y)
+        return Pos(self.y, self.x)
 
 
 # Width and Height of a Comp(onent).
@@ -250,7 +250,7 @@ class WinLayout(Layout):
     def window(self, name, pos, con, **params):
         # self.log(f'window({name}, {pos}, {con}, {params})')
         if not pos:
-            pos = Pos(self.y_margin, self.x_margin)
+            pos = Pos(self.x_margin, self.y_margin)
         ret = WinLayout(self, name, pos, con, **params)
         self.children.append(ret)
         return ret
@@ -258,7 +258,7 @@ class WinLayout(Layout):
     def panel(self, name, orient, pos, con):
         # self.log(f'window({name}, {pos}, {con})')
         if not pos:
-            pos = Pos(self.y_margin, self.x_margin)
+            pos = Pos(self.x_margin, self.y_margin)
         ret = FlowLayout(self, name, orient, pos, con)
         self.children.append(ret)
         return ret
@@ -343,6 +343,8 @@ def update_win_layout(layout, _v, _d):
     layout._last_layout_update = posdim
     if layout.window:
         layout.window.layout_change(pwin, layout.pos, layout.dim)
+    else:
+        layout.log(f'Warning: WinLayout "{layout.name}" has no window delegate. Call layout.initwin() before calling do_layout()')
 
 class RootLayout(WinLayout):
     def __init__(self, **params):
@@ -505,17 +507,17 @@ class FlowLayout(Layout):
 
         fixed_avail_space = dim.hw(Orient.invert(orient))
 
-        offset_flow = self.pos.yx(orient)
-        offset_fixed = self.pos.yx(Orient.invert(orient))
+        offset_flow = self.pos.xy(orient)
+        offset_fixed = self.pos.xy(Orient.invert(orient))
 
         for i, c in enumerate(children):
             c_size = c_sizes[i]
             c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
             if orient == Orient.HORI:
-                c.pos = Pos(offset_fixed, offset_flow)
+                c.pos = Pos(offset_flow, offset_fixed)
                 c.dim = Dim(c_size_fixed, c_size)
             elif orient == Orient.VERT:
-                c.pos = Pos(offset_flow, offset_fixed)
+                c.pos = Pos(offset_fixed, offset_flow)
                 c.dim = Dim(c_size, c_size_fixed)
             else:
                 raise ValueError("unknown orientation: " + orient)

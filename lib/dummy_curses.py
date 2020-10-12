@@ -9,7 +9,7 @@ def printe(s):
 class DummyCursesWindow:
     def __init__(self, parent, pos, dim):
         self.parent = parent
-        self.pos = Pos(pos.y, pos.x)
+        self.pos = Pos(pos.x, pos.y)
         self.con = None
         if parent:
             self.buf = parent.buf
@@ -68,12 +68,22 @@ class DummyCursesWindow:
         self.root()._doupdate()
 
     def _doupdate(self):
+        if not self.buf:
+            printe('<EMPTY_BUFFER>')
+            return
+
+        num_line = ''
+        for i in range(len(self.buf[0])):
+            num_line += str((i+1) % 10)
+
+        printe('    ' + num_line)
         for i, line in enumerate(self.buf):
-            printe("{:<3} {}".format(i, ''.join(line)))
+            printe("{:<3} {}".format(i+1, ''.join(line)))
+        printe('    ' + num_line)
         printe('')
 
     def derwin(self, h, w, y, x):
-        return DummyCursesWindow(self, Pos(y, x), Dim(h, w))
+        return DummyCursesWindow(self, Pos(x, y), Dim(h, w))
 
     def xyoff(self):
         win = self

@@ -173,7 +173,7 @@ def yaml_friendly(v):
 #
 
 class TextModel(PubSub):
-    def __init__(self, model_name, text=None):
+    def __init__(self, model_name='no_name', text=None):
         super().__init__()
         self.text = []
         self.model_name = model_name

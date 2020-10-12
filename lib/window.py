@@ -97,7 +97,7 @@ class Window:
     # CURSES Interface
     #
     def clear(self):
-        self.log(f'clear({self}')
+        # self.log(f'clear({self}')
         self.scr.clear()
 
     def derwin(self, dim, pos):
@@ -162,7 +162,7 @@ class Window:
     # calling on all subwindows.
     # Call window.paint() and then curses.doupdate() from the main loop instead.
     def paint(self, force=False):
-        self.log(f'paint({self}, {force})')
+        # self.log(f'paint({self}, {force})')
         if not self.scr:
             self.log(f'no scr to paint in {self.name}')
             return
