@@ -18,7 +18,7 @@ class DummyCursesWindow:
             self.resize(dim.h, dim.w)
 
     def __repr__(self):
-        return 'DummyWin(pos:[{}],dim:[{}])'.format(self.pos, self.dim)
+        return f'DummyWin(pos:[{self.pos}],dim:[{self.dim}])'
 
     # note the inverted dimensions (h, w) for curses
     def resize(self, h, w):
@@ -39,7 +39,6 @@ class DummyCursesWindow:
                 buf[y][x] = '.'
 
     def border(self):
-        # printe('border({})'.format(self))
         dim = self.dim
         buf = self.buf
         xoff, yoff = self.xyoff()
@@ -79,7 +78,7 @@ class DummyCursesWindow:
 
         printe('    ' + num_line)
         for i, line in enumerate(self.buf):
-            printe("{:<3} {}".format(i+1, ''.join(line)))
+            printe(f"{i+1:<3} {''.join(line)}")
         printe('    ' + num_line)
         printe('')
 

@@ -37,9 +37,9 @@ class Logger:
         elif self.mode == 'stdout':
             print(s)
         elif self.mode == 'stderr':
-            sys.stderr.write('{}\n'.format(s))
+            sys.stderr.write(f'{s}\n')
         else:
-            raise ValueError('unknown mode: {}'.format(self.mode))
+            raise ValueError(f'unknown mode: {self.mode}')
 
 
 # A simple debug function for printing with stacktrace depth

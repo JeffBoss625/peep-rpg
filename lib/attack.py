@@ -35,10 +35,10 @@ def calc_hit(ac, thaco, seed = 0):
         return False
 
 def attack(src, dst, attack_name, out, seed=0):
-    out.log('attack({}, {}, {})'.format(src, dst, attack_name))
+    out.log(f'attack({src}, {dst}, {attack_name})')
     if seed > 0:
         random.seed(seed)
-    out.message(src.name, "attacks with", attack_name + "!")
+    out.message(f'{src.name} attacks with {attack_name} !')
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:
         src_attack = src.attacks[attack_name]
@@ -50,12 +50,12 @@ def attack(src, dst, attack_name, out, seed=0):
             tot_hp_loss += hp_loss
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
-            out.message("the {} has died to the {}'s {}!".format(dst.name, src.name, attack_name ))
+            out.message(f"the {dst.name} has died to the {src.name}'s {attack_name}!")
         if src_attack.blowback != 0:
             bb = src_attack.blowback * tot_hp_loss / 100
             src.hp = src.hp - bb
     else:
-        out.message('the {} missed the {}'.format(src.name, dst.name))
+        out.message(f'the {src.name} missed the {dst.name}')
 
 
 if __name__ == '__main__':

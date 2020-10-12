@@ -1,6 +1,7 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 import sys
 from dataclasses import dataclass, field
+import traceback
 
 from lib.constants import COLOR, SIDE, curses_color
 from lib.util import min0
@@ -70,7 +71,7 @@ class Window:
 
 
     def __repr__(self):
-        return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
+        return f'Window"{self.name}": margin:[{self.x_margin} {self.y_margin}] scr:{self.scr}'
 
     # delete and rebuild curses windows using layout information (recursive on children. root window
     # is kept intact.)
@@ -167,7 +168,7 @@ class Window:
             self.log(f'no scr to paint in {self.name}')
             return
         if self.parent and not self.model:
-            raise RuntimeError('no model to paint in {}'.format(self.name))
+            raise RuntimeError(f'no model to paint in {self.name}')
 
         if self.needs_paint or force:
             self.clear()
@@ -199,10 +200,7 @@ class Window:
                     return ret
 
             except Exception as e:
-                # self.winfo.log('get_key failed: type:"{}", trace: {}'.format(
-                #     str(e),
-                #     ''.join(traceback.format_tb(e.__traceback__)))
-                # )
+                # self.log(f'get_key failed: type:"{str(e)}", trace: {"".join(traceback.format_tb(e.__traceback__))}')
                 pass        # ignore interrupts to getkey() following resize events etc.
 
     def write_char(self, x, y, char, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):

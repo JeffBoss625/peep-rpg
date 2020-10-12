@@ -46,7 +46,6 @@ class Dim:
 
     # calculate dimensions of a component from constraints, position and parent dimensions
     def child_dim(self, con, pos):
-        # printd('Dim.child_dim(self[{}],con[{}],pos[{}])'.format(self, con, pos))
         pdim = self
         if con.hmax == 0 or con.hmin > pdim.h - pos.y:
             reth = pdim.h - pos.x
@@ -58,9 +57,7 @@ class Dim:
         else:
             retw = min(con.wmax, pdim.w - pos.x)
 
-        ret = Dim(retw, reth)
-        # printd('...Dim.child_dim() return', ret)
-        return ret
+        return Dim(retw, reth)
 
     def dup(self):
         return Dim(self.w, self.h)
@@ -245,7 +242,7 @@ class WinLayout(Layout):
         self.winparent = wp
 
     def __repr__(self):
-        return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
+        return f'"{self.name}":[P[{self.pos}],D[{self.dim}],C[{self.con}]]'
 
     def window(self, name, pos, con, **params):
         # self.log(f'window({name}, {pos}, {con}, {params})')
@@ -434,7 +431,7 @@ class FlowLayout(Layout):
         self.panel_con = panel_con  # further constratins applied to aggregate of child constraints
 
     def __repr__(self):
-        return 'Panel "{}":{}:[P[{}],D[{}],C[{}]]'.format(self.name, self.orient, self.pos, self.dim, self.con)
+        return f'Panel "{self.name}":{self.orient}:[P[{self.pos}],D[{self.dim}],C[{self.con}]]'
 
     # panels derive their constraints from children and self.panel_con and set child positions
     def clear_layout(self):
@@ -447,7 +444,6 @@ class FlowLayout(Layout):
     # First calculate constraints based on child constraints (set from bottom-up) and panel_con.
     # Then calculate dimensions based on parent.dim and constraints
     def calc_constraints(self):
-        # self.log('calc_constraints({})'.format(self))
         if self.orient == Orient.VERT:
             vert_rule = ConApply.STACK
             hori_rule = ConApply.ADJACENT
@@ -456,7 +452,6 @@ class FlowLayout(Layout):
             hori_rule = ConApply.STACK
 
         self.con = self._calc_constraints(vert_rule, hori_rule)  # calculate AND SET child constraints (bottom up)
-        # self.log('...calc_constraints({})'.format(self))
 
     # calculate constraints from bottom-up for all constraints that are not set
     def _calc_constraints(self, vert_rule, hori_rule):

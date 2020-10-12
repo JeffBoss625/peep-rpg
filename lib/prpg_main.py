@@ -91,7 +91,7 @@ def player_turn(mainwin):
             alib.create_projectile(direct, model)
             model.message('Projectile shot')
         else:
-            model.message('unknown command: "{}"'.format(input_key))
+            model.message(f'unknown command: "{input_key}"')
 
         # continue with loop to get more input
 
