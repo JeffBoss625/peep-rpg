@@ -21,7 +21,7 @@ class PrpgControl:
         main_panel = root_layout.panel('root_panel', Orient.VERT, None, None)
 
         # Top Row
-        main_panel.window(WIN.TITLE, Con(3, 40, 3, 0))
+        main_panel.window(WIN.TITLE, Con(40,3,0,3))
 
         # Center Row
         maze_h = len(model.maze.walls.text) + 2
@@ -30,17 +30,17 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(WIN.STATS, Con(10, 30, 10, 30))
-        center_col1.window(WIN.EQUIP, Con(20, 30, 0, 30))
+        center_col1.window(WIN.STATS, Con(30,10,30,10))
+        center_col1.window(WIN.EQUIP, Con(30,20,30,0))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
-        center_col2.window(WIN.BANNER, Con(banner_h, maze_w, banner_h, 60))
-        center_col2.window(WIN.MAZE, Con(maze_h, maze_w, 0, 60))
+        center_col2.window(WIN.BANNER, Con(maze_w,banner_h,60,banner_h))
+        center_col2.window(WIN.MAZE, Con(maze_w,maze_h,60,0))
 
-        center.window(WIN.MESSAGES, Con(6, maze_w, 0, 0))
+        center.window(WIN.MESSAGES, Con(maze_w,6,0,0))
 
         # Bottom Row
-        main_panel.window(WIN.LOG, Con(4, 30))
+        main_panel.window(WIN.LOG, Con(30,4))
 
         init_windows(root_layout, model)
         self.root_win = root_layout.window

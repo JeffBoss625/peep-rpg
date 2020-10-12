@@ -90,10 +90,10 @@ class Orient:
 # zero indicates no constraint (min or max)
 @dataclass
 class Con:
-    hmin: int = 0
     wmin: int = 0
-    hmax: int = 0
+    hmin: int = 0
     wmax: int = 0
+    hmax: int = 0
 
     def __post_init__(self):
         if self.hmax and self.hmax < self.hmin:
@@ -102,7 +102,7 @@ class Con:
             self.wmax = self.wmin
 
     def __repr__(self):
-        return '{},{},{},{}'.format(self.hmin, self.wmin, self.hmax, self.wmax)
+        return f'({self.wmin} {self.hmin} {self.wmax} {self.hmax})'
 
     def min(self, orient):
         if orient == Orient.HORI: return self.wmin
@@ -115,10 +115,10 @@ class Con:
         raise ValueError("unknown orientation: " + orient)
 
     def invert(self):
-        return Con(self.wmin, self.hmin, self.wmax, self.hmax)
+        return Con(self.hmin, self.wmin, self.hmax, self.wmax)
 
     def dup(self):
-        return Con(self.hmin, self.wmin, self.hmax, self.wmax)
+        return Con(self.wmin, self.hmin, self.wmax, self.hmax)
 
     # adjust this constraint by the given rule along the specified orientation, bounding it by lo and hi bounds
     def constrain(self, rule, orient, vmin, vmax):
@@ -372,8 +372,8 @@ class RootLayout(WinLayout):
         # self.log(f'handle_resizing({os.get_terminal_size()})')
         if term_size != (self.dim.w, self.dim.h):
             w, h = term_size
-            self.dim = Dim(w, h)
-            self.con = Con(h, w, h, w)
+            self.dim = Dim(w,h)
+            self.con = Con(w,h,w,h)
             self.window.handle_resizing(h, w)
             self.do_layout()
 

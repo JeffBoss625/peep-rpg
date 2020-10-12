@@ -10,10 +10,10 @@ def printe(s):
     sys.stderr.write(s + "\n")
 
 def test_con():
-    assert Con(4, 7) != Con()
-    assert Con(4, 7) == Con(4, 7)
-    assert Con(4, 7, 5, 12) == Con(4, 7, 5, 12)
-    assert Con(4, 7, 5, 12) != Con(4, 7, 5, 13)
+    assert Con(7,4) != Con()
+    assert Con(7,4) == Con(7,4)
+    assert Con(7,4,12,5) == Con(7,4,12,5)
+    assert Con(7,4,12,5) != Con(7,4,13,5)
 
 def test_addcol():
     tests = [
@@ -21,15 +21,15 @@ def test_addcol():
         # dim,       pos,      con,           [ pos(),   con(),        dim ]
         
         [ Dim(12,4), None,     None,          [ Con(0,0),     Dim(12,4)] ],
-        [ Dim(12,5), None,     Con(2,3),      [ Con(2,3),     Dim(12,5)] ],
-        [ Dim(12,5), None,     Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,4)] ],
+        [ Dim(12,5), None,     Con(3,2),      [ Con(3,2),     Dim(12,5)] ],
+        [ Dim(12,5), None,     Con(3,2,7,4),  [ Con(3,2,7,4), Dim(7,4)] ],
 
         # position not enough to affect dimensions
-        [ Dim(12,5), Pos(2,1), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,4)] ],
+        [ Dim(12,5), Pos(2,1), Con(3,2,7,4),  [ Con(3,2,7,4), Dim(7,4)] ],
 
         # position makes dimensions shrink
-        [ Dim(12,5), Pos(5,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,3)] ],
-        [ Dim(12,5), Pos(6,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(6,3)] ],
+        [ Dim(12,5), Pos(5,2), Con(3,2,7,4),  [ Con(3,2,7,4), Dim(7,3)] ],
+        [ Dim(12,5), Pos(6,2), Con(3,2,7,4),  [ Con(3,2,7,4), Dim(6,3)] ],
     ]
 
     for row in tests:
@@ -82,37 +82,37 @@ FLOW_TESTS_10_30 = [
     # pos,      con           children constraints,            [ exp_parent_dim, exp_child_dims ]
 
     # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
-    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Dim(30,10), Dim(30,4), Dim(30,6)] ],
-    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Dim(30,10), Dim(30,5), Dim(30,5)] ],
+    [ None,     Con(10,5),       [Con(8,2,0,0), Con(5,3,0,0)], [Dim(30,10), Dim(30,4), Dim(30,6)] ],
+    [ None,     Con(20,5),       [Con(0,0,0,0), Con(0,0,0,0)], [Dim(30,10), Dim(30,5), Dim(30,5)] ],
 
     # children dimensions limited by panel constraints
-    [ None,     Con(5,10,9,25),  [Con(2,8,3,20), Con(3,5,0,0)], [Dim(25,9), Dim(20,3), Dim(25,6)] ],
-    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,2,20)], [Dim(25,9), Dim(25,4), Dim(20,2)] ],
-    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,0,0)], [Dim(25,9), Dim(25,4), Dim(25,5)] ],
+    [ None,     Con(10,5,25,9),  [Con(8,2,20,3), Con(5,3,0,0)], [Dim(25,9), Dim(20,3), Dim(25,6)] ],
+    [ None,     Con(10,5,25,9),  [Con(8,2,0,0), Con(5,2,20,2)], [Dim(25,9), Dim(25,4), Dim(20,2)] ],
+    [ None,     Con(10,5,25,9),  [Con(8,2,0,0), Con(5,2,0,0)], [Dim(25,9), Dim(25,4), Dim(25,5)] ],
 
     # children minimum size doesn't fit
-    [ None,     Con(3,6,4,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,4), Dim(25,4), Dim(25,0)] ],
-    [ None,     Con(3,6,5,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,5), Dim(25,4), Dim(25,1)] ],
-    [ None,     Con(3,6,7,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,7), Dim(25,4), Dim(25,3)] ],
+    [ None,     Con(6,3,25,4),  [Con(8,4,0,0), Con(5,4,0,0)], [Dim(25,4), Dim(25,4), Dim(25,0)] ],
+    [ None,     Con(6,3,25,5),  [Con(8,4,0,0), Con(5,4,0,0)], [Dim(25,5), Dim(25,4), Dim(25,1)] ],
+    [ None,     Con(6,3,25,7),  [Con(8,4,0,0), Con(5,4,0,0)], [Dim(25,7), Dim(25,4), Dim(25,3)] ],
 
     # panel shrinks to fit child constraints
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Dim(29,9), Dim(29,4), Dim(29,5)] ],
+    [ None,     Con(3,2),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
+    [ None,     Con(3,2),     [Con(8,2,29,4), Con(5,3,29,5)], [Dim(29,9), Dim(29,4), Dim(29,5)] ],
 
     # Positions
-    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0),  Con(3,5,0,0)],  [Dim(29,9), Dim(29,4), Dim(29,5)] ],
+    [ Pos(1,1),     Con(10,5),    [Con(8,2,0,0),  Con(5,3,0,0)],  [Dim(29,9), Dim(29,4), Dim(29,5)] ],
 
     # position causes panel to shrink
-    [ Pos(0,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
-    [ Pos(2,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(28,9), Dim(28,4), Dim(28,5)] ],
-    [ Pos(3,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
-    [ Pos(3,1),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
-    [ Pos(3,2),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,8), Dim(27,3), Dim(27,5)] ],
-    [ Pos(3,3),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,7), Dim(27,3), Dim(27,4)] ],
+    [ Pos(0,0),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
+    [ Pos(2,0),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(28,9), Dim(28,4), Dim(28,5)] ],
+    [ Pos(3,0),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
+    [ Pos(3,1),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
+    [ Pos(3,2),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(27,8), Dim(27,3), Dim(27,5)] ],
+    [ Pos(3,3),     Con(),     [Con(8,2,29,4), Con(5,3,28,5)], [Dim(27,7), Dim(27,3), Dim(27,4)] ],
 ]
 
 # def test_wide():
-# [ Pos(0,2),     Con(12,100,12,100), [Con(5,3,10,6), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(29,9)] ],
+# [ Pos(0,2),     Con(100,12,100,12), [Con(3,5,6,10), Con(5,3,28,5)], [Con(8,5,29,9),  Dim(29,9)] ],
 
 
 def test_layout_vertical():
@@ -184,8 +184,8 @@ def test_paint():
     root = dummy_root(Dim(100,15))
     hpan = root.panel('root-panel', Orient.HORI, None, None)
 
-    w1 = hpan.window('w1', Con(4,10,5,20))
-    w2 = hpan.window('w2', Con(3,5,8,10))
+    w1 = hpan.window('w1', Con(10,4,20,5))
+    w2 = hpan.window('w2', Con(5,3,10,8))
 
     w1.initwin(TextWindow, model=TextModel('model 1', 'window 1'))
     w2.initwin(TextWindow, model=TextModel('model 2', 'window 2'))
@@ -195,11 +195,11 @@ def test_paint():
     assert root.info.comp_by_name['w1'].name == 'w1'
     assert root.info.comp_by_name['w2'].name == 'w2'
     assert root.info.comp_by_name['root'].name == 'root'
-    assert hpan.con == Con(4,15,8,30)
+    assert hpan.con == Con(15,4,30,8)
 
     root.clear_layout()
     assert hpan.con is None
 
     root.do_layout()
-    assert hpan.con == Con(4,15,8,30)
+    assert hpan.con == Con(15,4,30,8)
 
