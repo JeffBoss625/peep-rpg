@@ -20,7 +20,7 @@ class RootInfo:
     win_by_name: dict = field(default_factory=dict)
 
 # abstraction wrapping a curses window.
-class Screen:
+class Window:
     def __init__(self, name, parent, **params):
         self.name = name
         self.params = params
@@ -72,7 +72,7 @@ class Screen:
     def __repr__(self):
         return 'Window"{}": margin:[{},{}] scr:{}'.format(self.name, self.x_margin, self.y_margin, self.scr)
 
-    # delete and rebuild curses screens using layout information (recursive on children. root screen
+    # delete and rebuild curses windows using layout information (recursive on children. root window
     # is kept intact.)
     def layout_change(self, parent, pos, dim):
         if parent is None:
@@ -160,7 +160,7 @@ class Screen:
 
     # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient for
     # calling on all subwindows.
-    # Call window.paint() and then curses.doupdate() from the main screen loop instead.
+    # Call window.paint() and then curses.doupdate() from the main loop instead.
     def paint(self, force=False):
         self.log(f'paint({self}, {force})')
         if not self.scr:
@@ -256,14 +256,14 @@ def align_y_offset(align_y, margin_y, nlines, max_h):
         raise ValueError(f'illegal value for align_y: "{align_y}"')
 
 
-class TextScreen(Screen):
+class TextWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
     def do_paint(self):
         self.write_lines(self.model.text, **self.params)
 
-class RootScreen(Screen):
+class RootWindow(Window):
     def __init__(self, name, **params):
         self.dim = params['dim']
         self.logger = params['logger']

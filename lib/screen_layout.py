@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 
 # Size and location of a Comp(ononent) in it's parent window.
-from lib.screen import RootScreen
+from lib.window import RootWindow
 from lib.util import min0, sum_max0
 
 
@@ -322,7 +322,7 @@ class WinLayout(Layout):
             if winparent.parent:
                 raise RuntimeError(f'initwin() should be called on non-root parent windows before children. parent:"{self.winparent.name}" child:"{self.name}"')
 
-            winparent.window = RootScreen('root', **self.winparent._winparams())    # initialize root window
+            winparent.window = RootWindow('root', **self.winparent._winparams())    # initialize root window
 
         self.window = constructor(self.name, winparent.window, **{**params, **self._winparams()})  # winparams override params
 

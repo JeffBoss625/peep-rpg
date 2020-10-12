@@ -1,7 +1,11 @@
+from lib.constants import SIDE
 from lib.screen_layout import *
-from lib.screen import *
+from lib.window import *
 
-class MazeScreen(Screen):
+from lib.window import TextWindow
+
+
+class MazeWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
@@ -14,7 +18,7 @@ class MazeScreen(Screen):
         for p in self.model.peeps:
             self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-class TitleScreen(Screen):
+class TitleWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
@@ -28,7 +32,7 @@ class TitleScreen(Screen):
             # age
         ])
 
-class StatsScreen(Screen):
+class StatsWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
@@ -41,7 +45,7 @@ class StatsScreen(Screen):
             # 'height: ' + str(p.body.size.h)
         ])
 
-class EquipScreen(Screen):
+class EquipWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
@@ -124,16 +128,16 @@ def init_windows(root_layout, model):
         return root_layout.info.comp_by_name[name]
 
     # custom windows
-    win(WIN.TITLE).initwin(TitleScreen, model=model.title, trunc_y=SIDE.TOP)
-    win(WIN.STATS).initwin(StatsScreen, model=model.maze)
-    win(WIN.EQUIP).initwin(EquipScreen, model=model.equip)
-    win(WIN.MAZE).initwin( MazeScreen,  model=model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    win(WIN.TITLE).initwin(TitleWindow, model=model.title, trunc_y=SIDE.TOP)
+    win(WIN.STATS).initwin(StatsWindow, model=model.maze)
+    win(WIN.EQUIP).initwin(EquipWindow, model=model.equip)
+    win(WIN.MAZE).initwin(MazeWindow, model=model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    win(WIN.BANNER).initwin(  TextScreen, model=model.banner_model, trunc_y=SIDE.TOP)
-    win(WIN.MESSAGES).initwin(TextScreen, model=model.message_model, trunc_y=SIDE.TOP)
-    win(WIN.LOG).initwin(     TextScreen, model=model.log_model, trunc_y=SIDE.TOP)
+    win(WIN.BANNER).initwin(TextWindow, model=model.banner_model, trunc_y=SIDE.TOP)
+    win(WIN.MESSAGES).initwin(TextWindow, model=model.message_model, trunc_y=SIDE.TOP)
+    win(WIN.LOG).initwin(TextWindow, model=model.log_model, trunc_y=SIDE.TOP)
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-#     screen = PrpgScreen(None, model)
+#     screen = PrpgWindow(None, model)
