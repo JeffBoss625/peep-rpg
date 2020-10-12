@@ -32,7 +32,6 @@ class Screen:
         self.y_margin = params.get('y_margin')
         self.curses = params.get('curses', None)        # curses library or instance of lib.DummyCurses
         self.scr = params.get('scr', None)              # curses root window or instance of lib.DummyWin
-        self._logger = params.get('logger', None)
         self.model = params.get('model', None)
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
@@ -117,14 +116,8 @@ class Screen:
 
         return max_w, max_h
 
-    # todo: move _logger to root
-    def logger(self):
-        if not self._logger:
-            self._logger = self.root()._logger
-        return self._logger
-
     def log(self, s):
-        self.logger().log(s)
+        self.root().logger.log(s)
 
     def write_lines(self, lines, **params):
         trunc_x = params.get('trunc_x', SIDE.RIGHT)
@@ -273,6 +266,7 @@ class TextScreen(Screen):
 class RootScreen(Screen):
     def __init__(self, name, **params):
         self.dim = params['dim']
+        self.logger = params['logger']
         super().__init__(name, None, **params)
 
     # called after main terminal window is resized by a user, but before layouts are recalculated.
