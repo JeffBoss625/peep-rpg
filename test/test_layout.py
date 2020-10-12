@@ -132,7 +132,7 @@ def test_layout_horizontal():
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = dummy_root(dim)
-    root.log(f'check_flow_layout({orient} dim:[{dim}] pos:[{pos}] con:[{con}] child_con:{children_con})')
+    # root.log(f'check_flow_layout({orient} dim:[{dim}] pos:[{pos}] con:[{con}] child_con:{children_con})')
     panel = root.panel('root-pan', orient, pos, con)
     for cc in children_con:
         panel.window(None, cc)
@@ -140,7 +140,7 @@ def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
         c.initwin(TextWindow, model=TextModel(['hi']))
 
     root.do_layout()
-    root.window.paint()
+    # root.window.paint()
 
     pdim = panel.dim
     assert pdim == exp_pdim
@@ -190,9 +190,7 @@ def test_paint():
     w1.initwin(TextWindow, model=TextModel('model 1', 'window 1'))
     w2.initwin(TextWindow, model=TextModel('model 2', 'window 2'))
     root.do_layout()
-    root.window.paint()
-    root.window.doupdate()
-    # print_win(root)
+    # root.window.paint()
 
     assert root.info.comp_by_name['w1'].name == 'w1'
     assert root.info.comp_by_name['w2'].name == 'w2'
