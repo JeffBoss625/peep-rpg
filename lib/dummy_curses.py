@@ -20,6 +20,7 @@ class DummyCursesWindow:
     def __repr__(self):
         return 'DummyWin(pos:[{}],dim:[{}])'.format(self.pos, self.dim)
 
+    # note the inverted dimensions (h, w) for curses
     def resize(self, h, w):
         if self.parent:
             raise ValueError("resize() supported only for root")
