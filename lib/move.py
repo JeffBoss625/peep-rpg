@@ -138,6 +138,9 @@ def direction_relative(direct, rotation):
 # failed (hit a wall)
 def move_peep(model, p, direct):
     dx, dy = direction_to_dxdy(direct)
+    if dx == 0 and dy == 0:
+        return True
+
     dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
     dst = peep_at_pos(model.maze.peeps, dst_pos)
     if maze_at_pos(model.maze.walls.text, dst_pos):
