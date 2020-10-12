@@ -16,7 +16,7 @@ class Pos:
     y: int = 0
 
     def __repr__(self):
-        return '{},{}'.format(self.x, self.y)
+        return f'({self.x} {self.y})'
 
     def xy(self, orient):
         if orient == Orient.HORI: return self.x
