@@ -21,3 +21,23 @@ class DotDict(dict):
 
 
 yaml.add_representer(DotDict, yaml.Dumper.yaml_representers[dict], yaml.Dumper)
+
+
+def min0(*a):
+    ret = a[0]
+    for v in a:
+        if ret == 0:
+            ret = v
+        elif v != 0 and v < ret:
+            ret = v
+    return ret
+
+
+def sum_max0(a):
+    ret = 0
+    for v in a:
+        if v == 0:
+            return 0
+        ret += v
+    return ret
+

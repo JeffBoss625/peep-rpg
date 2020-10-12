@@ -3,7 +3,7 @@ import sys
 from dataclasses import dataclass, field
 
 from lib.constants import COLOR, SIDE, curses_color
-from lib.screen_layout import min0
+from lib.util import min0
 
 
 def printe(s):
@@ -32,13 +32,13 @@ class Screen:
         self.y_margin = params.get('y_margin')
         self.curses = params.get('curses', None)        # curses library or instance of lib.DummyCurses
         self.scr = params.get('scr', None)              # curses root window or instance of lib.DummyWin
+        self._logger = params.get('logger', None)
+        self.model = params.get('model', None)
 
         self.color_pairs = {}       # color pair codes by (fg, bg) tuple
         self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.needs_paint = True
 
-        self._logger = params.get('logger', None)
-        self.model = params.get('model', None)
 
         if self.model:
             def update_fn(_model, _msg, **_kwds):
@@ -271,8 +271,9 @@ class TextScreen(Screen):
         self.write_lines(self.model.text, **self.params)
 
 class RootScreen(Screen):
-    def __init__(self, name, parent, **params):
-        super().__init__(name, parent, **params)
+    def __init__(self, name, **params):
+        self.dim = params['dim']
+        super().__init__(name, None, **params)
 
     # called after main terminal window is resized by a user, but before layouts are recalculated.
     def handle_resizing(self, w, h):

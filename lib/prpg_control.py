@@ -64,7 +64,7 @@ class WIN:
 
 #
 class PrpgControl:
-    def __init__(self, root_layout, model, scr, curses):
+    def __init__(self, root_layout, model):
         self.root_layout = root_layout
         self.model = model
 
@@ -92,7 +92,7 @@ class PrpgControl:
         # Bottom Row
         main_panel.window(WIN.LOG, Con(4, 30))
 
-        init_windows(root_layout, model, scr, curses)
+        init_windows(root_layout, model)
         self.main_screen = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
@@ -119,23 +119,20 @@ class PrpgControl:
 
 
 
-def init_windows(root_layout, model, scr, curses):
-    by_name = root_layout.info.comp_by_name
-
+def init_windows(root_layout, model):
     def win(name):
         return root_layout.info.comp_by_name[name]
 
     # custom windows
-    win(WIN.ROOT).initwin( RootScreen,  None, dim=root_layout.dim, scr=scr, curses=curses, logger=root_layout.logger())
-    win(WIN.TITLE).initwin(TitleScreen, model.title, trunc_y=SIDE.TOP)
-    win(WIN.STATS).initwin(StatsScreen, model.maze)
-    win(WIN.EQUIP).initwin(EquipScreen, model.equip)
-    win(WIN.MAZE).initwin( MazeScreen,  model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    win(WIN.TITLE).initwin(TitleScreen, model=model.title, trunc_y=SIDE.TOP)
+    win(WIN.STATS).initwin(StatsScreen, model=model.maze)
+    win(WIN.EQUIP).initwin(EquipScreen, model=model.equip)
+    win(WIN.MAZE).initwin( MazeScreen,  model=model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    win(WIN.BANNER).initwin(  TextScreen, model.banner_model, trunc_y=SIDE.TOP)
-    win(WIN.MESSAGES).initwin(TextScreen, model.message_model, trunc_y=SIDE.TOP)
-    win(WIN.LOG).initwin(     TextScreen, model.log_model, trunc_y=SIDE.TOP)
+    win(WIN.BANNER).initwin(  TextScreen, model=model.banner_model, trunc_y=SIDE.TOP)
+    win(WIN.MESSAGES).initwin(TextScreen, model=model.message_model, trunc_y=SIDE.TOP)
+    win(WIN.LOG).initwin(     TextScreen, model=model.log_model, trunc_y=SIDE.TOP)
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])

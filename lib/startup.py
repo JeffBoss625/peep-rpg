@@ -7,7 +7,7 @@ import os
 # startup.
 def curses_wrapper(fn, out=None):
     w, h = os.get_terminal_size()
-    curses.wrapper(lambda scr: fn(RootLayout(Dim(h,w), border=0, logger=Logger(out)), scr, curses))
+    curses.wrapper(lambda scr: fn(RootLayout(dim=Dim(h,w), border=0, logger=Logger(out), scr=scr, curses=curses)))
 
 # note - to set terminal size on windows machines: os.system("mode con cols=120 lines=40")
 #       on mac: os.system("resize -s 40 120")  (rows, cols)

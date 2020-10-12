@@ -5,6 +5,10 @@ from dataclasses import dataclass, field
 
 
 # Size and location of a Comp(ononent) in it's parent window.
+from lib.screen import RootScreen
+from lib.util import min0, sum_max0
+
+
 @dataclass
 class Pos:
     y: int = 0
@@ -153,6 +157,7 @@ class Layout:
         self.pos = pos  # position within parent. children of panels have this managed by parent.do_layout()
         self.con = con  # constraints used to calculate dim
         self.params = params if params else {}
+
         self.dim = params.get('dim', None)  # managed by parent panel and constrained by parent dim - see do_layout()
         self.border = params.get('border', 0)
         self.x_margin = params.get('x_margin', self.border)
@@ -171,6 +176,9 @@ class Layout:
             raise ValueError(f'multiple components with the same name: "{self.name}"')
 
         root.info.comp_by_name[self.name] = self
+
+    # these attributes are mastered in winlayout and passed to created windows
+    winparam_names = ('dim', 'border', 'x_margin', 'y_margin')
 
     # Called from root down
     def clear_layout(self):
@@ -244,14 +252,16 @@ class WinLayout(Layout):
     def __repr__(self):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
-    def window(self, name, pos, con, **kwds):
+    def window(self, name, pos, con, **params):
+        self.log(f'window({name}, {pos}, {con}, {params})')
         if not pos:
             pos = Pos(self.y_margin, self.x_margin)
-        ret = WinLayout(self, name, pos, con, **kwds)
+        ret = WinLayout(self, name, pos, con, **params)
         self.children.append(ret)
         return ret
 
     def panel(self, name, orient, pos, con):
+        self.log(f'window({name}, {pos}, {con})')
         if not pos:
             pos = Pos(self.y_margin, self.x_margin)
         ret = FlowLayout(self, name, orient, pos, con)
@@ -308,18 +318,25 @@ class WinLayout(Layout):
     def calc_constraints(self):
         raise NotImplementedError("constraints for non-panels should be set explicitly")
 
-    def initwin(self, constructor, model, **params):
-        pwin = self.winparent.window if self.winparent else None
-        self.window = constructor(
-            self.name,
-            pwin,
-            model=model,
-            border=self.border,
-            x_margin=self.x_margin,
-            y_margin=self.y_margin,
-            **params
-        )
+    def initwin(self, constructor, **params):
+        winparent = self.winparent
+        if winparent is None:
+            raise RuntimeError(f'initwin() is not intended for root component "{self.name}". it is for subwindows windows only.')
 
+
+        if winparent.window is None:
+            if winparent.parent:
+                raise RuntimeError(f'initwin() should be called on non-root parent windows before children. parent:"{self.winparent.name}" child:"{self.name}"')
+
+            winparent.window = RootScreen('root', **self.winparent._winparams())    # initialize root window
+
+        self.window = constructor(self.name, winparent.window, **{**params, **self._winparams()})  # winparams override params
+
+    # return the a dict of winlayout attributes that are passed to windows when created
+    def _winparams(self):
+        ret = self.params.copy()
+        ret.update({p: getattr(self, p) for p in self.winparam_names})
+        return ret
 
 # initialize window delegates of children of position or dimension changes
 def update_win_layout(layout, _v, _d):
@@ -332,10 +349,10 @@ def update_win_layout(layout, _v, _d):
     layout.window.layout_change(pwin, layout.pos, layout.dim)
 
 class RootLayout(WinLayout):
-    def __init__(self, dim, **params):
+    def __init__(self, **params):
         self.info = RootInfo()                      # info needs to be in place for super() init to register name
+        dim = self.dim = params['dim']
         super().__init__(None, 'root', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
-        self.dim = dim
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
     def clear_layout(self):
@@ -460,14 +477,16 @@ class FlowLayout(Layout):
         ret.constrain(ConApply.CONTAIN, Orient.HORI, self.panel_con.wmin, self.panel_con.wmax)
         return ret
 
-    def window(self, name, con, **kwds):
-        ret = WinLayout(self, name, None, con, **kwds)
+    def window(self, name, con, **params):
+        self.log(f'window({name}, {con}, {params})')
+        ret = WinLayout(self, name, None, con, **params)
         self.children.append(ret)
         self.con = None
         self.dim = None
         return ret
 
     def panel(self, name, orient, con):
+        self.log(f'panel({name}, {con})')
         ret = FlowLayout(self, name, orient, None, con)
         self.children.append(ret)
         self.con = None
@@ -509,25 +528,6 @@ class FlowLayout(Layout):
 
         for c in self.children:
             c.calc_child_dim()
-
-
-def min0(*a):
-    ret = a[0]
-    for v in a:
-        if ret == 0:
-            ret = v
-        elif v != 0 and v < ret:
-            ret = v
-    return ret
-
-
-def sum_max0(a):
-    ret = 0
-    for v in a:
-        if v == 0:
-            return 0
-        ret += v
-    return ret
 
 
 # place min-sized childrent and truncate the last child and children to fit

@@ -4,4 +4,4 @@ from lib.prpg_main import main
 from lib.screen_layout import Dim, RootLayout
 
 dcurses = DummyCurses(Dim(40, 120))
-main(RootLayout(dcurses.term.dim, border=0, logger=Logger('dbg.py')), dcurses.term, dcurses)
+main(RootLayout(dim=dcurses.term.dim, scr=dcurses.term, curses=dcurses, border=0, logger=Logger('dbg.py')))
