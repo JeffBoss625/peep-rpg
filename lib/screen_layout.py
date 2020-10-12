@@ -164,7 +164,6 @@ class Layout:
         self.y_margin = params.get('y_margin', self.border)
 
         self.children = []
-        self._logger = params.get('logger', None)
 
         # store consolidated window information in the root object
         root = self.root()
@@ -178,7 +177,7 @@ class Layout:
         root.info.comp_by_name[self.name] = self
 
     # these attributes are mastered in winlayout and passed to created windows
-    winparam_names = ('dim', 'border', 'x_margin', 'y_margin')
+    winparam_names = ('dim', 'border', 'x_margin', 'y_margin', 'logger')
 
     # Called from root down
     def clear_layout(self):
@@ -193,13 +192,8 @@ class Layout:
             p = p.parent
         return p
 
-    def logger(self):
-        if not self._logger:
-            self._logger = self.root()._logger
-        return self._logger
-
     def log(self, s):
-        self.logger().log(s)
+        self.root().logger.log(s)
 
     def apply_ddf(self, fn, v=None):
         for c in self.children:
@@ -335,7 +329,7 @@ class WinLayout(Layout):
     # return the a dict of winlayout attributes that are passed to windows when created
     def _winparams(self):
         ret = self.params.copy()
-        ret.update({p: getattr(self, p) for p in self.winparam_names})
+        ret.update({p: getattr(self, p) for p in self.winparam_names if hasattr(self, p)})
         return ret
 
 # initialize window delegates of children of position or dimension changes
@@ -351,6 +345,7 @@ def update_win_layout(layout, _v, _d):
 class RootLayout(WinLayout):
     def __init__(self, **params):
         self.info = RootInfo()                      # info needs to be in place for super() init to register name
+        self.logger = params['logger']
         dim = self.dim = params['dim']
         super().__init__(None, 'root', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
