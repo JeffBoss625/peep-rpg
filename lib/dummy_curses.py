@@ -1,5 +1,5 @@
 from lib.constants import Key
-from lib.screen_layout import Dim, Pos, Con
+from lib.win_layout import Dim, Pos
 import sys
 
 def printe(s):

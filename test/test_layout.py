@@ -1,6 +1,7 @@
 from lib.model import TextModel
-from lib.screen import TextWindow
-from lib.screen_layout import *
+from lib.startup import dummy_root
+from lib.window import TextWindow
+from lib.win_layout import *
 import sys
 
 
@@ -37,7 +38,7 @@ def test_addcol():
 # note that running nose tests with "-d" gives assertion descriptions including content of dataclasses
 # when variables are resolved, so we call "cpos = col.pos()..." as separate steps reveal data discrepancies.
 def check_col(rootdim, colpos, colcon, expcon, expdim):
-    root = create_root(rootdim)
+    root = dummy_root(rootdim)
     col = root.panel('pan1', Orient.VERT, colpos, colcon)
     root.do_layout()
 
@@ -126,7 +127,7 @@ def test_layout_horizontal():
         yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, expcon, expdims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
-    root = RootLayout(dim)
+    root = dummy_root(dim)
     # root.log('check_flow_layout({}, dim:[{}], pos:[{}], con:[{}], child_con:{})'.format(orient, dim, pos, con, children_con))
     panel = root.panel('root-pan', orient, pos, con)
     for cc in children_con:
@@ -173,14 +174,14 @@ def print_one_win(win, buf, xoff, yoff, depth):
 
 def test_paint():
     printe('')
-    root = RootLayout(Dim(15, 100))
+    root = dummy_root(Dim(15, 100))
     hpan = root.panel('root-panel', Orient.HORI, None, None)
 
     w1 = hpan.window('w1', Con(4,10,5,20))
     w2 = hpan.window('w2', Con(3,5,8,10))
 
-    w1.initwin(TextWindow, TextModel('model 1', 'window 1'))
-    w2.initwin(TextWindow, TextModel('model 2', 'window 2'))
+    w1.initwin(TextWindow, model=TextModel('model 1', 'window 1'))
+    w2.initwin(TextWindow, model=TextModel('model 2', 'window 2'))
     root.do_layout()
     root.window.paint()
     root.window.doupdate()

@@ -55,10 +55,10 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-def player_turn(screen):
+def player_turn(mainwin):
     while True:
-        model = screen.model
-        input_key = screen.get_key()
+        model = mainwin.model
+        input_key = mainwin.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
             if mlib.move_peep(model, model.maze.player, direct):
@@ -79,9 +79,9 @@ def player_turn(screen):
                 model.message("You have nothing in range to brain-swap with")
         elif input_key == 'a':
             model.message('Where do you want to shoot?')
-            sec_input_key = screen.get_key()
+            sec_input_key = mainwin.get_key()
             while sec_input_key not in DIRECTION_KEYS:
-                sec_input_key = screen.get_key()
+                sec_input_key = mainwin.get_key()
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
             direct = DIRECTION_KEYS[sec_input_key]

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, astuple
 from typing import Tuple
 
 from lib.constants import COLOR
+from lib.util import DotDict
 
 
 @dataclass
@@ -126,23 +127,35 @@ class Layer:
         return f'{self.thick_mm}mm {self.material} {self.construction} {self.grams_cm2:0.3f} g/cm2 {self.prot}'
 
 # calculate protection factor
-# base: inverse of protection (1 - protection percent)
-# nlayers: number of layers of the material
-# slow_compound: compounding factor of slowing a projectile
-# slow_log_base: compounding logarithm rate. e.g. 1.5 will compound slowing for every 50% increase in thickness. 2
-#    will compound for every doubling of thickness
-def layer_protection(base, nlayers, slow_compound, slow_log_base):
+#   base: inverse of protection (1 - protection percent)
+#   nlayers: number of layers of the material
+#   slow_compound: compounding factor of slowing a projectile
+#   slow_log_base: compounding logarithm rate. e.g. 1.5 will compound slowing for every 50% increase in thickness. 2
+#       will compound for every doubling of thickness
+#   exp: accelerates compounding to add more rapid asymptotic stopping of damage
+def calc_layer_prot(base, nlayers):
     if nlayers == 1:
-        return round(base * 100, 3)
-    xtra = (slow_compound ** (math.log(nlayers, slow_log_base))) ** (nlayers*4)
+        return round(base, 3)
     for i in range(2, int(nlayers+1)):
         base -= base / i
 
     if int(nlayers) != nlayers:
         frac = nlayers - int(nlayers)
         base -= (frac * (base/nlayers))
-    return round(base * xtra * 100, 3)
+    return round(base, 3)
 
+def stop_factor(nlayers, slow_compound, slow_log_base, exp=2):
+    return (slow_compound ** (math.log(nlayers, slow_log_base))) ** (nlayers * exp)
+
+def add_layer_protection(b1, b2):
+    pass
+
+class TestFn:
+    def __init__(self, v):
+        self.x = v
+
+    def handler(self, a, b):
+        return (a + b) * self.x
 
 if __name__ == '__main__':
     # for cname in CON_BY_NAME:
@@ -151,10 +164,4 @@ if __name__ == '__main__':
     #             layer = Layer(mname, cname, mm)
     #             print(repr(layer))
 
-    for i in range(1, 11):
-        print(f'i:{i} result:{layer_protection(0.22, i, 0.98, 1.5)}')
-
-    for i in (1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.1, 2.1):
-        print(f'i:{i} result:{layer_protection(0.22, i, 0.98, 1.5)}')
-
-    # print('result:', layer_protection2(0.48, 10))
+    pass

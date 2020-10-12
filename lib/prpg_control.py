@@ -1,5 +1,5 @@
 from lib.constants import SIDE
-from lib.screen_layout import *
+from lib.win_layout import *
 from lib.window import *
 
 from lib.window import TextWindow
@@ -97,7 +97,7 @@ class PrpgControl:
         main_panel.window(WIN.LOG, Con(4, 30))
 
         init_windows(root_layout, model)
-        self.main_screen = root_layout.window
+        self.root_win = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
 
@@ -106,8 +106,8 @@ class PrpgControl:
             model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
         model.maze.subscribe(log_event_fn)
-        self.main_screen.curses.raw()
-        self.main_screen.curses.curs_set(0)
+        self.root_win.curses.raw()
+        self.root_win.curses.curs_set(0)
 
     def get_key(self):
         self.root_layout.window.paint()
@@ -116,7 +116,7 @@ class PrpgControl:
     def resize_handler(self, _signum, _frame):
         try:
             if self.root_layout.handle_resizing():
-                self.main_screen.paint(force=True)
+                self.root_win.paint(force=True)
 
         except Exception as e:
             self.root_layout.log(e)
@@ -140,4 +140,4 @@ def init_windows(root_layout, model):
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
-#     screen = PrpgWindow(None, model)
+#     win = PrpgWindow(None, model)

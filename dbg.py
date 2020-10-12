@@ -1,7 +1,6 @@
-from lib.dummy_curses import DummyCurses
 from lib.logger import Logger
 from lib.prpg_main import main
-from lib.screen_layout import Dim, RootLayout
+from lib.screen_layout import Dim
+from lib.startup import dummy_root
 
-dcurses = DummyCurses(Dim(40, 120))
-main(RootLayout(dim=dcurses.term.dim, scr=dcurses.term, curses=dcurses, border=0, logger=Logger('dbg.py')))
+main(dummy_root(dim=Dim(40,120), logger=Logger('dbg.py')))

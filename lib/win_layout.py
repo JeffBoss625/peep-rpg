@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 
 # Size and location of a Comp(ononent) in it's parent window.
+from lib.logger import Logger
 from lib.window import RootWindow
 from lib.util import min0, sum_max0
 
@@ -247,7 +248,7 @@ class WinLayout(Layout):
         return '"{}":[P[{}],D[{}],C[{}]]'.format(self.name, self.pos, self.dim, self.con)
 
     def window(self, name, pos, con, **params):
-        self.log(f'window({name}, {pos}, {con}, {params})')
+        # self.log(f'window({name}, {pos}, {con}, {params})')
         if not pos:
             pos = Pos(self.y_margin, self.x_margin)
         ret = WinLayout(self, name, pos, con, **params)
@@ -255,7 +256,7 @@ class WinLayout(Layout):
         return ret
 
     def panel(self, name, orient, pos, con):
-        self.log(f'window({name}, {pos}, {con})')
+        # self.log(f'window({name}, {pos}, {con})')
         if not pos:
             pos = Pos(self.y_margin, self.x_margin)
         ret = FlowLayout(self, name, orient, pos, con)
@@ -340,13 +341,14 @@ def update_win_layout(layout, _v, _d):
 
     pwin = layout.winparent.window if layout.winparent else None
     layout._last_layout_update = posdim
-    layout.window.layout_change(pwin, layout.pos, layout.dim)
+    if layout.window:
+        layout.window.layout_change(pwin, layout.pos, layout.dim)
 
 class RootLayout(WinLayout):
     def __init__(self, **params):
         self.info = RootInfo()                      # info needs to be in place for super() init to register name
-        self.logger = params['logger']
-        dim = self.dim = params['dim']
+        self.logger = params.get('logger', Logger('stderr'))
+        dim = self.dim = params.get('dim', Dim(40,80))
         super().__init__(None, 'root', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
@@ -473,7 +475,7 @@ class FlowLayout(Layout):
         return ret
 
     def window(self, name, con, **params):
-        self.log(f'window({name}, {con}, {params})')
+        # self.log(f'window({name}, {con}, {params})')
         ret = WinLayout(self, name, None, con, **params)
         self.children.append(ret)
         self.con = None
@@ -481,7 +483,7 @@ class FlowLayout(Layout):
         return ret
 
     def panel(self, name, orient, con):
-        self.log(f'panel({name}, {con})')
+        # self.log(f'panel({name}, {con})')
         ret = FlowLayout(self, name, orient, None, con)
         self.children.append(ret)
         self.con = None
