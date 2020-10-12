@@ -127,28 +127,37 @@ class Layer:
         return f'{self.thick_mm}mm {self.material} {self.construction} {self.grams_cm2:0.3f} g/cm2 {self.prot}'
 
 # calculate protection factor
-#   base: inverse of protection (1 - protection percent)
+#   uexposure: vulnerability from one layer. inverse of protection (1 - protection percent)
 #   nlayers: number of layers of the material
+def calc_prot_layers(uexposure, nlayers):
+    if nlayers == 1:
+        return round(uexposure, 3)
+
+    for i in range(2, int(nlayers+1)):
+        uexposure -= uexposure / i
+
+    if int(nlayers) != nlayers:
+        frac = nlayers - int(nlayers)
+        uexposure -= (frac * (uexposure / nlayers))
+    return round(uexposure, 3)
+
+# return the extra stopping factor that results from combining layers
+#   nlayers: number of layers (unit size per material type)
 #   slow_compound: compounding factor of slowing a projectile
 #   slow_log_base: compounding logarithm rate. e.g. 1.5 will compound slowing for every 50% increase in thickness. 2
 #       will compound for every doubling of thickness
 #   exp: accelerates compounding to add more rapid asymptotic stopping of damage
-def calc_layer_prot(base, nlayers):
-    if nlayers == 1:
-        return round(base, 3)
-    for i in range(2, int(nlayers+1)):
-        base -= base / i
+def stop_factor(nlayers, compound=0.98, log_base=1.5, exponent=2):
+    return (compound ** (math.log(nlayers, log_base))) ** (nlayers * exponent)
 
-    if int(nlayers) != nlayers:
-        frac = nlayers - int(nlayers)
-        base -= (frac * (base/nlayers))
-    return round(base, 3)
+# calculate the exposure of
+def merge_different_layers(e1, e2):
+    if e1 > e2:
+        hi, lo = e1, e2
+    else:
+        hi, lo = e2, e1
 
-def stop_factor(nlayers, slow_compound, slow_log_base, exp=2):
-    return (slow_compound ** (math.log(nlayers, slow_log_base))) ** (nlayers * exp)
-
-def add_layer_protection(b1, b2):
-    pass
+    return round(hi - lo/2, 3)
 
 class TestFn:
     def __init__(self, v):
@@ -156,6 +165,7 @@ class TestFn:
 
     def handler(self, a, b):
         return (a + b) * self.x
+
 
 if __name__ == '__main__':
     # for cname in CON_BY_NAME:
