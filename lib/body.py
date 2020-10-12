@@ -7,12 +7,12 @@ from lib.items.belt import SoldiersBelt
 from lib.items.bow import Arrow, Bow
 from lib.items.holster import Quiver
 from lib.items.item import Item
-from lib.model import Size, register_yaml, DataModel
+from lib.model import Size, register_yaml
 from lib.util import DotDict
 
-RACE = DotDict(
-    HUMAN='human'
-)
+
+class RACE:
+    HUMAN='human',
 
 @dataclass
 class BodySlot:
@@ -66,7 +66,6 @@ class Body:
             ret[p.name] = slots
         return ret
 
-    # todo: use an ordered DotDict to store parts
     def parts_by_name(self):
         ret = DotDict()
         for p in self.parts:
@@ -198,11 +197,11 @@ if __name__ == '__main__':
     slot.items = ((Arrow(), 20),)
     bslots.torso.on_shoulder2.item = quiver
     state = body.__getstate__()
-    print(state)
+    # print(state)
     del state['items']
     body2 = create_humanoid(**state)
-    print(dump(body2))
+    # print(dump(body2))
     # print(dump(body))
-    # print(body.parts_by_name().head.size)
+    print(dump(list(body.parts_by_name().values())))
 
 

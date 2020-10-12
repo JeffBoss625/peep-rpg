@@ -3,7 +3,6 @@ from dataclasses import dataclass, field, astuple
 from typing import Tuple
 
 from lib.constants import COLOR
-from lib.util import DotDict
 
 
 @dataclass

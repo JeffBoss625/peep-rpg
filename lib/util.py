@@ -1,9 +1,11 @@
 # A simple dictionary extension that maps dot-notation access to public keys (do not start with '_')
 # while maintaining normal attribute behavior for private ('_...') keys.
+from collections import OrderedDict
+
 import yaml
 
 
-class DotDict(dict):
+class DotDict(OrderedDict):
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
 

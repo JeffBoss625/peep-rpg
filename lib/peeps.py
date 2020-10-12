@@ -5,8 +5,6 @@ from lib.body import Body, create_humanoid, RACE
 from lib.constants import COLOR
 from lib.model import DataModel, ModelDict, register_yaml, PubSub, Size
 
-from lib.util import DotDict
-
 @dataclass
 class Attack(DataModel):
     def __post_init__(self):

@@ -4,10 +4,6 @@
 #    curses.COLOR_BLUE
 #    etc...
 #
-from dataclasses import dataclass
-
-from lib.util import DotDict
-
 class COLOR:
     BLACK = 'BLACK'
     BLUE = 'BLUE'
@@ -23,18 +19,15 @@ def curses_color(color):
     return 'COLOR_' + color
 
 
-SIDE = DotDict(
-    TOP='TOP',
-    LEFT='LEFT',
-    BOTTOM='BOTTOM',
-    RIGHT='RIGHT',
-    CENTER='CENTER',
-)
+class SIDE:
+    TOP='TOP'
+    LEFT='LEFT'
+    BOTTOM='BOTTOM'
+    RIGHT='RIGHT'
+    CENTER='CENTER'
 
 
 class Key:
     CTRL_Q = '\x11'
 
 
-if __name__ == '__main__':
-    print(COLOR.values())
