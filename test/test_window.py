@@ -4,7 +4,7 @@ from lib.win_layout import *
 from lib.model import *
 
 def test_text_win():
-    root = dummy_root(Dim(10,30))
+    root = dummy_root(Dim(30,10))
     pan = root.panel('pan1', Orient.VERT, None, None)
     pan.window('win1', Con(4,6,8,10)).initwin(TextWindow, model=TextModel('foo'))
     textwin = pan.window('win2', Con(4,8,9,11))

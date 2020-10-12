@@ -8,9 +8,9 @@ import os
 # startup.
 def curses_wrapper(fn, out=None):
     w, h = os.get_terminal_size()
-    curses.wrapper(lambda scr: fn(RootLayout(dim=Dim(h,w), border=0, logger=Logger(out), scr=scr, curses=curses)))
+    curses.wrapper(lambda scr: fn(RootLayout(dim=Dim(w,h), border=0, logger=Logger(out), scr=scr, curses=curses)))
 
-def dummy_root(dim=Dim(40,120), border=0, logger=Logger('stderr')):
+def dummy_root(dim=Dim(120,40), border=0, logger=Logger('stderr')):
     dcurses = DummyCurses(dim)
     return RootLayout(dim=dim, border=border, logger=logger, scr=dcurses.term, curses=dcurses)
 

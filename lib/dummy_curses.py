@@ -13,7 +13,7 @@ class DummyCursesWindow:
         self.con = None
         if parent:
             self.buf = parent.buf
-            self.dim = Dim(dim.h, dim.w)
+            self.dim = Dim(dim.w, dim.h)
         else:
             self.resize(dim.h, dim.w)
 
@@ -24,7 +24,7 @@ class DummyCursesWindow:
         if self.parent:
             raise ValueError("resize() supported only for root")
 
-        self.dim = Dim(h, w)
+        self.dim = Dim(w, h)
         self.buf = [x[:] for x in [['.'] * self.dim.w] * self.dim.h]
 
     def clear(self):
@@ -83,7 +83,7 @@ class DummyCursesWindow:
         printe('')
 
     def derwin(self, h, w, y, x):
-        return DummyCursesWindow(self, Pos(x, y), Dim(h, w))
+        return DummyCursesWindow(self, Pos(x, y), Dim(w, h))
 
     def xyoff(self):
         win = self

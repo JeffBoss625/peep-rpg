@@ -20,16 +20,16 @@ def test_addcol():
         # root       addcol                   [ expected column ]
         # dim,       pos,      con,           [ pos(),   con(),        dim ]
         
-        [ Dim(4,12), None,     None,          [ Con(0,0),     Dim(4,12)] ],
-        [ Dim(5,12), None,     Con(2,3),      [ Con(2,3),     Dim(5,12)] ],
-        [ Dim(5,12), None,     Con(2,3,4,7),  [ Con(2,3,4,7), Dim(4,7)] ],
+        [ Dim(12,4), None,     None,          [ Con(0,0),     Dim(12,4)] ],
+        [ Dim(12,5), None,     Con(2,3),      [ Con(2,3),     Dim(12,5)] ],
+        [ Dim(12,5), None,     Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,4)] ],
 
         # position not enough to affect dimensions
-        [ Dim(5,12), Pos(2,1), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(4,7)] ],
+        [ Dim(12,5), Pos(2,1), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,4)] ],
 
         # position makes dimensions shrink
-        [ Dim(5,12), Pos(5,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,7)] ],
-        [ Dim(5,12), Pos(6,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(3,6)] ],
+        [ Dim(12,5), Pos(5,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(7,3)] ],
+        [ Dim(12,5), Pos(6,2), Con(2,3,4,7),  [ Con(2,3,4,7), Dim(6,3)] ],
     ]
 
     for row in tests:
@@ -82,42 +82,42 @@ FLOW_TESTS_10_30 = [
     # pos,      con           children constraints,            [ exp_parent_dim, exp_child_dims ]
 
     # child constraints don't affect panel constraints. panel constraints don't affect dim(10,30)
-    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Dim(10,30), Dim(4,30), Dim(6,30)] ],
-    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Dim(10,30), Dim(5,30), Dim(5,30)] ],
+    [ None,     Con(5,10),       [Con(2,8,0,0), Con(3,5,0,0)], [Dim(30,10), Dim(30,4), Dim(30,6)] ],
+    [ None,     Con(5,20),       [Con(0,0,0,0), Con(0,0,0,0)], [Dim(30,10), Dim(30,5), Dim(30,5)] ],
 
     # children dimensions limited by panel constraints
-    [ None,     Con(5,10,9,25),  [Con(2,8,3,20), Con(3,5,0,0)], [Dim(9,25), Dim(3,20), Dim(6,25)] ],
-    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,2,20)], [Dim(9,25), Dim(4,25), Dim(2,20)] ],
-    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,0,0)], [Dim(9,25), Dim(4,25), Dim(5,25)] ],
+    [ None,     Con(5,10,9,25),  [Con(2,8,3,20), Con(3,5,0,0)], [Dim(25,9), Dim(20,3), Dim(25,6)] ],
+    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,2,20)], [Dim(25,9), Dim(25,4), Dim(20,2)] ],
+    [ None,     Con(5,10,9,25),  [Con(2,8,0,0), Con(2,5,0,0)], [Dim(25,9), Dim(25,4), Dim(25,5)] ],
 
     # children minimum size doesn't fit
-    [ None,     Con(3,6,4,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(4,25), Dim(4,25), Dim(0,25)] ],
-    [ None,     Con(3,6,5,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(5,25), Dim(4,25), Dim(1,25)] ],
-    [ None,     Con(3,6,7,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(7,25), Dim(4,25), Dim(3,25)] ],
+    [ None,     Con(3,6,4,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,4), Dim(25,4), Dim(25,0)] ],
+    [ None,     Con(3,6,5,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,5), Dim(25,4), Dim(25,1)] ],
+    [ None,     Con(3,6,7,25),  [Con(4,8,0,0), Con(4,5,0,0)], [Dim(25,7), Dim(25,4), Dim(25,3)] ],
 
     # panel shrinks to fit child constraints
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,29), Dim(4,29), Dim(5,28)] ],
-    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Dim(9,29), Dim(4,29), Dim(5,29)] ],
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
+    [ None,     Con(2,3),     [Con(2,8,4,29), Con(3,5,5,29)], [Dim(29,9), Dim(29,4), Dim(29,5)] ],
 
     # Positions
-    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0),  Con(3,5,0,0)],  [Dim(9,29), Dim(4,29), Dim(5,29)] ],
+    [ Pos(1,1),     Con(5,10),    [Con(2,8,0,0),  Con(3,5,0,0)],  [Dim(29,9), Dim(29,4), Dim(29,5)] ],
 
     # position causes panel to shrink
-    [ Pos(0,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,29), Dim(4,29), Dim(5,28)] ],
-    [ Pos(2,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,28), Dim(4,28), Dim(5,28)] ],
-    [ Pos(3,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,27), Dim(4,27), Dim(5,27)] ],
-    [ Pos(3,1),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(9,27), Dim(4,27), Dim(5,27)] ],
-    [ Pos(3,2),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(8,27), Dim(3,27), Dim(5,27)] ],
-    [ Pos(3,3),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(7,27), Dim(3,27), Dim(4,27)] ],
+    [ Pos(0,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(29,9), Dim(29,4), Dim(28,5)] ],
+    [ Pos(2,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(28,9), Dim(28,4), Dim(28,5)] ],
+    [ Pos(3,0),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
+    [ Pos(3,1),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,9), Dim(27,4), Dim(27,5)] ],
+    [ Pos(3,2),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,8), Dim(27,3), Dim(27,5)] ],
+    [ Pos(3,3),     Con(),     [Con(2,8,4,29), Con(3,5,5,28)], [Dim(27,7), Dim(27,3), Dim(27,4)] ],
 ]
 
 # def test_wide():
-# [ Pos(0,2),     Con(12,100,12,100), [Con(5,3,10,6), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(9,29)] ],
+# [ Pos(0,2),     Con(12,100,12,100), [Con(5,3,10,6), Con(3,5,5,28)], [Con(5,8,9,29),  Dim(29,9)] ],
 
 
 def test_layout_vertical():
     for t in FLOW_TESTS_10_30:
-        yield check_flow_layout, Orient.VERT, Dim(10, 30), t[0], t[1], t[2], t[3][0], t[3][1:]
+        yield check_flow_layout, Orient.VERT, Dim(30,10), t[0], t[1], t[2], t[3][0], t[3][1:]
 
 # run same tests as test_layout_vertical() by using inverted input.
 def test_layout_horizontal():
@@ -128,7 +128,7 @@ def test_layout_horizontal():
         exp_parent_dim = t[3][0].invert()
         exp_child_dims = list(c.invert() for c in t[3][1:])
 
-        yield check_flow_layout, Orient.HORI, Dim(30, 10), pos, con, children, exp_parent_dim, exp_child_dims
+        yield check_flow_layout, Orient.HORI, Dim(10,30), pos, con, children, exp_parent_dim, exp_child_dims
 
 def check_flow_layout(orient, dim, pos, con, children_con, exp_pdim, exp_cdims):
     root = dummy_root(dim)
@@ -181,7 +181,7 @@ def print_one_win(win, buf, xoff, yoff, depth):
 
 def test_paint():
     printe('')
-    root = dummy_root(Dim(15, 100))
+    root = dummy_root(Dim(100,15))
     hpan = root.panel('root-panel', Orient.HORI, None, None)
 
     w1 = hpan.window('w1', Con(4,10,5,20))

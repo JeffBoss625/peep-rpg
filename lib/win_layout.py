@@ -30,16 +30,16 @@ class Pos:
 # Width and Height of a Comp(onent).
 @dataclass
 class Dim:
-    h: int = 0
     w: int = 0
+    h: int = 0
 
     def __repr__(self):
-        return '{},{}'.format(self.h, self.w)
+        return f'({self.w} {self.h})'
 
     def invert(self):
-        return Dim(self.w, self.h)
+        return Dim(self.h, self.w)
 
-    def hw(self, orient):
+    def wh(self, orient):
         if orient == Orient.HORI: return self.w
         if orient == Orient.VERT: return self.h
         raise ValueError("unknown orientation: " + orient)
@@ -58,12 +58,12 @@ class Dim:
         else:
             retw = min(con.wmax, pdim.w - pos.x)
 
-        ret = Dim(reth, retw)
+        ret = Dim(retw, reth)
         # printd('...Dim.child_dim() return', ret)
         return ret
 
     def dup(self):
-        return Dim(self.h, self.w)
+        return Dim(self.w, self.h)
 
 
 # Constraint application strategy - dictates how constraints are merged
@@ -283,7 +283,7 @@ class WinLayout(Layout):
     def calc_child_dim(self):
         for c in self.children:
             # child position is already indented by +(x_margin,y_margin), so constraint by 1 x (x_margin,y_margin)
-            dim = Dim(self.dim.h - self.y_margin, self.dim.w - self.x_margin)
+            dim = Dim(self.dim.w - self.x_margin, self.dim.h - self.y_margin)
             c.dim = dim.child_dim(c.con, c.pos)
             c.calc_child_dim()
 
@@ -350,7 +350,7 @@ class RootLayout(WinLayout):
     def __init__(self, **params):
         self.info = RootInfo()                      # info needs to be in place for super() init to register name
         self.logger = params.get('logger', Logger('stderr'))
-        dim = self.dim = params.get('dim', Dim(40,80))
+        dim = self.dim = params.get('dim', Dim(80,40))
         super().__init__(None, 'root', Pos(0,0), Con(dim.h,dim.w,dim.h,dim.w), **params)
         self._is_resizing = False       # track concurrent resizing callbacks to prevent redundant window resizing
 
@@ -372,7 +372,7 @@ class RootLayout(WinLayout):
         # self.log(f'handle_resizing({os.get_terminal_size()})')
         if term_size != (self.dim.w, self.dim.h):
             w, h = term_size
-            self.dim = Dim(h, w)
+            self.dim = Dim(w, h)
             self.con = Con(h, w, h, w)
             self.window.handle_resizing(h, w)
             self.do_layout()
@@ -499,13 +499,13 @@ class FlowLayout(Layout):
         dim = self.dim
         children = self.children
 
-        avail_space = min0(con.max(orient), dim.hw(orient))
+        avail_space = min0(con.max(orient), dim.wh(orient))
         ccon_mins = list(c.con.min(orient) for c in children)
         ccon_maxs = list(c.con.max(orient) for c in children)
 
         c_sizes = flow_calc_sizes(avail_space, ccon_mins, ccon_maxs)
 
-        fixed_avail_space = dim.hw(Orient.invert(orient))
+        fixed_avail_space = dim.wh(Orient.invert(orient))
 
         offset_flow = self.pos.xy(orient)
         offset_fixed = self.pos.xy(Orient.invert(orient))
@@ -515,10 +515,10 @@ class FlowLayout(Layout):
             c_size_fixed = min0(c.con.max(Orient.invert(orient)), fixed_avail_space)
             if orient == Orient.HORI:
                 c.pos = Pos(offset_flow, offset_fixed)
-                c.dim = Dim(c_size_fixed, c_size)
+                c.dim = Dim(c_size, c_size_fixed)
             elif orient == Orient.VERT:
                 c.pos = Pos(offset_fixed, offset_flow)
-                c.dim = Dim(c_size, c_size_fixed)
+                c.dim = Dim(c_size_fixed, c_size)
             else:
                 raise ValueError("unknown orientation: " + orient)
 
