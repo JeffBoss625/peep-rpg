@@ -66,8 +66,9 @@ def mat_by_name():
         ('steel',    'metal', COLOR.BLUE,    7.900, (0.60, 0.80, 0.55, 0.70, 0.70, 0.25, 0.15)),  # modern high-grade steel
         ('bronze',   'metal', COLOR.YELLOW,  8.800, (0.50, 0.70, 0.50, 0.50, 0.50, 0.20, 0.20)),  # weapon-grade brass (work-hardened high-tin content)
         ('iron',     'metal', COLOR.BLUE,    7.680, (0.45, 0.65, 0.45, 0.50, 0.50, 0.20, 0.80)),
-        ('leather',  'leather', COLOR.WHITE, 0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('leather',  'leather', COLOR.WHITE, 0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # soft oiled leather
         ('cotton',   'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('flax',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
         ('wool',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
         ('felt',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
         ('wicker',   'wicker', COLOR.WHITE,  0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
@@ -94,9 +95,9 @@ def construct_by_name():
         # name    weight_fac (pierce, slash, crush, heat, cold, elec)
         ('chainmail', 0.50, (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
         ('lamellar',  0.75, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
-        ('scalemail', 0.80, (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00)),
-        ('platemail', 1.00, (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)),
-        ('plate', 1.00, (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)),    # placeholder for normal layer over shields...
+        ('brigandine',  0.75, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+        ('scale', 0.80, (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00)),
+        ('plate', 1.00, (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)),    # solid metal plate
     )
     ret = {}
     for name, weight_fac, prot in data:
