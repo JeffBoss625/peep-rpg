@@ -24,9 +24,6 @@ def create_shield(layers):
 
 register_yaml([Shield])
 
-METAL_HELMS = (
-    ('iron', 'cap')
-)
 
 if __name__ == '__main__':
     s = Shield(layers=(Layer('iron', 'plate', 2), Layer('oak', 'plate', 10)))
