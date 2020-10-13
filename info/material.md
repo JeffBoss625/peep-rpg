@@ -141,3 +141,33 @@ High-tin bronze that is hammer-hardened is *harder* than any iron or steel avail
 It isn't until quenching of high-carbon steels becomes common that steel is overall superior to bronze.
 Mind you, straight hardness is only one of many qualities that must be compared when considering
 what makes weapons or armor "better"!
+
+# Wooden Shield Thickness [(site link)](http://members.ozemail.com.au/~chrisandpeter/shield/shield.html)
+
+
+
+##Combat techniques
+
+Analysis of battle damage to weapons from the massive Roman Iron Age deposit of Nydham indicated 
+the primary use for the large round shields was in fending off missiles, while sword duels were 
+conducted blade on blade (Schloß Gottorf: Archäologische Landesmuseum der Christian-Albrechts 
+Universität, Schleswig Germany: pers. obs. 1994). However, the use of shields in hand to hand 
+combat is recorded in customs such as the holmgang duel. The heavy iron construction of the Viking 
+Age boss is unlike the Roman Iron Age examples of thin bronze, perhaps indicating a change to a 
+hand-to-hand fighting style in which parrys with the boss were possible. The thin boards would 
+split easily, and could perhaps have been deliberately made so, in order to snare an attacker's 
+blade.
+
+* [Thickness Measures](shield-thickness.jpg)
+
+
+Small clamps made of iron or bronze sheet are occasionally found in graves (Table 3; Fig. 5). 
+Clamps were sometimes simply decorated by tinning, punching or engraving (Fig. 5-c). In Birka graves Bj 
+628 and 736 the clamps were butted to produce a continuous edge (Fig. 6), however, only sections of 
+the rim survive, perhaps indicating deliberate damage before burial.
+
+* [Shield Clamps](shield_with_clamps.jpg)
+
+
+
+
