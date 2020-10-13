@@ -169,5 +169,123 @@ the rim survive, perhaps indicating deliberate damage before burial.
 * [Shield Clamps](shield_with_clamps.jpg)
 
 
+# [Flax](https://www.sciencedirect.com/topics/engineering/flax-fiber#:~:text=Flax%20is%20stronger%20than%20cotton,from%20flax%20is%20called%20linen.)
+
+Flax fibre comes under the category of bast fibre (Fig. 3.1) and is extracted from the plant of the 
+linseed/flax plant (Linum usitatissimum L.). This plant is popular for two reason: one is flax fibre 
+and another is linseed oil (used for industrial applications) extracted from the seed of the plant 
+(Basu and Dutta, 2014). According to historical records, the earliest example of preserved linen 
+appears to be a needle-netted linen headpiece from Nahal Hemar Cave in Israel 8500 years ago, and 
+Swiss Lake Dwellers used a native flax to make cloth 5000–6000 years ago. It was also found that 
+ancient Egyptians used clothing, bed linen, and shrouds for mummies and for ships’ sails prepared 
+mainly from linen in those days. The earliest Egyptian linen cloth dates from the Old Kingdom, but 
+flax appears to be have been grown for linen about 5000 years ago in the Early Dynastic period 
+(Debnath, 2016). Sharma et al. (1999) described and compared different retting methods of flax 
+fibre, including water, dew and enzyme-retted, on physical chemical and thermal properties of flax
+fibre. 
+
+Linen is a “stiff” fabric and is less likely to cling to the skin; when it billows away, it quickly 
+dries out and becomes cool again. Summer clothes made of linen possess high air permeability, 
+which allows air to flow through the fabric easily and allows the body to breathe.
+
+The main benefit of wearing linen clothes in hot weather is the coolness they provide. Thanks 
+to the weave and linen fiber specifics linen fabric allow more airflow and its structure means 
+it stays away from your skin allowing better airflow over your body. Linen is a “stiff” fabric 
+and is less likely to cling to the skin; when it billows away, it quickly dries out and becomes 
+cool again. Summer clothes made of linen possess high air permeability, which allows air to flow 
+through the fabric easily and allows the body to breathe.
+
+Next, to coolness and high absorbency, linen has one more very favorable property – good heat 
+conductivity characteristics. Heat conductivity refers to the extent to which heat can be 
+conveyed through the fabric. As linen quickly allows the heat to escape, it further improves 
+cooling. It is claimed, that heat conductivity of linen is five times higher than wool and 
+eighteen times higher than silk. One more thing – linen weave reflects heat better, too. This 
+means linen blouse, linen dress or shirt has good “shading” properties as well and again – 
+the wearer of linen clothing feels cooler.
+
+## Physical properties of Flax/Linen fibers
+* Colour – yellowish to gray
+* Length – 18 to 30 inches
+* Tensile strength – tenacity of 5.5 to 6.5 gms/den.
+* Elongation at a break – 2.7 to 3.5 %
+* Elastic recovery – not enough
+* Specific gravity – 1.54
+* Moisture regain – 10 to 12%
+* Effect of heat – excellent resistance, a good conductor of heat
+* Effect of sunlight – not affected
+* Resiliency – very poor
+* Lusture – brighter than cotton, slightly silky
+* Abrasion resistance – moderate
+
+## Chemical properties of Flax/Linen Fibers
+* Bleaching action: Flax (Linen) is made difficult to bleach than cotton, its huge amount of impurities, like pectin and gum.
+* Effect of Acids: Flax not affected by weak acids but is damaged by concentrated acids.
+* Effect of alkali: Flax has good resistance to alkaline solutions
+* Effect of organic solvents: high Resistant
+* Effect of insects: Flax is not attacked by moth, grubs or beetles.
+* Effect of micro-orgasms: Attacked by fungi and bacteria, mild dew feed on linen fabrics
+* Dyeability: Not good affinity to dyes. Direct and vat dyes are suitable for flax fiber.
+
+## Characteristics of Flax/Linen Fiber/Fabrics
+* Clothes that made of linen is comfortable to Use: As the Linen fiber is a natural vegetable fiber it has a huge amount of Air Porosity holes. So, the air can go in and out while wearing these linen clothes and which make these clothes quite comfortable.
+* Linen Fiber is stronger than Cotton: Another reason behind of the linen fiber popularity is – you will get the same comfort like Cotton in the Linen fiber but the strength of the Linen fiber is twice than the Cotton fiber. Maximum sportswear where the strength is a matter, there the Linen fiber made linen clothes is widely used.
+* Hand Washable & Dry Cleanable: You can not only wash the clothes linen but also clean the lien clothes by drying. So, making linen clothes by using the linen fiber is a wise decision for the Textile Industry owner.
+* Crisp feeling: If you touch the linen fiber, you will feel that it’s a simply crisp fiber which has distinctive outlook and feels.
+* Tailors Well: One textile weavers or textile knitter can easily make the Linen fabric by using the flexible linen fiber and the tailors of the Garment Shop, even can easily make Dress and suits by using the Linen fabrics.
+* Absorbent: The absorbency of Linen fiber is quite good and this is why linen can be dyed well.
+* Dyes & Prints well: Along with the optimum efficiency in Dyeing, one can easily print the Linen cloth except for any kind of problems like print paste saturation, discolored surface etc.
+* Lightweight To Heavyweight: Any kind of linen fabric or linen fibers are available on the market which can be achieved in any weight as per the Textile buyers’ requirement.
+* No Static & Pilling problems: If any fabric produces the static electricity during wear, then nothing can be worst than that. People like to wear the fabric that is flexible and comfortable to wear. Linen is the perfect fabric in this regard which has no static electricity and pilling problems.
+* Good Abrasion Resistant: As the linen fiber is good in strength, then it is supposed to have the properties like Good abrasion resistant
+
+## Performance summary of Flax/Linen in apparel fabrics
+* AESTHETICS – Excellent
+* LUSTER – High
+* TEXTURE – Thick and thin
+* HAND – Stiff
+* DURABILITY – Good
+* ABRASION resistance – Good
+* TENACITY – Good
+* ELONGATION – Low
+* COMPORT – High
+* Absorbency – High
+* THERMAL retention – Good
+* APPEARANCE retention – Poor
+* RESILIENCY – Poor
+* DIMENSIONAL stability – Adequate
+* ELASTIC recovery – Low
+* RECOMMENDED care – Dry clean or machine wash
 
 
+# [Felt](http://www.madehow.com/Volume-7/Felt.html)
+
+Felt may be the oldest fabric known to man, and there are many references to felt in ancient writings Since felt is not woven and does not require a loom for its production, ancient man made it rather easily. Some of the earliest felt remains were found in the frozen tombs of nomadic horsemen in the Siberian Tlai mountains and date to around 700 B.C. These tribes made clothing, saddles, and tents from felt because it was strong and resistant to wet and snowy weather. Legend has it that during the Middle Ages St. Clement, who was to become the fourth bishop of Rome, was a wandering monk who happened upon the process of making felt by accident. It is said he stuffed his sandals with tow (short flax or linen fibers) in order to make them more comfortable. St. Clement discovered that the combination of moisture from perspiration and ground dampness coupled with pressure from his feet matted these tow fibers together and produced a cloth. After becoming bishop he set up groups of workers to develop felting operations. St. Clement became the patron saint for hatmakers, who extensively utilize felt to this day.
+
+
+
+Read more: http://www.madehow.com/Volume-7/Felt.html#ixzz6aiBa6Zzb
+
+## [Ancient Clothing](https://en.wikipedia.org/wiki/Clothing_in_the_ancient_world#Textile_materials)
+
+###Israeli
+
+* [simla (shawl)](https://en.wikipedia.org/wiki/Clothing_in_the_ancient_world#Outer_garments) 
+  of heavy wool or flax
+* me'il (cloak, abaya) made of expensive light fabric worn by priests
+
+* Headwear: Keffiyeh (scarf), Turban
+
+* kuttoneth undergarment worn to knee or to ankle
+
+* sandals of leather, or wood
+
+### [Greek](https://en.wikipedia.org/wiki/Clothing_in_the_ancient_world#Ancient_Greek_clothing)
+
+* Chiton (simple tunic worn by both sexes)
+
+* Peplos (worn by women - usually heavy wool)
+
+...
+
+### [Indian](https://en.wikipedia.org/wiki/Clothing_in_the_ancient_world#Ancient_Indian_clothing)
+...

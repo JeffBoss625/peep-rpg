@@ -33,13 +33,14 @@ class MAT:
 @dataclass
 class MatType:
     name: str = ''
-    unit_thickness: int = 0
+    unit_thickness_mm: float = 0
 
 def mtype_by_name():
     data = (
-        ('metal', 1),
-        ('wood', 20),
-        ('leather', 5),
+        ('metal', 0.2),
+        ('wood', 3),
+        ('leather', 0.5),
+        ('wicker', 0.5),
     )
     ret = {}
     for name, base_thickness in data:
@@ -60,14 +61,18 @@ class Material:
 
 def mat_by_name():
     data = (
-        ('mithril',  'metal', COLOR.BLUE,   1.950, (0.80, 0.90, 0.70, 0.15, 0.15, 0.45, 0.45)),
-        ('titanium', 'metal', COLOR.BLUE,   4.480, (0.70, 0.85, 0.60, 0.70, 0.70, 0.35, 0.25)),
-        ('steel',    'metal', COLOR.BLUE,   7.900, (0.60, 0.80, 0.55, 0.70, 0.70, 0.25, 0.15)),  # modern high-grade steel
-        ('bronze',   'metal', COLOR.YELLOW, 8.800, (0.50, 0.70, 0.50, 0.50, 0.50, 0.20, 0.20)),  # weapon-grade brass (work-hardened high-tin content)
-        ('iron',     'metal', COLOR.BLUE,   7.680, (0.45, 0.65, 0.45, 0.50, 0.50, 0.20, 0.80)),
-        ('leather',  'leather', COLOR.WHITE,  0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('oak',      'wood', COLOR.RED,    0.900, (0.25, 0.35, 0.35, 0.50, 0.50, 0.40, 0.50)),
-        ('pine',     'wood', COLOR.RED,    0.550, (0.15, 0.20, 0.20, 0.50, 0.50, 0.35, 0.50)),
+        ('mithril',  'metal', COLOR.BLUE,    1.950, (0.80, 0.90, 0.70, 0.15, 0.15, 0.45, 0.45)),
+        ('titanium', 'metal', COLOR.BLUE,    4.480, (0.70, 0.85, 0.60, 0.70, 0.70, 0.35, 0.25)),
+        ('steel',    'metal', COLOR.BLUE,    7.900, (0.60, 0.80, 0.55, 0.70, 0.70, 0.25, 0.15)),  # modern high-grade steel
+        ('bronze',   'metal', COLOR.YELLOW,  8.800, (0.50, 0.70, 0.50, 0.50, 0.50, 0.20, 0.20)),  # weapon-grade brass (work-hardened high-tin content)
+        ('iron',     'metal', COLOR.BLUE,    7.680, (0.45, 0.65, 0.45, 0.50, 0.50, 0.20, 0.80)),
+        ('leather',  'leather', COLOR.WHITE, 0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('cotton',   'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('wool',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('felt',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('wicker',   'wicker', COLOR.WHITE,  0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
+        ('oak',      'wood', COLOR.RED,      0.900, (0.25, 0.35, 0.35, 0.50, 0.50, 0.40, 0.50)),
+        ('pine',     'wood', COLOR.RED,      0.550, (0.15, 0.20, 0.20, 0.50, 0.50, 0.35, 0.50)),
     )
     ret = {}
     for name, mtype, fgcolor, grams_cm3, prot in data:
