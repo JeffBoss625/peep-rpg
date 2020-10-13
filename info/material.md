@@ -402,6 +402,11 @@ A jack of plate is a type of armour made up of small iron plates sewn between la
 Making a reproduction jack of plate
 The jack is similar to the brigandine. The main difference is in the method of construction: a brigandine is riveted whereas a jack is sewn. Jacks of plate were created by stitching as many as 1000 small overlapping squares of iron between two canvases.[3] The garments weighed about 17 pounds (7.7 kg), which made them much more acceptable to the wearer than solid breastplates. They also offered a tactical advantage: they allowed soldiers to rest the butts of weapons firmly against their shoulders, which wasn't feasible with smooth-surfaced plate armours. Jacks were often made from recycled pieces of older plate armor, including damaged brigandines and cuirasses cut into small squares.[4]
 
+# [Splinted Armor](https://en.wikipedia.org/wiki/Splint_armour)
+Splint armour (also splinted armour) is armour consisting of strips of metal ("splints") attached to a cloth or leather backing. It is most commonly found as limb armour such as 
+    [greaves](https://en.wikipedia.org/wiki/Greave)  or
+    [vambraces](https://en.wikipedia.org/wiki/Vambrace)
+
 # [Mirror or Disk](https://en.wikipedia.org/wiki/Mirror_armour)
 
 Mirror armour (Russian: зерцало, zertsalo, meaning "mirror"; Chinese: 护心镜, hùxīnjìng, meaning "protect-heart mirror"), sometimes referred to as disc armour or as chahār-āyneh or char-aina (Persian: چهاﺮآﻳنه‎ meaning "four mirrors"; whence Kazakh: шар-айна, şar-ayna), was a type of cuirass used mainly in Asia, the Middle East, and Eastern Europe; including Indian, Persia, Tibet, Russia, and the Ottoman Empire. It literally translates to "four mirrors" which is a reflection of how these pieces looked, which resembles four (sometimes more) metal discs or rectangular armour plates. Mirror armor was used in some cultures up to the 20th century.

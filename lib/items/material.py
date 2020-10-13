@@ -61,53 +61,155 @@ class Material:
 
 def mat_by_name():
     data = (
-        ('mithril',  'metal', COLOR.BLUE,    1.950, (0.80, 0.90, 0.70, 0.15, 0.15, 0.45, 0.45)),
-        ('titanium', 'metal', COLOR.BLUE,    4.480, (0.70, 0.85, 0.60, 0.70, 0.70, 0.35, 0.25)),
-        ('steel',    'metal', COLOR.BLUE,    7.900, (0.60, 0.80, 0.55, 0.70, 0.70, 0.25, 0.15)),  # modern high-grade steel
-        ('bronze',   'metal', COLOR.YELLOW,  8.800, (0.50, 0.70, 0.50, 0.50, 0.50, 0.20, 0.20)),  # weapon-grade brass (work-hardened high-tin content)
-        ('iron',     'metal', COLOR.BLUE,    7.680, (0.45, 0.65, 0.45, 0.50, 0.50, 0.20, 0.80)),
-        ('leather',  'leather', COLOR.WHITE, 0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # soft oiled leather
-        ('cotton',   'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('flax',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('wool',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('felt',     'cloth', COLOR.WHITE,   0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('wicker',   'wicker', COLOR.WHITE,  0.980, (0.10, 0.20, 0.50, 0.40, 0.40, 0.25, 0.40)),  # oiled leather
-        ('oak',      'wood', COLOR.RED,      0.900, (0.25, 0.35, 0.35, 0.50, 0.50, 0.40, 0.50)),
-        ('pine',     'wood', COLOR.RED,      0.550, (0.15, 0.20, 0.20, 0.50, 0.50, 0.35, 0.50)),
+        # material   type       color          unit_mm, g/cm3  (pier, slas, crus, heat, cold, elec)
+        ('mithril',  'metal',   COLOR.BLUE,    1.00,  1.950, (0.40, 0.35, 0.40, 0.80, 0.80, 0.75)),
+        ('titanium', 'metal',   COLOR.BLUE,    1.00,  4.480, (0.45, 0.40, 0.45, 0.75, 0.75, 0.65)),
+        ('steel',    'metal',   COLOR.BLUE,    1.00,  7.900, (0.55, 0.45, 0.55, 0.80, 0.80, 0.65)),  # modern high-grade steel
+        ('bronze',   'metal',   COLOR.YELLOW,  1.00,  8.800, (0.60, 0.50, 0.60, 0.85, 0.80, 0.90)),  # weapon-grade bronze (work-hardened high-tin content)
+        ('iron',     'metal',   COLOR.BLUE,    1.00,  7.680, (0.65, 0.55, 0.65, 0.90, 0.85, 0.80)),  # worked iron
+        ('leather',  'leather', COLOR.RED,     1.00,  0.980, (0.80, 0.65, 0.93, 0.30, 0.30, 0.25)),  # soft leather
+        ('cotton',   'cloth',   COLOR.WHITE,   0.20,  0.180, (0.96, 0.93, 0.97, 0.55, 0.55, 0.55)),
+        ('flax',     'cloth',   COLOR.WHITE,   0.20,  0.150, (0.94, 0.91, 0.98, 0.70, 0.70, 0.55)),  # light strong fabric
+        ('wool',     'cloth',   COLOR.WHITE,   2.00,  0.150, (0.96, 0.94, 0.95, 0.30, 0.30, 0.40)),  # warm loose fabric
+        ('felt',     'cloth',   COLOR.WHITE,   2.00,  0.220, (0.87, 0.89, 0.75, 0.35, 0.35, 0.40)),  # warm, thick, buffering fabric
+        ('wicker',   'wicker',  COLOR.WHITE,   1.50,  0.210, (0.90, 0.80, 0.80, 0.60, 0.60, 0.50)),
+        ('oak',      'wood',    COLOR.RED,     4.00,  0.900, (0.65, 0.55, 0.65, 0.40, 0.40, 0.40)),  # heavy oak
+        ('pine',     'wood',    COLOR.RED,     4.00,  0.550, (0.80, 0.60, 0.80, 0.45, 0.45, 0.45)),
     )
     ret = {}
     for name, mtype, fgcolor, grams_cm3, prot in data:
         ret[name] = Material(name, mtype, fgcolor, grams_cm3, Protection(*prot))
     return ret
 
+def durability():
+    data = (
+        # material   (pier, slas, crus, heat, cold, elec)
+        (
+            'mithril',
+            (0.03, 0.35, 0.40, 0.80, 0.80, 0.75),
+            (0.40, 0.35, 0.40, 0.80, 0.80, 0.75),
+        ),
+        ('titanium', (0.45, 0.40, 0.45, 0.75, 0.75, 0.65)),
+        ('steel',    (0.55, 0.45, 0.55, 0.80, 0.80, 0.65)),  # modern high-grade steel
+        ('bronze',   (0.60, 0.50, 0.60, 0.85, 0.80, 0.90)),  # weapon-grade bronze (work-hardened high-tin content)
+        ('iron',     (0.65, 0.55, 0.65, 0.90, 0.85, 0.80)),  # worked iron
+        ('leather',  (0.80, 0.65, 0.93, 0.30, 0.30, 0.25)),  # soft leather
+        ('cotton',   (0.96, 0.93, 0.97, 0.55, 0.55, 0.55)),
+        ('flax',     (0.94, 0.91, 0.98, 0.70, 0.70, 0.55)),  # light strong fabric
+        ('wool',     (0.96, 0.94, 0.95, 0.30, 0.30, 0.40)),  # warm loose fabric
+        ('felt',     (0.87, 0.89, 0.75, 0.35, 0.35, 0.40)),  # warm, thick, buffering fabric
+        ('wicker',   (0.90, 0.80, 0.80, 0.60, 0.60, 0.50)),
+        ('oak',      (0.65, 0.55, 0.65, 0.40, 0.40, 0.40)),  # heavy oak
+        ('pine',     (0.80, 0.60, 0.80, 0.45, 0.45, 0.45)),
+    )
+    ret = {}
+    for name, mtype, fgcolor, grams_cm3, prot in data:
+        ret[name] = Material(name, mtype, fgcolor, grams_cm3, Protection(*prot))
+    return ret
 
 MAT_BY_NAME = mat_by_name()
 
 
 @dataclass
 class Construction:
-    mat: str = ''
+    name: str = ''
+    mat: Tuple = field(default_factory=tuple)
     weight_fac: float = 0
     prot_fac: Tuple = field(default_factory=tuple)
 
-def construct_by_name():
-    data = (
-        # name    weight_fac (pierce, slash, crush, heat, cold, elec)
-        ('chainmail', 0.50, (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
-        ('lamellar',  0.75, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
-        ('brigandine',  0.75, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
-        ('scale', 0.80, (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00)),
-        ('plate', 1.00, (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)),    # solid metal plate
-    )
+
+def constructs():
+    data = {
+        # mass factor is the amount of material used for a given unit of the material.
+        # Protection factors of the multiple materials may add up to surpass the materials
+        # individual protection - meaning that they are better in synergy.
+        # name
+        #  (materials, ...), massf, (pierce, slash, crush, heat, cold, elec)
+        'quilt': (
+            (
+                ('cloth',), 0.40,
+                (0.40, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00),
+                (0.95, 0.10, 0.15, 1.00, 1.00, 2.00, 1.00),     # durability factor
+            ),
+            (('cloth',), 0.20, (0.25, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
+            (('cloth',), 0.40, (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
+        ),
+        'bound-wood': (
+            # wood planks wrapped in cloth or leather with strong resin
+            (('wood')),
+            (('cloth', 'leather'), 0.40, (0.40, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
+
+        ),
+        'hard-leather': (
+            #  (materials, ...), massf,
+            (
+                ('leather',) ,1.20,
+                # pier, slas, crus, heat, cold, elec
+                (1.50, 1.90, 3.00, 1.20, 1.20, 1.10),
+                (2.00, 2.50, 0.10, 1.20, 0.50, 1.00),       # damage factor
+            ),
+        ),
+        'rim': (
+            # some construction, such as shields can add a rim of enforcement to protect against slashing
+        ),
+        'chain': (
+            (('metal',), 0.50, (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
+        ),
+        'lamellar': (
+            (('metal', 'ceramic', 'shell'), 0.65, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+            (('leather', 'cloth'), 0.35, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+        ),
+        'brigandine': (
+            (('metal', 'hard-leather'), 0.85, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+            (('leather', 'cloth'), (0.35, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+        ),
+        'splint': (
+             (('metal', 'wood'), 0.60, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+             (('leather', 'cloth'), 0.45, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+         ),
+        'scale': (
+            (('metal', 'shell', 'scale'), 0.80, (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00)),
+            (('leather', 'cloth'),       0.30, (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00)),
+        ),
+        'mirror': (
+            (('metal', 'shell', 'hard-leather', 'wood'), 0.65, (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00)),
+        ),
+        'plate': (
+           (('metal', 'shell', 'hard-leather'), 1.00, (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00)),
+        ),
+    }
     ret = {}
-    for name, weight_fac, prot in data:
-        ret[name] = Construction(name, weight_fac, prot)
+    for name, constructs in data:
+        for materials, weight_fac, prot in constructs:
+            ret[name] = Construction(name, weight_fac, prot)
     return ret
 
+def construct_by_name():
+    prot = (
+        # name         weight_fac (pierce, slash, crush, heat, cold, elec)
+        ('chain',      0.50,      (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00) ),
+        ('lamellar',   0.75,      (0.55, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00) ),
+        ('brigandine', 0.75,      (0.65, 0.80, 0.70, 1.00, 1.00, 0.80, 1.00) ),
+        ('scale',      0.80,      (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00) ),
+        ('splint',     0.80,      (0.70, 0.85, 0.70, 1.00, 1.00, 0.85, 1.00) ),
+        ('plate',      1.00,      (1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00) ),    # solid metal plate
+        ('quilt',      1.00,      (0.50, 0.75, 0.15, 1.00, 1.00, 2.00, 1.00) ),
+    )
 
-CON_BY_NAME = construct_by_name()
+    comp = {
+        'chain': (
+            ('metal', 1.0),
+        ),
+        'lamellar': (
+            ('metal', 0.30),
+            ('leather', 0.70),
+        )
+    }
 
 
+
+
+CONSTRUCTS = constructs()
 @dataclass
 class Layer:
     material: str = ''
@@ -117,9 +219,9 @@ class Layer:
     def __post_init__(self):
         mat = MAT_BY_NAME[self.material]
         mtype = MTYPE_BY_NAME[mat.type]
-        con = CON_BY_NAME[self.construction]
+        con = METAL_CONSTRUCTS[self.construction]
         self.grams_cm2 = mat.grams_cm3 * (self.thick_mm / 10) * con.weight_fac
-        thick_unit = self.thick_mm/mtype.unit_thickness
+        thick_unit = self.thick_mm/mtype.unit_thickness_mm
         thick = pow(thick_unit, pow(1.04, thick_unit))
         mprot = astuple(mat.prot)
         prot = (1 - ((1 - p * fac)/thick) for p, fac in zip(mprot, con.prot_fac))
@@ -173,10 +275,10 @@ class TestFn:
 
 
 if __name__ == '__main__':
-    # for cname in CON_BY_NAME:
-    #     for mname in MAT_BY_NAME:
-    #         for mm in range(1, 12):
-    #             layer = Layer(mname, cname, mm)
-    #             print(repr(layer))
+    for mname in MAT_BY_NAME:
 
-    pass
+        for cname in METAL_CONSTRUCTS:
+            for mm in range(1, 12):
+                layer = Layer(mname, cname, mm)
+                print(repr(layer))
+
