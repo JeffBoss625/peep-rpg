@@ -2,9 +2,6 @@ import math
 from dataclasses import dataclass, field, astuple
 from typing import Tuple
 
-from lib.constants import COLOR
-
-
 @dataclass
 class Protection:
     pierce: float = 0
@@ -55,26 +52,27 @@ MTYPE_BY_NAME = mtype_by_name()
 class Material:
     name: str = ''
     type: str = ''
-    fgcolor: str = COLOR.BLUE
+    fgcolor: str = 'blue'
     grams_cm3: float = 0        # grams per cm^3
     prot: Protection = field(default=MAT.MITHRIL)
 
 def mat_by_name():
     data = (
-        # material   type       color          unit_mm, g/cm3  (pier, slas, crus, heat, cold, elec)
-        ('mithril',  'metal',   COLOR.BLUE,    1.00,  1.950, (0.40, 0.35, 0.40, 0.80, 0.80, 0.75)),
-        ('titanium', 'metal',   COLOR.BLUE,    1.00,  4.480, (0.45, 0.40, 0.45, 0.75, 0.75, 0.65)),
-        ('steel',    'metal',   COLOR.BLUE,    1.00,  7.900, (0.55, 0.45, 0.55, 0.80, 0.80, 0.65)),  # modern high-grade steel
-        ('bronze',   'metal',   COLOR.YELLOW,  1.00,  8.800, (0.60, 0.50, 0.60, 0.85, 0.80, 0.90)),  # weapon-grade bronze (work-hardened high-tin content)
-        ('iron',     'metal',   COLOR.BLUE,    1.00,  7.680, (0.65, 0.55, 0.65, 0.90, 0.85, 0.80)),  # worked iron
-        ('leather',  'leather', COLOR.RED,     1.00,  0.980, (0.80, 0.65, 0.93, 0.30, 0.30, 0.25)),  # soft leather
-        ('cotton',   'cloth',   COLOR.WHITE,   0.20,  0.180, (0.96, 0.93, 0.97, 0.55, 0.55, 0.55)),
-        ('flax',     'cloth',   COLOR.WHITE,   0.20,  0.150, (0.94, 0.91, 0.98, 0.70, 0.70, 0.55)),  # light strong fabric
-        ('wool',     'cloth',   COLOR.WHITE,   2.00,  0.150, (0.96, 0.94, 0.95, 0.30, 0.30, 0.40)),  # warm loose fabric
-        ('felt',     'cloth',   COLOR.WHITE,   2.00,  0.220, (0.87, 0.89, 0.75, 0.35, 0.35, 0.40)),  # warm, thick, buffering fabric
-        ('wicker',   'wicker',  COLOR.WHITE,   1.50,  0.210, (0.90, 0.80, 0.80, 0.60, 0.60, 0.50)),
-        ('oak',      'wood',    COLOR.RED,     4.00,  0.900, (0.65, 0.55, 0.65, 0.40, 0.40, 0.40)),  # heavy oak
-        ('pine',     'wood',    COLOR.RED,     4.00,  0.550, (0.80, 0.60, 0.80, 0.45, 0.45, 0.45)),
+        # material   type       color    unit_mm, g/cm3  (pier, slas, crus, heat, cold, elec)
+        ('mithril',  'metal',   'blue',    1.00,  1.950, (0.40, 0.35, 0.40, 0.80, 0.80, 0.75)),
+        ('titanium', 'metal',   'blue',    1.00,  4.480, (0.45, 0.40, 0.45, 0.75, 0.75, 0.65)),
+        ('steel',    'metal',   'blue',    1.00,  7.900, (0.55, 0.45, 0.55, 0.80, 0.80, 0.65)),  # modern high-grade steel
+        ('bronze',   'metal',   'yellow',  1.00,  8.800, (0.60, 0.50, 0.60, 0.85, 0.80, 0.93)),  # weapon-grade bronze (work-hardened high-tin content)
+        ('iron',     'metal',   'blue',    1.00,  7.680, (0.65, 0.55, 0.65, 0.90, 0.85, 0.80)),  # worked iron
+        ('gold',     'metal',   'yellow',  1.00, 19.280, (0.90, 0.85, 0.90, 0.90, 0.85, 0.98)),  # worked iron
+        ('oak',      'wood',    'red',     4.00,  0.900, (0.65, 0.55, 0.65, 0.40, 0.40, 0.40)),  # heavy oak
+        ('pine',     'wood',    'red',     4.00,  0.550, (0.80, 0.60, 0.80, 0.45, 0.45, 0.45)),
+        ('leather',  'leather', 'red',     1.00,  0.980, (0.80, 0.65, 0.92, 0.30, 0.30, 0.25)),  # soft leather
+        ('felt',     'cloth',   'white',   2.00,  0.220, (0.87, 0.89, 0.70, 0.35, 0.35, 0.40)),  # warm, thick, buffering fabric
+        ('wicker',   'wicker',  'white',   1.50,  0.210, (0.90, 0.80, 0.80, 0.60, 0.60, 0.50)),
+        ('flax',     'cloth',   'white',   0.20,  0.150, (0.94, 0.91, 0.96, 0.80, 0.80, 0.55)),  # light strong fabric
+        ('cotton',   'cloth',   'white',   0.20,  0.180, (0.98, 0.95, 0.96, 0.75, 0.75, 0.55)),
+        ('wool',     'cloth',   'white',   2.00,  0.150, (0.98, 0.95, 0.92, 0.30, 0.30, 0.40)),  # warm loose fabric
     )
     ret = {}
     for name, mtype, fgcolor, grams_cm3, prot in data:

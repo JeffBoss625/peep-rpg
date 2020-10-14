@@ -1,113 +1,113 @@
 # weights from https://www.mojobob.com/roleplay/weight_chart.html
 # METAL (kg/m^3)
-
-Substance	kg/m3	lbs/ft3
-Aluminium	2,720	170
-Brass:	- Red	8,720	545
- 	- Yellow	8,480	530
- 	- Forging	8,400	525
-Bronze	8,800	550
-Copper	8,960	560
-Gold	19,280	1,205
-Iron	- Pure	7,840	490
- 	- Wrought	7,680	480
- 	- Cast (grey)	7,120	445
- 	- Malleable	7,200	450
-Lead	11,360	710
-Magnesium	1,760	110
-Mercury	13,520	845
-Nickel	8,880	555
-Platinum	21,440	1,340
-Silver	10,480	655
-Silver, Sterling	10,320	645
-Steel	- Cold rolled	8,000	500
- 	- Carbon	7,760	485
- 	- Tungsten	8,080	505
- 	- Stainless	8,000	500
-Tin	- Pure	7,280	455
- 	- Soft solder	8,400	525
- 	- White Metal	7,264	454
- 	- Pewter	7,264	454
- 	- Tin Babbit	7,520	470
-Titanium	4,480	280
-Tungsten	19,280	1,205
-Zinc	7,120	445
+                        
+    Substance              kg/m3  lbs/ft3
+    Aluminium              2,720    170
+    Brass:  - Red          8,720    545
+        - Yellow           8,480    530
+        - Forging          8,400    525
+    Bronze                 8,800    550
+    Copper                 8,960    560
+    Gold                  19,280  1,205
+    Iron  - Pure           7,840    490
+        - Wrought          7,680    480
+        - Cast (grey)      7,120    445
+        - Malleable        7,200    450
+    Lead                  11,360    710
+    Magnesium              1,760    110
+    Mercury               13,520    845
+    Nickel                 8,880    555
+    Platinum              21,440  1,340
+    Silver                10,480    655
+    Silver, Sterling      10,320    645
+    Steel  - Cold rolled   8,000    500
+        - Carbon           7,760    485
+        - Tungsten         8,080    505
+        - Stainless        8,000    500
+    Tin  - Pure            7,280    455
+        - Soft solder      8,400    525
+        - White Metal      7,264    454
+        - Pewter           7,264    454
+        - Tin Babbit       7,520    470
+    Titanium               4,480    280
+    Tungsten              19,280  1,205
+    Zinc                   7,120    445
 
 # STONE
 
-Substance	kg/m3	lbs/ft3
-Agate	2700	169
-Alabaster	2775	173
-Amber	1100	69
-Beryl	2700	169
-Biotite	3050	191
-Brick	1600	100
-Calamine	4475	280
-Cement	3000	188
-Chalk	2000	125
-Cinnabar	8100	506
-Coal	1400	87
-Coke	1000	62
-Diamond	3200	200
-Dolomite	2825	176
-Feldspar	2650	166
-Flint	2625	164
-Galena	7450	466
-Garnet	3675	230
-Granite	2725	170
-Haematite	5125	320
-Magnetite	5125	320
-Malachite	4000	250
-Marble	2725	170
-Opal	2200	137
-Pyrite	4950	309
-Quartz	2650	166
-Sandstone	2250	141
-Soapstone	2725	170
-Topaz	3525	220
+Substance  kg/m3  lbs/ft3
+Agate  2700  169
+Alabaster  2775  173
+Amber  1100  69
+Beryl  2700  169
+Biotite  3050  191
+Brick  1600  100
+Calamine  4475  280
+Cement  3000  188
+Chalk  2000  125
+Cinnabar  8100  506
+Coal  1400  87
+Coke  1000  62
+Diamond  3200  200
+Dolomite  2825  176
+Feldspar  2650  166
+Flint  2625  164
+Galena  7450  466
+Garnet  3675  230
+Granite  2725  170
+Haematite  5125  320
+Magnetite  5125  320
+Malachite  4000  250
+Marble  2725  170
+Opal  2200  137
+Pyrite  4950  309
+Quartz  2650  166
+Sandstone  2250  141
+Soapstone  2725  170
+Topaz  3525  220
 
 # WOOD (seasoned)
 
-Apple	825	52
-Ash	850	53
-Balsa	125	8
-Bamboo	400	25
-Cedar	550	34
-Ebony	1,200	75
-Lignum-vitae	1,325	83
-Mahogany	650	41
-Oak	900	56
-Pine, white	500	31
-Pine, yellow	600	37
-Teak, Indian	875	55
-Teak, African	975	61
-Willow	600	37
+Apple  825  52
+Ash  850  53
+Balsa  125  8
+Bamboo  400  25
+Cedar  550  34
+Ebony  1,200  75
+Lignum-vitae  1,325  83
+Mahogany  650  41
+Oak  900  56
+Pine, white  500  31
+Pine, yellow  600  37
+Teak, Indian  875  55
+Teak, African  975  61
+Willow  600  37
 
-# MISC 	kg/m3
+# MISC   kg/m3
 
-Asbestos	2,800	175
-Beeswax	950	59
-Bone	2,000	125
-Butter	875	55
-Camphor	1,000	62
-Charcoal	550	34
-Clay	2,600	162
-Cork	225	14
-Glass	2,800	175
-Gum Arabic	1,400	87
-Ice	925	58
-Ivory	1,925	120
-Leather (dry)	875	55
-Ochre	3,500	219
-Paper	950	59
-Paraffin	900	56
-Pitch	1,075	67
-Porcelain	2,400	150
-Rock salt	2,175	136
-Rubber, hard	1,200	75
-Rubber, soft	1,100	69
-Sugar	1,600	100
-Wax (paraffin)	1,800	112
+Asbestos  2,800  175
+Beeswax  950  59
+Bone  2,000  125
+Butter  875  55
+Camphor  1,000  62
+Charcoal  550  34
+Clay  2,600  162
+Cork  225  14
+Glass  2,800  175
+Gum Arabic  1,400  87
+Ice  925  58
+Ivory  1,925  120
+Leather (dry)  875  55
+Ochre  3,500  219
+Paper  950  59
+Paraffin  900  56
+Pitch  1,075  67
+Porcelain  2,400  150
+Rock salt  2,175  136
+Rubber, hard  1,200  75
+Rubber, soft  1,100  69
+Sugar  1,600  100
+Wax (paraffin)  1,800  112
 
 # Hoplite (Ancient Greece)
 

@@ -5,18 +5,18 @@
 #    etc...
 #
 class COLOR:
-    BLACK = 'BLACK'
-    BLUE = 'BLUE'
-    CYAN = 'CYAN'
-    GREEN = 'GREEN'
-    MAGENTA = 'MAGENTA'
-    RED = 'RED'
-    WHITE = 'WHITE'
-    YELLOW = 'YELLOW'
+    BLACK = 'black'
+    BLUE = 'blue'
+    CYAN = 'cyan'
+    GREEN = 'green'
+    MAGENTA = 'magenta'
+    RED = 'red'
+    WHITE = 'white'
+    YELLOW = 'yellow'
 
 
 def curses_color(color):
-    return 'COLOR_' + color
+    return 'COLOR_' + color.upper()
 
 
 class SIDE:
