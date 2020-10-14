@@ -26,25 +26,42 @@
 
 3. The defender defends
 
-   * Experienced and dexterous defenders will attempt to avoid by stepping away or to the side. 
+   * Experienced and dexterous defenders will attempt to **avoid** by stepping away or to the side. 
      Trained fighters, thieves and assassins, samorai, get bonuses over other classes.
      
-   * If that is not enough, the defender will attempt to deflect with shield or weapon. The weight of the 
-     item used to block along with experience blocking with the item will increase odds
+   * If the attack cannot be avoided, the defender will attempt to **block** with shield, 
+     bracers, or weapon. The lightness of the 
+     item used to deflect along with experience blocking with the item and defender's class
+     dexterity and experience will increase odds.
    
-4. If a defender's block succeeds, a determination is made if it is a **deflection** or a **block**.
+4. If a defender's **block** succeeds, a determination is made for **deflection**. Deflection is the 
+   successful redirecting of the attack away from equipment and defender resulting in
+   less damage.
+   
+    * A highly successful **deflection** redirects most of the attack away from the defender and 
+      his or her equipment. Success depends again on class, dexterity, and experience, but also
+      the material used to deflect and the type and weight of the attack. Hard smooth materials 
+      such as titanium plate have 
+      higher deflection rates. At the same time, heavy blows with a hammer are much harder to deflect.
+      Partial deflection can be thought of as redirecting much, but not all, of the damage away from vital
+      or sensitive areas of the body.
+
+    * Any portion of attack that is not deflected is then calculated for **absorbtion**
     
-    * A **deflection** causes little damage to the defender and the defender's equipment. 
-    
-    * A **block** will result in a hit to the equipment with **absorbtion** of the item and **damage** to
-      equipment determined by the
-      type of the attack (pierce, slash, crush, fire, ...), the material/construction of the equipment, and
-      the amount of partial deflection that was achieved. A blow may be partially or mostly deflected
-      if the deflection roll was high reducing damage to equipment and defender.
+      **Absorbtion** is determined by the equipment blocking the blow. Heavier equipment with
+      hard material will absorb more than light soft material. The best equipment will absorb
+      a large amount of power even from a heavy strike without sustaining noticable damage. But powerful
+      hits from heavy weapons will damage most normal equipment. Type and thickness of **material**,
+      weapon and type of attack (pierce, slash, crush, fire, ...), as well as **construction**
+      factors will determine how much power 
+      is absorbed, 
+      how much passes through and how much **damage** is done to the equipment that absorbed the
+      blow. Slashing weapons do more damage to leather and cloth than crushing weapons, for example.
+      Thick felt can absorb some damage from heavy crushing attacks, and so on.
       
       For blocks, the portion of damage and force that penetrates the item may hit underlying layers of 
-      protection such as an arming doublet undershirt. That item may absorb and take some damage before 
-      the damage then affects the defender.
+      protection such as an arming doublet undershirt which in turn may absorb some damage before 
+      the remaining power of the attack then affects the defender.
       
     For example:
     
@@ -53,16 +70,40 @@
         A goblin thrusts his spear at a novice fighter. The spear rips through his shield and
         jack-of-plate doublet hitting the novice's torso and causing 5 points damage.
         
-        That's the short summary, in fact, the game engine generated a more detailed account:
+        That's the short summary; the game engine generated a more detailed account:
     
         A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the thrust but
         does manage to move his light-weight wood/leather shield up to block. 
         The block has a poor deflection and 95% of the thrust is delivered to the shield and 
         penetrates clean through. The shield absorbs only 15% of the thrust.
-        The remaining 80% of the thrust strikes through to the fighter's jack-of-plate doublet. 
-        This thrust penetrates between plates in the doublet which absorbs only 10% of the thrust and so 
-        70% of that thrust damages the fighter.
+        The remaining 80% of the thrust strikes the fighter's jack-of-plate doublet. 
+        The doublet does not deflect the blow.  The spear hit lands between metal plates in the 
+        doublet which absorbs only 10% of the thrust as the spear penetrates through wounding
+        the fighter who takes 70% of the damage (5 points).
         
         The novice's shield and doublet take piercing damage and are now slightly less effective.
        
-5. 
+5. If the defender's **block** fails, the attacker may score a hit directly on the defender.
+
+    For Example:
+    
+        Summary of attack:
+        
+        A goblin thrusts his spear at a novice fighter. The novice fails to raise his
+        shield in time and the thrust rips through his jack-of-plate doublet into his torso causing
+        8 points damage.
+        
+        That's the short summary; the game engine generated a more detailed account:
+    
+        A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the 
+        thrust he also fails to raise his light-weight wood/leather shield up to block. 
+        The remaining thrust strikes the fighter's jack-of-plate doublet. 
+        The doublet does not deflect the blow.  The spear hit lands between metal plates in the 
+        doublet which absorbs only 10% of the thrust as the spear penetrates through wounding
+        the fighter who takes 90% of the damage (8 points).
+        
+        The novice's doublet takes piercing damage and are now slightly less effective.
+    
+    ... or the attack may be **deflected** by the underlying equipment, glancing off a titanium chestplate
+    for example. Again, experience, strength, class and material play a role in chance and 
+    amount of deflection.

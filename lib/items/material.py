@@ -81,11 +81,12 @@ def mat_by_name():
 
 def durability():
     data = (
-        # material   (pier, slas, crus, heat, cold, elec)
         (
-            'mithril',
-            (0.03, 0.35, 0.40, 0.80, 0.80, 0.75),
-            (0.40, 0.35, 0.40, 0.80, 0.80, 0.75),
+            # material, durability
+            'mithril', 10000,
+            # (pier, slas, crus, heat, cold, elec)
+            (0.85, 0.90, 0.85, 0.80, 0.80, 0.75),       # deflect factor
+            (0.40, 0.35, 0.40, 0.80, 0.80, 0.75),       # damage factor
         ),
         ('titanium', (0.45, 0.40, 0.45, 0.75, 0.75, 0.65)),
         ('steel',    (0.55, 0.45, 0.55, 0.80, 0.80, 0.65)),  # modern high-grade steel
