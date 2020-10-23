@@ -60,7 +60,6 @@ class ITEM_SLOT:
 class Item:
     name: str = ''
     char: str = '?'
-    material: str = ''
     size: tuple = field(default_factory=tuple)  # width, length, height in inches ** when placed in storage or slot **
     weight: int = 1
     slot_type: str = ''

@@ -4,7 +4,6 @@ from typing import Tuple
 import yaml
 
 from lib.items.item import BODY_SLOT, Item
-from lib.items.material import Layer
 from lib.model import register_yaml, Size
 
 

@@ -46,9 +46,19 @@
       Partial deflection can be thought of as redirecting much, but not all, of the damage away from vital
       or sensitive areas of the body.
 
-    * Any portion of attack that is not deflected is then calculated for **absorbtion**
+    * Any portion of attack that is not deflected is then calculated for **penetration** 
     
-      **Absorbtion** is determined by the equipment blocking the blow. Heavier equipment with
+      Penetration is determined by the type of material, the type of attack and the type and
+      weight of weapon and power of the attack. Pierce attacks with heavy pointed weapons
+      are more effective penetrating chainmail, for example, than slash attacks on chainmail.
+      
+      An attack that successfully penetrates equipment looses some power due to **absorbtion**
+      of the equipment taking the hit.
+    
+      Failed armor penetration from piercing and slashing attacks result in a conversion 
+      of the attack power to crushing attack applied against subsequent layers.
+      
+      **Absorbtion** is determined by the type of blocking the blow. Heavier equipment with
       hard material will absorb more than light soft material. The best equipment will absorb
       a large amount of power even from a heavy strike without sustaining noticable damage. But powerful
       hits from heavy weapons will damage most normal equipment. Type and thickness of **material**,
@@ -63,14 +73,13 @@
       protection such as an arming doublet undershirt which in turn may absorb some damage before 
       the remaining power of the attack then affects the defender.
       
-    For example:
-    
-        Summary of attack:
-        
+   Example: A blocked, but penetrating attack:
+
+
         A goblin thrusts his spear at a novice fighter. The spear rips through his shield and
         jack-of-plate doublet hitting the novice's torso and causing 5 points damage.
         
-        That's the short summary; the game engine generated a more detailed account:
+        Details:
     
         A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the thrust but
         does manage to move his light-weight wood/leather shield up to block. 
@@ -83,17 +92,34 @@
         
         The novice's shield and doublet take piercing damage and are now slightly less effective.
        
+   Example: A blocked attack:
+   
+           A goblin thrusts his spear at a novice fighter. The spear glances heavily off his shield
+           doing 1 damage to his arm.
+           
+           
+           Details:
+       
+           A goblin thrusts a spear at a novice fighter. The fighter could not move 
+           enough avoid the thrust but
+           does manage to move his light-weight wood/leather shield up to block. 
+           The block has a decent deflection and 65% of the thrust glances off, while 35% 
+           crushing damage is delivered into the fighter's block. 
+           The shield absorbs 25% of the crushing power from the thrust, leaving 10%
+           power delivered through to the novice's arm and side for 1 damage.
+           
+           The novice's shield is lightly marked from the blow.
+               
+
 5. If the defender's **block** fails, the attacker may score a hit directly on the defender.
 
-    For Example:
-    
         Summary of attack:
         
         A goblin thrusts his spear at a novice fighter. The novice fails to raise his
         shield in time and the thrust rips through his jack-of-plate doublet into his torso causing
         8 points damage.
         
-        That's the short summary; the game engine generated a more detailed account:
+        Details:
     
         A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the 
         thrust he also fails to raise his light-weight wood/leather shield up to block. 
@@ -107,3 +133,22 @@
     ... or the attack may be **deflected** by the underlying equipment, glancing off a titanium chestplate
     for example. Again, experience, strength, class and material play a role in chance and 
     amount of deflection.
+    
+6. Slashing and Piercing attacks that land and fail to penetrate armor are converted to crush attack 
+   damage on lower layers. For this reason, cushion under-armor can be effective.
+   
+       A goblin thrusts his spear at a novice fighter. The spear knocks hard against his jack-of-plate
+       doublet bruising him for 2 damage.
+       
+       
+       Details:
+   
+        A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the 
+        thrust he also fails to raise his light-weight wood/leather shield up to block. 
+        The spear thrust strikes the fighter's jack-of-plate doublet. 
+        The doublet does not deflect the blow.  The spear rams into a metal plate in the 
+        doublet and does not penetrate the armor. 60% of the thrust is absorbed by the
+        doublet and 20% by the underlying quilted padding. The remaining force jams into the fighter's
+        torso causing a nasty bruise (2 points)
+        
+        The novice's doublet takes minor damage.
