@@ -9,10 +9,14 @@
    * a specific weakness (e.g. gap in armor or exposed area on the side). Note that damaged armor will have
      naturally more gaps and exposures to exploit.  A breast plate with a hole or large gash could 
      allow an assassin to put their dagger right through without any protection. This is represented in the game
-     as reduced body coverage which decreases with armor damage that attackers may target and exploit.
+     as reduced body coverage which decreases with armor damage.
      
-     Finding weak spots is especially true for cunning and seasoned adversaries. They can not only choose
-     a weakness, but will select an attack in their arsenal that exploits that weakness.
+     Penalties for Armor damage are amplified by attacker cunning and experience. Seasoned adversaries 
+     may scan the defenders entire body for damaged and exposed areas matching weak spots against
+     attacks in their arsenal that exploit those weaknesses, such as a piercing attack aimed at a 
+     hole in a damaged breastplate. However, arrogant adversaries (unwise) may go too far with this approach, 
+     aiming for small openings that are beyond their skill ratio and unlikely to hit
+     because they underestimate the opponent's agility and skill relative to their own own.
      
      To find a weakness, the attacker scans the defender sizing up coverage/exposure of body
      parts that are accessible to them and selecting the attack(s) that can hit the most 
@@ -22,13 +26,13 @@
      
 2. The attacker rolls for hitting their target. For small targets, the lightness and design of the
    weapon and lightness of overall weight of equipment increases chance to hit along with 
-   familiarity with the weapon, experience, training strength and dexterity.
+   familiarity with the weapon, experience, training strength and dexterity. Attacker
+   advantages are compared with defender experience, agility, weight, class and so on to 
+   determine chance of hit.  Trained fighters, thieves and assassins, samorai, get evade/dodge bonuses 
+   over other classes.
 
 3. The defender defends
 
-   * Experienced and dexterous defenders will attempt to **avoid** by stepping away or to the side. 
-     Trained fighters, thieves and assassins, samorai, get bonuses over other classes.
-     
    * If the attack cannot be avoided, the defender will attempt to **block** with shield, 
      bracers, or weapon. The lightness of the 
      item used to deflect along with experience blocking with the item and defender's class

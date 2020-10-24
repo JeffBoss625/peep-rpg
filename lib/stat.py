@@ -134,15 +134,3 @@ def adjust_stat(stat, adj, norm=1.0):
     else:
         return norm + (stat - norm) * adj   # reduce weakness
 
-def calc_deflection(defl, skillrat, weightrat, playerstats, roundto=3):
-    ret = defl
-    ret = calc_pct(ret, weightrat, 0.5)         # weight-ratio 50% impact on deflection
-    ret = calc_pct(ret, playerstats.str, 0.5)   # strength has 50% impact on deflection
-    ret = calc_pct(ret, playerstats.dex)        # dexterity has 100% impact on deflection
-    ret = calc_pct(ret, skillrat)               # skill ratio has 100% impact on deflection
-
-    return round(ret, roundto)
-
-
-if __name__ == '__main__':
-    pass

@@ -1,6 +1,7 @@
 import random
 import lib.move as mlib
 import lib.projectile as ammolib
+from lib.stat import calc_pct
 
 
 def create_projectile(direction, model):
@@ -56,6 +57,16 @@ def attack(src, dst, attack_name, out, seed=0):
             src.hp = src.hp - bb
     else:
         out.message(f'the {src.name} missed the {dst.name}')
+
+
+def calc_deflection(defl, skillrat, weightrat, playerstats, roundto=3):
+    ret = defl
+    ret = calc_pct(ret, weightrat, 0.5)         # weight-ratio 50% impact on deflection
+    ret = calc_pct(ret, playerstats.str, 0.5)   # strength has 50% impact on deflection
+    ret = calc_pct(ret, playerstats.dex)        # dexterity has 100% impact on deflection
+    ret = calc_pct(ret, skillrat)               # skill ratio has 100% impact on deflection
+
+    return round(ret, roundto)
 
 
 if __name__ == '__main__':

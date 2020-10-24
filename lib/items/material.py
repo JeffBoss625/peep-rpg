@@ -330,59 +330,15 @@ class DefendStats:
     # item_familiarity: float = 1.0     # improved handling from familiarity defending with a shield, sword, bracers....
     # item_bonus: float = 1.0
 
-def calc_damage(attack_stats, defend_stats, armor):
-    pass
-
 # Where 1.0 is normal-competent, human stats are generally range 0.1..3.0* ranging from extremely deficient
 # to heroic (strength to lift 4.5 times body weight, dexterity 3 times faster than most fit humans). Above 3.0 is
 # super-human, 5 to 10 times human is demigod and 20-50 is
 # godlike where a 300 lb being would lift 9,000-22,500 lbs. - the weight of one or two african bull elephants or react
 # 20 times faster than a normal human.
 
-def calc_pct(pct, stat):
-    if stat == 1:
-        return pct
-
-    r1 = pct * stat
-    r2 = 1 - (1 - pct)/stat
-    if 0.0001 < r2 < r1:
-        ret = r2
-    else:
-        ret = r1
-    return round(ret, 4)
-
-# adjust a stat that is centered/oriented at 1.0 as the norm by the given percentage (above or below norm).
-def adjust_stat(stat, pct):
-    if stat == 1:
-        return stat
-    return 1 + (stat - 1) * pct
-
-def calc_deflection(skilladj, intensity, playerstats, deflection):
-    ret = []
-    for inte, defl in zip(astuple(intensity), astuple(deflection)):
-        if inte:
-            d = calc_pct(defl, adjust_stat(playerstats.str, 0.5))
-            d = calc_pct(d, playerstats.dex)
-            d = calc_pct(d, skilladj)
-        else:
-            d = 0.0
-
-        ret.append((defl, d))
-    return ret
-
 
 if __name__ == '__main__':
-    # attstats = AttackStats(skill=2.0, intensity=HarmStats(pierce=0.5))
-    # defstats = DefendStats(skill=2.0, playerstats=PlayerStats(str=2.0, dex=1.0))
-    defl = HarmStats(*DEFL_BY_NAME['oak'])
-    # item = Armor('iron shield', 100, 4.0, ('leather', 'oak'), deflect_stats)
-    d = calc_deflection(1.5, HarmStats(pierce=0.5), PlayerStats(str=2.0, dex=1.0), defl)
-    print(d)
-    print(calc_pct(0.9, 0.1))
-    for p in range(1,10):
-        for i in range(1,30):
-            print(i/10, 1 + (i/10 - 1)/2)
-
+    pass
     # for mname in MAT_BY_NAME:
     #     print(mname)
         #
