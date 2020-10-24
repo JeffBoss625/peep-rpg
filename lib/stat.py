@@ -40,7 +40,7 @@ from dataclasses import dataclass, astuple
 #                   intelligence - can't think
 #                   constitution - can't stop a fit of uncontrollable coughing at a damp breeze
 #                   wisdom - greet and attempt to befriend a raging umber hulk
-#                   charisma - can't possibly be any less appealing
+#                   charisma - repulsive in many ways. can't possibly be any less charasmatic
 #                   ...
 #
 # Where 1.0 is normal-competent, human stats are generally range 0.1..3.0* ranging from extremely deficient
@@ -102,14 +102,14 @@ class PlayerStats:
     #     person
     # 2.0 is a very highly trained and/or gifted individual who anticipates and evades and strikes with excellent skill
     # 3.0 is return-of-the dragon Bruce Lee. Incredibly hard to hit or block.
-    # 5.0 is heroic/legendary with near spidey-sense anticipation.
+    # 5.0 is heroic/legendary approaching spidey-sense and reflexes.
     dex: float = 1.0
     con: float = 1.0
     cha: float = 1.0
 
 # adjust the percentage relative to percentage off 1.0 norm using the stat scale (0.1 to 5.0 ... 20.0 (gods)... range)
-def calc_pct(pct, stat, statadj=1.0, roundto=8):
-    if stat == 1.0:
+def calc_pct(pct, stat, statadj=1.0):
+    if stat == 1.0 or pct == 1.0:
         return pct
 
     if statadj != 1.0:
@@ -121,13 +121,18 @@ def calc_pct(pct, stat, statadj=1.0, roundto=8):
         ret = r2
     else:
         ret = r1
-    return round(ret, roundto)
+
+    return ret
+
 
 # adjust a stat that is centered/oriented at 1.0 as the norm by the given percentage (above or below norm).
-def adjust_stat(stat, pct):
-    if stat == 1:
+def adjust_stat(stat, adj, norm=1.0):
+    if stat == norm:
         return stat
-    return 1 + (stat - 1) * pct
+    if stat < norm and adj > 1.0:
+        return stat / adj                   # amplify weakness
+    else:
+        return norm + (stat - norm) * adj   # reduce weakness
 
 def calc_deflection(defl, skillrat, weightrat, playerstats, roundto=3):
     ret = defl
