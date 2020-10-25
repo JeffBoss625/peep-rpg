@@ -5,13 +5,13 @@ from lib.peeps import Peep
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of
 #   { number-of-moves: monster-list (indexes) }
-# put remainder ticks into monster state
+# put remaining ticks into monster state
 def elapse_time(peeps):
-    move_counts = []
+    move_counts = []                    # same array indexes as peeps
     for p in peeps:
         tics = p.speed + p.tics
-        move_counts.append(tics // 10)  # Special division operator (python 3+)
-        p.tics = tics % 10  # MOD operator
+        move_counts.append(tics // 10)  # round-down division operator (python 3+)
+        p.tics = tics % 10              # store remaining ticks (MOD operator)
 
     return move_counts
 
@@ -40,6 +40,24 @@ def peeps_by_clicks(move_counts):
     return [monstersbyclicks, tot_clicks]
 
 
+# create an array the length of all clicks and put at each
+# click/index where there is a move an array of monster (indexes) that get a move at
+# that click.
+#
+# For example, in the returned array below, m1 has a move at clicks 1, 5, and 9.
+# m2 has a move at clicks 3 and 7
+# m3 has a move only at click 5 (simultaneously with m1's second move)
+# [
+#   1       [m1]
+#   2       []
+#   3       [m2]
+#   4       []
+#   5       [m1,m3]
+#   6       []
+#   7       [m2]
+#   8       []
+#   9       [m1]
+# ]
 def _calc_turn_sequence(monstersbyclicks, tot_clicks):
     # walk through tot_clicks and sequence monster moves for every click
     ret = [[] for _ in range(tot_clicks)]
