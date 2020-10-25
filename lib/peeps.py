@@ -1,18 +1,30 @@
-from dataclasses import dataclass, field, MISSING
-from typing import Dict, Tuple
+from dataclasses import dataclass, field
+from typing import Tuple
 
-from lib.body import Body, create_humanoid, RACE
+from lib.body import Body
 from lib.constants import COLOR
-from lib.model import DataModel, ModelDict, register_yaml, PubSub, Size
+from lib.items.item import Item
+from lib.model import DataModel, register_yaml
 
 @dataclass
 class Attack(DataModel):
+    name: str = ''
+    damage: str = '1d1'
+    range: int = 0
+    # blowback is multiplied by damage done and applied to attacker. positive causes damage negative
+    # *heals* hit points (life drain)
+    blowback: float = 0
+
     def __post_init__(self):
         super().__init__()
 
-    damage: str = '1d1'
-    range: int = 0
-    blowback: int = 0
+@dataclass
+class LevelData():
+    pclass: str = ''
+    level: int = 0
+    expmin: int = 0
+    expmax: int = 0
+    hp: int = 0   # todo: use human relative scale 0.1..3.0..
 
 
 @dataclass
@@ -28,16 +40,18 @@ class Peep(DataModel):
 
     # todo: maintain two structures, the resting/normal state and the current state (hp, speed... enhanced from potions etc)
     # todo: lazy-calculate values such as "speed" and "ac" from equipment, dexterity, etc...
+    ldata: Tuple[LevelData] = field(default=())
     maxhp: int = 0
     thaco: int = 20
     speed: int = 10
     ac: int = 10
-    move_tactic: str = 'seek'
+    move_tactic: str = 'hunt'
+    direct: int = -1
 
     hp: int = 0
     tics: int = 0
-    pos: tuple = field(default=(0,0))
-    attacks: Dict[str, PubSub] = field(default_factory=ModelDict)
+    pos: Tuple[int,int] = field(default_factory=tuple)
+    attacks: Tuple[Attack,...] = field(default_factory=tuple)
 
     body: Body = None
 
@@ -57,8 +71,9 @@ def make_dad_buff(dad):
 
 
 if __name__ == '__main__':
-    dad = create_humanoid(RACE.HUMAN, 203, 120, 8)
-    volumes = list((p.name, p.size.volume()) for p in dad.parts)
+    pass
+    # dad = create_humanoid(RACE.HUMAN, 203, 120, 8)
+    # volumes = list((p.name, p.size.volume()) for p in dad.parts)
     # vtot = sum(v[1] for v in volumes)
     # print('vtotal parts', vtot)
     # print('vtotal', bill.size.volume())

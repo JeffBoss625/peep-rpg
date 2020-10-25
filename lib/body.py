@@ -12,7 +12,7 @@ from lib.util import DotDict
 
 
 class RACE:
-    HUMAN='human',
+    HUMAN = 'human'
 
 @dataclass
 class BodySlot:
@@ -31,9 +31,6 @@ class BodyPart:
 
 @dataclass
 class Body:
-    def __post_init__(self):
-        super().__init__()
-
     body_type: str = ''
     size: Size = ()
     weight: int = 0
@@ -122,7 +119,15 @@ def update_proportions(body, body_to_head):
         part.size = Size(int(h), int(h*wdrat[0]), int(h*wdrat[1]))
 
 
-def create_humanoid(body_type, height, weight, body_to_head):
+def create_body(body_type, kwds):
+    if body_type == 'humanoid':
+        ret = create_humanoid(**kwds)
+    else:
+        raise ValueError(f'body_type {body_type}')
+
+    return ret
+
+def create_humanoid(height=180, weight=90, body2head=7.5):
     height *= 10        # save precision
     slot_definitions = (
         # Upper Bodywear
@@ -178,8 +183,8 @@ def create_humanoid(body_type, height, weight, body_to_head):
         bslots = tuple(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body(body_type, Size(height, int(height/4), int(height/10)), weight, body_to_head, tuple(parts))
-    update_proportions(ret, body_to_head)
+    ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, body2head, tuple(parts))
+    update_proportions(ret, body2head)
 
     return ret
 
@@ -187,7 +192,7 @@ def create_humanoid(body_type, height, weight, body_to_head):
 register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
-    body = create_humanoid(RACE.HUMAN, 203, 120, 8)
+    body = create_humanoid(height=203, weight=120, body2head=8)
     # print(dump(body.parts))
     bslots = body.body_slots()
     bslots.torso.on_shoulder1.item = Bow()

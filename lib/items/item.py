@@ -100,24 +100,7 @@ class Shooter:
     shot_deceleration: int = 0  # 1/10,000 percent change in speed per square traveled (negative is deceleration)
 
 
-@dataclass
-class Ammo(Item):
-    ac: int = 0
-    maxhp: int = 1
-    thaco: int = 20
-    move_tactic: str = 'straight'
-    distance: int = 0  # track distance travelled, 10 per square.
-
-    # temp state
-    tics: int = 0
-    speed: int = 100
-    pos: tuple = field(default_factory=tuple)
-    attacks: dict = field(default_factory=dict)
-    direct: int = 0
-    slot_type: str = ''
-
-
-register_yaml((Ammo, Shooter, Item))
+register_yaml((Shooter, Item))
 
 
 if __name__ == '__main__':

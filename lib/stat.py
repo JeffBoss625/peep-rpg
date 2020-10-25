@@ -1,5 +1,3 @@
-from dataclasses import dataclass, astuple
-
 # Stats naturally range from 0.33 to 3.00 (1/3 to 3 times competent level) for human population with the very limits
 # being at 3.0 and incompetency below 0.3, 5 being legendary/heroic unheard of. We call this the 5-range scale
 # because that is where values will range for humanoids (though gods and beasts values can go to the 50's and
@@ -48,6 +46,9 @@ from dataclasses import dataclass, astuple
 # super-human, 5 to 10 times human is demigod and 20-50 is
 # godlike where a 300 lb being would lift 9,000-22,500 lbs. - the weight of one or two african bull elephants or react
 # 20 times faster than a normal human.
+
+from random import random, randint
+from dataclasses import dataclass, astuple
 
 @dataclass
 class HarmStats:
@@ -124,7 +125,6 @@ def calc_pct(pct, stat, statadj=1.0):
 
     return ret
 
-
 # adjust a stat that is centered/oriented at 1.0 as the norm by the given percentage (above or below norm).
 def adjust_stat(stat, adj, norm=1.0):
     if stat == norm:
@@ -134,3 +134,11 @@ def adjust_stat(stat, adj, norm=1.0):
     else:
         return norm + (stat - norm) * adj   # reduce weakness
 
+def roll_dice(dstring):
+    parts = dstring.split("d")
+    ndice = int(parts[0])
+    nsides = int(parts[1])
+    ret = 0
+    for i in range(1, ndice + 1):
+        ret += randint(1, nsides)
+    return ret

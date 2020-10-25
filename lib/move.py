@@ -1,7 +1,7 @@
-from lib.items.item import Ammo
+from lib.attack import attack_dst, choose_melee_attack
 from lib.peeps import Peep
-import lib.attack as attacklib
-import lib.model as modellib
+
+
 # update time for monsters
 # return the number of moves (rounded down) for each monster as a structure of
 #   { number-of-moves: monster-list (indexes) }
@@ -58,7 +58,7 @@ def calc_turn_sequence(peeps):
     return _calc_turn_sequence(p_by_clicks, tot_clicks)
 
 # x and y modifiers for each directions on keypad
-# Direction constants match keypad layout
+# Direction constants match keypad layout 1-9
 #       7 8 9
 #       4 5 6
 #       1 2 3
@@ -143,30 +143,20 @@ def move_peep(model, p, direct):
 
     dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
     dst = peep_at_pos(model.maze.peeps, dst_pos)
-    if maze_at_pos(model.maze.walls.text, dst_pos):
-        if model.is_player(p) or isinstance(p, Ammo):
-            dst = maze_at_pos(model.maze.walls.text, dst_pos)
-            weapon = attacklib.choose_melee_attack(p)
-            attacklib.attack(p, dst, weapon, model)
-            return True
-        else:
-            return False
+    if not dst:
+        # players and ammo strike wall-peeps
+        wall = wall_at_pos(model.maze.walls.text, dst_pos)
+        if wall:
+            if model.is_player(p) or getattr(p, 'move_tactic', None) == 'straight':
+                dst = wall
+            else:
+                return False # peep did not move
 
     if dst:
-        if model.is_player(p):
-            weapon = attacklib.choose_melee_attack(p)
-            attacklib.attack(p, dst, weapon, model)
-            return True
-        elif isinstance(p, Ammo):
-            weapon = attacklib.choose_melee_attack(p)
-            if attacklib.attack(p, dst, weapon, model):
-                return True
-            else:
-                p.pos = dst_pos
-        else:
-            weapon = attacklib.choose_melee_attack(p)
-            attacklib.attack(p, dst, weapon, model)
-            return True
+        src_attack = choose_melee_attack(p)
+        if src_attack:
+            attack_dst(p, dst, src_attack, model)
+        return True
 
     # all clear. just move
     p.pos = (p.pos[0] + dx, p.pos[1] + dy)
@@ -179,7 +169,7 @@ def peep_at_pos(peeps, pos):
             return p
     return None
 
-def maze_at_pos(maze, pos):
+def wall_at_pos(maze, pos):
     line = maze[pos[1]]
     char = line[pos[0]]
     if char == '#':

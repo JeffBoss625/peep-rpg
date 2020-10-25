@@ -17,11 +17,11 @@ def test_maze_at_xy():
         '..####',
         '.#####',
     ]
-    assert mlib.maze_at_pos(maze, (0,0)) is None
-    assert mlib.maze_at_pos(maze, (1,0)) is None
-    wall = mlib.maze_at_pos(maze, (2,0))
+    assert mlib.wall_at_pos(maze, (0, 0)) is None
+    assert mlib.wall_at_pos(maze, (1, 0)) is None
+    wall = mlib.wall_at_pos(maze, (2, 0))
     assert wall.type == 'wall'
-    assert mlib.maze_at_pos(maze, (0,1)) is None
+    assert mlib.wall_at_pos(maze, (0, 1)) is None
 
 def test_move_peep():
     peeps = [
@@ -56,7 +56,7 @@ def test_move_peep():
 
 def test_move_attack():
     peeps = [
-        Peep(name='p1', pos=(0,1), attacks={'sword': Attack(damage='1d6')}),
+        Peep(name='p1', pos=(0,1), attacks=(Attack(name='sword', damage='1d6'),)),
         Peep(name='m1', pos=(0,2), hp=5),
         Peep(name='m2', pos=(4,3), hp=10),
     ]

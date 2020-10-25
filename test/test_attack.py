@@ -1,4 +1,4 @@
-from lib.attack import *
+from lib.attack import calc_deflection, attack_dst
 from lib.peeps import Attack, Peep
 from lib.stat import PlayerStats
 
@@ -44,16 +44,16 @@ def test_calc_deflection():
         assert d == exp
 
 def test_attack():
-    p1 = Peep(name='p1', hp=3, attacks={'teeth': Attack(damage='1d3')})
-    p2 = Peep(name='m1', hp=2, attacks={'teeth': Attack(damage='1d3')})
+    p1 = Peep(name='p1', hp=3, attacks=(Attack('teeth', damage='1d3'),))
+    p2 = Peep(name='m1', hp=2, attacks=(Attack('kick', damage='1d3'),))
 
     out = Out()
 
-    attack(p1, p2, 'teeth', out, 3)
+    attack_dst(p1, p2, p1.attacks[0], out, 3)
     assert p2.hp == 2
-    attack(p2, p1, 'teeth', out, 3)
+    attack_dst(p2, p1, p2.attacks[0], out, 3)
     assert p1.hp == 3
-    attack(p1, p2, 'teeth', out, 3)
+    attack_dst(p1, p2, p1.attacks[0], out, 3)
     assert p2.hp == 2
 
     # try this.... not changing.

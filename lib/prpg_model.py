@@ -9,6 +9,8 @@
 # that will be costly to change, but easier to work with and understand.
 
 from lib.model import ModelList, DataModel, TextModel
+from lib.move import direction_to_dxdy
+from lib.peep_types import create_peep
 
 
 class MazeModel(DataModel):
@@ -54,3 +56,14 @@ class PrpgModel(DataModel):
 
     def is_player(self, peep):
         return peep == self.maze.player
+
+    def create_projectile(self, direct):
+        dx, dy = direction_to_dxdy(direct)
+
+        ammo = create_peep(
+            'arrow',
+            pos=(self.maze.player.pos[0] + dx, self.maze.player.pos[1] + dy),
+        )
+        ammo.direct = direct
+        self.maze.peeps.append(ammo)
+

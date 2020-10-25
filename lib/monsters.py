@@ -1,95 +1,15 @@
-from lib.peeps import Peep, Attack
-from lib.constants import COLOR, COLOR
+from lib.peeps import Peep, Attack, LevelData
+from lib.constants import COLOR
+from lib.peep_types import create_peep
 import yaml
 
 MONSTERS = [
     # GOBLINS
-    Peep(
-        name='Thark',
-        type='goblin',
-        char='g',
-        fgcolor=COLOR.GREEN,
-        maxhp=10,
-        thaco=18,
-        speed=13,
-        ac=19,
-        attacks={
-            'bite': Attack('1d3'),
-            'scratch': Attack('2d2'),
-            'punch': Attack('2d1'),
-        }
-    ),
-
-    # Animals
-    Peep(
-        name='Giant Rat',
-        type='rat',
-        char='g',
-        fgcolor=COLOR.YELLOW,
-        maxhp=5,
-        thaco=19,
-        speed=13,
-        ac=10,
-        attacks={
-            'bite': Attack('1d3'),
-            'scratch': Attack('1d3'),
-            'tail': Attack('2d1'),
-        }
-    ),
-
-    Peep(
-        name='Big Bird',
-        type='bird',
-        char='g',
-        fgcolor=COLOR.WHITE,
-        bgcolor=COLOR.BLACK,
-        maxhp=15,
-        thaco=17,
-        speed=19,
-        ac=8,
-        attacks={
-            'beak': Attack('1d10'),
-            'talons': Attack('2d7'),
-            'wing_blow': Attack('6d1'),
-        }
-    ),
-
-    # Red Dragons
-    Peep(
-        name='Spark',
-        type='red dragon',
-        char='D',
-        fgcolor=COLOR.RED,
-        bgcolor=COLOR.BLACK,
-        maxhp=50,
-        thaco=10,
-        speed=20,
-        ac=10,
-        attacks={
-            'bite': Attack('1d10'),
-            'scratch': Attack('2d7'),
-            'tail': Attack('3d5'),
-            'fire_breath': Attack('2d10', range=5),
-        }
-    ),
-    # The Black Dragon
-    Peep(
-        name='Brog',
-        type='black dragon',
-        char='D',
-        fgcolor=COLOR.BLUE,
-        bgcolor=COLOR.BLACK,
-        maxhp=200,
-        thaco=3,
-        speed=75,
-        ac=3,
-        attacks={
-            'bite': Attack('1d30'),
-            'scratch': Attack('2d21'),
-            'tail': Attack('3d15'),
-            'acid_breath': Attack('2d30', range=15),
-        }
-    ),
+    create_peep('goblin', name='Thark'),
+    create_peep('giant rat'),
+    create_peep('big bird'),
+    create_peep('red dragon', name='Spark'),
+    create_peep('black dragon', name='Brog'),
 ]
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}

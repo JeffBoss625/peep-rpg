@@ -1,5 +1,4 @@
 import lib.move as mlib
-import lib.attack as alib
 from lib.constants import Key
 from lib.move import Direction
 from lib.monsters import monster_by_name
@@ -37,7 +36,7 @@ MAZE = [
 
 
 PEEPS = [
-    player_by_name('Super Dad', pos=(1,2), hp=40, speed=33),
+    player_by_name('Super Dad', pos=(1,2), hp=40),
     monster_by_name('Thark', pos=(2,2), hp=10),
     monster_by_name('Spark', pos=(24,7), hp=50),
     monster_by_name('Brog', pos=(14,20), hp=200,)
@@ -59,18 +58,17 @@ DIRECTION_KEYS = {
 }
 
 def player_turn(mainwin):
-    while True:
+    end_with_key = ''   # ends the loop when set to a character key
+    while not end_with_key:
         model = mainwin.model
         input_key = mainwin.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
-            if mlib.move_peep(model, model.maze.player, direct):
-                return input_key
+            mlib.move_peep(model, model.maze.player, direct)
+            end_with_key = input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
-            return 'q'
-        # elif input_key in ('=', '+', '-'):
-        #     return input_key
+            end_with_key = 'q'
         elif input_key == 'm':
             if len(model.maze.peeps) > 1:
                 player = model.maze.player
@@ -80,6 +78,7 @@ def player_turn(mainwin):
                 model.message("You are now " + model.maze.player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
+                # continue
         elif input_key == 'a':
             model.message('Where do you want to shoot?')
             sec_input_key = mainwin.get_key()
@@ -88,19 +87,20 @@ def player_turn(mainwin):
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
             direct = DIRECTION_KEYS[sec_input_key]
-            alib.create_projectile(direct, model)
+            model.create_projectile(direct)
             model.message('Projectile shot')
+            # continue
         else:
             model.message(f'unknown command: "{input_key}"')
+            # continue
 
-        # continue with loop to get more input
-
+    return end_with_key
 
 def monster_turn(model, monster):
     if monster.move_tactic == 'straight':
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
-    elif monster.move_tactic == 'seek':
+    elif monster.move_tactic == 'hunt':
         dx = model.maze.player.pos[0] - monster.pos[0]
         dy = model.maze.player.pos[1] - monster.pos[1]
         if model.maze.player.hp <= 0:

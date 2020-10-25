@@ -13,7 +13,7 @@
   thaco: 18
   speed: 13
   ac: 19
-  move_tactic: seek
+  move_tactic: hunt
   hp: 0
   tics: 0
   x: 0

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from lib.items.item import Ammo, Item, ITEM_SLOT, Shooter, BODY_SLOT
+from lib.items.item import Item, ITEM_SLOT, Shooter, BODY_SLOT
 from lib.model import register_yaml
 
 # A Shooter transfers velocity
@@ -14,7 +14,7 @@ class Bow(Shooter, Item):
 
 
 @dataclass
-class Arrow(Ammo, Item):
+class Arrow(Item):
     name = 'arrow'
     char = '-'
     material = 'wood'
@@ -23,6 +23,6 @@ class Arrow(Ammo, Item):
     slot_type = ITEM_SLOT.ARROW
 
 
-register_yaml((Arrow,))
+register_yaml((Bow,))
 
 
