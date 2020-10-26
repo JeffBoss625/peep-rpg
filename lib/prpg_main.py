@@ -135,7 +135,7 @@ def main(root_layout):
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     turn_seq = mlib.calc_turn_sequence(model.maze.peeps, 1.0)
     while True:
-        turn_state = { 'new_peeps':[], 'turn_index':0 }
+        turn_state = {}
         ret_status = execute_turns(control, turn_seq, turn_state)
         if ret_status == 'quit':
             return 0
@@ -144,14 +144,15 @@ def main(root_layout):
             return 0
         else:
             if turn_state['new_peeps']:
-                pass
+                npeeps = {p.name: p.hp for p in turn_state['new_peeps']}
+                model.message(f'npeeps {npeeps} ti {turn_state["turn_index"]}/{len(turn_seq)}')
 
 
 def execute_turns(control, turn_seq, turn_state):
     model = control.model
     peeps = tuple(p for p in model.maze.peeps)
-    ti = 0
-    new_peeps = turn_state['new_peeps']
+    turn_state['new_peeps'] = new_peeps = []
+    turn_state['turn_index'] = ti = 0
     while not new_peeps and ti < len(turn_seq):
         peep_indexes = turn_seq[ti]
         # this loop moves simultaneous peeps - all moves complete together (before adding new projectiles/peeps/etc)
@@ -164,11 +165,13 @@ def execute_turns(control, turn_seq, turn_state):
                 continue
             if model.is_player(peep):
                 if player_turn(control, new_peeps) == 'q':
+                    turn_state['turn_index'] = ti
                     return 'quit'
             else:
                 if monster_turn(model, peep, new_peeps) == 'q':
                     while control.get_key() not in ('q', Key.CTRL_Q):
                         pass
+                    turn_state['turn_index'] = ti
                     return 'died'
 
             # update peeps list to living peeps
@@ -176,4 +179,5 @@ def execute_turns(control, turn_seq, turn_state):
 
         ti += 1
 
-    return ti
+    turn_state['turn_index'] = ti
+    return 'done'
