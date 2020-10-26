@@ -1,6 +1,4 @@
-# Data model for
-
-from dataclasses import dataclass, field, MISSING, astuple
+from dataclasses import dataclass, MISSING
 import yaml
 import re
 
@@ -191,6 +189,30 @@ class TextModel(PubSub):
         for s in lines: slines.extend(s.split('\n'))
         self.text.extend(slines)
         self.publish_update(None, lines)
+
+    # Replace a rectangular region of text.
+    #
+    # xoff, yoff - column and row offsets for the upper-left corder of the replacement (inclusive)
+    # lines: a block of text (same length strings)
+    def replace_region(self, xoff, yoff, lines):
+        text = self.text
+        prev = []
+        width = len(lines[0])
+        for ln in lines:
+            if len(ln) != width:
+                raise ValueError(f'region has inconsistent line length: {width} and {len(ln)}')
+
+        for y in range(0, len(lines)):
+            nrow = lines[y]
+            prow = text[yoff + y]
+            prev.append(prow[xoff:xoff + width])
+            text[yoff + y] = prow[0:xoff] + nrow + prow[xoff + width:]
+
+        # should probably represent text region as an object with offset.
+        self.publish_update(prev, lines)
+
+    def char_at(self, x, y):
+        return self.text[y][x]
 
 @dataclass
 class Size:

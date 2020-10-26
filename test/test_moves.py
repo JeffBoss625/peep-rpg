@@ -34,17 +34,6 @@ def test_elapse_time():
         assert tics == exptics
 
 
-def test_maze_at_xy():
-    maze = [
-        '..####',
-        '.#####',
-    ]
-    assert mlib.wall_at_pos(maze, (0, 0)) is None
-    assert mlib.wall_at_pos(maze, (1, 0)) is None
-    wall = mlib.wall_at_pos(maze, (2, 0))
-    assert wall.type == 'wall'
-    assert mlib.wall_at_pos(maze, (0, 1)) is None
-
 def test_move_peep():
     peeps = [
         Peep(name='p1', pos=(0,0)),     # player information and state

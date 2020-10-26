@@ -57,7 +57,7 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-def player_turn(mainwin, new_peeps):
+def player_turn(mainwin):
     end_with_key = ''   # ends the loop when set to a character key
     while not end_with_key:
         model = mainwin.model
@@ -87,8 +87,12 @@ def player_turn(mainwin, new_peeps):
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
             direct = DIRECTION_KEYS[sec_input_key]
-            new_peeps.append(model.create_projectile(direct))
-            model.message('Projectile shot')
+            shot = model.create_projectile(direct)
+            model.maze.new_peeps.append(shot)
+            peep = model.maze.peeps[0]
+            model.message(f'Projectile shot {shot}')
+            printe(f'{shot.name} {shot.pos}')
+            printe(f'{peep.name} {peep.pos}')
             return input_key
         else:
             model.message(f'unknown command: "{input_key}"')
@@ -96,7 +100,11 @@ def player_turn(mainwin, new_peeps):
 
     return end_with_key
 
-def monster_turn(model, monster, new_peeps):
+def printe(s):
+    sys.stderr.write(s)
+    sys.stderr.write('\n')
+
+def monster_turn(model, monster):
     if monster.move_tactic == 'straight':
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
@@ -127,13 +135,15 @@ def monster_turn(model, monster, new_peeps):
 
 def main(root_layout):
     model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0], items=ITEMS)
+    maze = model.maze
     control = PrpgControl(root_layout, model)
 
     if sys.platform != "win32":
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
-    turn_seq = mlib.calc_turn_sequence(model.maze.peeps, 1.0)
+    move_counts = mlib.elapse_time(model.maze.peeps, 1.0)
+    turn_seq = mlib.calc_turn_sequence(move_counts)
     while True:
         turn_state = {}
         ret_status = execute_turns(control, turn_seq, turn_state)
@@ -143,9 +153,31 @@ def main(root_layout):
             model.banner('  YOU DIED! (press "q" to exit)')
             return 0
         else:
-            if turn_state['new_peeps']:
-                npeeps = {p.name: p.hp for p in turn_state['new_peeps']}
-                model.message(f'npeeps {npeeps} ti {turn_state["turn_index"]}/{len(turn_seq)}')
+            if maze.new_peeps:
+                ti = turn_state["turn_index"]
+                move_counts = remaining_moves(turn_seq, ti, len(maze.peeps))
+                model.message(f'tseq {turn_seq} {ti}')
+                model.message(f'move_counts {move_counts}')
+
+                new_move_counts = mlib.elapse_time(maze.new_peeps, ti/len(turn_seq))
+                move_counts.extend(new_move_counts)
+                maze.peeps.extend(maze.new_peeps)
+                maze.new_peeps = []
+            else:
+                move_counts = mlib.elapse_time(maze.peeps, 1.0)
+
+            # maze.peeps = list(p for p in maze.peeps if p.hp > 0)
+            turn_seq = mlib.calc_turn_sequence(move_counts)
+
+
+def remaining_moves(turn_seq, turn_offset, npeeps):
+    ret = [0 for _ in range(npeeps)]
+    for tsi in range(turn_offset, len(turn_seq)):
+        peep_idxs = turn_seq[tsi]
+        for pi in peep_idxs:
+            ret[pi] += 1
+
+    return ret
 
 
 def execute_turns(control, turn_seq, turn_state):
@@ -164,18 +196,15 @@ def execute_turns(control, turn_seq, turn_state):
             if peep.hp <= 0:
                 continue
             if model.is_player(peep):
-                if player_turn(control, new_peeps) == 'q':
+                if player_turn(control) == 'q':
                     turn_state['turn_index'] = ti
                     return 'quit'
             else:
-                if monster_turn(model, peep, new_peeps) == 'q':
+                if monster_turn(model, peep) == 'q':
                     while control.get_key() not in ('q', Key.CTRL_Q):
                         pass
                     turn_state['turn_index'] = ti
                     return 'died'
-
-            # update peeps list to living peeps
-            model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
 
         ti += 1
 

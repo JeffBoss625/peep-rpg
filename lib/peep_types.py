@@ -173,6 +173,33 @@ MONSTERS = [
         }
     ),
     PType(
+        name='wall',
+        char='#',
+        fgcolor=COLOR.YELLOW,
+        hp='20d100',
+        thaco=20,
+        speed=4,
+        ac=20,
+        attacks=(
+            AttackInfo('crush', '2d4'),
+        ),
+    ),
+
+    PType(
+        name='permanent wall',
+        char='%',
+        fgcolor=COLOR.CYAN,
+        hp='100d999999999999',
+        thaco=15,
+        speed=2,
+        ac=14,
+        attacks=(
+            AttackInfo('smush', '5d10'),
+            AttackInfo('bury', '2d12'),
+        ),
+    ),
+
+    PType(
         name='arrow',
         char='-',
         fgcolor=COLOR.YELLOW,

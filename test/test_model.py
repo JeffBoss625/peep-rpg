@@ -1,6 +1,6 @@
 import yaml
 
-from lib.model import ModelList, ModelDict, Size, register_yaml
+from lib.model import ModelList, ModelDict, Size, register_yaml, TextModel
 from lib.monsters import MONSTERS_BY_NAME
 
 
@@ -74,3 +74,40 @@ def test_dict():
     astr = yaml.dump(a, Dumper=yaml.Dumper, default_flow_style=True)
     assert astr == '{a: 1, b: 2, c: 3}\n'
 
+def test_text_model():
+    t = TextModel()
+    hec1 = Hector()
+    t.subscribe(hec1.collect)
+
+    txt = [
+        'A 0123456789',
+        'B 0123456789',
+        'C 0123456789',
+    ]
+    t.extend(txt)
+    u = hec1.args.pop()
+    assert u[1] == 'update'
+    assert u[2] is None
+    assert u[3] == txt
+
+    t.replace_region(0, 1, ['Z'])
+    u = hec1.args.pop()
+    assert u[1] == 'update'
+    assert u[2] == ['B']
+    assert u[3] == ['Z']
+    assert t.text == [
+        'A 0123456789',
+        'Z 0123456789',
+        'C 0123456789',
+    ]
+
+    t.replace_region(4, 1, ['@@@','###'])
+    u = hec1.args.pop()
+    assert u[1] == 'update'
+    assert u[2] == ['234','234']
+    assert u[3] == ['@@@','###']
+    assert t.text == [
+        'A 0123456789',
+        'Z 01@@@56789',
+        'C 01###56789',
+    ]

@@ -14,12 +14,24 @@ from lib.peep_types import create_peep
 
 
 class MazeModel(DataModel):
-    def __init__(self, walls, peeps, player, items):
+    def __init__(self, walls, peeps, player=None, items=()):
         super().__init__()
-        self.walls = walls
-        self.peeps = peeps
+        self.walls = TextModel('walls', walls)
+        self.peeps = ModelList()
+        self.peeps.extend(peeps)
+
         self.player = player
         self.items = items
+        self.new_peeps = []
+
+    def update_wall(self, pos, char):
+        x, y = pos
+        self.walls.replace_region(x, y, [char])
+
+    def wall_at(self, pos):
+        ret = self.walls.char_at(*pos)
+        if ret == '#' or ret == '%':
+            return ret
 
 class PrpgModel(DataModel):
     def __init__(self, walls=(), peeps=(), player=None, items=(), seed=0):
@@ -28,12 +40,7 @@ class PrpgModel(DataModel):
         peepmodel.extend(peeps)
         itemsmodel = ModelList()
         itemsmodel.extend(items)
-        self.maze = MazeModel(
-            TextModel('walls', walls),
-            peepmodel,
-            player,
-            itemsmodel,
-        )
+        self.maze = MazeModel(walls, peeps, player, items)
         self.title = self.maze
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')

@@ -34,7 +34,6 @@ def attack_dst(src, dst, src_attack, out, seed=0):
     out.log(f'attack({src}, {dst}, {src_attack})')
     if seed > 0:
         random.seed(seed)
-    out.message(f'{src.name} attacks with {src_attack.name} !')
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:
         dice_info = parse_dice(src_attack.damage)
@@ -42,9 +41,12 @@ def attack_dst(src, dst, src_attack, out, seed=0):
         for i in range(1, dice_info['num_dice'] + 1):
             hp_loss = random.randint(1, dice_info['num_sides'])
             tot_hp_loss += hp_loss
+        out.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
             out.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
+        else:
+            out.message(f'  {dst.name} has {dst.hp} points remaining')
         if src_attack.blowback != 0:
             bb = src_attack.blowback * tot_hp_loss / 100
             src.hp = src.hp - bb

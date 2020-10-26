@@ -1,5 +1,5 @@
 from lib.attack import attack_dst, choose_melee_attack
-from lib.peeps import Peep
+from lib.peep_types import create_peep
 
 
 # update time for peeps
@@ -20,9 +20,10 @@ def elapse_time(peeps, fac):
 def peeps_by_clicks(move_counts):
     peepidx_by_mc = {}
     for peep_index, mc in enumerate(move_counts):
-        if mc not in peepidx_by_mc:
-            peepidx_by_mc[mc] = []
-        peepidx_by_mc[mc].append(peep_index)
+        if mc != 0:
+            if mc not in peepidx_by_mc:
+                peepidx_by_mc[mc] = []
+            peepidx_by_mc[mc].append(peep_index)
 
     # peepidx_by_mc is something like {1:[0,2,3], 3:[4], 7:[1]}  (indexes of peeps moving once, three times and seven times)
     # peepidx_by_mc.keys would be [1,3,7]
@@ -66,22 +67,13 @@ def _calc_turn_sequence(peepsbyclicks, tot_clicks):
     for click_count in range(1, tot_clicks + 1):
         for clicks in peepsbyclicks.keys():
             if click_count % clicks == 0:
-                monsters = peepsbyclicks[clicks]
-                for m in monsters:
-                    ret[click_count - 1].append(m)
-
+                peeps = peepsbyclicks[clicks]
+                for p in peeps:
+                    ret[click_count - 1].append(p)
     return ret
 
-def merge_move_counts(a, b):
-    if not a:
-        return b
-    if not b:
-        return a
 
-
-def calc_turn_sequence(peeps, fac):
-    move_counts = elapse_time(peeps, fac)
-
+def calc_turn_sequence(move_counts):
     p_by_clicks, tot_clicks = peeps_by_clicks(move_counts)
     return _calc_turn_sequence(p_by_clicks, tot_clicks)
 
@@ -172,10 +164,11 @@ def move_peep(model, p, direct):
     dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
     dst = peep_at_pos(model.maze.peeps, dst_pos)
     if not dst:
-        # players and ammo strike wall-peeps
-        wall = wall_at_pos(model.maze.walls.text, dst_pos)
-        if wall:
+        # players and ammo strike wall
+        char = model.maze.wall_at(dst_pos)
+        if char:
             if model.is_player(p) or getattr(p, 'move_tactic', None) == 'straight':
+                wall = create_wally(model.maze, dst_pos)
                 dst = wall
             else:
                 return False # peep did not move
@@ -193,19 +186,22 @@ def move_peep(model, p, direct):
 
 def peep_at_pos(peeps, pos):
     for p in peeps:
-        if p.pos == pos:
+        if p.pos == pos and p.hp > 0:
             return p
     return None
 
-def wall_at_pos(maze, pos):
-    line = maze[pos[1]]
-    char = line[pos[0]]
+def create_wally(maze, pos):
+    char = maze.wall_at(pos)
     if char == '#':
-        return Peep(name='Wally', type='wall', hp= 1000, ac= 20, char=char, pos=pos)
+        wall = create_peep('wall', 'Wally', pos=pos)
     elif char == '%':
-        return Peep(name='Wally', type='wall', hp= 999999999999, ac=20, char=char, pos=pos)
+        wall = create_peep('permanent wall', '*WALLY*', pos=pos)
     else:
-        return None
+        raise ValueError(f'no wall located at {pos}')
+
+    maze.walls.replace_region(pos[0], pos[1], ['.'])
+    maze.new_peeps.append(wall)
+    return wall
 
 
 # if __name__ == "__main__":

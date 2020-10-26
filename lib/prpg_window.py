@@ -11,7 +11,8 @@ class MazeWindow(Window):
         self.write_lines(self.model.walls.text, **params)
 
         for p in self.model.peeps:
-            self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
+            if p.hp > 0:
+                self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
         for it in self.model.items:
             self.write_char(it.pos[0], it.pos[1], it.char, it.fgcolor, it.bgcolor, **params)
