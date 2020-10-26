@@ -57,7 +57,7 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
-def player_turn(mainwin):
+def player_turn(mainwin, new_peeps):
     end_with_key = ''   # ends the loop when set to a character key
     while not end_with_key:
         model = mainwin.model
@@ -87,16 +87,16 @@ def player_turn(mainwin):
                 model.message('That is not a valid direction to shoot')
                 model.message('Where do you want to shoot?')
             direct = DIRECTION_KEYS[sec_input_key]
-            model.create_projectile(direct)
+            new_peeps.append(model.create_projectile(direct))
             model.message('Projectile shot')
-            # continue
+            return input_key
         else:
             model.message(f'unknown command: "{input_key}"')
             # continue
 
     return end_with_key
 
-def monster_turn(model, monster):
+def monster_turn(model, monster, new_peeps):
     if monster.move_tactic == 'straight':
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
@@ -133,29 +133,47 @@ def main(root_layout):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
+    turn_seq = mlib.calc_turn_sequence(model.maze.peeps, 1.0)
     while True:
-        peeps = tuple(p for p in model.maze.peeps)
-        turns = mlib.calc_turn_sequence(model.maze.peeps)
+        turn_state = { 'new_peeps':[], 'turn_index':0 }
+        ret_status = execute_turns(control, turn_seq, turn_state)
+        if ret_status == 'quit':
+            return 0
+        elif ret_status == 'died':
+            model.banner('  YOU DIED! (press "q" to exit)')
+            return 0
+        else:
+            if turn_state['new_peeps']:
+                pass
 
-        for peep_indexes in turns:
-            for peep_index in peep_indexes:
-                # if there are new peeps in the new_peeps list, break out of loop.
-                # When broken out of loop take remaining clicks to go through from the turns variable
-                # Add those remaining turns into a function that adds the new peeps's turns to it
-                peep = peeps[peep_index]
-                if peep.hp <= 0:
-                    continue
-                if model.is_player(peep):
-                    if player_turn(control) == 'q':
-                        return 0     # QUIT GAME
-                else:
-                    if monster_turn(model, peep) == 'q':
-                        model.banner('  YOU DIED! (press "q" to exit)')
-                        while control.get_key() not in ('q', Key.CTRL_Q):
-                            pass
-                        return 0
 
-                # update peeps list to living peeps
-                model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
+def execute_turns(control, turn_seq, turn_state):
+    model = control.model
+    peeps = tuple(p for p in model.maze.peeps)
+    ti = 0
+    new_peeps = turn_state['new_peeps']
+    while not new_peeps and ti < len(turn_seq):
+        peep_indexes = turn_seq[ti]
+        # this loop moves simultaneous peeps - all moves complete together (before adding new projectiles/peeps/etc)
+        for peep_index in peep_indexes:
+            # if there are new peeps in the new_peeps list, break out of loop.
+            # When broken out of loop take remaining clicks to go through from the turns variable
+            # Add those remaining turns into a function that adds the new peeps's turns to it
+            peep = peeps[peep_index]
+            if peep.hp <= 0:
+                continue
+            if model.is_player(peep):
+                if player_turn(control, new_peeps) == 'q':
+                    return 'quit'
+            else:
+                if monster_turn(model, peep, new_peeps) == 'q':
+                    while control.get_key() not in ('q', Key.CTRL_Q):
+                        pass
+                    return 'died'
 
-                # model.undirty()
+            # update peeps list to living peeps
+            model.maze.peeps = [p for p in model.maze.peeps if p.hp > 0]
+
+        ti += 1
+
+    return ti

@@ -2,15 +2,37 @@ import lib.move as mlib
 from lib.move import Direction
 from lib.peeps import Peep, Attack
 from lib.prpg_model import PrpgModel
+import sys
+
+def printe(s):
+    sys.stderr.write(str(s))
+    sys.stderr.write('\n')
 
 def test_elapse_time():
     peeps = [
-        Peep(name='p1', speed=10),
-        Peep(name='p2', speed=7),
+        Peep(name='p10', speed=10),
+        Peep(name='p07', speed=7),
+        Peep(name='p02', speed=2),
     ]
-    moves = mlib.elapse_time(peeps)
-    assert peeps[0].tics == 0
-    assert peeps[1].tics == 7
+    data = (
+        # fac  moves  tics remaining
+        ( 1.0, [1,0,0], (0.0, 7.0, 2.0) ),
+        ( 1.0, [1,1,0], (0.0, 4.0, 4.0) ),
+        ( 1.0, [1,1,0], (0.0, 1.0, 6.0) ),
+        ( 1.0, [1,0,0], (0.0, 8.0, 8.0) ),
+        ( 1.0, [1,1,1], (0.0, 5.0, 0.0) ),
+        ( 0.5, [0,0,0], (5.0, 8.5, 1.0) ),
+        ( 0.1, [0,0,0], (6.0, 9.2, 1.2) ),
+        ( 0.2, [0,1,0], (8.0, 0.6, 1.6) ),
+        ( 0.3, [1,0,0], (1.0, 2.7, 2.2) ),
+    )
+    for t, expmoves, exptics in data:
+        printe(f'{t} {expmoves} {exptics}')
+        moves = mlib.elapse_time(peeps, t)
+        tics = tuple(p.tics for p in peeps)
+        assert moves == expmoves
+        assert tics == exptics
+
 
 def test_maze_at_xy():
     maze = [

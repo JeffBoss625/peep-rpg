@@ -60,10 +60,10 @@ class PrpgModel(DataModel):
     def create_projectile(self, direct):
         dx, dy = direction_to_dxdy(direct)
 
-        ammo = create_peep(
+        ret = create_peep(
             'arrow',
             pos=(self.maze.player.pos[0] + dx, self.maze.player.pos[1] + dy),
         )
-        ammo.direct = direct
-        self.maze.peeps.append(ammo)
+        ret.direct = direct
+        return ret
 
