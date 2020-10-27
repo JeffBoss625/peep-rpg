@@ -48,8 +48,13 @@ def attack_dst(src, dst, src_attack, out, seed=0):
         else:
             out.message(f'  {dst.name} has {dst.hp} points remaining')
         if src_attack.blowback != 0:
-            bb = src_attack.blowback * tot_hp_loss / 100
-            src.hp = src.hp - bb
+            src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
+            if src.hp <= 0:
+                out.message(f'  {src.name} is destroyed')
+            else:
+                # todo: convert arrow into item
+                src.speed = 0   # todo: remove remaining moves in turn_seq
+                src.attacks = ()
     else:
         out.message(f'the {src.name} missed the {dst.name}')
 

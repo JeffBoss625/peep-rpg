@@ -1,3 +1,4 @@
+from lib.constants import Key
 from lib.prpg_window import *
 from lib.win_layout import Con, Orient
 
@@ -58,6 +59,11 @@ class PrpgControl:
     def get_key(self):
         self.root_layout.window.paint()
         return self.root_layout.window.get_key()
+
+    def player_died(self):
+        self.model.banner('  YOU DIED! (press "q" to exit)')
+        while self.get_key() not in ('q', Key.CTRL_Q):
+            pass
 
     def resize_handler(self, _signum, _frame):
         try:

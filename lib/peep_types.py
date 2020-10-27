@@ -204,12 +204,12 @@ MONSTERS = [
         char='-',
         fgcolor=COLOR.YELLOW,
         bgcolor=COLOR.BLACK,
-        hp='1d1',
+        hp='2d8',
         thaco=20,
         speed=200,
-        ac=2,
+        ac=-10,
         attacks=(
-            AttackInfo(name='hit', damage='3d80', blowback=10),
+            AttackInfo(name='hit', damage='1d6', blowback=2.0),
         ),
         move_tactic='straight',
     ),]
