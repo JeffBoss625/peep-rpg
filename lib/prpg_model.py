@@ -45,7 +45,7 @@ class MazeModel(DataModel):
         shot.direct = direct
 
         self.new_peeps.append(shot)
-        self.message(f'{src.name} shoots {shot.name}')
+        self.log(f'{src.name} shoots {shot.name}')
         return shot
 
     def log(self, s):
