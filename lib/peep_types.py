@@ -77,7 +77,7 @@ MONSTERS = [
     # Animals
     PType(
         name='giant rat',
-        char='g',
+        char='r',
         fgcolor=COLOR.YELLOW,
         hp='1d4',
         thaco=19,
@@ -92,7 +92,7 @@ MONSTERS = [
 
     PType(
         name='big bird',
-        char='g',
+        char='b',
         fgcolor=COLOR.WHITE,
         bgcolor=COLOR.BLACK,
         hp='3d8',
@@ -178,10 +178,10 @@ MONSTERS = [
         fgcolor=COLOR.YELLOW,
         hp='20d100',
         thaco=20,
-        speed=4,
+        speed=0,
         ac=20,
         attacks=(
-            AttackInfo('crush', '2d4'),
+            # AttackInfo('crush', '2d4'),
         ),
     ),
 
@@ -191,11 +191,11 @@ MONSTERS = [
         fgcolor=COLOR.CYAN,
         hp='100d999999999999',
         thaco=15,
-        speed=2,
+        speed=0,
         ac=14,
         attacks=(
-            AttackInfo('smush', '5d10'),
-            AttackInfo('bury', '2d12'),
+            # AttackInfo('smush', '5d10'),
+            # AttackInfo('bury', '2d12'),
         ),
     ),
 
@@ -204,7 +204,7 @@ MONSTERS = [
         char='-',
         fgcolor=COLOR.YELLOW,
         bgcolor=COLOR.BLACK,
-        hp='2d8',
+        hp='1d2',
         thaco=20,
         speed=200,
         ac=-10,
@@ -212,7 +212,22 @@ MONSTERS = [
             AttackInfo(name='hit', damage='1d6', blowback=2.0),
         ),
         move_tactic='straight',
-    ),]
+    ),
+    PType(
+        name='fire breath',
+        char='*',
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
+        hp='2d8',
+        thaco=20,
+        speed=200,
+        ac=-10,
+        attacks=(
+            AttackInfo(name='burn', damage='3d6', blowback=10.0),
+        ),
+        move_tactic='straight',
+    ),
+]
 
 PTYPES_BY_NAME = {m.name:m for m in MONSTERS}
 

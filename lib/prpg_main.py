@@ -2,6 +2,7 @@ import lib.move as mlib
 from lib.constants import Key
 from lib.move import Direction
 from lib.monsters import monster_by_name
+from lib.peep_types import create_peep
 from lib.players import player_by_name
 from lib.prpg_control import PrpgControl
 from lib.prpg_model import PrpgModel
@@ -39,7 +40,9 @@ PEEPS = [
     player_by_name('Super Dad', pos=(1,2), hp=40),
     monster_by_name('Thark', pos=(2,2), hp=10),
     monster_by_name('Spark', pos=(24,7), hp=50),
-    monster_by_name('Brog', pos=(14,20), hp=200,)
+    monster_by_name('Brog', pos=(14,20), hp=200),
+    create_peep('big bird', name='Beaky', pos=(18,4)),
+    create_peep('giant rat', name='Scriggle', pos=(19,4)),
 ]
 ITEMS = [
 
@@ -80,12 +83,11 @@ def player_turn(mainwin):
                 model.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
-            sec_input_key = 'x'
+            model.message('Where do you want to shoot?')
+            sec_input_key = mainwin.get_key()
             while sec_input_key not in DIRECTION_KEYS:
-                model.message('Where do you want to shoot?')
-                sec_input_key = mainwin.get_key()
                 model.message('That is not a valid direction to shoot')
-            maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
+            maze.create_projectile(player, 'fire breath', DIRECTION_KEYS[sec_input_key])
 
             return input_key
         else:

@@ -273,7 +273,7 @@ def calc_prot_layers(uexposure, nlayers):
 #   slow_compound: compounding factor of slowing a projectile
 #   slow_log_base: compounding logarithm rate. e.g. 1.5 will compound slowing for every 50% increase in thickness. 2
 #       will compound for every doubling of thickness
-#   exp: accelerates compounding to add more rapid asymptotic stopping of damage
+#   exponent: accelerates compounding to add more rapid asymptotic stopping of damage
 def stop_factor(nlayers, compound=0.98, log_base=1.5, exponent=2):
     return (compound ** (math.log(nlayers, log_base))) ** (nlayers * exponent)
 
