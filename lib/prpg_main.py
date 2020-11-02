@@ -1,17 +1,12 @@
 import lib.move as mlib
 from lib.constants import Key
 from lib.move import Direction
-from lib.monsters import monster_by_name
-from lib.peep_types import create_peep
-from lib.players import player_by_name
 from lib.prpg_control import PrpgControl
 from lib.prpg_model import PrpgModel
 import random
 import sys
 import signal
 import lib.mazes as mazes
-
-
 
 
 DIRECTION_KEYS = {
@@ -25,7 +20,6 @@ DIRECTION_KEYS = {
     'h': Direction.LEFT,
     'b': Direction.DOWN_LEFT,
 }
-
 
 def player_turn(control):
     while True:
@@ -99,8 +93,8 @@ def monster_turn(control, monster):
 
     return True
 
-def main(root_layout):
-    model = PrpgModel(walls=mazes.dungeon1, peeps=mazes.dungeon1_peeps, player=mazes.dungeon1_peeps[0], items=mazes.dungeon1_items)
+def main(root_layout, maze='dungeon1'):
+    model = mazes.create_maze(maze)
     maze = model.maze
     control = PrpgControl(root_layout, model)
 
