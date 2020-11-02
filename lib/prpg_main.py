@@ -87,7 +87,7 @@ def player_turn(mainwin):
             sec_input_key = mainwin.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 model.message('That is not a valid direction to shoot')
-            maze.create_projectile(player, 'fire breath', DIRECTION_KEYS[sec_input_key])
+            maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
 
             return input_key
         else:
