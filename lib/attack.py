@@ -1,5 +1,4 @@
 import random
-
 from lib.stat import calc_pct
 
 
@@ -57,6 +56,8 @@ def attack_dst(src, dst, src_attack, out, seed=0):
                 src.attacks = ()
     else:
         out.message(f'the {src.name} missed the {dst.name}')
+        if src.type is 'projectile':
+            src.pos = (src.pos[0] + src.direct[0], src.pos[1] + src.direct[1])
 
 # return chance of deflecting a blow
 def calc_deflection(defl, skillrat, weightrat, playerstats, roundto=3):

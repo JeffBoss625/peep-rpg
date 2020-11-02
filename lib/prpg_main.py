@@ -9,44 +9,10 @@ from lib.prpg_model import PrpgModel
 import random
 import sys
 import signal
-
-MAZE = [
-    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-    '%....####....######%.........%',
-    '%....####....######%.........%',
-    '%....####....####..#.........%',
-    '%............####..#.........%',
-    '%....####....####............%',
-    '%....####..........#.........%',
-    '%....####....#######.........%',
-    '%....####....#######.........%',
-    '%###########################.%',
-    '%###########################.%',
-    '%#############...............%',
-    '%#############.##############%',
-    '%#############.##############%',
-    '%#########.........##########%',
-    '%#####..................#####%',
-    '%####....................####%',
-    '%####....................####%',
-    '%#####..................#####%',
-    '%#########.........##########%',
-    '%#############.##############%',
-    '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-]
+import lib.mazes as mazes
 
 
-PEEPS = [
-    player_by_name('Super Dad', pos=(1,2), hp=40),
-    monster_by_name('Thark', pos=(2,2), hp=10),
-    monster_by_name('Spark', pos=(24,7), hp=50),
-    monster_by_name('Brog', pos=(14,20), hp=200),
-    create_peep('big bird', name='Beaky', pos=(18,4)),
-    create_peep('giant rat', name='Scriggle', pos=(19,4)),
-]
-ITEMS = [
 
-]
 
 DIRECTION_KEYS = {
     '.': Direction.CENTER,
@@ -89,7 +55,7 @@ def player_turn(control):
             sec_input_key = control.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 model.message('That is not a valid direction to shoot')
-            maze.create_projectile(player, 'fire breath', DIRECTION_KEYS[sec_input_key])
+            maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
 
             return input_key
         else:
@@ -134,7 +100,7 @@ def monster_turn(control, monster):
     return True
 
 def main(root_layout):
-    model = PrpgModel(walls=MAZE, peeps=PEEPS, player=PEEPS[0], items=ITEMS)
+    model = PrpgModel(walls=mazes.dungeon1, peeps=mazes.dungeon1_peeps, player=mazes.dungeon1_peeps[0], items=mazes.dungeon1_items)
     maze = model.maze
     control = PrpgControl(root_layout, model)
 

@@ -33,6 +33,7 @@ class LevelInfo:
 class PType:
     name: str = ''
     char: str = ''
+    type: str = 'monster'
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK
     hp: str = '1d1'         # initial hit points (dice) at level 0
@@ -62,6 +63,7 @@ MONSTERS = [
     PType(
         name='goblin',
         char='g',
+        type='monster',
         fgcolor=COLOR.GREEN,
         hp='1d6',
         thaco=18,
@@ -78,6 +80,7 @@ MONSTERS = [
     PType(
         name='giant rat',
         char='r',
+        type='monster',
         fgcolor=COLOR.YELLOW,
         hp='1d4',
         thaco=19,
@@ -93,6 +96,7 @@ MONSTERS = [
     PType(
         name='big bird',
         char='b',
+        type='monster',
         fgcolor=COLOR.WHITE,
         bgcolor=COLOR.BLACK,
         hp='3d8',
@@ -110,6 +114,7 @@ MONSTERS = [
     PType(
         name='red dragon',
         char='D',
+        type='monster',
         fgcolor=COLOR.RED,
         bgcolor=COLOR.BLACK,
         hp='8d10',
@@ -127,6 +132,7 @@ MONSTERS = [
     PType(
         name='black dragon',
         char='D',
+        type='monster',
         fgcolor=COLOR.BLUE,
         bgcolor=COLOR.BLACK,
         hp='12d10',
@@ -143,6 +149,7 @@ MONSTERS = [
     PType(
         name='dog',
         char='d',
+        type='monster',
         hp='5d10',
         thaco=19,
         speed=33,
@@ -157,6 +164,7 @@ MONSTERS = [
     PType(
         name='human',
         char='h',
+        type='monster',
         hp='3d8',
         thaco=19,
         speed=45,
@@ -175,6 +183,7 @@ MONSTERS = [
     PType(
         name='wall',
         char='#',
+        type='wall',
         fgcolor=COLOR.YELLOW,
         hp='20d100',
         thaco=20,
@@ -188,6 +197,7 @@ MONSTERS = [
     PType(
         name='permanent wall',
         char='%',
+        type='wall',
         fgcolor=COLOR.CYAN,
         hp='100d999999999999',
         thaco=15,
@@ -202,6 +212,7 @@ MONSTERS = [
     PType(
         name='arrow',
         char='-',
+        type='projectile',
         fgcolor=COLOR.YELLOW,
         bgcolor=COLOR.BLACK,
         hp='1d2',
@@ -216,6 +227,7 @@ MONSTERS = [
     PType(
         name='fire breath',
         char='*',
+        type='projectile',
         fgcolor=COLOR.RED,
         bgcolor=COLOR.BLACK,
         hp='2d8',
