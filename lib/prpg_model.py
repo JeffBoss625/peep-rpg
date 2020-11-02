@@ -28,6 +28,8 @@ class MazeModel(DataModel):
         self.turn_seq = None
         self.logger = logger
         self.ti = 0
+        self.cursorpos = (0,0)
+        self.cursorvis = 0
 
     def update_wall(self, pos, char):
         x, y = pos

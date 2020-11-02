@@ -61,12 +61,12 @@ DIRECTION_KEYS = {
 }
 
 
-def player_turn(mainwin):
+def player_turn(control):
     while True:
-        model = mainwin.model
+        model = control.model
         maze = model.maze
         player = maze.player
-        input_key = mainwin.get_key()
+        input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
             if mlib.move_peep(model, maze.player, direct):
@@ -83,8 +83,10 @@ def player_turn(mainwin):
                 model.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
+            maze.cursorvis = 1
+            maze.cursorpos = (3, 3)
             model.message('Where do you want to shoot?')
-            sec_input_key = mainwin.get_key()
+            sec_input_key = control.get_key()
             while sec_input_key not in DIRECTION_KEYS:
                 model.message('That is not a valid direction to shoot')
             maze.create_projectile(player, 'fire breath', DIRECTION_KEYS[sec_input_key])
@@ -93,10 +95,6 @@ def player_turn(mainwin):
         else:
             model.message(f'unknown command: "{input_key}"')
             # continue
-
-def printe(s):
-    sys.stderr.write(s)
-    sys.stderr.write('\n')
 
 def monster_turn(control, monster):
     model = control.model

@@ -52,7 +52,7 @@ class PrpgControl:
             name = getattr(m, '"name" ', '')
             model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
-        model.maze.subscribe(log_event_fn)
+        # model.maze.subscribe(log_event_fn)
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 

@@ -112,6 +112,9 @@ class DummyCursesWindow:
             printe('KeyboardInterrupt')
             return Key.CTRL_Q
 
+    def move(self, y, x):
+        pass
+
 class DummyCurses:
     COLOR_BLACK = 0
     COLOR_BLUE = 4

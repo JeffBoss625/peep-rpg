@@ -17,6 +17,13 @@ class MazeWindow(Window):
         for it in self.model.items:
             self.write_char(it.pos[0], it.pos[1], it.char, it.fgcolor, it.bgcolor, **params)
 
+        if self.model.cursorvis:
+            # todo: cursor does not print
+            self.curses.curs_set(self.model.cursorvis)
+            x, y = self.model.cursorpos
+            self.scr.move(y, x)
+            self.log(f'move({y}, {x})')
+
 class TitleWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)

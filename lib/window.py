@@ -1,14 +1,9 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
-import sys
 from dataclasses import dataclass, field
 import traceback
 
 from lib.constants import COLOR, SIDE, curses_color
 from lib.util import min0
-
-
-def printe(s):
-    sys.stderr.write(s + "\n")
 
 
 IGNORED_KEYS = {
