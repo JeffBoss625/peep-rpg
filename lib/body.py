@@ -70,7 +70,7 @@ class Body:
         return ret
 
 # average height in cm: Elf: 180, Human: 175, Dwarf: 135, Hobbit: 105
-def update_proportions(body, body_to_head):
+def update_human_proportions(body, body_to_head):
     # humanoid size ratios
     # body-to-head: normal Human 7.5, Dunadain and Elves are 8, Dwarves are 6.
     hratio = DotDict({
@@ -118,6 +118,23 @@ def update_proportions(body, body_to_head):
         wdrat = wdratio[pn]
         part.size = Size(int(h), int(h*wdrat[0]), int(h*wdrat[1]))
 
+def update_dragon_proportions(body, head):
+    dratio = DotDict({
+        # 'Name': (height, width, depth) in proportion to head
+        'head':      (1.00, 1.00, 1.00),
+        'neck':      (0.90, 0.90, 1.50),
+        'body':      (2.50, 1.25, 5.00),
+        'tail_base': (1.20, 1.20, 1.40),
+        'tail_mid':  (0.90, 0.90, 1.30),
+        'tail_tip':  (0.60, 0.60, 1.20),
+        'l_leg':     (3.75, 0.90, 0.90),
+        'r_leg':     (3.75, 0.90, 0.90),
+        'l_arm':     (3.75, 0.90, 0.90),
+        'r_arm':     (3.75, 0.90, 0.90),
+    })
+    for part in body.parts:
+        ratio = dratio[part.name]
+        part.size = Size(ratio[0] * head[0], ratio[1] * head[1], ratio[2] * head[2])
 
 def create_body(body_type, kwds):
     if body_type == 'humanoid':
@@ -167,6 +184,8 @@ def create_humanoid(height=180, weight=90, body2head=7.5):
         ('l_finger2', ('l_finger2',)),
         ('l_finger3', ('l_finger3',)),
         ('l_finger4', ('l_finger4',)),
+        ('l_arm', ('l_wrist',)),
+        ('r_arm', ('r_wrist',)),
 
         ('legs', (
             'legs_inner',  # breeches, pants, leather-leggings, cargo-pants (pockets!), ...
@@ -177,36 +196,62 @@ def create_humanoid(height=180, weight=90, body2head=7.5):
             'foot_outer',  # boots, sandles, shoes, slippers, ...
         )),
     )
-
     parts = []
     for name, slotnames in slot_definitions:
         bslots = tuple(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
     ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, body2head, tuple(parts))
-    update_proportions(ret, body2head)
+    update_human_proportions(ret, body2head)
+    return ret
 
+def create_drag(height=240, weight=300):
+    height *= 10
+    slot_definitions = (
+        # Upper Bodywear
+        ('head', ()),    # helmet, crown, hood, hat, ...
+        ('neck', ('neck',)),    # necklass, amulet, neck scarf, ...
+        ('body',(
+            'saddle',
+        )),
+        # Hands / Arms
+        ('l_arm', ('l_wrist',)),
+        ('r_arm', ('r_wrist',)),
+
+        # rings cannot be warn over gauntlets (but perhaps may be held?)
+        # rings right
+
+        ('l_leg', ('l_ankle',)),
+        ('r_leg', ('r_ankle',)),
+    )
+    parts = []
+    for name, slotnames in slot_definitions:
+        bslots = tuple(BodySlot(slotname) for slotname in slotnames)
+        parts.append(BodyPart(name, slots=bslots))
+
+    ret = Body('dragon', Size(height, int(height/4), int(height/10)), weight, 1.0, tuple(parts))
+    update_dragon_proportions(ret, (90, 70, 180))
     return ret
 
 
 register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
-    body = create_humanoid(height=203, weight=120, body2head=8)
-    # print(dump(body.parts))
-    bslots = body.body_slots()
-    bslots.torso.on_shoulder1.item = Bow()
-    bslots.torso.on_waist = SoldiersBelt()
-    quiver = Quiver()
-    slot = quiver.slots[0]
-    slot.items = ((Arrow(), 20),)
-    bslots.torso.on_shoulder2.item = quiver
-    state = body.__getstate__()
-    # print(state)
-    del state['items']
-    body2 = create_humanoid(**state)
-    # print(dump(body2))
-    # print(dump(body))
-    print(dump(list(body.parts_by_name().values())))
+    body = create_drag(height=203, weight=120)
+    print(dump(body.parts, sort_keys=False))
+    # bslots = body.body_slots()
+    # bslots.torso.on_shoulder1.item = Bow()
+    # bslots.torso.on_waist = SoldiersBelt()
+    # quiver = Quiver()
+    # slot = quiver.slots[0]
+    # slot.items = ((Arrow(), 20),)
+    # bslots.torso.on_shoulder2.item = quiver
+    # state = body.__getstate__()
+    # # print(state)
+    # del state['items']
+    # body2 = create_humanoid(**state)
+    # # print(dump(body2))
+    # # print(dump(body))
+    # print(dump(list(body.parts_by_name().values())))
 
 
