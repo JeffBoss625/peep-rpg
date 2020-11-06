@@ -23,11 +23,7 @@ def calc_hit(ac, thaco, seed=0):
     if seed > 0:
         random.seed(seed)
     chance = thaco - ac
-    die_roll = random.randint(1, 20)
-    if die_roll >= chance:
-        return True
-    else:
-        return False
+    return random.randint(1, 20) >= chance
 
 def attack_dst(src, dst, src_attack, out, seed=0):
     out.log(f'attack({src}, {dst}, {src_attack})')
@@ -60,16 +56,16 @@ def attack_dst(src, dst, src_attack, out, seed=0):
             src.pos = (src.pos[0] + src.direct[0], src.pos[1] + src.direct[1])
 
 # return chance of deflecting a blow
-def calc_deflection(defl, skillrat, weightrat, playerstats, roundto=3):
+def calc_deflection(defl, skillrat, playerstats, roundto=3):
     ret = defl
-    ret = calc_pct(ret, weightrat, 0.5)         # weight-ratio 50% impact on deflection
     ret = calc_pct(ret, playerstats.str, 0.5)   # strength has 50% impact on deflection
     ret = calc_pct(ret, playerstats.dex)        # dexterity has 100% impact on deflection
     ret = calc_pct(ret, skillrat)               # skill ratio has 100% impact on deflection
 
     return round(ret, roundto)
 
-def calc_hit2(src, dst):
+def calc_hit2(src, dst, attack, out, seed=0):
+
     pass
 
 

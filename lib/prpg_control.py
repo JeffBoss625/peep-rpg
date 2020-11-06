@@ -56,9 +56,13 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
+    def win(self, name):
+        return self.root_layout.info.comp_by_name[name]
+
     def get_key(self):
         self.root_layout.window.paint()
         return self.root_layout.window.get_key()
+        # return self.win(WIN.MAZE).window.get_key()
 
     def player_died(self):
         self.model.banner('  YOU DIED! (press "q" to exit)')
@@ -72,8 +76,6 @@ class PrpgControl:
 
         except Exception as e:
             self.root_layout.log(e)
-
-
 
 def init_windows(root_layout, model):
     def win(name):
