@@ -257,6 +257,7 @@ def create_peep(ptype, name='', pos=(0, 0), body_stats=None, seed=0):
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
+        type=pt.type,
         char=pt.char,
         fgcolor=pt.fgcolor,
         bgcolor=pt.bgcolor,

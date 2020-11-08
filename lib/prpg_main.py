@@ -35,9 +35,10 @@ def player_turn(control):
         elif input_key == Key.CTRL_Q:
             return 'q'
         elif input_key == 'm':
-            if len(maze.peeps) > 1:
+            morph_peeps = list(p for p in maze.peeps if p.type == 'monster')
+            if len(morph_peeps) > 1:
                 while maze.player == player:
-                    player = maze.peeps[random.randint(0, len(maze.peeps) - 1)]
+                    player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
                 maze.player = player
                 model.message("You are now " + player.name)
             else:

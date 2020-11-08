@@ -63,6 +63,7 @@ class Item:
     size: tuple = field(default_factory=tuple)  # width, length, height in inches ** when placed in storage or slot **
     weight: int = 1
     slot_type: str = ''
+    pos: Tuple[int,int] = field(default_factory=tuple)
 
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK

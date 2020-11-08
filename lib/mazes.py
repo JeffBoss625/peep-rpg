@@ -1,7 +1,10 @@
+from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
 from lib.players import player_by_name
 from lib.prpg_model import PrpgModel
+from lib.items.item import Item
+# import lib.items.bow
 
 MAZES = {
     'dungeon1': {
@@ -37,6 +40,9 @@ MAZES = {
             create_peep('big bird', name='Beaky', pos=(18,4)),
             create_peep('giant rat', name='Scriggle', pos=(19,4)),
         ],
+        'items': [
+            Item("belt", '=', Size(3,5,4), 10, '', pos=(1,1))
+        ]
     },
     'open':{
         'walls': [
