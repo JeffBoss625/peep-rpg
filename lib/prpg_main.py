@@ -37,7 +37,8 @@ def player_turn(control):
         elif input_key == 'm':
             if len(maze.peeps) > 1:
                 while maze.player == player:
-                    maze.player = player = maze.peeps[random.randint(0, len(maze.peeps) - 1)]
+                    player = maze.peeps[random.randint(0, len(maze.peeps) - 1)]
+                maze.player = player
                 model.message("You are now " + player.name)
             else:
                 model.message("You have nothing in range to brain-swap with")
