@@ -20,12 +20,17 @@ def curses_color(color):
 
 
 class SIDE:
-    TOP='TOP'
-    LEFT='LEFT'
-    BOTTOM='BOTTOM'
-    RIGHT='RIGHT'
-    CENTER='CENTER'
+    TOP = 'TOP'
+    LEFT = 'LEFT'
+    BOTTOM = 'BOTTOM'
+    RIGHT = 'RIGHT'
+    CENTER = 'CENTER'
 
+class FACING:
+    FRONT = 'FRONT'
+    LEFT = 'LEFT'
+    RIGHT = 'RIGHT'
+    BACK = 'BACK'
 
 class Key:
     CTRL_Q = '\x11'

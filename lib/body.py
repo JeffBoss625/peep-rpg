@@ -144,8 +144,7 @@ def create_body(body_type, kwds):
 
     return ret
 
-def create_humanoid(height=180, weight=90, body2head=7.5):
-    height *= 10        # save precision
+def create_humanoid(height=1800, weight=90, body2head=7.5):
     slot_definitions = (
         # Upper Bodywear
         ('head', ('head',)),    # helmet, crown, hood, hat, ...
@@ -164,26 +163,27 @@ def create_humanoid(height=180, weight=90, body2head=7.5):
         )),
 
         # Hands / Arms
-        ('r_hand', (
-            'r_hand',           # glove, gauntlet, OR rings
-            'r_hand_holding',   # shield, weapon, bag, cup, wand, staff, any item, ...
-        )),
         ('l_hand', (
             'l_hand',           # glove, gauntlet, OR rings
             'l_hand_holding',   # shield, weapon, bag, cup, wand, staff, any item, ...
         )),
+        ('r_hand', (
+            'r_hand',           # glove, gauntlet, OR rings
+            'r_hand_holding',   # shield, weapon, bag, cup, wand, staff, any item, ...
+        )),
 
         # rings cannot be warn over gauntlets (but perhaps may be held?)
-        # rings right
-        ('r_finger1', ('r_finger1',)),
-        ('r_finger2', ('r_finger2',)),
-        ('r_finger3', ('r_finger3',)),
-        ('r_finger4', ('r_finger4',)),
         # rings left
         ('l_finger1', ('l_finger1',)),
         ('l_finger2', ('l_finger2',)),
         ('l_finger3', ('l_finger3',)),
         ('l_finger4', ('l_finger4',)),
+        # rings right
+        ('r_finger1', ('r_finger1',)),
+        ('r_finger2', ('r_finger2',)),
+        ('r_finger3', ('r_finger3',)),
+        ('r_finger4', ('r_finger4',)),
+
         ('l_arm', ('l_wrist',)),
         ('r_arm', ('r_wrist',)),
 
@@ -205,14 +205,14 @@ def create_humanoid(height=180, weight=90, body2head=7.5):
     update_human_proportions(ret, body2head)
     return ret
 
-def create_drag(height=240, weight=300):
+def create_dragon(height=240, weight=300):
     height *= 10
     slot_definitions = (
         # Upper Bodywear
-        ('head', ()),    # helmet, crown, hood, hat, ...
+        ('head', ()),
         ('neck', ('neck',)),    # necklass, amulet, neck scarf, ...
         ('body',(
-            'saddle',
+            'on_back',          # for a saddle
         )),
         # Hands / Arms
         ('l_arm', ('l_wrist',)),
@@ -237,7 +237,7 @@ def create_drag(height=240, weight=300):
 register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
-    body = create_drag(height=203, weight=120)
+    body = create_dragon(height=203, weight=120)
     print(dump(body.parts, sort_keys=False))
     # bslots = body.body_slots()
     # bslots.torso.on_shoulder1.item = Bow()

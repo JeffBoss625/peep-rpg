@@ -1,4 +1,6 @@
 import random
+
+from lib.constants import FACING
 from lib.stat import calc_pct
 
 
@@ -64,7 +66,32 @@ def calc_deflection(defl, skillrat, playerstats, roundto=3):
 
     return round(ret, roundto)
 
-def calc_hit2(src, dst, attack, out, seed=0):
+def calc_exposure(parts, facing, attack):
+    # todo: return a tuple of (attack, exposure, part) for the most vulnerable or accessible part for the attack
+    return attack, 1.0, parts[0]
+
+def choose_melee_attack2(src, dst, facing):
+    exposures = []
+    for attack in src.attacks:
+        parts = dst.body.parts_exposed(facing, attack)
+        exposures.append(calc_exposure(parts, facing, attack))
+
+    exposures.sort(key=lambda tup: tup[1])
+    return exposures[0]
+
+
+def attack_dst2(src, dst, _attack, out, seed=0):
+    # 1. attacker chooses attack and body part(s)
+    attack, exposure, part = choose_melee_attack2(src, dst, FACING.FRONT)
+
+    # 2. attacker rolls for hit (agility and skill vs target)
+
+
+    # 3. hit? defender could not avoid the blow, but attempts to deflect (shield etc)
+
+    # 4. calculate armor deflection, penetration of materials, damage
+
+    # 5. calculate blow-back damage or life-drain/healing
 
     pass
 
