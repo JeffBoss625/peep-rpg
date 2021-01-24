@@ -226,8 +226,8 @@ class Size:
     @classmethod
     def from_yaml(cls, loader, node):
         v = loader.construct_scalar(node)
-        w,h,l = map(int, v.split('x'))
-        return Size(w,h,l)
+        h, w, d = map(int, v.split('x'))
+        return Size(h, w, d)
 
     @classmethod
     def to_yaml(cls, dumper, v):

@@ -1,5 +1,3 @@
-from lib.peeps import Peep, Attack, LevelData
-from lib.constants import COLOR
 from lib.peep_types import create_peep
 import yaml
 

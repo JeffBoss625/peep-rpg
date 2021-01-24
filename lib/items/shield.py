@@ -11,7 +11,6 @@ from lib.model import register_yaml, Size
 class Shield(Item):
     char: str = ')'
     slot_type: str = BODY_SLOT.ON_BACK
-    size: Size = field(default_factory=Size)
     layers: Tuple = field(default_factory=tuple)
 
     def __post_init__(self):

@@ -8,7 +8,6 @@ from lib.model import Size, register_yaml
 
 
 # item slots on the body (armor, rings, held weapons...)
-
 class BODY_SLOT:
     HEAD = 'head'
     NECK = 'neck'
@@ -20,18 +19,20 @@ class BODY_SLOT:
     WAIST_UPPER = 'waist_upper'
     WAIST_LOWER = 'waist_lower'
     # todo: consider upper-arm lower-arm arm-holster...
-    R_HAND = 'r_hand'
-    R_HAND_HOLDING = 'r_hand_holding'
     L_HAND = 'l_hand'
     L_HAND_HOLDING = 'l_hand_holding'
-    R_FINGER1 = 'r_finger1'
-    R_FINGER2 = 'r_finger2'
-    R_FINGER3 = 'r_finger3'
-    R_FINGER4 = 'r_finger4'
+    R_HAND = 'r_hand'
+    R_HAND_HOLDING = 'r_hand_holding'
+    L_ARM = 'l_arm'
+    R_ARM = 'r_arm'
     L_FINGER1 = 'r_finger1'
     L_FINGER2 = 'r_finger2'
     L_FINGER3 = 'r_finger3'
     L_FINGER4 = 'r_finger4'
+    R_FINGER1 = 'r_finger1'
+    R_FINGER2 = 'r_finger2'
+    R_FINGER3 = 'r_finger3'
+    R_FINGER4 = 'r_finger4'
     # todo: consider top and bottom legs (shin guards...)
     LEGS_INNER = 'legs_inner'
     LEGS_OUTER = 'legs_outer'
@@ -60,7 +61,7 @@ class ITEM_SLOT:
 class Item:
     name: str = ''
     char: str = '?'
-    size: tuple = field(default_factory=tuple)  # width, length, height in inches ** when placed in storage or slot **
+    size: Size = field(default_factory=Size)  # height, width, depth in mm ** when placed in storage or slot **
     weight: int = 1
     slot_type: str = ''
 

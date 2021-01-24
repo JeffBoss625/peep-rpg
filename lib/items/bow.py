@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 from lib.items.item import Item, ITEM_SLOT, Shooter, BODY_SLOT
-from lib.model import register_yaml
+from lib.model import register_yaml, Size
+
 
 # A Shooter transfers velocity
 @dataclass
@@ -18,7 +19,7 @@ class Arrow(Item):
     name = 'arrow'
     char = '-'
     material = 'wood'
-    size = (90, 2, 2)  # cm (about 3 ft)
+    size = Size(90, 2, 2)  # cm (about 3 ft)
     weight = 100  # grams
     slot_type = ITEM_SLOT.ARROW
 

@@ -34,7 +34,6 @@ class Body:
     body_type: str = ''
     size: Size = ()
     weight: int = 0
-    body_to_head: int = 7.5
     parts: Tuple[BodyPart] = field(default_factory=tuple)      # BodyParts in order top to bottom
 
     # hide reproducable state
@@ -50,7 +49,6 @@ class Body:
             'body_type': self.body_type,
             'height': self.size.h,
             'weight': self.weight,
-            'body_to_head': self.body_to_head,
             'items': items_by_slot,
         }
 
@@ -69,8 +67,8 @@ class Body:
             ret[p.name] = p
         return ret
 
-# average height in cm: Elf: 180, Human: 175, Dwarf: 135, Hobbit: 105
-def update_human_proportions(body, body_to_head):
+# average height in mm: Elf: 1800, Human: 1750, Dwarf: 1350, Hobbit: 1050
+def update_human_proportions(body, body2head):
     # humanoid size ratios
     # body-to-head: normal Human 7.5, Dunadain and Elves are 8, Dwarves are 6.
     hratio = DotDict({
@@ -127,10 +125,10 @@ def update_dragon_proportions(body, head):
         'tail_base': (1.20, 1.20, 1.40),
         'tail_mid':  (0.90, 0.90, 1.30),
         'tail_tip':  (0.60, 0.60, 1.20),
-        'l_leg':     (3.75, 0.90, 0.90),
-        'r_leg':     (3.75, 0.90, 0.90),
         'l_arm':     (3.75, 0.90, 0.90),
         'r_arm':     (3.75, 0.90, 0.90),
+        'l_leg':     (3.75, 0.90, 0.90),
+        'r_leg':     (3.75, 0.90, 0.90),
     })
     for part in body.parts:
         ratio = dratio[part.name]
@@ -144,7 +142,7 @@ def create_body(body_type, kwds):
 
     return ret
 
-def create_humanoid(height=1800, weight=90, body2head=7.5):
+def create_humanoid(height=1800, weight=90000, body2head=7.5):
     slot_definitions = (
         # Upper Bodywear
         ('head', ('head',)),    # helmet, crown, hood, hat, ...
@@ -201,12 +199,11 @@ def create_humanoid(height=1800, weight=90, body2head=7.5):
         bslots = tuple(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, body2head, tuple(parts))
+    ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, tuple(parts))
     update_human_proportions(ret, body2head)
     return ret
 
-def create_dragon(height=240, weight=300):
-    height *= 10
+def create_dragon(height=2.0, weight=20.0):
     slot_definitions = (
         # Upper Bodywear
         ('head', ()),
@@ -229,7 +226,7 @@ def create_dragon(height=240, weight=300):
         bslots = tuple(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body('dragon', Size(height, int(height/4), int(height/10)), weight, 1.0, tuple(parts))
+    ret = Body('dragon', Size(height, int(height/4), int(height/10)), weight, tuple(parts))
     update_dragon_proportions(ret, (90, 70, 180))
     return ret
 

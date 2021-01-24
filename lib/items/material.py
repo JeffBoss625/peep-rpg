@@ -171,8 +171,8 @@ def constructs():
         # Protection factors of the multiple materials may add up to surpass the materials
         # individual protection - meaning that they are better in synergy.
         # name
-        #  (materials, ...),                    massf   thick_min, thick_max
         'quilted': {
+            # (materials, ...),                  massf   thick_min, thick_max
             'mat': (
                 (('cotton', 'flax',),            1.0,    1.0,    2.0),
                 (('cloth',),                     1.0,    1.0,    2.0),        # any cloth (felt, wool...)
