@@ -9,7 +9,7 @@ from lib.model import register_yaml, Size
 @dataclass
 class Belt:
     char: str = '_'
-    material: str = 'leater'
+    material: str = 'leather'
     size: Size = Size(45, 45, 5)
     weight: int = 300
     slot_type: Tuple[BODY_SLOT] = (BODY_SLOT.WAIST_LOWER,)
