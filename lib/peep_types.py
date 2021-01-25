@@ -160,6 +160,18 @@ MONSTERS = [
             AttackInfo('scratch', '2d7'),
         ),
     ),
+    PType(
+        name='dodger',
+        char='d',
+        type='monster',
+        hp='1000d10',
+        thaco=0,
+        speed=1,
+        ac=0,
+        attacks=(
+            AttackInfo('absolute destruction', '10d10000000'),
+        ),
+    ),
 
     PType(
         name='human',
@@ -188,7 +200,7 @@ MONSTERS = [
         hp='20d100',
         thaco=20,
         speed=0,
-        ac=20,
+        ac=100,
         attacks=(
             # AttackInfo('crush', '2d4'),
         ),
@@ -202,7 +214,7 @@ MONSTERS = [
         hp='100d999999999999',
         thaco=15,
         speed=0,
-        ac=14,
+        ac=100,
         attacks=(
             # AttackInfo('smush', '5d10'),
             # AttackInfo('bury', '2d12'),
