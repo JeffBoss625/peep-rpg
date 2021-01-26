@@ -55,7 +55,8 @@ def attack_dst(src, dst, src_attack, out, seed=0):
     else:
         out.message(f'the {src.name} missed the {dst.name}')
         if src.type is 'projectile':
-            src.pos = (src.pos[0] + src.direct[0], src.pos[1] + src.direct[1])
+            return False
+    return True
 
 # return chance of deflecting a blow
 def calc_deflection(defl, skillrat, playerstats, roundto=3):

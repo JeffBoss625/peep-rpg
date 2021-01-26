@@ -76,7 +76,7 @@ DUNGEONS = {
         ],
         'peeps': [
             create_peep('human', name='Super Dad', pos=(2,1)),
-            create_peep('red dragon', name='Spark', pos=(29,1))
+            create_peep('dodger', name='Dummy', pos=(29,1))
         ]
     }
 }

@@ -101,9 +101,10 @@ def move_peep(model, p, direct):
     if dst:
         src_attack = choose_melee_attack(p)
         if src_attack:
-            attack_dst(p, dst, src_attack, model)
-        return True
-
+            if attack_dst(p, dst, src_attack, model):
+                return True
+            else:
+                p.pos = (p.pos[0] + dx, p.pos[1] + dy)
     # all clear. just move
     p.pos = (p.pos[0] + dx, p.pos[1] + dy)
     return True
