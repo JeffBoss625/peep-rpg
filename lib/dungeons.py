@@ -2,11 +2,11 @@ from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
 from lib.players import player_by_name
-from lib.prpg_model import PrpgModel
+from lib.dungeon import Dungeon
 from lib.items.item import Item
 # import lib.items.bow
 
-MAZES = {
+DUNGEONS = {
     'dungeon1': {
         'walls': [
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
@@ -81,9 +81,9 @@ MAZES = {
     }
 }
 
-def create_maze(name):
-    info = MAZES[name]
-    return PrpgModel(
+def create_dungeon(name):
+    info = DUNGEONS[name]
+    return Dungeon(
         walls=info['walls'],
         peeps=info['peeps'],
         player=info['peeps'][0],

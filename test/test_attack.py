@@ -13,10 +13,6 @@ class Out:
     def log(self, *args):
         self.args.append(args)
 
-def tt():
-    list = [1,2,3,4]
-    print(t)
-
 def test_calc_deflection():
     data = (
         # defl, skill   str     dex    exp

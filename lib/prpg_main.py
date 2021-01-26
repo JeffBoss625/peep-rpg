@@ -1,12 +1,9 @@
 import lib.move as mlib
 from lib.constants import Key
 from lib.move import Direction
-from lib.prpg_control import PrpgControl
-from lib.prpg_model import PrpgModel
 import random
 import sys
 import signal
-import lib.mazes as mazes
 
 
 DIRECTION_KEYS = {
@@ -95,18 +92,14 @@ def monster_turn(control, monster):
 
     return True
 
-def main(root_layout, maze='dungeon1'):
-    model = mazes.create_maze(maze)
-    maze = model.maze
-    control = PrpgControl(root_layout, model)
-
+def main(control, model):
     if sys.platform != "win32":
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
-    maze.elapse_time()
+    model.maze.elapse_time()
     while execute_turn_seq(control):
-        maze.elapse_time()
+        model.maze.elapse_time()
 
 
 def execute_turn_seq(control):
