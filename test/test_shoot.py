@@ -10,7 +10,7 @@ from lib.constants import Key
 from lib.win_layout import Dim
 
 
-def dungeon_test(model, keys, paint=False):
+def assert_dungeon(model, keys, paint=False):
     root_layout = dummy_root(dim=Dim(110, 14), logger=Logger('dbg.py'))
 
     control = PrpgControl(root_layout, model)
@@ -37,7 +37,7 @@ def test_shoot_wall():
             create_peep('human', name='Super Dad', pos=(1,1)),
         ]
     })
-    dungeon_test(model, keys=['a', 'l', '.', '.', Key.CTRL_Q])
+    assert_dungeon(model, ['a', 'l', '.', '.', Key.CTRL_Q])
 
 
 def test_shoot_thru_monster():
@@ -53,5 +53,5 @@ def test_shoot_thru_monster():
             create_peep('dodger', name='Dummy', pos=(4,1))
         ]
     })
-    dungeon_test(model, keys=['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
+    assert_dungeon(model, ['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
 
