@@ -24,6 +24,8 @@ def calc_hit(ac, thaco):
     chance = thaco - ac
     return random.randint(1, 20) >= chance
 
+# attack dst with src/src_attack.
+# return True if the attack hits, False if missed
 def attack_dst(src, dst, src_attack, out):
     out.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
@@ -49,9 +51,7 @@ def attack_dst(src, dst, src_attack, out):
                 src.attacks = ()
     else:
         out.message(f'the {src.name} missed the {dst.name}')
-        if src.type is 'projectile':
-            return False
-    return True
+        return False
 
 # return chance of deflecting a blow
 def calc_deflection(defl, skillrat, playerstats, roundto=3):

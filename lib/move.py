@@ -92,7 +92,7 @@ def move_peep(model, p, direct):
         # players and ammo strike wall
         char = model.maze.wall_at(dst_pos)
         if char:
-            if model.is_player(p) or getattr(p, 'move_tactic', None) == 'straight':
+            if p.type == 'projectile':
                 wall = create_wally(model.maze, dst_pos)
                 dst = wall
             else:
@@ -102,10 +102,16 @@ def move_peep(model, p, direct):
         src_attack = choose_melee_attack(p)
         if src_attack:
             if attack_dst(p, dst, src_attack, model):
+                # hit!
                 return True
             else:
-                p.pos = (p.pos[0] + dx, p.pos[1] + dy)
-    # all clear. just move
+                # missed
+                if p.type is not 'projectile':
+                    # used up move with miss
+                    return True
+                # else continue to move (below)
+
+    # move
     p.pos = (p.pos[0] + dx, p.pos[1] + dy)
     return True
 

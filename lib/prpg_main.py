@@ -46,8 +46,9 @@ def player_turn(control):
             maze.cursorpos = (3, 3)
             model.message('Where do you want to shoot?')
             sec_input_key = control.get_key()
-            while sec_input_key not in DIRECTION_KEYS:
+            while sec_input_key not in DIRECTION_KEYS or sec_input_key == '.':
                 model.message('That is not a valid direction to shoot')
+                sec_input_key = control.get_key()
             maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
 
             return input_key
