@@ -81,8 +81,10 @@ DUNGEONS = {
     }
 }
 
-def create_dungeon(name):
-    info = DUNGEONS[name]
+def create_dungeon(info):
+    if isinstance(info, str):
+        info = DUNGEONS[info]
+
     return Dungeon(
         walls=info['walls'],
         peeps=info['peeps'],

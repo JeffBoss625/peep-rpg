@@ -1,7 +1,7 @@
 from lib.attack import calc_deflection, attack_dst
 from lib.peeps import Attack, Peep
 from lib.stat import PlayerStats
-
+import random
 
 class Out:
     def __init__(self):
@@ -37,17 +37,17 @@ def test_calc_deflection():
         assert d == exp
 
 def test_attack():
-    p1 = Peep(name='p1', hp=3, attacks=(Attack('teeth', damage='1d3'),))
-    p2 = Peep(name='m1', hp=2, attacks=(Attack('kick', damage='1d3'),))
+    p1 = Peep(name='p1', hp=4, attacks=(Attack('teeth', damage='1d3'),))
+    m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'),))
 
     out = Out()
-
-    attack_dst(p1, p2, p1.attacks[0], out, 3)
-    assert p2.hp == 2
-    attack_dst(p2, p1, p2.attacks[0], out, 3)
-    assert p1.hp == 3
-    attack_dst(p1, p2, p1.attacks[0], out, 3)
-    assert p2.hp == 2
+    random.seed(5)
+    attack_dst(p1, m1, p1.attacks[0], out)
+    assert m1.hp == 3
+    attack_dst(m1, p1, m1.attacks[0], out)
+    assert p1.hp == 1
+    attack_dst(p1, m1, p1.attacks[0], out)
+    assert m1.hp == 2
 
     # try this.... not changing.
     # attack(p1, p2, 'teeth', out, 3)

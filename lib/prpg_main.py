@@ -93,7 +93,7 @@ def monster_turn(control, monster):
     return True
 
 def main(control, model):
-    if sys.platform != "win32":
+    if sys.platform != "win32" and hasattr(control, 'resize_handler'):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)

@@ -3,7 +3,6 @@ import random
 from lib.constants import FACING
 from lib.stat import calc_pct
 
-
 def parse_dice(dstring):
     parts = dstring.split("d")
     return {
@@ -21,16 +20,12 @@ def choose_melee_attack(src):
         i = random.randint(1, numattacks-1)
         return src.attacks[i]
 
-def calc_hit(ac, thaco, seed=0):
-    if seed > 0:
-        random.seed(seed)
+def calc_hit(ac, thaco):
     chance = thaco - ac
     return random.randint(1, 20) >= chance
 
-def attack_dst(src, dst, src_attack, out, seed=0):
+def attack_dst(src, dst, src_attack, out):
     out.log(f'attack({src}, {dst}, {src_attack})')
-    if seed > 0:
-        random.seed(seed)
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:
         dice_info = parse_dice(src_attack.damage)
