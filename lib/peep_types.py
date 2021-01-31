@@ -39,7 +39,7 @@ class PType:
     hp: str = '1d1'         # initial hit points (dice) at level 0
     regen: float = 1.0
     exp: float = 0
-    exptolevel: int = 100
+    level: int = 1
     skill: float = 1.0
 
     # todo: move this to level info to allow different rates and limit

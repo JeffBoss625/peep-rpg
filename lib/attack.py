@@ -1,5 +1,5 @@
 import random
-
+import math
 from lib.constants import FACING
 from lib.stat import calc_pct
 
