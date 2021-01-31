@@ -12,9 +12,11 @@ MONSTERS = [
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}
 
-def monster_by_name(name, pos=(0,0), hp=0):
+def monster_by_name(name, pos=(0,0), maxhp=0):
     ret = MONSTERS_BY_NAME[name]
-    ret.hp = ret.maxhp if hp == 0 else hp
+    if maxhp > 0:
+        ret.hp = maxhp
+    ret.hp = ret.maxhp
     ret.pos = pos
     return ret
 

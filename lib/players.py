@@ -7,9 +7,11 @@ _PEEPS = [
 
 _PEEPS_BY_NAME = {m.name: m for m in _PEEPS}
 
-def player_by_name(name, pos=(0,0), hp=0):
+def player_by_name(name, pos=(0,0), maxhp=0):
     ret = _PEEPS_BY_NAME[name]
-    ret.hp = ret.maxhp if hp == 0 else hp
+    if maxhp > 0:
+        ret.maxhp = maxhp
+    ret.hp = ret.maxhp
     ret.pos = pos
     return ret
 
