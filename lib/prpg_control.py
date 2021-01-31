@@ -1,6 +1,8 @@
 from lib.constants import Key
 from lib.prpg_window import *
+from lib.stat import roll_dice
 from lib.win_layout import Con, Orient
+from lib.pclass import level_calc
 
 
 class WIN:
@@ -68,6 +70,13 @@ class PrpgControl:
         self.model.banner('  YOU DIED! (press "q" to exit)')
         while self.get_key() not in ('q', Key.CTRL_Q):
             pass
+
+    def monster_killed(self, src, dst):
+        src.exp += dst.exp_value()
+        new_level = level_calc(src.exp, src.level_factor)
+        while src.level < new_level:
+            src.level += 1
+            src.maxhp += round(roll_dice(src.hitdice) * src.hitdicefac)
 
     def resize_handler(self, _signum, _frame):
         try:
