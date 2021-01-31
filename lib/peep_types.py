@@ -37,6 +37,7 @@ class PType:
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK
     hp: str = '1d1'         # initial hit points (dice) at level 0
+    regen: float = 1.0
     skill: float = 1.0
 
     # todo: move this to level info to allow different rates and limit
@@ -66,6 +67,7 @@ MONSTERS = [
         type='monster',
         fgcolor=COLOR.GREEN,
         hp='1d6',
+        regen=1.0,
         thaco=18,
         speed=13,
         ac=19,
@@ -118,6 +120,7 @@ MONSTERS = [
         fgcolor=COLOR.RED,
         bgcolor=COLOR.BLACK,
         hp='8d10',
+        regen=2.0,
         thaco=10,
         speed=20,
         ac=10,

@@ -35,4 +35,5 @@ class FACING:
 class Key:
     CTRL_Q = '\x11'
 
-
+class GAME_SETTINGS:
+    REGEN_RATE = 0.01           #Normal % heal per turn

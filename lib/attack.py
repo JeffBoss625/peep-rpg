@@ -91,6 +91,11 @@ def attack_dst2(src, dst, _attack, out, seed=0):
 
     pass
 
+def peep_regenhp(peepmaxhp, peepspeed, peepregen):
+    speedhealfac = 10 / peepspeed
+    amount_heal = peepmaxhp * peepregen
+    ret = speedhealfac * amount_heal
+    return ret
 
 if __name__ == '__main__':
     print("HERE")

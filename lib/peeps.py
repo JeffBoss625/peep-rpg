@@ -49,6 +49,7 @@ class Peep(DataModel):
     direct: int = -1
 
     hp: int = 0
+    regen: float = 0.01
     tics: int = 0
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)

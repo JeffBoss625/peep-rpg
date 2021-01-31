@@ -1,4 +1,5 @@
 import lib.move as mlib
+from lib.attack import peep_regenhp
 from lib.constants import Key
 from lib.move import Direction
 import random
@@ -19,6 +20,9 @@ DIRECTION_KEYS = {
 }
 
 def player_turn(control):
+    player = control.model.maze.player
+    player.hp += peep_regenhp(player.maxhp, player.speed, player.regen)
+    if player.hp > player.maxhp: player.hp = player.maxhp
     while True:
         model = control.model
         maze = model.maze
