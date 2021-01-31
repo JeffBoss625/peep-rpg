@@ -1,4 +1,5 @@
 from lib.window import *
+import math
 
 class MazeWindow(Window):
     def __init__(self, name, parent, **params):
@@ -46,7 +47,7 @@ class StatsWindow(Window):
         p = self.model.player
         self.write_lines([
             p.name,
-            'hp:     ' + str(p.hp) + '/' + str(p.maxhp),
+            'hp:     ' + str(math.floor(p.hp)) + '/' + str(p.maxhp),
             # 'speed:  ' + str(p.speed),
             # 'height: ' + str(p.body.size.h)
         ])
