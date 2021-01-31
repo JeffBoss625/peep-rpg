@@ -12,7 +12,9 @@ from dataclasses import dataclass
 
 from lib.model import ModelList, DataModel, TextModel
 from lib.move import direction_to_dxdy
+from lib.pclass import level_calc
 from lib.peep_types import create_peep
+from lib.stat import roll_dice
 
 
 class MazeModel(DataModel):
@@ -199,4 +201,10 @@ class Dungeon(DataModel):
     def is_player(self, peep):
         return peep == self.maze.player
 
+    def monster_killed(self, src, dst):
+        src.exp += dst.exp_value()
+        new_level = level_calc(src.exp, src.level_factor)
+        while src.level < new_level:
+            src.level += 1
+            src.maxhp += round(roll_dice(src.hitdice) * src.hitdicefac)
 
