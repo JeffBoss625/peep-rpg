@@ -1,7 +1,8 @@
 import lib.move as mlib
 from lib.move import Direction
 from lib.peeps import Peep, Attack
-from lib.prpg_model import Dungeon
+from lib.dungeons import Dungeon
+from lib.dungeon import elapse_time
 import sys
 
 def printe(s):
@@ -28,7 +29,7 @@ def test_elapse_time():
     )
     for t, expmoves, exptics in data:
         printe(f'{t} {expmoves} {exptics}')
-        moves = mlib.elapse_time(peeps, t)
+        moves = elapse_time(peeps, t)
         tics = tuple(p.tics for p in peeps)
         assert moves == expmoves
         assert tics == exptics
