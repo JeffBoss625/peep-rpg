@@ -64,6 +64,8 @@ def monster_turn(control, monster):
     model = control.model
     maze = model.maze
     player = maze.player
+    monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen)
+    if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'straight':
         direct = monster.direct
         mlib.move_peep(model, monster, direct)
