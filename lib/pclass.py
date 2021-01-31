@@ -34,7 +34,7 @@ def xptolevel_calc(level, factor, base):
 
 def level_calc(xp, factor):
     ret = 1
-    to_level = 99
+    to_level = GAME_SETTINGS.BASEEXPTOLEVEL - 1
     while to_level < xp:
         to_level = xptolevel_calc(ret + 1, factor, GAME_SETTINGS.BASEEXPTOLEVEL) - 1
         ret += 1

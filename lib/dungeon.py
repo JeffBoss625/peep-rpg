@@ -201,10 +201,12 @@ class Dungeon(DataModel):
     def is_player(self, peep):
         return peep == self.maze.player
 
-    def monster_killed(self, src, dst):
+    def monster_killed(self, src, src_attack, dst):
+        self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
         src.exp += dst.exp_value()
         new_level = level_calc(src.exp, src.level_factor)
         while src.level < new_level:
-            src.level += 1
             src.maxhp += round(roll_dice(src.hitdice) * src.hitdicefac)
+            src.level += 1
+            self.message(f'{src.name} is now level {src.level}!')
 

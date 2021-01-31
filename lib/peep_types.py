@@ -38,7 +38,7 @@ class PType:
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK
     hitdice: str = '1d1'         # initial hit points (dice) at level 0
-    regen: float = 1.0
+    regen_fac: float = 1.0
     skill: float = 1.0
 
     # todo: move this to level info to allow different rates and limit
@@ -68,7 +68,7 @@ MONSTERS = [
         type='monster',
         fgcolor=COLOR.GREEN,
         hitdice='1d6',
-        regen=1.0,
+        regen_fac=1.0,
         thaco=18,
         speed=13,
         ac=19,
@@ -121,7 +121,7 @@ MONSTERS = [
         fgcolor=COLOR.RED,
         bgcolor=COLOR.BLACK,
         hitdice='8d10',
-        regen=2.0,
+        regen_fac=2.0,
         thaco=10,
         speed=20,
         ac=10,
@@ -280,7 +280,7 @@ def create_peep(
     hp = roll_dice(pt.hitdice)
     factor = pc.level_factor * GAME_SETTINGS.LEVELUPFACTOR
     level = level_calc(exp, factor)
-    regen = pt.regen * GAME_SETTINGS.REGEN_RATE
+    regen_fac = pt.regen_fac
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
@@ -290,7 +290,7 @@ def create_peep(
         bgcolor=pt.bgcolor,
         hp=hp,
         maxhp=hp,
-        regen=regen,
+        regen_fac=regen_fac,
         exp=exp,
         level=level,
         level_factor=factor,

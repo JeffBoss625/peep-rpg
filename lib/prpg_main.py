@@ -21,16 +21,16 @@ DIRECTION_KEYS = {
 
 def player_turn(control):
     player = control.model.maze.player
-    player.hp += peep_regenhp(player.maxhp, player.speed, player.regen)
+    player.hp += peep_regenhp(player.maxhp, player.speed, player.regen_fac)
     if player.hp > player.maxhp: player.hp = player.maxhp
     while True:
-        model = control.model
-        maze = model.maze
+        dungeon = control.model
+        maze = dungeon.maze
         player = maze.player
         input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
             direct = DIRECTION_KEYS[input_key]
-            if mlib.move_peep(model, maze.player, direct):
+            if mlib.move_peep(dungeon, maze.player, direct):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -41,30 +41,30 @@ def player_turn(control):
                 while maze.player == player:
                     player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
                 maze.player = player
-                model.message("You are now " + player.name)
+                dungeon.message("You are now " + player.name)
             else:
-                model.message("You have nothing in range to brain-swap with")
+                dungeon.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
             maze.cursorvis = 1
             maze.cursorpos = (3, 3)
-            model.message('Where do you want to shoot?')
+            dungeon.message('Where do you want to shoot?')
             sec_input_key = control.get_key()
             while sec_input_key not in DIRECTION_KEYS or sec_input_key == '.':
-                model.message('That is not a valid direction to shoot')
+                dungeon.message('That is not a valid direction to shoot')
                 sec_input_key = control.get_key()
             maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
 
             return input_key
         else:
-            model.message(f'unknown command: "{input_key}"')
+            dungeon.message(f'unknown command: "{input_key}"')
             # continue
 
 def monster_turn(control, monster):
     model = control.model
     maze = model.maze
     player = maze.player
-    monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen)
+    monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'straight':
         direct = monster.direct
@@ -99,19 +99,19 @@ def monster_turn(control, monster):
 
     return True
 
-def main(control, model):
+def main(control, dungeon):
     if sys.platform != "win32" and hasattr(control, 'resize_handler'):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
-    model.maze.elapse_time()
+    dungeon.maze.elapse_time()
     while execute_turn_seq(control):
-        model.maze.elapse_time()
+        dungeon.maze.elapse_time()
 
 
 def execute_turn_seq(control):
-    model = control.model
-    maze = model.maze
+    dungeon = control.model
+    maze = dungeon.maze
     while not maze.new_peeps and maze.ti < len(maze.turn_seq):
         peep_indexes = maze.turn_seq[maze.ti]
         # this loop moves simultaneous peeps - all moves complete together (before adding new projectiles/peeps/etc)
@@ -122,7 +122,7 @@ def execute_turn_seq(control):
             peep = maze.peeps[peep_index]
             if peep.hp <= 0:
                 continue
-            if model.is_player(peep):
+            if dungeon.is_player(peep):
                 if player_turn(control) == 'q':
                     return False
             else:

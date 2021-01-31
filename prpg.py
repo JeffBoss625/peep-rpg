@@ -24,9 +24,9 @@ import lib.dungeons as models
 w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
-    model = models.create_dungeon('dungeon1')
-    control = PrpgControl(root_layout, model)
-    main(control, model)
+    dungeon = models.create_dungeon('dungeon1')
+    control = PrpgControl(root_layout, dungeon)
+    main(control, dungeon)
 
 
 curses.wrapper(cb)

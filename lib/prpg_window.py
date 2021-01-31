@@ -1,5 +1,7 @@
+from lib.constants import GAME_SETTINGS
 from lib.window import *
-import math
+from lib.pclass import xptolevel_calc
+from math import floor
 
 class MazeWindow(Window):
     def __init__(self, name, parent, **params):
@@ -47,7 +49,9 @@ class StatsWindow(Window):
         p = self.model.player
         self.write_lines([
             p.name,
-            'hp:     ' + str(math.floor(p.hp)) + '/' + str(p.maxhp),
+            f'level:  {p.level}',
+            f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASEEXPTOLEVEL))}',
+            f'hp:     {floor(p.hp)}/{p.maxhp}',
             # 'speed:  ' + str(p.speed),
             # 'height: ' + str(p.body.size.h)
         ])

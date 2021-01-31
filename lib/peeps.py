@@ -50,7 +50,7 @@ class Peep(DataModel):
     direct: int = -1
 
     hp: int = 0
-    regen: float = 0.01
+    regen_fac: float = 1.0
     exp: int = 1
     level: int = 1
     level_factor: int = 2
@@ -71,7 +71,7 @@ class Peep(DataModel):
     def exp_value(self):
         b = GAME_SETTINGS.BASE_KILL_EXP
         # very basic - todo: use attacks and other info to calculate experience
-        return b * math.pow(self.maxhp, 0.5) * self.regen
+        return b * math.pow(self.maxhp, 0.5) * self.regen_fac
 
 
 def printargs(model, msg, **args):

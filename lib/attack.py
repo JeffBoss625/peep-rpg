@@ -1,6 +1,6 @@
 import random
 import math
-from lib.constants import FACING
+from lib.constants import FACING, GAME_SETTINGS
 from lib.stat import calc_pct
 
 def parse_dice(dstring):
@@ -26,8 +26,8 @@ def calc_hit(ac, thaco):
 
 # attack dst with src/src_attack.
 # return True if the attack hits, False if missed
-def attack_dst(src, dst, src_attack, out):
-    out.log(f'attack({src}, {dst}, {src_attack})')
+def attack_dst(src, dst, src_attack, dungeon):
+    dungeon.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:
         dice_info = parse_dice(src_attack.damage)
@@ -35,22 +35,22 @@ def attack_dst(src, dst, src_attack, out):
         for i in range(1, dice_info['num_dice'] + 1):
             hp_loss = random.randint(1, dice_info['num_sides'])
             tot_hp_loss += hp_loss
-        out.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
+        dungeon.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
-            out.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
+            dungeon.monster_killed(src, src_attack, dst)
         else:
-            out.message(f'  {dst.name} has {dst.hp} points remaining')
+            dungeon.message(f'  {dst.name} has {dst.hp} points remaining')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
-                out.message(f'  {src.name} is destroyed')
+                dungeon.message(f'  {src.name} is destroyed')
             else:
                 # todo: convert arrow into item
                 src.speed = 0   # todo: remove remaining moves in turn_seq
                 src.attacks = ()
     else:
-        out.message(f'the {src.name} missed the {dst.name}')
+        dungeon.message(f'the {src.name} missed the {dst.name}')
         return False
 
 # return chance of deflecting a blow
@@ -91,9 +91,9 @@ def attack_dst2(src, dst, _attack, out, seed=0):
 
     pass
 
-def peep_regenhp(peepmaxhp, peepspeed, peepregen):
+def peep_regenhp(peepmaxhp, peepspeed, regen_fac):
     speedhealfac = 10 / peepspeed
-    amount_heal = peepmaxhp * peepregen
+    amount_heal = peepmaxhp * regen_fac * GAME_SETTINGS.REGEN_RATE
     ret = speedhealfac * amount_heal
     return ret
 

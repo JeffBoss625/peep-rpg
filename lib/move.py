@@ -81,19 +81,19 @@ def direction_relative(direct, rotation):
 
 # Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
 # failed (hit a wall)
-def move_peep(model, p, direct):
+def move_peep(dungeon, p, direct):
     dx, dy = direction_to_dxdy(direct)
     if dx == 0 and dy == 0:
         return True
 
     dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
-    dst = peep_at_pos(model.maze.peeps, dst_pos)
+    dst = peep_at_pos(dungeon.maze.peeps, dst_pos)
     if not dst:
         # players and ammo strike wall
-        char = model.maze.wall_at(dst_pos)
+        char = dungeon.maze.wall_at(dst_pos)
         if char:
             if p.type == 'projectile':
-                wall = create_wally(model.maze, dst_pos)
+                wall = create_wally(dungeon.maze, dst_pos)
                 dst = wall
             else:
                 return False # peep did not move
@@ -101,7 +101,7 @@ def move_peep(model, p, direct):
     if dst:
         src_attack = choose_melee_attack(p)
         if src_attack:
-            if attack_dst(p, dst, src_attack, model):
+            if attack_dst(p, dst, src_attack, dungeon):
                 # hit!
                 return True
             else:

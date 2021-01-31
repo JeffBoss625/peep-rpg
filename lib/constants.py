@@ -36,7 +36,7 @@ class Key:
     CTRL_Q = '\x11'
 
 class GAME_SETTINGS:
-    REGEN_RATE = 0.01      # Normal % heal per turn
-    BASEEXPTOLEVEL = 100   # base xp is 100 to level 2
-    LEVELUPFACTOR = 2.0    # Altered by other factors
-    BASE_KILL_EXP = 1.0    # basic experience for killing a monster (before modifications)
+    REGEN_RATE =        0.01   # Normal % heal per turn
+    BASEEXPTOLEVEL =    2.00   # base xp is 100 to level 2
+    LEVELUPFACTOR =     2.00   # Altered by other factors
+    BASE_KILL_EXP =     1.00   # basic experience for killing a monster (before modifications)
