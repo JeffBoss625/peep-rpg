@@ -53,6 +53,9 @@ class Peep(DataModel):
     regen: float = 0.01
     exp: int = 1
     level: int = 1
+    level_factor: int = 2
+    hitdice: str = '1d1'
+    hitdicefac: int = 0
     tics: int = 0
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)

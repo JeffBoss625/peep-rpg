@@ -281,7 +281,6 @@ def create_peep(
     factor = pc.level_factor * GAME_SETTINGS.LEVELUPFACTOR
     level = level_calc(exp, factor)
     regen = pt.regen * GAME_SETTINGS.REGEN_RATE
-    # hdfactor = hd*pc.factor
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
@@ -294,8 +293,9 @@ def create_peep(
         regen=regen,
         exp=exp,
         level=level,
-        # level_factor=factor,
-        # hitdice=hitdice,
+        level_factor=factor,
+        hitdice=pt.hitdice,
+        hitdicefac=pc.hitdicefac,
         thaco=pt.thaco,
         speed=pt.speed,
         ac=pt.ac,
