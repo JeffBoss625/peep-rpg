@@ -4,6 +4,8 @@ from typing import Tuple, Dict, Any
 from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR
+from lib.constants import PCLASS
+from lib.pclass import get_pclass
 import yaml
 
 from lib.stat import roll_dice
@@ -268,8 +270,9 @@ def create_attack(attack_info):
         blowback=attack_info.blowback,
     )
 
-def create_peep(ptype, name='', pos=(0, 0), body_stats=None, seed=0):
+def create_peep(ptype, pclass=PCLASS.FIGHTER, name='', pos=(0, 0), body_stats=None, seed=0):
     pt = PTYPES_BY_NAME[ptype]
+    pc = get_pclass(pclass)
     hp = roll_dice(pt.hp)
 
     ret = Peep(
