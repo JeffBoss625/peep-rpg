@@ -2,6 +2,7 @@ from lib.attack import calc_deflection, attack_dst
 from lib.peeps import Attack, Peep
 from lib.stat import PlayerStats
 import random
+import math
 
 class Out:
     def __init__(self):
@@ -71,4 +72,25 @@ def test_attack():
     # attack(p1, p2, 'teeth', out, 3)
     # attack(p2, p1, 'teeth', out, 3)
     # print(p1.hp, p2.hp)
+
+def level_calc(level, factor, base):
+    ret = 0
+    for i in range(0, level):
+        addon = base*math.pow(factor, i)
+        ret += addon
+    return ret
+
+def test_level_calc():
+    data = (
+        (1, 2, 100, 100),
+        (2, 2, 100, 300),
+        (3, 2, 100, 700),
+        (1, 2.5, 100, 100),
+        (2, 2.5, 100, 350),
+        (3, 2.5, 100, 975),
+    )
+    for level, factor, base, exp in data:
+        lc = level_calc(level, factor, base)
+        # print(lc)
+        assert lc == exp
 
