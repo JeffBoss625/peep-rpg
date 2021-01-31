@@ -281,7 +281,6 @@ def create_peep(
     factor = pc.level_factor * GAME_SETTINGS.LEVELUPFACTOR
     level = level_calc(exp, factor)
     regen = pt.regen * GAME_SETTINGS.REGEN_RATE
-    healthgain = roll_dice(pc.hitdice)
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
