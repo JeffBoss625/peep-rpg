@@ -3,8 +3,9 @@ from typing import Tuple
 
 from lib.body import Body
 from lib.constants import COLOR
-from lib.items.item import Item
+from lib.constants import GAME_SETTINGS
 from lib.model import DataModel, register_yaml
+import math
 
 @dataclass
 class Attack(DataModel):
@@ -62,6 +63,13 @@ class Peep(DataModel):
 
     def equip(self, holder, item):
         pass
+
+    # return the experience point value for killing this monster
+    def exp_value(self):
+        b = GAME_SETTINGS.BASE_KILL_EXP
+        # very basic - todo: use attacks and other info to calculate experience
+        return b * math.pow(self.maxhp, 0.5) * self.regen
+
 
 def printargs(model, msg, **args):
     print(model.__class__.__name__, model.name, msg, args)
