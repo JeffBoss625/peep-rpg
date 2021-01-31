@@ -37,4 +37,5 @@ class Key:
 
 class GAME_SETTINGS:
     REGEN_RATE = 0.01           #Normal % heal per turn
-    baseexptolevel: int = 100   #base xp is 100 to level 2
+    BASEEXPTOLEVEL = 100   #base xp is 100 to level 2
+    LEVELUPFACTOR = 2      #Altered by other factors

@@ -1,4 +1,6 @@
 from lib.attack import calc_deflection, attack_dst
+from lib.constants import GAME_SETTINGS
+from lib.pclass import level_calc
 from lib.peeps import Attack, Peep
 from lib.stat import PlayerStats
 import random
@@ -73,14 +75,14 @@ def test_attack():
     # attack(p2, p1, 'teeth', out, 3)
     # print(p1.hp, p2.hp)
 
-def level_calc(level, factor, base):
+def xptolevel_calc(level, factor, base):
     ret = 0
     for i in range(0, level):
         addon = base*math.pow(factor, i)
         ret += addon
     return ret
 
-def test_level_calc():
+def test_xptolevel_calc():
     data = (
         (1, 2, 100, 100),
         (2, 2, 100, 300),
@@ -90,7 +92,26 @@ def test_level_calc():
         (3, 2.5, 100, 975),
     )
     for level, factor, base, exp in data:
-        lc = level_calc(level, factor, base)
+        lc = xptolevel_calc(level, factor, base)
         # print(lc)
         assert lc == exp
 
+def test_level_calc():
+    data = (
+        (0, 2, 1),
+        (1, 2, 1),
+        (99, 2, 1),
+        (100, 2, 2),
+        (101, 2, 2),
+        (299, 2, 2),
+        (300, 2, 3),
+        (301, 2, 3),
+        (699, 2, 3),
+        (700, 2, 4),
+        (701, 2, 4),
+        (1499, 2, 4),
+    )
+    for xp, factor, exp in data:
+        lc = level_calc(xp, factor)
+        # print(f'level_calc({xp}, {factor}) = {lc} (expected {exp})')
+        assert lc == exp

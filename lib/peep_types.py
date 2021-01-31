@@ -3,9 +3,9 @@ from typing import Tuple, Dict, Any
 
 from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
-from lib.constants import COLOR
-from lib.constants import PCLASS
-from lib.pclass import get_pclass
+from lib.constants import COLOR, GAME_SETTINGS
+from lib.pclass import PCLASSES
+from lib.pclass import get_pclass, level_calc
 import yaml
 
 from lib.stat import roll_dice
@@ -40,8 +40,6 @@ class PType:
     bgcolor: str = COLOR.BLACK
     hp: str = '1d1'         # initial hit points (dice) at level 0
     regen: float = 1.0
-    exp: float = 0
-    level: int = 1
     skill: float = 1.0
 
     # todo: move this to level info to allow different rates and limit
@@ -270,10 +268,21 @@ def create_attack(attack_info):
         blowback=attack_info.blowback,
     )
 
-def create_peep(ptype, pclass=PCLASS.FIGHTER, name='', pos=(0, 0), body_stats=None, seed=0):
+def create_peep(
+        ptype,
+        pclass="FIGHTER",
+        name='',
+        pos=(0, 0),
+        body_stats=None,
+        exp=0,
+    ):
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)
     hp = roll_dice(pt.hp)
+    factor = pc.level_factor * GAME_SETTINGS.LEVELUPFACTOR
+    level = level_calc(exp, factor)
+    regen = pt.regen * GAME_SETTINGS.REGEN_RATE
+    # hdfactor = hd*pc.factor
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
@@ -283,6 +292,11 @@ def create_peep(ptype, pclass=PCLASS.FIGHTER, name='', pos=(0, 0), body_stats=No
         bgcolor=pt.bgcolor,
         hp=hp,
         maxhp=hp,
+        regen=regen,
+        exp=exp,
+        level=level,
+        # level_factor=factor,
+        # hitdice=hitdice,
         thaco=pt.thaco,
         speed=pt.speed,
         ac=pt.ac,
