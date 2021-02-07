@@ -23,3 +23,12 @@ def angle(p1, p2):
         angle += 360
     ret = angle
     return ret
+
+def target_list(positions, origin):
+    list = []
+    for i, p in enumerate(positions):
+        dis = distance(origin, p)
+        ang = angle (origin, p)
+        list.append((dis, ang, i))
+    list.sort()
+    return list

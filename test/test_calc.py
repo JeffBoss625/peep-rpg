@@ -65,3 +65,22 @@ def test_angle():
         lc = round(angle(p1, p2), 2)
         # print(f'angle({p1}, {p2}) = {lc} (expected {exp})')
         assert lc == exp
+
+
+def target_list(positions, origin):
+    list = []
+    for i, p in enumerate(positions):
+        dis = distance(origin, p)
+        ang = angle (origin, p)
+        list.append((dis, ang, i))
+    list.sort()
+    return list
+
+def test_target_list():
+    data = (
+        ([(0, 0), (1, 1), (3, 3), (4, 4), (7, 8), (9, 10), (0, 5), (5, 0)], [0, 0], 0),
+    )
+    for positions, origin, exp in data:
+        lc = target_list(positions, origin)
+        print(f'target_list({positions}, {origin}) = {lc} (expected {exp})')
+        # assert lc == exp
