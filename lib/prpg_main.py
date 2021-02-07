@@ -1,11 +1,13 @@
 import lib.move as mlib
 from lib.attack import peep_regenhp
+from lib.calc import target_list
 from lib.constants import Key
 from lib.move import Direction
 import random
 import sys
 import signal
 
+from lib.target import line_points
 
 DIRECTION_KEYS = {
     '.': Direction.CENTER,
@@ -48,12 +50,18 @@ def player_turn(control):
         elif input_key == 'a':
             maze.cursorvis = 1
             maze.cursorpos = (3, 3)
-            dungeon.message('Where do you want to shoot?')
+            dungeon.message('Where do you want to shoot? (* to target)')
             sec_input_key = control.get_key()
-            while sec_input_key not in DIRECTION_KEYS or sec_input_key == '.':
-                dungeon.message('That is not a valid direction to shoot')
-                sec_input_key = control.get_key()
-            maze.create_projectile(player, 'arrow', DIRECTION_KEYS[sec_input_key])
+            target = None
+            while target is None:
+                if sec_input_key in DIRECTION_KEYS and sec_input_key != '.':
+                    target = target_for_direction(sec_input_key)
+                elif sec_input_key == '*':
+                    target = select_target(control)
+                else:
+                    dungeon.message('That is not a valid direction to shoot')
+                    sec_input_key = control.get_key()
+            maze.create_projectile(player, 'arrow', target)
 
             return input_key
         else:
@@ -131,4 +139,41 @@ def execute_turn_seq(control):
 
         maze.ti += 1
 
+    return True
+
+
+def select_target(control, origin):
+    dungeon = control.model
+    maze = dungeon.maze
+    peeps = maze.peeps
+    positions = []
+    for p in maze.peeps:
+        positions.append(peeps[p].pos)
+    targets = target_list(positions, origin)
+    target_positions = list((t[2], positions[t[2]]) for t in targets) # (peep index, peep position) tuples
+    current = next_target(0, positions, maze.walls, origin)     # return -1 if no target
+    input_key = None
+    pathtotarget = None
+    while input_key != 't':
+
+        # draw path to current target
+        # Advance to the next target in the list (wraparound)
+        current = next_target(current, positions, maze.walls, origin)  # return -1 if no target
+        # get player input
+
+def next_target(start, target_positions, walls, origin):
+    num_checks = len(target_positions)
+    current = start
+    ret = None
+    while num_checks > 0:
+        ti, pos = target_positions[current]
+        if pos != origin and is_in_sight(origin, pos, walls):
+            ret = line_points(origin, pos)
+        num_checks -= 1
+        current = (current + 1) % len(target_positions)
+
+    return ret
+
+def is_in_sight(origin, pos, walls):
+    path = line_points(origin, pos)
     return True
