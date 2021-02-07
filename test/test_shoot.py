@@ -5,7 +5,7 @@ from lib.peep_types import create_peep
 from lib.prpg_control import PrpgControl
 from lib.prpg_main import main
 from lib.startup import dummy_root
-import lib.dungeons as models
+import lib.dungeons as dungeons
 from lib.constants import Key
 from lib.win_layout import Dim
 
@@ -27,7 +27,7 @@ def assert_dungeon(model, keys, paint=False):
 
 def test_shoot_wall():
     random.seed = 1
-    model = models.create_dungeon({
+    model = dungeons.create_dungeon({
         'walls': [
             '%%%%',
             '%..%',
@@ -42,7 +42,7 @@ def test_shoot_wall():
 
 def test_shoot_thru_monster():
     random.seed = 1
-    model = models.create_dungeon({
+    model = dungeons.create_dungeon({
         'walls': [
             '%%%%%%',
             '%....%',

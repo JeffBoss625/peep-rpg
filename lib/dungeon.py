@@ -23,6 +23,7 @@ class MazeModel(DataModel):
         self.walls = TextModel('walls', walls)
         self.peeps = ModelList()
         self.peeps.extend(peeps)
+        self.target = ()          # line of points (from source and target) drawn to select targets on the screen
 
         self.player = player
         self.items = items
