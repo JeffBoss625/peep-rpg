@@ -125,9 +125,9 @@ def peep_at_pos(peeps, pos):
 def create_wally(maze, pos):
     char = maze.wall_at(pos)
     if char == '#':
-        wall = create_peep('wall', 'Wally', pos=pos)
+        wall = create_peep('wall', 'FIGHTER', 'Wally', pos=pos)
     elif char == '%':
-        wall = create_peep('permanent wall', '*WALLY*', pos=pos)
+        wall = create_peep('permanent wall', 'FIGHTER', '*WALLY*', pos=pos)
     else:
         raise ValueError(f'no wall located at {pos}')
 
