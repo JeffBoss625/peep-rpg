@@ -30,8 +30,6 @@ class Window:
         self.scr = params.get('scr', None)              # curses root window or instance of lib.DummyWin
         self.model = params.get('model', None)
 
-        self.color_pairs = {}       # color pair codes by (fg, bg) tuple
-        self.color_pair_count = 0   # color pairs are defined with integer references. this is used to define next pair
         self.needs_paint = True
 
 
@@ -45,6 +43,8 @@ class Window:
             parent.children.append(self)
         else:
             self.curses = params.get('curses')
+            self.curses.color_pairs = {}
+            self.curses.color_pair_count = 0
 
         # store consolidated window information in the root object
         if parent:
@@ -198,10 +198,11 @@ class Window:
                 # self.log(f'get_key failed: type:"{str(e)}", trace: {"".join(traceback.format_tb(e.__traceback__))}')
                 pass        # ignore interrupts to getkey() following resize events etc.
 
-    def write_char(self, x, y, char, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
+    def write_str(self, x, y, s, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
+        slen = len(s)
         max_w, max_h = self.getmax_wh()
-        if x >= max_w or y >= max_h:
-            return
+        if x + slen > max_w or y >= max_h:
+            return slen
 
         align_x = params.get('align_x', SIDE.LEFT)
         align_y = params.get('align_y', SIDE.TOP)
@@ -213,19 +214,20 @@ class Window:
         # self.log(f'align_y_offset({align_y}, {self.y_margin}, 1, {max_h})')
         yoff = align_y_offset(align_y, self.y_margin, text_h, max_h)
         # self.log(f'addstr({yoff} + {y}, {xoff} + {x}, {char})')
-        self.scr.addstr(yoff + y, xoff + x, char, cpair)
+        self.scr.addstr(yoff + y, xoff + x, s, cpair)
+        return slen
 
     def color_pair(self, fg, bg):
         curses = self.curses
         key = (fg, bg)
-        if key not in self.color_pairs:
-            self.color_pair_count += 1
+        if key not in curses.color_pairs:
+            curses.color_pair_count += 1
             fgc = getattr(curses, curses_color(fg))
             bgc = getattr(curses, curses_color(bg))
-            curses.init_pair(self.color_pair_count, fgc, bgc)
-            self.color_pairs[key] = curses.color_pair(self.color_pair_count)
+            curses.init_pair(curses.color_pair_count, fgc, bgc)
+            curses.color_pairs[key] = curses.color_pair(curses.color_pair_count)
 
-        return self.color_pairs[key]
+        return curses.color_pairs[key]
 
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):

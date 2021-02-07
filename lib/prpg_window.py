@@ -13,12 +13,15 @@ class MazeWindow(Window):
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
         self.write_lines(self.model.walls.text, **params)
 
+        for it in self.model.items:
+            self.write_str(it.pos[0], it.pos[1], it.char, it.fgcolor, it.bgcolor, **params)
+
         for p in self.model.peeps:
             if p.hp > 0:
-                self.write_char(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
+                self.write_str(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-        for it in self.model.items:
-            self.write_char(it.pos[0], it.pos[1], it.char, it.fgcolor, it.bgcolor, **params)
+        for p in self.model.target[1:]:
+            self.write_str(p[0], p[1], '*', **params)
 
         if self.model.cursorvis:
             # todo: cursor does not print
