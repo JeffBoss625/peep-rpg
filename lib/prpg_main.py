@@ -55,13 +55,14 @@ def player_turn(control):
             target = None
             while target is None:
                 if sec_input_key in DIRECTION_KEYS and sec_input_key != '.':
-                    target = target_for_direction(sec_input_key)
+                    target = target_for_direction(DIRECTION_KEYS[sec_input_key], player.pos, maze)
                 elif sec_input_key == '*':
-                    target = select_target(control)
+                    target = select_target(control, player)
                 else:
                     dungeon.message('That is not a valid direction to shoot')
                     sec_input_key = control.get_key()
-            maze.create_projectile(player, 'arrow', target)
+            target_path = tuple(line_points(player.pos, target))
+            maze.create_projectile(player, 'arrow', target_path)
 
             return input_key
         else:
@@ -151,15 +152,16 @@ def select_target(control, origin):
         positions.append(peeps[p].pos)
     targets = target_list(positions, origin)
     target_positions = list((t[2], positions[t[2]]) for t in targets) # (peep index, peep position) tuples
-    current = next_target(0, positions, maze.walls, origin)     # return -1 if no target
+    current = next_target(0, target_positions, maze.walls, origin)     # return -1 if no target
     input_key = None
-    pathtotarget = None
     while input_key != 't':
 
         # draw path to current target
         # Advance to the next target in the list (wraparound)
-        current = next_target(current, positions, maze.walls, origin)  # return -1 if no target
+        current = next_target(current, target_positions, maze.walls, origin)  # return -1 if no target
         # get player input
+
+    return target_positions[current][1]
 
 def next_target(start, target_positions, walls, origin):
     num_checks = len(target_positions)
@@ -177,3 +179,41 @@ def next_target(start, target_positions, walls, origin):
 def is_in_sight(origin, pos, walls):
     path = line_points(origin, pos)
     return True
+
+def target_for_direction(direction, origin, maze):
+    mx = maze.max_x()
+    my = maze.max_y()
+    x, y = origin
+    if direction == Direction.UP:
+        y = 0
+    elif direction == Direction.UP_RIGHT:
+        dx = mx - x
+        dy = my - y
+        d = dx if dx < dy else dy
+        x = x + d
+        y = y - d
+    elif direction == Direction.RIGHT:
+        x = mx
+    elif direction == Direction.DOWN_RIGHT:
+        dx = mx - x
+        dy = my - y
+        d = dx if dx < dy else dy
+        x = x + d
+        y = y + d
+    elif direction == Direction.DOWN:
+        y = my
+    elif direction == Direction.DOWN_LEFT:
+        dx = mx - x
+        dy = my - y
+        d = dx if dx < dy else dy
+        x = x - d
+        y = y + d
+    elif direction == Direction.LEFT:
+        x = 0
+    elif direction == Direction.UP_LEFT:
+        dx = mx - x
+        dy = my - y
+        d = dx if dx < dy else dy
+        x = x - d
+        y = y - d
+    return x, y

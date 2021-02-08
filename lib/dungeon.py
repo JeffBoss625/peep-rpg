@@ -43,7 +43,7 @@ class MazeModel(DataModel):
         if ret == '#' or ret == '%':
             return ret
 
-    def create_projectile(self, src, ptype, direct):
+    def create_projectile(self, src, ptype, targetpath):
         dx, dy = direction_to_dxdy(direct)
 
         shot = create_peep(ptype, pos=(src.pos[0] + dx, src.pos[1] + dy))
@@ -75,6 +75,12 @@ class MazeModel(DataModel):
 
         self.turn_seq = calc_turn_sequence(move_counts)
         self.ti = 0
+
+    def max_x(self):
+        return len(self.walls.text[0])
+
+    def max_y(self):
+        return len(self.walls.text)
 
 
 # update time for peeps
