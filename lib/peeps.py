@@ -48,6 +48,8 @@ class Peep(DataModel):
     ac: int = 10
     move_tactic: str = 'hunt'
     direct: int = -1
+    pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
+    pos_i = 0
 
     hp: int = 0
     regen_fac: float = 1.0

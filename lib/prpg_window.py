@@ -20,7 +20,7 @@ class MazeWindow(Window):
             if p.hp > 0:
                 self.write_str(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-        for p in self.model.target[1:]:
+        for p in self.model.target_path[1:]:
             self.write_str(p[0], p[1], '*', **params)
 
         if self.model.cursorvis:
@@ -50,12 +50,30 @@ class StatsWindow(Window):
 
     def do_paint(self):
         p = self.model.player
+
+        # x = 0
+        # y = 0
+        # self.write_str(x, y, p.name)
+        # y += 1
+        # self.write_str(x, y, f'level:  {p.level}')
+        # y += 1
+        #
+
+        hp = floor(p.hp)
+        hp_rat = hp/p.maxhp
+        if hp_rat < 0.25:
+            hp_col = COLOR.RED
+        elif hp_rat < 0.8:
+            hp_col = COLOR.YELLOW
+        else:
+            hp_col = COLOR.GREEN
+
         self.write_lines([
             p.name,
             f'level:  {p.level}',
             f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASEEXPTOLEVEL))}',
-            f'hp:     {floor(p.hp)}/{p.maxhp}',
-            # 'speed:  ' + str(p.speed),
+            f'hp:     <:fg:{hp_col}:>{floor(p.hp)}/{p.maxhp}',
+            f'speed:  {p.speed}',
             # 'height: ' + str(p.body.size.h)
         ])
 

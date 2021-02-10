@@ -23,7 +23,7 @@ class MazeModel(DataModel):
         self.walls = TextModel('walls', walls)
         self.peeps = ModelList()
         self.peeps.extend(peeps)
-        self.target = ()          # line of points (from source and target) drawn to select targets on the screen
+        self.target_path = ()          # line of points (from source and target) drawn to select targets on the screen
 
         self.player = player
         self.items = items
@@ -44,10 +44,9 @@ class MazeModel(DataModel):
             return ret
 
     def create_projectile(self, src, ptype, targetpath):
-        dx, dy = direction_to_dxdy(direct)
-
-        shot = create_peep(ptype, pos=(src.pos[0] + dx, src.pos[1] + dy))
-        shot.direct = direct
+        shot = create_peep(ptype, pos=targetpath[0])
+        shot.pos_path = targetpath
+        shot.pos_i = 0
 
         self.new_peeps.append(shot)
         self.log(f'{src.name} shoots {shot.name}')

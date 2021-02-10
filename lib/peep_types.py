@@ -238,7 +238,7 @@ MONSTERS = [
         attacks=(
             AttackInfo(name='hit', damage='1d6', blowback=2.0),
         ),
-        move_tactic='straight',
+        move_tactic='pos_path',
     ),
     PType(
         name='fire breath',
@@ -253,7 +253,7 @@ MONSTERS = [
         attacks=(
             AttackInfo(name='burn', damage='3d6', blowback=10.0),
         ),
-        move_tactic='straight',
+        move_tactic='pos_path',
     ),
 ]
 

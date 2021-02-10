@@ -31,8 +31,8 @@ def player_turn(control):
         player = maze.player
         input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
-            direct = DIRECTION_KEYS[input_key]
-            if mlib.move_peep(dungeon, maze.player, direct):
+            dst = mlib.adjacent_pos(maze.player.pos, DIRECTION_KEYS[input_key])
+            if mlib.move_peep(dungeon, maze.player, dst):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -48,36 +48,50 @@ def player_turn(control):
                 dungeon.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
-            maze.cursorvis = 1
-            maze.cursorpos = (3, 3)
-            dungeon.message('Where do you want to shoot? (* to target)')
-            sec_input_key = control.get_key()
-            target = None
-            while target is None:
-                if sec_input_key in DIRECTION_KEYS and sec_input_key != '.':
-                    target = target_for_direction(DIRECTION_KEYS[sec_input_key], player.pos, maze)
-                elif sec_input_key == '*':
-                    target = select_target(control, player)
-                else:
-                    dungeon.message('That is not a valid direction to shoot')
-                    sec_input_key = control.get_key()
-            target_path = tuple(line_points(player.pos, target))
-            maze.create_projectile(player, 'arrow', target_path)
-
+            player_aim(control)
             return input_key
         else:
             dungeon.message(f'unknown command: "{input_key}"')
             # continue
 
+def player_aim(control):
+    dungeon = control.model
+    maze = dungeon.maze
+    player = maze.player
+    maze.cursorvis = 1
+    maze.cursorpos = (3, 3)
+    dungeon.message('Where do you want to shoot? (* to target)')
+    sec_input_key = control.get_key()
+    target = 'UNSET'
+    while target == 'UNSET':
+        if sec_input_key in DIRECTION_KEYS and sec_input_key != '.':
+            target = target_for_direction(player.pos, DIRECTION_KEYS[sec_input_key], maze)
+        elif sec_input_key == '*':
+            target = choose_target(control, player)
+        else:
+            dungeon.message('That is not a valid direction to shoot')
+            sec_input_key = control.get_key()
+            continue
+
+    if target is not None:
+        target_pos = getattr(target, 'pos', target)     # target may be a peep or a position
+        path = list(line_points(player.pos, target_pos))[1:]
+        maze.create_projectile(player, 'arrow', path)
+
+
 def monster_turn(control, monster):
-    model = control.model
-    maze = model.maze
+    dungeon = control.model
+    maze = dungeon.maze
     player = maze.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
-    if monster.move_tactic == 'straight':
-        direct = monster.direct
-        mlib.move_peep(model, monster, direct)
+    if monster.move_tactic == 'pos_path':
+        if monster.pos_i < len(monster.pos_path) - 1:
+            monster.pos_i += 1
+            dst_pos = monster.pos_path[monster.pos_i]
+            mlib.move_peep(dungeon, monster, dst_pos)
+        else:
+            dungeon.message(f'{monster.name} hits the ground')
     elif monster.move_tactic == 'hunt':
         dx = player.pos[0] - monster.pos[0]
         dy = player.pos[1] - monster.pos[1]
@@ -90,7 +104,8 @@ def monster_turn(control, monster):
         else:
             direct = mlib.direction_from_vector(dx, dy)
 
-        if mlib.move_peep(model, monster, direct):
+        dst_pos = mlib.adjacent_pos(monster.pos, direct)
+        if mlib.move_peep(dungeon, monster, dst_pos):
             return True
 
         # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
@@ -98,11 +113,13 @@ def monster_turn(control, monster):
         while rotation <= 4:
             d2 = mlib.direction_relative(direct, rotation)
             # model.print(monster.name, 'trying direction', d2)
-            if mlib.move_peep(model, monster, d2):
+            dst_pos = mlib.adjacent_pos(monster.pos, d2)
+            if mlib.move_peep(dungeon, monster, dst_pos):
                 return True
             d2 = mlib.direction_relative(direct, -rotation)
             # model.print(monster.name, 'trying direction', d2)
-            if mlib.move_peep(model, monster, d2):
+            dst_pos = mlib.adjacent_pos(monster.pos, d2)
+            if mlib.move_peep(dungeon, monster, dst_pos):
                 return True
             rotation += 1
 
@@ -143,44 +160,49 @@ def execute_turn_seq(control):
     return True
 
 
-def select_target(control, origin):
+# Interactively select a target to shoot
+# Return a selected peep or position (int, int) for the target.
+def choose_target(control, src_peep):
     dungeon = control.model
     maze = dungeon.maze
-    peeps = maze.peeps
-    positions = []
-    for p in maze.peeps:
-        positions.append(peeps[p].pos)
-    targets = target_list(positions, origin)
-    target_positions = list((t[2], positions[t[2]]) for t in targets) # (peep index, peep position) tuples
-    current = next_target(0, target_positions, maze.walls, origin)     # return -1 if no target
-    input_key = None
-    while input_key != 't':
+    targets = target_list(src_peep, maze.peeps)  # peeps sorted in order of distance and relative angle from origin
+    ti = next_target(src_peep, targets, maze.walls, 0)  # return None if no target
+    if ti == -1:
+        return None     # todo: start cursor on self to allow manual selection
+    while True:
+        maze.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))    # draws the target path
+        input_key = control.get_key()
+        if input_key == 't':
+            maze.target_path = ()
+            return targets[ti]
+        elif input_key == 'q':
+            maze.target_path = ()
+            return None
+        elif input_key == '*':
+            ti = next_target(src_peep, targets, maze.walls, ti + 1)
+        else:
+            dungeon.message(f'Use "*" to choose next, "t" to target.')
 
-        # draw path to current target
-        # Advance to the next target in the list (wraparound)
-        current = next_target(current, target_positions, maze.walls, origin)  # return -1 if no target
-        # get player input
 
-    return target_positions[current][1]
-
-def next_target(start, target_positions, walls, origin):
-    num_checks = len(target_positions)
-    current = start
-    ret = None
+# return the index of the next target in the list (by distance from origin)
+def next_target(origin, targets, walls, starti):
+    num_checks = len(targets)
+    current = starti % len(targets)
     while num_checks > 0:
-        ti, pos = target_positions[current]
-        if pos != origin and is_in_sight(origin, pos, walls):
-            ret = line_points(origin, pos)
+        t = targets[current]
+        if is_in_sight(origin, t.pos, walls):
+            return current
         num_checks -= 1
-        current = (current + 1) % len(target_positions)
+        current = (current + 1) % len(targets)
 
-    return ret
+    return -1
 
 def is_in_sight(origin, pos, walls):
-    path = line_points(origin, pos)
+    # path = line_points(origin, pos)
+    # check points in line for wall
     return True
 
-def target_for_direction(direction, origin, maze):
+def target_for_direction(origin, direction, maze):
     mx = maze.max_x()
     my = maze.max_y()
     x, y = origin

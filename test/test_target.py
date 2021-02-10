@@ -31,16 +31,39 @@ def test_line_points():
 
 def test_draw_target():
     data = (
-        # (0,-6),
-        # (1,-6),
-        (0,-5),
-        (2,-5),
-        (4,-5),
-        (5,-5),
-        (5,-4),
-        (5,-2),
-        (5,-1),
-        (5,0),
+        (0, -4),
+        (1, -4),
+        (2, -4),
+        (3, -4),
+        (4, -4),
+        (4, -3),
+        (4, -2),
+        (4, -1),
+        (4, 0),
+        (4, 1),
+        (4, 2),
+        (4, 3),
+        (4, 4),
+        (3, 4),
+        (2, 4),
+        (1, 4),
+        (0, 4),
+        (-1, 4),
+        (-2, 4),
+        (-3, 4),
+        (-4, 4),
+        (-4, 3),
+        (-4, 2),
+        (-4, 1),
+        (-4, 0),
+        (-4, -1),
+        (-4, -2),
+        (-4, -3),
+        (-4, -4),
+        (-3, -4),
+        (-2, -4),
+        (-1, -4),
+        (0, -4),
     )
     random.seed = 1
     dungeon = dungeons.create_dungeon({
@@ -63,7 +86,7 @@ def test_draw_target():
             create_peep('human', name='Super Dad', pos=(6,6)),
         ]
     })
-    root_layout = dummy_root(dim=Dim(100, 24), logger=Logger('dbg.py'))
+    root_layout = dummy_root(dim=Dim(100, 22), logger=Logger('dbg.py'))
     control = PrpgControl(root_layout, dungeon)
     player = dungeon.maze.peeps[0]
     for target in data:

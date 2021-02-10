@@ -24,11 +24,13 @@ def angle(p1, p2):
     ret = angle
     return ret
 
-def target_list(positions, origin):
-    list = []
-    for i, p in enumerate(positions):
-        dis = distance(origin, p)
-        ang = angle (origin, p)
-        list.append((dis, ang, i))
-    list.sort()
-    return list
+# src_peep is the peep from which target distances are calculated. targets is a list of objects with .pos attributes.
+def target_list(src_peep, targets):
+    tuples = []
+    for t in targets:
+        if t.pos != src_peep.pos and t.hp > 0:
+            dis = distance(src_peep.pos, t.pos)
+            ang = angle (src_peep.pos, t.pos)
+            tuples.append((dis, ang, t))
+    tuples.sort()
+    return list(t[2] for t in tuples)

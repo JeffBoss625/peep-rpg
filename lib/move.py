@@ -79,40 +79,39 @@ def direction_relative(direct, rotation):
     i = (si + rotation) % len(DIRECT_ROTATION)
     return DIRECT_ROTATION[i]
 
+def adjacent_pos(src_pos, direct):
+    dx, dy = direction_to_dxdy(direct)
+    return src_pos[0] + dx, src_pos[1] + dy
+
 # Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
 # failed (hit a wall)
-def move_peep(dungeon, p, direct):
-    dx, dy = direction_to_dxdy(direct)
-    if dx == 0 and dy == 0:
-        return True
-
-    dst_pos = (p.pos[0] + dx, p.pos[1] + dy)
+def move_peep(dungeon, peep, dst_pos):
     dst = peep_at_pos(dungeon.maze.peeps, dst_pos)
     if not dst:
         # players and ammo strike wall
         char = dungeon.maze.wall_at(dst_pos)
         if char:
-            if p.type == 'projectile':
+            if peep.type == 'projectile':
                 wall = create_wally(dungeon.maze, dst_pos)
                 dst = wall
             else:
                 return False # peep did not move
 
     if dst:
-        src_attack = choose_melee_attack(p)
+        src_attack = choose_melee_attack(peep)
         if src_attack:
-            if attack_dst(p, dst, src_attack, dungeon):
+            if attack_dst(peep, dst, src_attack, dungeon):
                 # hit!
                 return True
             else:
                 # missed
-                if p.type is not 'projectile':
+                if peep.type is not 'projectile':
                     # used up move with miss
                     return True
                 # else continue to move (below)
 
     # move
-    p.pos = (p.pos[0] + dx, p.pos[1] + dy)
+    peep.pos = dst_pos
     return True
 
 
