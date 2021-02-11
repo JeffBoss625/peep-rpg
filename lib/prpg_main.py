@@ -68,6 +68,8 @@ def player_aim(control):
             target = target_for_direction(player.pos, DIRECTION_KEYS[sec_input_key], maze)
         elif sec_input_key == '*':
             target = choose_target(control, player)
+        elif sec_input_key == 'q':
+            target = None
         else:
             dungeon.message('That is not a valid direction to shoot')
             sec_input_key = control.get_key()
@@ -165,23 +167,27 @@ def execute_turn_seq(control):
 def choose_target(control, src_peep):
     dungeon = control.model
     maze = dungeon.maze
+    top = f'*: choose next, t: target, q: quit'
     targets = target_list(src_peep, maze.peeps)  # peeps sorted in order of distance and relative angle from origin
     ti = next_target(src_peep, targets, maze.walls, 0)  # return None if no target
     if ti == -1:
         return None     # todo: start cursor on self to allow manual selection
     while True:
         maze.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))    # draws the target path
+        dungeon.banner([top, f'Aiming at {targets[ti].name}'])
         input_key = control.get_key()
         if input_key == 't':
             maze.target_path = ()
+            dungeon.banner('')
             return targets[ti]
-        elif input_key == 'q':
+        elif input_key == 'q' or input_key == Key.CTRL_Q:
             maze.target_path = ()
+            dungeon.banner('')
             return None
         elif input_key == '*':
             ti = next_target(src_peep, targets, maze.walls, ti + 1)
         else:
-            dungeon.message(f'Use "*" to choose next, "t" to target.')
+            dungeon.message(f'unknown command "{input_key}"')
 
 
 # return the index of the next target in the list (by distance from origin)

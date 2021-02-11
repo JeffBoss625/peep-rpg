@@ -184,6 +184,12 @@ class TextModel(PubSub):
         s = ' '.join(str(a) for a in args)
         self.extend([s])
 
+    def replace(self, lines):
+        if isinstance(lines, str):
+            lines = [lines]
+        self.text = []
+        self.extend(lines)
+
     def extend(self, lines):
         slines = []
         for s in lines: slines.extend(s.split('\n'))

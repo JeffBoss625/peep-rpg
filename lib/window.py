@@ -1,6 +1,5 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 from dataclasses import dataclass, field
-import traceback
 
 from lib.constants import COLOR, SIDE, curses_color
 from lib.util import min0
@@ -32,7 +31,6 @@ class Window:
 
         self.needs_paint = True
 
-
         if self.model:
             def update_fn(_model, _msg, **_kwds):
                 self.needs_paint = True
@@ -63,7 +61,6 @@ class Window:
             raise ValueError(f'multiple components with the same name: "{self.name}"')
 
         root.info.win_by_name[self.name] = self
-
 
     def __repr__(self):
         return f'Window"{self.name}": margin:[{self.x_margin} {self.y_margin}] scr:{self.scr}'
@@ -198,22 +195,34 @@ class Window:
                 # self.log(f'get_key failed: type:"{str(e)}", trace: {"".join(traceback.format_tb(e.__traceback__))}')
                 pass        # ignore interrupts to getkey() following resize events etc.
 
-    def write_str(self, x, y, s, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
-        slen = len(s)
+    def xy_offset(self, x, y, slen, **params):
         max_w, max_h = self.getmax_wh()
         if x + slen > max_w or y >= max_h:
-            return slen
+            return -1
 
         align_x = params.get('align_x', SIDE.LEFT)
         align_y = params.get('align_y', SIDE.TOP)
         text_w = min(params.get('text_w', 1), max_w)
         text_h = min(params.get('text_h', 1), max_h)
-
-        cpair = self.color_pair(fg, bg)
         xoff = align_x_offset(align_x, self.x_margin, text_w, max_w)
         # self.log(f'align_y_offset({align_y}, {self.y_margin}, 1, {max_h})')
         yoff = align_y_offset(align_y, self.y_margin, text_h, max_h)
         # self.log(f'addstr({yoff} + {y}, {xoff} + {x}, {char})')
+        return xoff, yoff
+
+    def change_attr(self, x, y, n, attr, **params):
+        xoff, yoff = self.xy_offset(x, y, n, **params)
+        if xoff == -1:
+            return
+        self.scr.chgat(yoff + y, xoff + x, n, attr)
+
+    def write_str(self, x, y, s, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
+        slen = len(s)
+        xoff, yoff = self.xy_offset(x, y, slen, **params)
+        if xoff == -1:
+            return slen
+
+        cpair = self.color_pair(fg, bg)
         self.scr.addstr(yoff + y, xoff + x, s, cpair)
         return slen
 

@@ -97,6 +97,9 @@ class DummyCursesWindow:
     def getmaxyx(self):
         return self.dim.h, self.dim.w
 
+    def chgat(self, y, x, n, attr):
+        pass
+
     def addstr(self, y, x, s, _color_pair=None):
         xoff, yoff = self.xyoff()
         y += yoff
@@ -142,6 +145,9 @@ class DummyCurses:
         pass
 
     def curs_set(self, _n):
+        pass
+
+    def chgat(self, *args):
         pass
 
     def init_pair(self, _n, _fgc, _bgc):

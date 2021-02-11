@@ -11,7 +11,6 @@ import sys
 from dataclasses import dataclass
 
 from lib.model import ModelList, DataModel, TextModel
-from lib.move import direction_to_dxdy
 from lib.pclass import level_calc
 from lib.peep_types import create_peep
 from lib.stat import roll_dice
@@ -201,8 +200,8 @@ class Dungeon(DataModel):
     def log(self, *args):
         self.log_model.print(*args)
 
-    def banner(self, *args):
-        self.banner_model.print(*args)
+    def banner(self, lines):
+        self.banner_model.replace(lines)
 
     def is_player(self, peep):
         return peep == self.maze.player

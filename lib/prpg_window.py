@@ -2,6 +2,7 @@ from lib.constants import GAME_SETTINGS
 from lib.window import *
 from lib.pclass import xptolevel_calc
 from math import floor
+import curses
 
 class MazeWindow(Window):
     def __init__(self, name, parent, **params):
@@ -20,8 +21,12 @@ class MazeWindow(Window):
             if p.hp > 0:
                 self.write_str(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
 
-        for p in self.model.target_path[1:]:
-            self.write_str(p[0], p[1], '*', **params)
+        path = self.model.target_path
+        if len(path):
+            for p in path[1:-1]:
+                self.write_str(p[0], p[1], '*', COLOR.GREEN, COLOR.BLACK, **params)
+            last = path[-1]
+            self.change_attr(last[0], last[1], 1, curses.A_REVERSE, **params)
 
         if self.model.cursorvis:
             # todo: cursor does not print

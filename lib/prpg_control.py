@@ -71,7 +71,6 @@ class PrpgControl:
         while self.get_key() not in ('q', Key.CTRL_Q):
             pass
 
-
     def resize_handler(self, _signum, _frame):
         try:
             if self.root_layout.handle_resizing():
