@@ -36,6 +36,6 @@ class Key:
 
 class GAME_SETTINGS:
     REGEN_RATE =        0.01   # Normal % heal per turn
-    BASEEXPTOLEVEL =    2.00   # base xp is 100 to level 2
-    LEVELUPFACTOR =     2.00   # Altered by other factors
+    BASE_EXP_TO_LEVEL = 100.00   # base xp is 100 to level 2
+    LEVEL_UP_FACTOR =     2.00   # Altered by other factors
     BASE_KILL_EXP =     1.00   # basic experience for killing a monster (before modifications)

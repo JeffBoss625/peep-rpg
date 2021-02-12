@@ -278,8 +278,8 @@ def create_peep(
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)
     hp = roll_dice(pt.hitdice)
-    factor = pc.level_factor * GAME_SETTINGS.LEVELUPFACTOR
-    level = level_calc(exp, factor)
+    factor = pc.level_factor * GAME_SETTINGS.LEVEL_UP_FACTOR
+    level = level_calc(exp, factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
     regen_fac = pt.regen_fac
 
     ret = Peep(

@@ -1,8 +1,6 @@
 from lib.constants import Key
 from lib.prpg_window import *
-from lib.stat import roll_dice
 from lib.win_layout import Con, Orient
-from lib.pclass import level_calc
 
 
 class WIN:

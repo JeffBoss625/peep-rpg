@@ -76,7 +76,7 @@ class StatsWindow(Window):
         self.write_lines([
             p.name,
             f'level:  {p.level}',
-            f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASEEXPTOLEVEL))}',
+            f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL))}',
             f'hp:     <:fg:{hp_col}:>{floor(p.hp)}/{p.maxhp}',
             f'speed:  {p.speed}',
             # 'height: ' + str(p.body.size.h)

@@ -32,11 +32,11 @@ def xptolevel_calc(level, factor, base):
         ret += addon
     return ret
 
-def level_calc(xp, factor):
+def level_calc(xp, factor, base):
     ret = 1
-    to_level = GAME_SETTINGS.BASEEXPTOLEVEL - 1
+    to_level = base - 1
     while to_level < xp:
-        to_level = xptolevel_calc(ret + 1, factor, GAME_SETTINGS.BASEEXPTOLEVEL) - 1
+        to_level = xptolevel_calc(ret + 1, factor, base) - 1
         ret += 1
     return ret
 
