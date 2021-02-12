@@ -112,5 +112,5 @@ def test_level_calc():
     )
     for xp, factor, exp in data:
         lc = level_calc(xp, factor, 100)
-        print(f'level_calc({xp}, {factor}) = {lc} (expected {exp})')
+        print(f'level_calc({xp}, {factor}) = {lc}/{exp})')
         # assert lc == exp
