@@ -55,3 +55,17 @@ def test_shoot_thru_monster():
     })
     assert_dungeon(model, ['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
 
+def test_shoot_monster():
+    random.seed = 1
+    model = dungeons.create_dungeon({
+        'walls': [
+            '%%%%%%',
+            '%....%',
+            '%%%%%%',
+        ],
+        'peeps': [
+            create_peep('human', name='Super Dad', pos=(1,1)),
+            create_peep('goblin', name='Gark', pos=(4,1))
+        ]
+    })
+    assert_dungeon(model, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
