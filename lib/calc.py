@@ -28,7 +28,7 @@ def angle(p1, p2):
 def target_list(src_peep, targets):
     tuples = []
     for t in targets:
-        if t.pos != src_peep.pos and t.hp > 0:
+        if t.pos != src_peep.pos and t.hp > 0 and t.type != 'wall':    #is targetable
             dis = distance(src_peep.pos, t.pos)
             ang = angle (src_peep.pos, t.pos)
             tuples.append((dis, ang, t))

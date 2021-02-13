@@ -172,6 +172,7 @@ def choose_target(control, src_peep):
     targets = target_list(src_peep, maze.peeps)  # peeps sorted in order of distance and relative angle from origin
     ti = next_target(src_peep, targets, maze.walls, 0)  # return None if no target
     if ti == -1:
+        dungeon.message('No targets in sight')
         return None     # todo: start cursor on self to allow manual selection
     while True:
         maze.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))    # draws the target path
@@ -205,8 +206,11 @@ def next_target(origin, targets, walls, starti):
     return -1
 
 def is_in_sight(origin, pos, walls):
-    # path = line_points(origin, pos)
-    # check points in line for wall
+    path = tuple(line_points(origin.pos, pos))
+    for p in path:
+        row = walls.text[p[1]]
+        if row[p[0]] in ['#', '%']:
+            return False
     return True
 
 def target_for_direction(origin, direction, maze):
