@@ -1,9 +1,27 @@
-# Color constants correspond to curses lib basic colors of the same name pattern (name is used for lookup in curses)
-#
-#    curses.COLOR_BLACK
-#    curses.COLOR_BLUE
-#    etc...
-#
+# Text attribute flags from _curses.py
+# Copied here to prevent application from direct curses linkage (debug/dummy mode etc)
+class TEXTA:
+    # ALTCHARSET = 4194304
+    # ATTRIBUTES = 4294967040
+    # BLINK = 524288
+    BOLD = 2097152
+    # CHARTEXT = 255
+    # COLOR = 65280
+    DIM = 1048576
+    # HORIZONTAL = 33554432
+    INVIS = 8388608
+    # LEFT = 67108864
+    # LOW = 134217728
+    # NORMAL = 0
+    # PROTECT = 16777216
+    REVERSE = 262144
+    # RIGHT = 268435456
+    # STANDOUT = 65536
+    # TOP = 536870912
+    UNDERLINE = 131072
+    # VERTICAL = 1073741824
+
+# Color constants matching available curses colors (facilitates configuration settings with simple case)
 class COLOR:
     BLACK = 'black'
     BLUE = 'blue'
@@ -13,10 +31,6 @@ class COLOR:
     RED = 'red'
     WHITE = 'white'
     YELLOW = 'yellow'
-
-
-def curses_color(color):
-    return 'COLOR_' + color.upper()
 
 class SIDE:
     TOP = 'TOP'

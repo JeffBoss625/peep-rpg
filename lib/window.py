@@ -1,12 +1,23 @@
 # wrappers around curses windows that narrow the interface with curses and add convenience functions for the game.
 from dataclasses import dataclass, field
 
-from lib.constants import COLOR, SIDE, curses_color
+from lib.constants import COLOR, SIDE
 from lib.util import min0
 
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
+}
+
+COLOR_CODES = {
+    COLOR.BLACK: 0,
+    COLOR.RED: 1,
+    COLOR.GREEN: 2,
+    COLOR.YELLOW: 3,
+    COLOR.BLUE: 4,
+    COLOR.MAGENTA: 5,
+    COLOR.CYAN: 6,
+    COLOR.WHITE: 7,
 }
 
 @dataclass
@@ -41,7 +52,7 @@ class Window:
             parent.children.append(self)
         else:
             self.curses = params.get('curses')
-            self.curses.color_pairs = {}
+            self.curses.color_pairs = {}            # store curses color_pairs by (fg, bg) color keys
             self.curses.color_pair_count = 0
 
         # store consolidated window information in the root object
@@ -216,27 +227,27 @@ class Window:
             return
         self.scr.chgat(yoff + y, xoff + x, n, attr)
 
-    def write_str(self, x, y, s, fg=COLOR.WHITE, bg=COLOR.BLACK, **params):
+    def write_str(self, x, y, s, **params):
         slen = len(s)
         xoff, yoff = self.xy_offset(x, y, slen, **params)
         if xoff == -1:
             return slen
 
-        cpair = self.color_pair(fg, bg)
-        self.scr.addstr(yoff + y, xoff + x, s, cpair)
+        self.scr.addstr(yoff + y, xoff + x, s, self.params2attrib(params))
         return slen
 
-    def color_pair(self, fg, bg):
+    # merge fg, bg, and attrib flag into a single or'd flag for use with curses using curses.init_pair() etc.
+    def params2attrib(self, params):
+        fg = COLOR_CODES[params.get('fg', COLOR.WHITE)]
+        bg = COLOR_CODES[params.get('bg', COLOR.BLACK)]
         curses = self.curses
         key = (fg, bg)
         if key not in curses.color_pairs:
             curses.color_pair_count += 1
-            fgc = getattr(curses, curses_color(fg))
-            bgc = getattr(curses, curses_color(bg))
-            curses.init_pair(curses.color_pair_count, fgc, bgc)
+            curses.init_pair(curses.color_pair_count, fg, bg)
             curses.color_pairs[key] = curses.color_pair(curses.color_pair_count)
 
-        return curses.color_pairs[key]
+        return params.get('attrib', 0) | curses.color_pairs[key]
 
 # align_x_offset only called when linelen < max_w
 def align_x_offset(align_x, margin_x, linelen, max_w):

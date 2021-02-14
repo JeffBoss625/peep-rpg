@@ -1,8 +1,7 @@
-from lib.constants import GAME_SETTINGS
+from lib.constants import GAME_SETTINGS, TEXTA
 from lib.window import *
 from lib.pclass import xptolevel_calc
 from math import floor
-import curses
 
 class MazeWindow(Window):
     def __init__(self, name, parent, **params):
@@ -15,18 +14,18 @@ class MazeWindow(Window):
         self.write_lines(self.model.walls.text, **params)
 
         for it in self.model.items:
-            self.write_str(it.pos[0], it.pos[1], it.char, it.fgcolor, it.bgcolor, **params)
+            self.write_str(it.pos[0], it.pos[1], it.char, **{**params, **{'fg': it.fgcolor, 'bg': it.bgcolor}})
 
         for p in self.model.peeps:
             if p.hp > 0:
-                self.write_str(p.pos[0], p.pos[1], p.char, p.fgcolor, p.bgcolor, **params)
+                self.write_str(p.pos[0], p.pos[1], p.char, **{**params, **{'fg': p.fgcolor, 'bg': p.bgcolor}})
 
         path = self.model.target_path
         if len(path):
             for p in path[1:-1]:
-                self.write_str(p[0], p[1], '*', COLOR.GREEN, COLOR.BLACK, **params)
+                self.write_str(p[0], p[1], '*', **{**params, **{'fg': COLOR.GREEN, 'bg': COLOR.BLACK}})
             last = path[-1]
-            self.change_attr(last[0], last[1], 1, curses.A_REVERSE, **params)
+            self.change_attr(last[0], last[1], 1, TEXTA.REVERSE, **params)
 
         if self.model.cursorvis:
             # todo: cursor does not print
@@ -73,11 +72,13 @@ class StatsWindow(Window):
         else:
             hp_col = COLOR.GREEN
 
+        hp_str = f'{hp}/{p.maxhp}'
+
         self.write_lines([
             p.name,
             f'level:  {p.level}',
             f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL))}',
-            f'hp:     <:fg:{hp_col}:>{floor(p.hp)}/{p.maxhp}',
+            f'hp:     {hp_str}',
             f'speed:  {p.speed}',
             # 'height: ' + str(p.body.size.h)
         ])
