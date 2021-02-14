@@ -11,6 +11,9 @@ def parse_dice(dstring):
 
 def choose_melee_attack(src):
     numattacks = len(src.attacks)
+    for a in src.attacks:
+        if a.range > 0:
+            numattacks -= 1
     if numattacks == 0:
         return None
     elif numattacks == 1:
@@ -39,7 +42,7 @@ def attack_dst(src, dst, src_attack, dungeon):
         if dst.hp <= 0:
             dungeon.monster_killed(src, src_attack, dst)
         else:
-            dungeon.message(f'  {dst.name} has {dst.hp} points remaining')
+            dungeon.message(f'  {dst.name} has {round(dst.hp)} points remaining')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
