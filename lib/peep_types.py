@@ -130,7 +130,7 @@ MONSTERS = [
             AttackInfo('bite', '1d10'),
             AttackInfo('scratch', '2d7'),
             AttackInfo('tail', '3d5'),
-            AttackInfo('fire_breath', '2d10', range=15),
+            AttackInfo('fire_breath', '2d10', range=15, blowback=2),
         )
     ),
     # The Black Dragon
@@ -148,7 +148,7 @@ MONSTERS = [
             AttackInfo('bite', '1d30'),
             AttackInfo('scratch', '2d21'),
             AttackInfo('tail', '3d15'),
-            AttackInfo('acid_breath', '2d30', range=15),
+            AttackInfo('acid_breath', '2d30', range=15, blowback=2),
         ),
     ),
     PType(
@@ -189,7 +189,7 @@ MONSTERS = [
         attacks=(
             AttackInfo('karate-chop', '5d8'),
             AttackInfo('head-butt', '4d4'),
-            AttackInfo('arrow', '1d6', range=100)
+            AttackInfo('arrow', '1d6', range=100, blowback=2) #Blowback is for projectile
         ),
         body_stats={
             'btype': 'humanoid',
@@ -256,6 +256,22 @@ MONSTERS = [
         ),
         move_tactic='pos_path',
     ),
+    PType(
+        name='acid_breath',
+        char='*',
+        type='projectile',
+        fgcolor=COLOR.GREEN,
+        bgcolor=COLOR.BLACK,
+        hitdice='2d8',
+        thaco=20,
+        speed=200,
+        ac=-10,
+        attacks=(
+
+        ),
+        move_tactic='pos_path',
+    ),
+
 ]
 
 PTYPES_BY_NAME = {m.name:m for m in MONSTERS}

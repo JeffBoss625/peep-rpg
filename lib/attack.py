@@ -12,6 +12,9 @@ def parse_dice(dstring):
 
 def choose_melee_attack(src):
     numattacks = len(src.attacks)
+    for a in src.attacks:
+        if a.range > 0:
+            numattacks -= 1
     if numattacks == 0:
         return None
     elif numattacks == 1:
