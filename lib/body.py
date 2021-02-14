@@ -83,7 +83,7 @@ def update_human_proportions(body, body2head):
 
         # armspan components (in proportion to height)
         # 'biacromial': 0.240,  # width between shoulder-blades
-        'arm':   0.265,         # wrist-to-shoulder
+        'arm':   0.265,         # shoulder-to-wrist
         'hand':  0.115,         # wrist-to-fingertips
         # above adds up to 1 (same as height)
 
