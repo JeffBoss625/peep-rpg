@@ -9,7 +9,7 @@
 # that will be costly to change, but easier to work with and understand.
 import sys
 from dataclasses import dataclass
-
+from lib.peep_types import MONSTERS
 from lib.constants import GAME_SETTINGS
 from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
@@ -42,8 +42,8 @@ class MazeModel(DataModel):
         if ret == '#' or ret == '%':
             return ret
 
-    def create_projectile(self, src, ptype, targetpath):
-        shot = create_peep(ptype, pos=targetpath[0])
+    def create_projectile(self, src, ptype, targetpath, attacks):
+        shot = create_peep(ptype, pos=targetpath[0], attacks=attacks)
         shot.pos_path = targetpath
         shot.pos_i = 0
 

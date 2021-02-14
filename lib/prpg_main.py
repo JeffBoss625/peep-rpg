@@ -6,6 +6,7 @@ from lib.move import Direction
 import random
 import sys
 import signal
+from lib.calc import distance
 
 from lib.target import line_points
 
@@ -78,7 +79,7 @@ def player_aim(control):
     if target is not None:
         target_pos = getattr(target, 'pos', target)     # target may be a peep or a position
         path = list(line_points(player.pos, target_pos))[1:]
-        maze.create_projectile(player, 'arrow', path)
+        maze.create_projectile(player, 'arrow', path, (player.attacks[2],))
 
 
 def monster_turn(control, monster):
@@ -86,6 +87,13 @@ def monster_turn(control, monster):
     maze = dungeon.maze
     player = maze.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
+    for a in monster.attacks:
+        if monster.type != 'projectile':
+            if a.range > 0:
+                if a.range > distance(monster.pos, player.pos) and is_in_sight(monster, player.pos, maze.walls):
+                    path = list(line_points(monster.pos, player.pos))
+                    maze.create_projectile(player, a.name, path, (a,))
+                    return True
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
