@@ -9,6 +9,20 @@ def parse_dice(dstring):
         'num_sides': int(parts[1])
     }
 
+def choose_ranged_attack(src):
+    ranged_attacks = []
+    for a in src.attacks:
+        if a.range > 0:
+            ranged_attacks.append(a)
+    numattacks = len(ranged_attacks)
+    if numattacks == 0:
+        return None
+    if numattacks == 1:
+        return ranged_attacks[0]
+    else:
+        i = random.randint(1, numattacks-1)
+        return ranged_attacks[i]
+
 def choose_melee_attack(src):
     numattacks = len(src.attacks)
     for a in src.attacks:

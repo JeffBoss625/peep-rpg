@@ -1,5 +1,5 @@
 import lib.move as mlib
-from lib.attack import peep_regenhp
+from lib.attack import peep_regenhp, choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
 from lib.move import Direction
@@ -79,7 +79,7 @@ def player_aim(control):
     if target is not None:
         target_pos = getattr(target, 'pos', target)     # target may be a peep or a position
         path = list(line_points(player.pos, target_pos))[0:]
-        maze.create_projectile(player, 'arrow', path, (player.attacks[2].projectile_attack(),))
+        maze.create_projectile(player, 'arrow', path, (choose_ranged_attack(player).projectile_attack(),))
 
 
 def monster_turn(control, monster):
