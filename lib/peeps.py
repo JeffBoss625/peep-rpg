@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Tuple
 
 from lib.body import Body
@@ -18,6 +18,9 @@ class Attack(DataModel):
 
     def __post_init__(self):
         super().__init__()
+
+    def projectile_attack(self):
+        return replace(self, range=0)
 
 @dataclass
 class LevelData():
