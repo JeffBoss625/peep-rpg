@@ -198,7 +198,7 @@ class Window:
     def xy_offset(self, x, y, slen, **params):
         max_w, max_h = self.getmax_wh()
         if x + slen > max_w or y >= max_h:
-            return -1
+            return -1, -1
 
         align_x = params.get('align_x', SIDE.LEFT)
         align_y = params.get('align_y', SIDE.TOP)
