@@ -52,8 +52,6 @@ def set_pairs(fg, bg):
 
 
 def main_loop(stdscr):
-    ret = 0
-    EXIT = False
     try:
         curses.curs_set(1)  # set curses options and variables
         curses.noecho()
@@ -64,8 +62,8 @@ def main_loop(stdscr):
             with SuspendCurses():
                 print('Terminal window needs to be at least 10h by 65w')
                 print('Current h:{0}  and w:{1}'.format(maxy, maxx))
-            ret = 1
-            EXIT = True
+            return 1
+
         stdscr.refresh()
         h, w = 10, 65
         test_win = curses.newwin(h, w, 0, 0)
@@ -82,14 +80,15 @@ def main_loop(stdscr):
         cursor_bounds = ((0, 0), (0, 1))
         teststr = '! @ # $ % ^ & *     _ + - = '
         k, newk = 1, 2
-        while not EXIT:
+        exit = False
+        while not exit:
             if k > -1:
                 test_win.clear()
                 if k in move_dirs.keys():  # move cursor left or right with wrapping
                     cursor[1] += move_dirs[k][1]
                     if cursor[1] > cursor_bounds[1][1]: cursor[1] = cursor_bounds[1][0]
                     if cursor[1] < cursor_bounds[1][0]: cursor[1] = cursor_bounds[1][1]
-                if k == 45:  # decr currently selected attr
+                if k == ord('-'):  # decr currently selected attr
                     if cursor[1] == 0:
                         fgcol -= 1
                         if fgcol < 0: fgcol = maxc - 1
@@ -106,7 +105,7 @@ def main_loop(stdscr):
                         if bgcol > maxc - 1: bgcol = 0
                     set_pairs(fgcol, bgcol)
                 if k in (ord('q'), 27):
-                    EXIT = True
+                    exit = True
                 test_win.addstr(1, 10, '{0} colors supported'.format(maxc), cp(0))
                 test_win.addstr(2, 2, 'FG: {0}  '.format(fgcol), cp(0))
                 test_win.addstr(2, 32, 'BG: {0}  '.format(bgcol), cp(0))
@@ -123,11 +122,11 @@ def main_loop(stdscr):
     except KeyboardInterrupt:
         pass
     except:
-        ret = 1
         with SuspendCurses():
             print(format_exc())
-    finally:
-        return ret
+        return 1
+
+    return 0
 
 
 if __name__ == '__main__':
