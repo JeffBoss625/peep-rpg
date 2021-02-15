@@ -62,18 +62,18 @@ def player_aim(control):
     maze.cursorvis = 1
     maze.cursorpos = (3, 3)
     dungeon.message('Where do you want to shoot? (* to target)')
-    sec_input_key = control.get_key()
+    key = control.get_key()
     target = 'UNSET'
     while target == 'UNSET':
-        if sec_input_key in DIRECTION_KEYS and sec_input_key != '.':
-            target = target_for_direction(player.pos, DIRECTION_KEYS[sec_input_key], maze)
-        elif sec_input_key == '*':
+        if key in DIRECTION_KEYS and key != '.':
+            target = target_for_direction(player.pos, DIRECTION_KEYS[key], maze)
+        elif key == '*':
             target = choose_target(control, player)
-        elif sec_input_key == 'q':
+        elif key == 'q' or key == Key.CTRL_Q:
             target = None
         else:
-            dungeon.message('That is not a valid direction to shoot')
-            sec_input_key = control.get_key()
+            dungeon.message(f'{key} is not a valid direction to shoot')
+            key = control.get_key()
             continue
 
     if target is not None:
