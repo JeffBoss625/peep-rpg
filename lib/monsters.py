@@ -8,6 +8,7 @@ MONSTERS = [
     create_peep('big bird'),
     create_peep('red dragon', name='Spark'),
     create_peep('black dragon', name='Brog'),
+    create_peep('multi-hued dragon', name='Crystal')
 ]
 
 MONSTERS_BY_NAME = {m.name:m for m in MONSTERS}

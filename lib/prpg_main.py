@@ -88,13 +88,11 @@ def monster_turn(control, monster):
     maze = dungeon.maze
     player = maze.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
-    for a in monster.attacks:
-        if monster.type != 'projectile':
-            if a.range > 0:
-                if a.range > distance(monster.pos, player.pos) and is_in_sight(monster, player.pos, maze.walls):
-                    path = list(line_points(monster.pos, player.pos))
-                    maze.create_projectile(player, a.name, path, (a.projectile_attack(),))
-                    return True
+    ranged_attack = choose_ranged_attack(monster)
+    if monster.type != 'projectile':
+        if ranged_attack:
+            path = list(line_points(monster.pos, player.pos))
+            maze.create_projectile(player, ranged_attack.name, path, ranged_attack.projectile_attack)
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
