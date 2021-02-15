@@ -9,17 +9,6 @@ IGNORED_KEYS = {
     'KEY_RESIZE': 1,
 }
 
-COLOR_CODES = {
-    COLOR.BLACK: 0,
-    COLOR.RED: 1,
-    COLOR.GREEN: 2,
-    COLOR.YELLOW: 3,
-    COLOR.BLUE: 4,
-    COLOR.MAGENTA: 5,
-    COLOR.CYAN: 6,
-    COLOR.WHITE: 7,
-}
-
 @dataclass
 class RootInfo:
     win_count: int = 0
@@ -238,13 +227,15 @@ class Window:
 
     # merge fg, bg, and attrib flag into a single or'd flag for use with curses using curses.init_pair() etc.
     def params2attrib(self, params):
-        fg = COLOR_CODES[params.get('fg', COLOR.WHITE)]
-        bg = COLOR_CODES[params.get('bg', COLOR.BLACK)]
         curses = self.curses
-        key = (fg, bg)
+        fg = params.get('fg', COLOR.WHITE)
+        bg = params.get('bg', COLOR.BLACK)
+        fgc = getattr(curses, f'COLOR_{fg.upper()}')
+        bgc = getattr(curses, f'COLOR_{bg.upper()}')
+        key = (fgc, bgc)
         if key not in curses.color_pairs:
             curses.color_pair_count += 1
-            curses.init_pair(curses.color_pair_count, fg, bg)
+            curses.init_pair(curses.color_pair_count, fgc, bgc)
             curses.color_pairs[key] = curses.color_pair(curses.color_pair_count)
 
         return params.get('attrib', 0) | curses.color_pairs[key]
