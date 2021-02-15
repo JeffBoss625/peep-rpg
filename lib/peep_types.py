@@ -235,7 +235,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='1d2',
         thaco=20,
-        speed=200,
+        speed=500,
         ac=-10,
         attacks=(
         ),
@@ -249,7 +249,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=200,
+        speed=500,
         ac=-10,
         attacks=(
 
@@ -264,7 +264,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=200,
+        speed=500,
         ac=-10,
         attacks=(
 

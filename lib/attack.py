@@ -29,6 +29,8 @@ def calc_hit(ac, thaco):
 # attack dst with src/src_attack.
 # return True if the attack hits, False if missed
 def attack_dst(src, dst, src_attack, dungeon):
+    if src == dst:
+        return False
     dungeon.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:

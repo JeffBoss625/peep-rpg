@@ -92,7 +92,7 @@ def monster_turn(control, monster):
             if a.range > 0:
                 if a.range > distance(monster.pos, player.pos) and is_in_sight(monster, player.pos, maze.walls):
                     path = list(line_points(monster.pos, player.pos))
-                    maze.create_projectile(player, a.name, path, (a,))
+                    maze.create_projectile(player, a.name, path, (a.projectile_attack(),))
                     return True
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
