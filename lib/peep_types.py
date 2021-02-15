@@ -130,7 +130,7 @@ MONSTERS = [
             AttackInfo('bite', '1d10'),
             AttackInfo('scratch', '2d7'),
             AttackInfo('tail', '3d5'),
-            AttackInfo('fire_breath', '2d10', range=15, blowback=2),
+            AttackInfo('fire_breath', '2d10', range=15, blowback=100),
         )
     ),
     # The Black Dragon
@@ -148,7 +148,7 @@ MONSTERS = [
             AttackInfo('bite', '1d30'),
             AttackInfo('scratch', '2d21'),
             AttackInfo('tail', '3d15'),
-            AttackInfo('acid_breath', '2d30', range=15, blowback=2),
+            AttackInfo('acid_breath', '2d30', range=15, blowback=100),
         ),
     ),
     PType(
@@ -189,7 +189,7 @@ MONSTERS = [
         attacks=(
             AttackInfo('karate-chop', '5d8'),
             AttackInfo('head-butt', '4d4'),
-            AttackInfo('arrow', '1d6', range=100, blowback=2) #Blowback is for projectile
+            AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
             'btype': 'humanoid',

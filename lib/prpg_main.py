@@ -79,7 +79,8 @@ def player_aim(control):
     if target is not None:
         target_pos = getattr(target, 'pos', target)     # target may be a peep or a position
         path = list(line_points(player.pos, target_pos))[0:]
-        maze.create_projectile(player, 'arrow', path, (choose_ranged_attack(player).projectile_attack(),))
+        attack = choose_ranged_attack(player)
+        maze.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
 
 
 def monster_turn(control, monster):
