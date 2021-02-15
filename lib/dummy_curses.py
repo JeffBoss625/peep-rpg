@@ -100,7 +100,7 @@ class DummyCursesWindow:
     def chgat(self, y, x, n, attr):
         pass
 
-    def addstr(self, y, x, s, _attrib):
+    def addstr(self, y, x, s, _attrib=0):
         xoff, yoff = self.xyoff()
         y += yoff
         x += xoff
@@ -154,5 +154,6 @@ class DummyCurses:
         pass
 
     def color_pair(self, _n):
-        pass
+        return 1
+
 

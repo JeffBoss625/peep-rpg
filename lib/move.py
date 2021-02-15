@@ -95,7 +95,7 @@ def move_peep(dungeon, peep, dst_pos):
                 wall = create_wally(dungeon.maze, dst_pos)
                 dst = wall
             else:
-                return False # peep did not move
+                return False # peep tried wall - did not move
 
     if dst:
         src_attack = choose_melee_attack(peep)
