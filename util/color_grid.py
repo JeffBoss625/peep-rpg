@@ -30,63 +30,70 @@ class SuspendCurses():
 def cp(i):
     return curses.color_pair(i)
 
+# CGA COLOR NAMES
+# 0 = Black     8 = Gray
+# 1 = Blue      9 = Light Blue
+# 2 = Green     A = Light Green
+# 3 = Aqua      B = Light Aqua
+# 4 = Red       C = Light Red
+# 5 = Purple    D = Light Purple
+# 6 = Yellow    E = Light Yellow
+# 7 = White	    F = Bright White
+
 class COLOR:
     BLACK   = 'black'
     BLUE    = 'blue'
-    CYAN    = 'cyan'
     GREEN   = 'green'
-    PURPLE = 'purple'
+    AQUA    = 'aqua'
     RED     = 'red'
-    WHITE   = 'white'
+    PURPLE  = 'purple'
     YELLOW  = 'yellow'
+    WHITE   = 'white'
 
     GRAY = 'gray'
-    LT_BLUE = 'lt_blue'
-    LT_CYAN = 'lt_cyan'
-    LT_GREEN = 'lt_green'
+    LT_BLUE   = 'lt_blue'
+    LT_GREEN  = 'lt_green'
+    LT_AQUA   = 'lt_aqua'
+    LT_RED    = 'lt_red'
     LT_PURPLE = 'lt_purple'
-    PINK = 'pink'
-    LT_WHITE = 'lt_white'
     LT_YELLOW = 'lt_yellow'
+    LT_WHITE  = 'lt_white'
 
 
 COLOR8 = {
     'black'   : curses.COLOR_BLACK,
     'blue'    : curses.COLOR_BLUE,
-    'cyan'    : curses.COLOR_CYAN,
     'green'   : curses.COLOR_GREEN,
-    'purple'  : curses.COLOR_MAGENTA,
+    'aqua'    : curses.COLOR_CYAN,
     'red'     : curses.COLOR_RED,
-    'white'   : curses.COLOR_WHITE,
+    'purple'  : curses.COLOR_MAGENTA,
     'yellow'  : curses.COLOR_YELLOW,
+    'white'   : curses.COLOR_WHITE,
 }
 
 COLOR16 = {
     'win32': {
         'gray'  : 8,
         'lt_blue': 9,
-        'lt_cyan': 11,
         'lt_green': 10,
+        'lt_aqua': 11,
+        'lt_red': 12,
         'lt_purple': 13,
-        'pink': 12,
-        'lt_white': 15,
         'lt_yellow': 14,
+        'lt_white': 15,
     },
     # darwin is used also as the defualt (linux...)
     'darwin': {
         'gray'  : 8,
         'lt_blue': 12,
-        'lt_cyan': 14,
         'lt_green': 10,
+        'lt_aqua': 14,
+        'lt_red': 9,
         'lt_purple': 13,
-        'pink': 9,
-        'lt_white': 15,
         'lt_yellow': 11,
+        'lt_white': 15,
     }
 }
-
-# 1, 2, 4, 3, 6, 5, 8, 7 (8, 9, 11, 10, 13, 12, 15, 14) - WINDOWS
-# 1, 5, 7, 3, 6, 2, 8, 4 (8, 12, 14, 10, 13, 9, 15, 11) - MACOS
 
 def set_pairs(bg, os_name):
     i = 0
@@ -101,8 +108,8 @@ def set_pairs(bg, os_name):
         i += 1
         curses.init_pair(i, c16[k], COLOR8[bg])
 
-    for i in range(240):
-        curses.init_pair(i+17, i+16, 0)
+    for i in range(16, 255):
+        curses.init_pair(i+1, i, 0)
 
 def main_loop(stdscr):
     try:
@@ -115,7 +122,7 @@ def main_loop(stdscr):
         curses.noecho()
         curses.cbreak()
         maxy, maxx = stdscr.getmaxyx()
-        h, w = 14, 80
+        h, w = 22, 80
         if maxy < h or maxx < w:
             with SuspendCurses():
                 print(f'Terminal window needs to be at least {h} by {w}')
@@ -141,14 +148,14 @@ def main_loop(stdscr):
                 test_win.clear()
                 if k in (ord('q'), 27):
                     done = True
-                test_win.addstr(1, 3, f'{16} colors supported', cp(0))
-                for x in range(16):
-                    test_win.addstr(3, 2 + x * 2, 'A ', cp(x + 1))
-
+                test_win.addstr(1, 3, f'{curses.COLORS} colors supported', cp(0))
                 for i in range(256):
-                    row = i // 32
-                    x = i % 32
-                    test_win.addstr(5 + row, 2 + x * 2, 'A ', cp(i + 1))
+                    row = i // 16
+                    x = i % 16
+                    hx = hex(i)[2:].upper()
+                    if len(hx) == 1:
+                        hx = '0' + hx
+                    test_win.addstr(3 + row, 5 + x * 4, hx, cp(i + 1))
 
                 test_win.move(1, 2)
                 test_win.box()
