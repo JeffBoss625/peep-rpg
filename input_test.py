@@ -101,6 +101,9 @@ def set_pairs(bg, os_name):
         i += 1
         curses.init_pair(i, c16[k], COLOR8[bg])
 
+    for i in range(240):
+        curses.init_pair(i+17, i+16, 0)
+
 def main_loop(stdscr):
     try:
         if not curses.can_change_color():
@@ -112,7 +115,7 @@ def main_loop(stdscr):
         curses.noecho()
         curses.cbreak()
         maxy, maxx = stdscr.getmaxyx()
-        h, w = 8, 40
+        h, w = 14, 80
         if maxy < h or maxx < w:
             with SuspendCurses():
                 print(f'Terminal window needs to be at least {h} by {w}')
@@ -138,11 +141,15 @@ def main_loop(stdscr):
                 test_win.clear()
                 if k in (ord('q'), 27):
                     done = True
-                test_win.addstr(1, 3, f'{len(COLOR8)} colors supported', cp(0))
-                for x in range(8):
+                test_win.addstr(1, 3, f'{16} colors supported', cp(0))
+                for x in range(16):
                     test_win.addstr(3, 2 + x * 2, 'A ', cp(x + 1))
-                for x in range(8):
-                    test_win.addstr(4, 2 + x * 2, 'A ', cp(x + 9))
+
+                for i in range(256):
+                    row = i // 32
+                    x = i % 32
+                    test_win.addstr(5 + row, 2 + x * 2, 'A ', cp(i + 1))
+
                 test_win.move(1, 2)
                 test_win.box()
                 test_win.refresh()
