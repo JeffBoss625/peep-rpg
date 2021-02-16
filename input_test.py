@@ -35,36 +35,71 @@ class COLOR:
     BLUE    = 'blue'
     CYAN    = 'cyan'
     GREEN   = 'green'
-    MAGENTA = 'magenta'
+    PURPLE = 'purple'
     RED     = 'red'
     WHITE   = 'white'
     YELLOW  = 'yellow'
+
     GRAY = 'gray'
     LT_BLUE = 'lt_blue'
+    LT_CYAN = 'lt_cyan'
     LT_GREEN = 'lt_green'
-    LT_AQUA = 'lt_aqua'
-    LT_RED = 'lt_red'
     LT_PURPLE = 'lt_purple'
+    PINK = 'pink'
+    LT_WHITE = 'lt_white'
+    LT_YELLOW = 'lt_yellow'
+
 
 COLOR8 = {
     'black'   : curses.COLOR_BLACK,
     'blue'    : curses.COLOR_BLUE,
     'cyan'    : curses.COLOR_CYAN,
     'green'   : curses.COLOR_GREEN,
-    'magenta' : curses.COLOR_MAGENTA,
+    'purple'  : curses.COLOR_MAGENTA,
     'red'     : curses.COLOR_RED,
     'white'   : curses.COLOR_WHITE,
     'yellow'  : curses.COLOR_YELLOW,
 }
 
+COLOR16 = {
+    'win32': {
+        'gray'  : 8,
+        'lt_blue': 9,
+        'lt_cyan': 11,
+        'lt_green': 10,
+        'lt_purple': 13,
+        'pink': 12,
+        'lt_white': 15,
+        'lt_yellow': 14,
+    },
+    # darwin is used also as the defualt (linux...)
+    'darwin': {
+        'gray'  : 8,
+        'lt_blue': 12,
+        'lt_cyan': 14,
+        'lt_green': 10,
+        'lt_purple': 13,
+        'pink': 9,
+        'lt_white': 15,
+        'lt_yellow': 11,
+    }
+}
 
-def set_pairs(bg):
-    i = 1
+# 1, 2, 4, 3, 6, 5, 8, 7 (8, 9, 11, 10, 13, 12, 15, 14) - WINDOWS
+# 1, 5, 7, 3, 6, 2, 8, 4 (8, 12, 14, 10, 13, 9, 15, 11) - MACOS
+
+def set_pairs(bg, os_name):
+    i = 0
     for k in COLOR8.keys():
-        curses.init_pair(i, COLOR8[k], COLOR8[bg])
         i += 1
-    for i in range(8, 16):
-        curses.init_pair(i + 1, i, COLOR8[bg])
+        curses.init_pair(i, COLOR8[k], COLOR8[bg])
+
+    if os_name not in COLOR16:
+        os_name = 'darwin'
+    c16 = COLOR16[os_name]
+    for k in c16.keys():
+        i += 1
+        curses.init_pair(i, c16[k], COLOR8[bg])
 
 def main_loop(stdscr):
     try:
@@ -92,7 +127,7 @@ def main_loop(stdscr):
         test_win.bkgd(' ', cp(0))
         test_win.box()
         test_win.move(2, 2)
-        set_pairs(COLOR.BLACK)
+        set_pairs(COLOR.BLACK, sys.platform)
         test_win.refresh()
         # maxc = curses.COLORS
         maxc = len(COLOR8)
