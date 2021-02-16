@@ -112,7 +112,7 @@ def main_loop(stdscr):
         curses.noecho()
         curses.cbreak()
         maxy, maxx = stdscr.getmaxyx()
-        h, w = 24, 80
+        h, w = 8, 40
         if maxy < h or maxx < w:
             with SuspendCurses():
                 print(f'Terminal window needs to be at least {h} by {w}')
