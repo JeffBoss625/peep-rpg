@@ -101,7 +101,7 @@ def set_pairs(bg, os_name):
         i += 1
         curses.init_pair(i, c16[k], COLOR8[bg])
 
-    for i in range(240):
+    for i in range(239):
         curses.init_pair(i+17, i+16, 0)
 
 def main_loop(stdscr):
