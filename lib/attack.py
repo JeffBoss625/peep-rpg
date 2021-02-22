@@ -1,4 +1,6 @@
 import random
+
+import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
 from lib.stat import calc_pct
 

@@ -40,23 +40,20 @@ def calc_humanoid_area(height):
     width = height/3
     return width*height
 
-def calc_rndshld(radius):
-    return radius ** 2 * math.pi
+def calc_rndshld(diameter):
+    return (diameter/2) ** 2 * math.pi
 
 def calc_rectshld(height, width):
     return height * width
 
-def calc_sqrshld(side):
-    return side ** 2
-
-def calc_sheild_block(shldarea, targetarea):
+def calc_shld_block(shldarea, targetarea):
     chance = randint(1, targetarea)
     if chance > shldarea:
         return False
     if chance >= shldarea:
         return True
 
-def where_hit(area, shldarea):
+def where_hit(area, shldarea):      #Which body part did the attack hit?
     head = .0825 * area
     legs = .1675 * area
     torso = .75 * area
@@ -72,3 +69,41 @@ def where_hit(area, shldarea):
         return 'legs'
     else:
         return 'torso'
+
+def hit_helm():                 #calc if attack hits helmet
+    random = randint(1, 100)
+    if random > 15:
+        return 'helmet'
+    else:
+        return 'head'
+
+def dmg_multiplier_from_part(where_hit):  #dmg multiplier based on where attack lands
+    if where_hit == 'head':
+        return 2
+    if where_hit == 'torso':
+        return 1
+    if where_hit == 'legs':
+        return .75
+    if where_hit == 'helmet':
+        return .3
+    if where_hit == 'shield':
+        return .15
+
+def calc_dmg_multiplier(dst, shield):
+    area = calc_humanoid_area(dst.height)
+    if shield != 'None':
+        if shield.type == 'round':
+            shldarea = calc_rndshld(shield.width)
+        else:        #shield is rectangular
+            shldarea = calc_rectshld(shield.height, shield.width)
+        hit = calc_shld_block(area, shldarea)
+        if hit:
+            part_of_body = where_hit(area, shldarea)
+            if part_of_body == 'head':
+                part_of_body = hit_helm()          #Did it hit helmet if area of hit is head
+            return dmg_multiplier_from_part(part_of_body)
+        else:
+            return dmg_multiplier_from_part('shield')
+    else:
+        part_of_body = where_hit(area, 0)       #No shield, so no shld_area
+        return dmg_multiplier_from_part(where_hit)
