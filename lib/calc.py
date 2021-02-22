@@ -106,4 +106,4 @@ def calc_dmg_multiplier(dst, shield):
             return dmg_multiplier_from_part('shield')
     else:
         part_of_body = where_hit(area, 0)       #No shield, so no shld_area
-        return dmg_multiplier_from_part(where_hit)
+        return dmg_multiplier_from_part(part_of_body)
