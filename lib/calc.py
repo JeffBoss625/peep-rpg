@@ -1,4 +1,5 @@
 import math
+from random import randint
 
 
 def distance(p1, p2):
@@ -34,3 +35,40 @@ def target_list(src_peep, targets):
             tuples.append((dis, ang, t))
     tuples.sort()
     return list(t[2] for t in tuples)
+
+def calc_humanoid_area(height):
+    width = height/3
+    return width*height
+
+def calc_rndshld(radius):
+    return radius ** 2 * math.pi
+
+def calc_rectshld(height, width):
+    return height * width
+
+def calc_sqrshld(side):
+    return side ** 2
+
+def calc_sheild_block(shldarea, targetarea):
+    chance = randint(1, targetarea)
+    if chance > shldarea:
+        return False
+    if chance >= shldarea:
+        return True
+
+def where_hit(area, shldarea):
+    head = .0825 * area
+    legs = .1675 * area
+    torso = .75 * area
+    torso = torso - shldarea
+    if torso < 0:
+        legs = legs + torso
+        torso = 0
+    totarea = head + legs + torso
+    hit = randint(1, totarea)
+    if hit <= head:
+        return 'head'
+    elif hit <= legs+head:
+        return 'legs'
+    else:
+        return 'torso'
