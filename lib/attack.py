@@ -55,6 +55,14 @@ def attack_dst(src, dst, src_attack, dungeon):
         for i in range(1, dice_info['num_dice'] + 1):
             hp_loss = random.randint(1, dice_info['num_sides'])
             tot_hp_loss += hp_loss
+            # if shield_in_hand(dst.equipment.hands):
+            #     if shield_in_hand(dst.equipment.hands) == 0:
+            #         dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.equipment.hands[0])
+            #     else:
+            #         dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.equipment.hands[1])
+            # else:
+            #     dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
+            # tot_hp_loss *= dmg_multiplier
         dungeon.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
@@ -117,7 +125,13 @@ def peep_regenhp(peepmaxhp, peepspeed, regen_fac):
     ret = speedhealfac * amount_heal
     return ret
 
-
+def shield_in_hand(hands):
+    if hands[0] != 'shield':
+        if hands[1] != 'shield':
+            return None
+        return 1
+    else:
+        return 0
 
 if __name__ == '__main__':
     print("HERE")
