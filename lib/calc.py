@@ -47,10 +47,11 @@ def calc_rectshld(height, width):
     return height * width
 
 def calc_shld_block(shldarea, targetarea):
-    chance = randint(1, targetarea)
+    area = round(targetarea)
+    chance = randint(1, area)
     if chance > shldarea:
         return False
-    if chance >= shldarea:
+    if chance <= shldarea:
         return True
 
 def where_hit(area, shldarea):      #Which body part did the attack hit?
