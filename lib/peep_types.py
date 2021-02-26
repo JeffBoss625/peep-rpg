@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
-
+from lib.jjv_items import item_by_name
 from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
@@ -9,22 +9,7 @@ import yaml
 
 from lib.stat import roll_dice
 
-@dataclass
-class Inventory:
-    hand1: str = ''
-    hand2: str = ''
-    back: str = ''
-    waist: str = ''
-    gloves: str = ''
-    head: str = ''
-    neck: str = ''
-    wrist: str = ''
-    arm: str = ''
-    feet: str = ''
-    under_armor: str = ''
-    over_armor: str = ''
-    legs: str = ''
-    shoulders: str = ''
+
 
 @dataclass
 class AttackInfo:
@@ -57,12 +42,12 @@ class PType:
     hitdice: str = '1d1'         # initial hit points (dice) at level 0
     regen_fac: float = 1.0
     skill: float = 1.0
+    height: int = 5
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level
     skill_inc: float = 1.0  # rate of skill increase per level
     attacks: Tuple[AttackInfo, ...] = field(default_factory=tuple)    # attacks available for this range of levels
-    inventory: List[Inventory, ...] = field(default_factory=list)
 
     # todo: calculate these from other stats
     thaco: int = 0
@@ -228,12 +213,6 @@ MONSTERS = [
             AttackInfo('head-butt', '4d4'),
             AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
-        inventory=[
-            Inventory(
-                hand1='Cool Sword',
-                hand2='Cool Shield',
-            ),
-        ],
         body_stats={
             'btype': 'humanoid',
             'height': 160,
@@ -392,6 +371,7 @@ def create_peep(
         thaco=pt.thaco,
         speed=pt.speed,
         ac=pt.ac,
+        height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
         body=create_humanoid(**body_stats) if body_stats else None,

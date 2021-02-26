@@ -1,7 +1,6 @@
 from dataclasses import field, dataclass
-from typing import Tuple, List
+from typing import Tuple, List, Any
 
-from lib.peep_types import AttackInfo
 
 @dataclass
 class DamageInfo:
@@ -18,9 +17,9 @@ class Item:
     weight: int = 10
     space: int = 0
     melee_damage: Tuple[DamageInfo, ...] = field(default_factory=tuple)
-    holding: List[..., ...] = field(default_factory=list)
-    item_slot: List[str, str] = field(default_factory=list)
-    type: Tuple[..., ...] = field(default_factory=tuple)
+    holding: List[Any] = field(default_factory=list)
+    item_slot: List[Any] = field(default_factory=list)
+    type: Tuple[Any, Any] = field(default_factory=tuple)
 
 ITEMS = [
     Item(
@@ -49,6 +48,11 @@ ITEMS = [
         ),
     ),
 ]
+
+ITEMS_BY_NAME = {i.name:i for i in ITEMS}
+
+def item_by_name(name):
+    return ITEMS_BY_NAME[name]
 
 def create_item(name='', pos=(0, 0), item_stats=None):
     pass

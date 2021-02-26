@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field, replace
-from typing import Tuple
+from typing import Tuple, List, Any
 
 from lib.body import Body
 from lib.constants import COLOR
 from lib.constants import GAME_SETTINGS
 from lib.model import DataModel, register_yaml
 import math
+
+
 
 @dataclass
 class Attack(DataModel):
@@ -21,6 +23,23 @@ class Attack(DataModel):
 
     def projectile_attack(self):
         return replace(self, range=0)
+
+@dataclass
+class Inventory:
+    hand1: str = ''
+    hand2: str = ''
+    back: str = ''
+    waist: str = ''
+    gloves: str = ''
+    head: str = ''
+    neck: str = ''
+    wrist: str = ''
+    arm: str = ''
+    feet: str = ''
+    under_armor: str = ''
+    over_armor: str = ''
+    legs: str = ''
+    shoulders: str = ''
 
 @dataclass
 class LevelData():
@@ -49,6 +68,7 @@ class Peep(DataModel):
     thaco: int = 20
     speed: int = 10
     ac: int = 10
+    height: int = 5
     move_tactic: str = 'hunt'
     direct: int = -1
     pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
@@ -64,6 +84,7 @@ class Peep(DataModel):
     tics: int = 0
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
+    inventory: Inventory = Inventory()
 
     body: Body = None
 

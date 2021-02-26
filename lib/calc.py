@@ -1,5 +1,5 @@
 import math
-from random import randint
+from random import randint, random
 
 
 def distance(p1, p2):
@@ -63,7 +63,7 @@ def where_hit(area, shldarea):      #Which body part did the attack hit?
         legs = legs + torso
         torso = 0
     totarea = head + legs + torso
-    hit = randint(1, totarea)
+    hit = random() * totarea
     if hit <= head:
         return 'head'
     elif hit <= legs+head:
@@ -72,7 +72,7 @@ def where_hit(area, shldarea):      #Which body part did the attack hit?
         return 'torso'
 
 def hit_helm():                 #calc if attack hits helmet
-    random = randint(1, 100)
+    random = randint(0, 100)
     if random > 15:
         return 'helmet'
     else:
