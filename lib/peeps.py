@@ -84,7 +84,7 @@ class Peep(DataModel):
     tics: int = 0
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
-    inventory: Inventory = Inventory()
+    inventory: Inventory = field(default_factory=Inventory)
 
     body: Body = None
 

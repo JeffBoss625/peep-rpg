@@ -48,11 +48,11 @@ def calc_rectshld(height, width):
 
 def calc_shld_block(shldarea, targetarea):
     area = round(targetarea)
-    chance = randint(1, area)
+    chance = random() * area
     if chance > shldarea:
-        return False
-    if chance <= shldarea:
         return True
+    if chance <= shldarea:
+        return False
 
 def where_hit(area, shldarea):      #Which body part did the attack hit?
     head = .0825 * area
@@ -62,6 +62,11 @@ def where_hit(area, shldarea):      #Which body part did the attack hit?
     if torso < 0:
         legs = legs + torso
         torso = 0
+    if legs < 0:
+        head = head + legs
+        legs = 0
+    if head < 0:
+        head = 0
     totarea = head + legs + torso
     hit = random() * totarea
     if hit <= head:
@@ -97,7 +102,7 @@ def calc_dmg_multiplier(dst, shield):
             shldarea = calc_rndshld(shield.width)
         else:        #shield is rectangular
             shldarea = calc_rectshld(shield.height, shield.width)
-        hit = calc_shld_block(area, shldarea)
+        hit = calc_shld_block(shldarea, area)
         if hit:
             part_of_body = where_hit(area, shldarea)
             if part_of_body == 'head':

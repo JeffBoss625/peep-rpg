@@ -1,9 +1,19 @@
+from lib import dungeons
 from lib.attack import calc_deflection, attack_dst
+from lib.constants import Key
+from lib.logger import Logger
 from lib.pclass import level_calc
+from lib.peep_types import create_peep
 from lib.peeps import Attack, Peep
+from lib.prpg_control import PrpgControl
+from lib.prpg_main import main
+from lib.startup import dummy_root
 from lib.stat import PlayerStats
 import random
 import math
+
+from lib.win_layout import Dim
+
 
 class Out:
     def __init__(self):
@@ -14,6 +24,20 @@ class Out:
 
     def log(self, *args):
         self.args.append(args)
+
+def assert_dungeon(model, keys, paint=False):
+    root_layout = dummy_root(dim=Dim(110, 14), logger=Logger('dbg.py'))
+
+    control = PrpgControl(root_layout, model)
+
+    def get_key():
+        if paint:
+            control.root_layout.window.paint()
+        ret = keys.pop(0)
+        return ret
+
+    control.get_key = get_key
+    main(control, model)
 
 def test_calc_deflection():
     data = (
@@ -114,3 +138,27 @@ def test_level_calc():
         lc = level_calc(xp, factor, 100)
         print(f'level_calc({xp}, {factor}) = {lc}/{exp})')
         # assert lc == exp
+
+def test_shield_block():
+    random.seed = 1
+    model = dungeons.create_dungeon({
+        'walls': [
+            '%%%%',
+            '%..%',
+            '%%%%',
+        ],
+        'peeps': [
+            create_peep('human', name='Super Dad', pos=(1,1)),
+            create_peep('big bird', name='birdy!', pos=(2,1)),
+        ]
+    })
+
+    class shield:
+        type: str = 'rect'
+        height: int = 2
+        width: int = 2
+
+    p = model.maze.peeps[0]
+    model.maze.peeps[0].inventory.hand1 = shield()
+    print(p)
+    assert_dungeon(model, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=True)
