@@ -5,7 +5,6 @@ from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
 from lib.pclass import get_pclass, level_calc
-import yaml
 
 from lib.stat import roll_dice
 
@@ -174,7 +173,7 @@ MONSTERS = [
         ),
     ),
     PType(
-        name='bolrog',
+        name='balrog',
         char='B',
         type='monster',
         fgcolor=COLOR.RED,

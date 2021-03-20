@@ -91,7 +91,7 @@ DUNGEONS = {
         ],
         'peeps':[
             create_peep('human', name='Super Dad', pos=(10,1)),
-            create_peep('bolrog', name='Bolrog', pos=(10,18)),
+            create_peep('balrog', name='Bolrog', pos=(10,18)),
         ]
     },
     'open':{
