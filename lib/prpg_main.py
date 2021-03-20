@@ -106,6 +106,7 @@ def monster_turn(control, monster):
         else:
             dungeon.message(f'{monster.name} hits the ground')
             monster.hp = 0  # todo: convert to item with chance of breaking
+        return True
     elif monster.move_tactic == 'hunt':
         dx = player.pos[0] - monster.pos[0]
         dy = player.pos[1] - monster.pos[1]

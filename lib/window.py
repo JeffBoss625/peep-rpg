@@ -7,6 +7,7 @@ from lib.util import min0
 
 IGNORED_KEYS = {
     'KEY_RESIZE': 1,
+    'KEY_F(8)': 1,
 }
 
 @dataclass
