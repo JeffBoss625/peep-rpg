@@ -181,11 +181,11 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='10d30',
         thaco=2,
-        speed=75,
+        speed=30,
         ac=2,
         attacks=(
             AttackInfo('burn', '1d30'),
-            AttackInfo('fire_whip', '5d10', range=2, blowback=100),
+            AttackInfo('fire_whip', '5d10', range=3, blowback=100),
         ),
     ),
     PType(
@@ -221,7 +221,7 @@ MONSTERS = [
         type='monster',
         hitdice='3d8',
         thaco=19,
-        speed=45,
+        speed=30,
         ac=10,
         attacks=(
             AttackInfo('karate-chop', '5d8'),
@@ -272,7 +272,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='1d2',
         thaco=20,
-        speed=500,
+        speed=100,
         ac=-10,
         attacks=(
         ),
@@ -286,7 +286,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=500,
+        speed=100,
         ac=-10,
         attacks=(
         ),
@@ -294,13 +294,13 @@ MONSTERS = [
     ),
     PType(
         name='fire_whip',
-        char='+',
+        char='-',
         type='projectile',
         fgcolor=COLOR.RED,
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=500,
+        speed=30,
         ac=-10,
         attacks=(
         ),
@@ -314,7 +314,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=500,
+        speed=100,
         ac=-10,
         attacks=(
         ),
@@ -328,7 +328,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=500,
+        speed=100,
         ac=-10,
         attacks=(
 
@@ -343,7 +343,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=500,
+        speed=100,
         ac=-10,
         attacks=(
 
