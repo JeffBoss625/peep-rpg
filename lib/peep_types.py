@@ -174,6 +174,21 @@ MONSTERS = [
         ),
     ),
     PType(
+        name='bolrog',
+        char='B',
+        type='monster',
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
+        hitdice='10d30',
+        thaco=2,
+        speed=75,
+        ac=2,
+        attacks=(
+            AttackInfo('burn', '1d30'),
+            AttackInfo('fire_whip', '5d10', range=2, blowback=100),
+        ),
+    ),
+    PType(
         name='dog',
         char='d',
         type='monster',
@@ -274,7 +289,20 @@ MONSTERS = [
         speed=500,
         ac=-10,
         attacks=(
-
+        ),
+        move_tactic='pos_path',
+    ),
+    PType(
+        name='fire_whip',
+        char='+',
+        type='projectile',
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
+        hitdice='2d8',
+        thaco=20,
+        speed=500,
+        ac=-10,
+        attacks=(
         ),
         move_tactic='pos_path',
     ),
@@ -289,7 +317,6 @@ MONSTERS = [
         speed=500,
         ac=-10,
         attacks=(
-
         ),
         move_tactic='pos_path',
     ),
