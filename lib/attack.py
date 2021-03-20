@@ -1,4 +1,6 @@
 import random
+
+import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
 from lib.stat import calc_pct
 
@@ -53,6 +55,26 @@ def attack_dst(src, dst, src_attack, dungeon):
         for i in range(1, dice_info['num_dice'] + 1):
             hp_loss = random.randint(1, dice_info['num_sides'])
             tot_hp_loss += hp_loss
+        if shield_in_hand(dst.inventory) != 'None':
+            if shield_in_hand(dst.inventory) == 0:
+                dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.inventory.hand1)
+            elif shield_in_hand(dst.inventory) == 1:
+                dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.inventory.hand2)
+            else:
+                dmg_multiplier = 1
+        else:
+            dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
+        tot_hp_loss *= dmg_multiplier
+        if dmg_multiplier == 0.3:
+            dungeon.message('the blow hit the helmet')
+        if dmg_multiplier == 1:
+            dungeon.message('the blow hit the torso')
+        if dmg_multiplier == 0.15:
+            dungeon.message('the blow hit the shield')
+        if dmg_multiplier == 2:
+            dungeon.message('the blow hit the head')
+        if dmg_multiplier == 0.75:
+            dungeon.message('the blow hit the legs')
         dungeon.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
@@ -115,7 +137,13 @@ def peep_regenhp(peepmaxhp, peepspeed, regen_fac):
     ret = speedhealfac * amount_heal
     return ret
 
-
+def shield_in_hand(inventory):
+    if inventory.hand1 == '':
+        if inventory.hand2 == '':
+            return 'None'
+        return 1
+    else:
+        return 0
 
 if __name__ == '__main__':
     print("HERE")

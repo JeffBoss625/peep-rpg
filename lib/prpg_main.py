@@ -1,3 +1,5 @@
+import time
+
 import lib.move as mlib
 from lib.attack import peep_regenhp, choose_ranged_attack
 from lib.calc import target_list

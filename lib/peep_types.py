@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Tuple, Dict, Any
-
+from typing import Tuple, Dict, Any, List
+from lib.jjv_items import item_by_name
 from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
@@ -8,6 +8,7 @@ from lib.pclass import get_pclass, level_calc
 import yaml
 
 from lib.stat import roll_dice
+
 
 
 @dataclass
@@ -41,11 +42,12 @@ class PType:
     hitdice: str = '1d1'         # initial hit points (dice) at level 0
     regen_fac: float = 1.0
     skill: float = 1.0
+    height: int = 5
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level
     skill_inc: float = 1.0  # rate of skill increase per level
-    attacks: Tuple[AttackInfo,...] = field(default_factory=tuple)    # attacks available for this range of levels
+    attacks: Tuple[AttackInfo, ...] = field(default_factory=tuple)    # attacks available for this range of levels
 
     # todo: calculate these from other stats
     thaco: int = 0
@@ -172,6 +174,21 @@ MONSTERS = [
         ),
     ),
     PType(
+        name='bolrog',
+        char='B',
+        type='monster',
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
+        hitdice='10d30',
+        thaco=2,
+        speed=75,
+        ac=2,
+        attacks=(
+            AttackInfo('burn', '1d30'),
+            AttackInfo('fire_whip', '5d10', range=2, blowback=100),
+        ),
+    ),
+    PType(
         name='dog',
         char='d',
         type='monster',
@@ -216,7 +233,7 @@ MONSTERS = [
             'height': 160,
             'weight': 90,
             'body2head': 7.5,
-        }
+        },
     ),
     PType(
         name='wall',
@@ -272,7 +289,20 @@ MONSTERS = [
         speed=500,
         ac=-10,
         attacks=(
-
+        ),
+        move_tactic='pos_path',
+    ),
+    PType(
+        name='fire_whip',
+        char='+',
+        type='projectile',
+        fgcolor=COLOR.RED,
+        bgcolor=COLOR.BLACK,
+        hitdice='2d8',
+        thaco=20,
+        speed=500,
+        ac=-10,
+        attacks=(
         ),
         move_tactic='pos_path',
     ),
@@ -287,7 +317,6 @@ MONSTERS = [
         speed=500,
         ac=-10,
         attacks=(
-
         ),
         move_tactic='pos_path',
     ),
@@ -369,6 +398,7 @@ def create_peep(
         thaco=pt.thaco,
         speed=pt.speed,
         ac=pt.ac,
+        height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
         body=create_humanoid(**body_stats) if body_stats else None,
