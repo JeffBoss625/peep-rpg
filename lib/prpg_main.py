@@ -1,5 +1,6 @@
 import time
-
+from lib.dungeons import DUNGEONS
+from lib.dungeon import Dungeon
 import lib.move as mlib
 from lib.attack import peep_regenhp, choose_ranged_attack
 from lib.calc import target_list
@@ -53,6 +54,20 @@ def player_turn(control):
         elif input_key == 'a':
             player_aim(control)
             return input_key
+        elif input_key == '<':
+            if maze.walls[player.pos.y][player.pos.x] == '<':
+                change_level('<', maze.level, control)
+            else:
+                dungeon.message(f'you are not standing at a staircase down')
+                key = control.get_key()
+                continue
+        elif input_key == '>':
+            if maze.walls[player.pos.y][player.pos.x] == '>':
+                change_level('>', maze.level, control)
+            else:
+                dungeon.message(f'you are not standing at a staircase up')
+            key = control.get_key()
+            continue
         else:
             dungeon.message(f'unknown command: "{input_key}"')
             # continue
@@ -262,3 +277,22 @@ def target_for_direction(origin, direction, maze):
         x = x - d
         y = y - d
     return x, y
+
+def change_level(dir, level, control):
+    if dir == '<':
+        create_dungeon(level + 1, control)
+    else:
+        create_dungeon(level - 1, control)
+
+def create_dungeon(num, control):
+    if DUNGEONS.get('level_' + str(num), None) == None:
+        control.model.message('This staircase has been caved in.')
+        return None
+    else:
+        info = DUNGEONS.get('level_' + str(num), None)
+        return Dungeon(
+            walls=info['walls'],
+            peeps=info['peeps'],
+            player=info['peeps'][0],
+            items=info.get('items', []),
+        )
