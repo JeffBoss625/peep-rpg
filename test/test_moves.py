@@ -50,20 +50,20 @@ def test_move_peep():
     ]
     player = peeps[0]
     model = Dungeon(walls=walls, peeps=peeps)
-    mlib.move_peep(model, player, mlib.Direction.RIGHT)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.RIGHT))
     assert player.pos == (1,0) # x changed!
 
     # Run into wall (right)
-    mlib.move_peep(model, player, mlib.Direction.RIGHT)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.RIGHT))
     assert player.pos == (1,0)
     # Run into wall diagnally-right
-    mlib.move_peep(model, player, mlib.Direction.DOWN_RIGHT)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN_RIGHT))
     assert player.pos == (1,0)
     # Run into wall down
-    mlib.move_peep(model, player, mlib.Direction.DOWN)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN))
     assert player.pos == (1,0)
     # Move down left without collision
-    mlib.move_peep(model, player, mlib.Direction.DOWN_LEFT)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN_LEFT))
     assert player.pos == (0,1)
 
 def test_move_attack():
@@ -82,7 +82,7 @@ def test_move_attack():
     ]
     model = Dungeon(peeps=peeps, walls=walls)
     # Run into monster at [0,2]
-    mlib.move_peep(model, player, mlib.Direction.DOWN)
+    mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN))
     assert player.pos == (0,1)
 
 
@@ -105,9 +105,9 @@ def test_handle_enemy_move():
     dy = model.maze.player.pos[0] - enemy.pos[0]
     edir = mlib.direction_from_vector(dx, dy)
 
-    mlib.move_peep(model, enemy, edir)
+    mlib.move_peep(model, enemy, mlib.adjacent_pos(enemy.pos, edir))
     assert enemy.pos == (0,1)
-    mlib.move_peep(model, enemy, edir)
+    mlib.move_peep(model, enemy, mlib.adjacent_pos(enemy.pos, edir))
     assert enemy.pos == (0,1)
 
 def test_direction_relative():

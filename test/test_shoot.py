@@ -21,8 +21,7 @@ def assert_dungeon(dungeon, keys, paint=False):
         ret = keys.pop(0)
         return ret
 
-    control.get_key = get_key
-    main(control, dungeon)
+    main(root_layout, dungeon, get_key)
 
 
 def test_shoot_wall():
@@ -99,5 +98,5 @@ def test_balrog_whip():
             create_peep('balrog', name='Gark', pos=(3,1))
         ]
     })
-    assert_dungeon(dungeon, ['.', '.', Key.CTRL_Q], paint=True)
+    assert_dungeon(dungeon, ['.', '.', '.', Key.CTRL_Q], paint=True)
     print('hi')
