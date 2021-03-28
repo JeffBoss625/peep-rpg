@@ -1,5 +1,3 @@
-import time
-
 import lib.move as mlib
 from lib.attack import peep_regenhp, choose_ranged_attack
 from lib.calc import target_list
@@ -9,6 +7,7 @@ import random
 import sys
 import signal
 from lib.calc import distance
+from lib.prpg_control import PrpgControl
 
 from lib.target import line_points
 
@@ -24,6 +23,7 @@ DIRECTION_KEYS = {
     'b': Direction.DOWN_LEFT,
 }
 
+
 def player_turn(control):
     player = control.model.maze.player
     player.hp += peep_regenhp(player.maxhp, player.speed, player.regen_fac)
@@ -34,8 +34,8 @@ def player_turn(control):
         player = maze.player
         input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
-            dst = mlib.adjacent_pos(maze.player.pos, DIRECTION_KEYS[input_key])
-            if mlib.move_peep(dungeon, maze.player, dst):
+            dst_pos = mlib.adjacent_pos(maze.player.pos, DIRECTION_KEYS[input_key])
+            if mlib.move_peep(dungeon, maze.player, dst_pos):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -56,6 +56,7 @@ def player_turn(control):
         else:
             dungeon.message(f'unknown command: "{input_key}"')
             # continue
+
 
 def player_aim(control):
     dungeon = control.model
@@ -79,7 +80,7 @@ def player_aim(control):
             continue
 
     if target is not None:
-        target_pos = getattr(target, 'pos', target)     # target may be a peep or a position
+        target_pos = getattr(target, 'pos', target)  # target may be a peep or a position
         path = list(line_points(player.pos, target_pos))[0:]
         attack = choose_ranged_attack(player)
         maze.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
@@ -91,12 +92,12 @@ def monster_turn(control, monster):
     player = maze.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
     ranged_attack = choose_ranged_attack(monster)
-    if monster.type != 'projectile':
-        if ranged_attack is not None:
-            if is_in_sight(monster, player.pos, maze.walls) and distance(monster.pos, player.pos) < ranged_attack.range:
-                path = list(line_points(monster.pos, player.pos))
-                maze.create_projectile(player, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
-                return True
+    if monster.type != 'projectile' \
+            and ranged_attack is not None \
+            and is_in_sight(monster, player.pos, maze.walls) \
+            and distance(monster.pos, player.pos) < ranged_attack.range:
+        path = list(line_points(monster.pos, player.pos))
+        maze.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
@@ -106,7 +107,6 @@ def monster_turn(control, monster):
         else:
             dungeon.message(f'{monster.name} hits the ground')
             monster.hp = 0  # todo: convert to item with chance of breaking
-        return True
     elif monster.move_tactic == 'hunt':
         dx = player.pos[0] - monster.pos[0]
         dy = player.pos[1] - monster.pos[1]
@@ -114,7 +114,7 @@ def monster_turn(control, monster):
             control.player_died()
             return False
 
-        if monster.hp/monster.maxhp < 0.3:
+        if monster.hp / monster.maxhp < 0.3:
             direct = mlib.direction_from_vector(-dx, -dy)  # If low health, run away
         else:
             direct = mlib.direction_from_vector(dx, dy)
@@ -127,12 +127,10 @@ def monster_turn(control, monster):
         rotation = 1
         while rotation <= 4:
             d2 = mlib.direction_relative(direct, rotation)
-            # model.print(monster.name, 'trying direction', d2)
             dst_pos = mlib.adjacent_pos(monster.pos, d2)
             if mlib.move_peep(dungeon, monster, dst_pos):
                 return True
             d2 = mlib.direction_relative(direct, -rotation)
-            # model.print(monster.name, 'trying direction', d2)
             dst_pos = mlib.adjacent_pos(monster.pos, d2)
             if mlib.move_peep(dungeon, monster, dst_pos):
                 return True
@@ -140,7 +138,11 @@ def monster_turn(control, monster):
 
     return True
 
-def main(control, dungeon):
+
+def main(root_layout, dungeon, get_key=None):
+    control = PrpgControl(root_layout, dungeon)
+    if get_key is not None:
+        control.get_key = get_key
     if sys.platform != "win32" and hasattr(control, 'resize_handler'):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
@@ -154,9 +156,12 @@ def execute_turn_seq(control):
     dungeon = control.model
     maze = dungeon.maze
     while not maze.new_peeps and maze.ti < len(maze.turn_seq):
+        # print(f'turn_seq {maze.ti}/{maze.turn_seq}')
         peep_indexes = maze.turn_seq[maze.ti]
         # this loop moves simultaneous peeps - all moves complete together (before adding new projectiles/peeps/etc)
         for peep_index in peep_indexes:
+            pnames = tuple(p.name for p in maze.peeps)
+            # print(f'peep_index {peep_index}/{pnames}')
             # if there are new peeps in the new_peeps list, break out of loop.
             # When broken out of loop take remaining clicks to go through from the turns variable
             # Add those remaining turns into a function that adds the new peeps's turns to it
@@ -185,9 +190,9 @@ def choose_target(control, src_peep):
     ti = next_target(src_peep, targets, maze.walls, 0)  # return None if no target
     if ti == -1:
         dungeon.message('No targets in sight')
-        return None     # todo: start cursor on self to allow manual selection
+        return None  # todo: start cursor on self to allow manual selection
     while True:
-        maze.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))    # draws the target path
+        maze.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))  # draws the target path
         dungeon.banner([top, f'Aiming at {targets[ti].name}'])
         input_key = control.get_key()
         if input_key == 't':
@@ -217,6 +222,7 @@ def next_target(origin, targets, walls, starti):
 
     return -1
 
+
 def is_in_sight(origin, pos, walls):
     path = tuple(line_points(origin.pos, pos))
     for p in path:
@@ -224,6 +230,7 @@ def is_in_sight(origin, pos, walls):
         if row[p[0]] in ['#', '%']:
             return False
     return True
+
 
 def target_for_direction(origin, direction, maze):
     mx = maze.max_x()
