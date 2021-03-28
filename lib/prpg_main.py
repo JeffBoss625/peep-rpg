@@ -57,14 +57,14 @@ def player_turn(control):
             player_aim(control)
             return input_key
         elif input_key == '<':
-            if maze.walls[player.pos.y][player.pos.x] == '<':
+            if maze.walls[player.pos[1]][player.pos[0]] == '<':
                 change_level('<', maze.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase down')
                 key = control.get_key()
                 continue
         elif input_key == '>':
-            if maze.walls[player.pos.y][player.pos.x] == '>':
+            if maze.walls[player.pos[1]][player.pos[0]] == '>':
                 change_level('>', maze.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase up')
@@ -303,6 +303,6 @@ def create_dungeon(num, control):
         return Dungeon(
             walls=info['walls'],
             peeps=info['peeps'],
-            player=info['peeps'][0],
+            player=control.model.maze.player,
             items=info.get('items', []),
         )

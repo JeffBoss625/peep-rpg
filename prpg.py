@@ -24,7 +24,7 @@ import lib.dungeons as models
 w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
-    dungeon = models.create_dungeon('dungeon1')
+    dungeon = models.create_dungeon('level_2')
     main(root_layout, dungeon)
 
 
