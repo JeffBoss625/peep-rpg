@@ -2,6 +2,7 @@ import time
 from lib.dungeons import DUNGEONS
 from lib.dungeon import Dungeon
 import lib.move as mlib
+from lib import dungeons
 from lib.attack import peep_regenhp, choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
@@ -43,6 +44,8 @@ def player_turn(control):
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
             return 'q'
+        elif input_key == '>':
+            return '>'
         elif input_key == 'm':
             morph_peeps = list(p for p in maze.peeps if p.type == 'monster')
             if len(morph_peeps) > 1:
@@ -165,9 +168,15 @@ def main(root_layout, dungeon, get_key=None):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
-    dungeon.maze.elapse_time()
-    while execute_turn_seq(control):
-        dungeon.maze.elapse_time()
+    while True:
+        control.model.maze.elapse_time()
+        res = execute_turn_seq(control)
+        if res == 'quit' or res == 'player_died':
+            return 0
+        if res == 'down_level':
+            control.set_dungeon(dungeons.create_dungeon('level_2'))
+
+        control.model.maze.elapse_time()
 
 
 def execute_turn_seq(control):
@@ -187,11 +196,14 @@ def execute_turn_seq(control):
             if peep.hp <= 0:
                 continue
             if dungeon.is_player(peep):
-                if player_turn(control) == 'q':
-                    return False
+                res = player_turn(control)
+                if res == 'q':
+                    return 'quit'
+                elif res == '>':
+                    return 'down_level'
             else:
                 if not monster_turn(control, peep):
-                    return False
+                    return 'player_died'
 
         maze.ti += 1
 

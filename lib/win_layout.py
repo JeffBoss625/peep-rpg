@@ -315,7 +315,6 @@ class WinLayout(Layout):
         if winparent is None:
             raise RuntimeError(f'initwin() is not intended for root component "{self.name}". it is for subwindows windows only.')
 
-
         if winparent.window is None:
             if winparent.parent:
                 raise RuntimeError(f'initwin() should be called on non-root parent windows before children. parent:"{self.winparent.name}" child:"{self.name}"')
