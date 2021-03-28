@@ -105,7 +105,7 @@ MONSTERS = [
         fgcolor=COLOR.YELLOW,
         hitdice='3d12',
         thaco=19,
-        speed=13,
+        speed=20,
         ac=10,
         attacks=(
             AttackInfo('bite', '2d4'),
