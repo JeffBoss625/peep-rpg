@@ -63,7 +63,20 @@ DUNGEONS = {
             '%..........###.###........%',
             '%.........................%',
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-        ]
+        ],
+        'peeps': [
+            create_peep('human', name='Super Dad', pos=(1, 1)),
+            create_peep('giant rat', name='Scraggle', pos=(24, 1)),
+            create_peep('giant rat', name='Scriggy', pos=(25, 1)),
+            create_peep('giant rat', name='Scritch', pos=(24, 2)),
+            create_peep('giant rat', name='Wriggle', pos=(25, 2)),
+            create_peep('giant rat', name='Scatter', pos=(24, 3)),
+            create_peep('giant rat', name='Skitter', pos=(25, 3)),
+            create_peep('giant rat', name='Skreet', pos=(24, 4)),
+            create_peep('giant rat', name='Squeak', pos=(25, 4)),
+            create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
+        ],
+        'level': 1,
     },
     'level_2':{
         'walls': [
@@ -92,7 +105,8 @@ DUNGEONS = {
         'peeps':[
             create_peep('human', name='Super Dad', pos=(10,1)),
             create_peep('balrog', name='Bolrog', pos=(10,18)),
-        ]
+        ],
+        'level': 2,
     },
     'open':{
         'walls': [
@@ -140,4 +154,5 @@ def create_dungeon(info):
         peeps=info['peeps'],
         player=info['peeps'][0],
         items=info.get('items', []),
+        level=info.get('level', 1),
     )

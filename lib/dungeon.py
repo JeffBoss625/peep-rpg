@@ -172,12 +172,13 @@ class Logger:
         self.logger.log(s)
 
 class Dungeon(DataModel):
-    def __init__(self, walls=(), peeps=(), player=None, items=(), seed=0):
+    def __init__(self, walls=(), peeps=(), player=None, items=(), level=1, seed=0):
         super().__init__()
         peepmodel = ModelList()
         peepmodel.extend(peeps)
         itemsmodel = ModelList()
         itemsmodel.extend(items)
+        self.level = level
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
         self.maze = MazeModel(walls, peeps, player, items, logger=Logger(self))

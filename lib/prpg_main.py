@@ -44,8 +44,8 @@ def player_turn(control):
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
             return 'q'
-        elif input_key == '>':
-            return '>'
+        elif input_key == '>' or input_key == '<':
+            return input_key
         elif input_key == 'm':
             morph_peeps = list(p for p in maze.peeps if p.type == 'monster')
             if len(morph_peeps) > 1:
@@ -59,16 +59,16 @@ def player_turn(control):
         elif input_key == 'a':
             player_aim(control)
             return input_key
-        elif input_key == '<':
-            if maze.walls[player.pos[1]][player.pos[0]] == '<':
-                change_level('<', maze.level, control)
+        elif input_key == '>':
+            if maze.walls.text[player.pos[1]][player.pos[0]] == '<':
+                change_level('>', maze.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase down')
                 key = control.get_key()
                 continue
-        elif input_key == '>':
-            if maze.walls[player.pos[1]][player.pos[0]] == '>':
-                change_level('>', maze.level, control)
+        elif input_key == '<':
+            if maze.walls.text[player.pos[1]][player.pos[0]] == '>':
+                change_level('<', maze.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase up')
             key = control.get_key()
@@ -174,7 +174,9 @@ def main(root_layout, dungeon, get_key=None):
         if res == 'quit' or res == 'player_died':
             return 0
         if res == 'down_level':
-            control.set_dungeon(dungeons.create_dungeon('level_2'))
+            control.set_dungeon(dungeons.create_dungeon(f'level_{control.model.level + 1}'))
+        if res == 'up_level':
+            control.set_dungeon(dungeons.create_dungeon(f'level_{control.model.level - 1}'))
 
         control.model.maze.elapse_time()
 
@@ -201,6 +203,8 @@ def execute_turn_seq(control):
                     return 'quit'
                 elif res == '>':
                     return 'down_level'
+                elif res == '<':
+                    return 'up_level'
             else:
                 if not monster_turn(control, peep):
                     return 'player_died'

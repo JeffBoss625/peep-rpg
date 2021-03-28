@@ -99,6 +99,22 @@ MONSTERS = [
     ),
 
     PType(
+        name='giant rat leader',
+        char='R',
+        type='monster',
+        fgcolor=COLOR.YELLOW,
+        hitdice='3d12',
+        thaco=19,
+        speed=13,
+        ac=10,
+        attacks=(
+            AttackInfo('bite', '2d4'),
+            AttackInfo('scratch', '4d2'),
+            AttackInfo('tail', '8d1'),
+        )
+    ),
+
+    PType(
         name='big bird',
         char='b',
         type='monster',
