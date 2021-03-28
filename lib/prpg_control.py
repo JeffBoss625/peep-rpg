@@ -56,6 +56,20 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
+    def set_dungeon(self, dungeon):
+        self.model = dungeon
+
+        def win(name):
+            return self.root_layout.info.comp_by_name[name].window
+
+        win(WIN.TITLE).model = dungeon.title
+        win(WIN.STATS).model = dungeon.maze
+        win(WIN.EQUIP).model = dungeon.equip
+        win(WIN.MAZE).model = dungeon.maze
+        win(WIN.BANNER).model = dungeon.banner_model
+        win(WIN.MESSAGES).model = dungeon.message_model
+        win(WIN.LOG).model = dungeon.log_model
+
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
 
@@ -91,6 +105,7 @@ def init_windows(root_layout, model):
     win(WIN.BANNER).initwin(TextWindow, model=model.banner_model, trunc_y=SIDE.TOP)
     win(WIN.MESSAGES).initwin(TextWindow, model=model.message_model, trunc_y=SIDE.TOP)
     win(WIN.LOG).initwin(TextWindow, model=model.log_model, trunc_y=SIDE.TOP)
+
 
 # if __name__ == '__main__':
 #     model = PrpgModel(peeps=PEEPS, maze=MAZE, player=PEEPS[0])
