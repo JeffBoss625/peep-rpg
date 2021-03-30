@@ -63,9 +63,9 @@ class PrpgControl:
         def win(name):
             return self.root_layout.info.comp_by_name[name].window
 
-        win(WIN.TITLE).model = dungeon.title
-        win(WIN.STATS).model = dungeon.maze
-        win(WIN.EQUIP).model = dungeon.equip
+        win(WIN.TITLE).model = dungeon.maze.player
+        win(WIN.STATS).model = dungeon.maze.player
+        win(WIN.EQUIP).model = dungeon.maze.player
         win(WIN.MAZE).model = dungeon.maze
         win(WIN.BANNER).model = dungeon.banner_model
         win(WIN.MESSAGES).model = dungeon.message_model

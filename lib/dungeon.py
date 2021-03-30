@@ -187,8 +187,6 @@ class Dungeon(DataModel):
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
-        self.stats = self.maze
-        self.equip = self.maze
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array

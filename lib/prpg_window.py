@@ -39,7 +39,7 @@ class TitleWindow(Window):
         super().__init__(name, parent, **params)
 
     def do_paint(self):
-        p = self.model.player
+        p = self.model
         self.write_lines([
             p.name,
             # class
@@ -53,7 +53,7 @@ class StatsWindow(Window):
         super().__init__(name, parent, **params)
 
     def do_paint(self):
-        p = self.model.player
+        p = self.model  # player
 
         # x = 0
         # y = 0
@@ -88,7 +88,7 @@ class EquipWindow(Window):
         super().__init__(name, parent, **params)
 
     def do_paint(self):
-        p = self.model.player
+        p = self.model
         self.write_lines([
             'equip',
         ])
