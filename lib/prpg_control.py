@@ -43,7 +43,8 @@ class PrpgControl:
         # Bottom Row
         main_panel.window(WIN.LOG, Con(30,4))
 
-        init_windows(root_layout, model)
+        init_windows(root_layout)
+        self.set_dungeon(model)
         self.root_win = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
@@ -91,20 +92,20 @@ class PrpgControl:
         except Exception as e:
             self.root_layout.log(e)
 
-def init_windows(root_layout, model):
+def init_windows(root_layout):
     def win(name):
         return root_layout.info.comp_by_name[name]
 
     # custom windows
-    win(WIN.TITLE).initwin(TitleWindow, model=model.title, trunc_y=SIDE.TOP)
-    win(WIN.STATS).initwin(StatsWindow, model=model.maze)
-    win(WIN.EQUIP).initwin(EquipWindow, model=model.equip)
-    win(WIN.MAZE).initwin(MazeWindow, model=model.maze, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
+    win(WIN.TITLE).initwin(TitleWindow, trunc_y=SIDE.TOP)
+    win(WIN.STATS).initwin(StatsWindow)
+    win(WIN.EQUIP).initwin(EquipWindow)
+    win(WIN.MAZE).initwin(MazeWindow, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
-    win(WIN.BANNER).initwin(TextWindow, model=model.banner_model, trunc_y=SIDE.TOP)
-    win(WIN.MESSAGES).initwin(TextWindow, model=model.message_model, trunc_y=SIDE.TOP)
-    win(WIN.LOG).initwin(TextWindow, model=model.log_model, trunc_y=SIDE.TOP)
+    win(WIN.BANNER).initwin(TextWindow, trunc_y=SIDE.TOP)
+    win(WIN.MESSAGES).initwin(TextWindow, trunc_y=SIDE.TOP)
+    win(WIN.LOG).initwin(TextWindow, trunc_y=SIDE.TOP)
 
 
 # if __name__ == '__main__':
