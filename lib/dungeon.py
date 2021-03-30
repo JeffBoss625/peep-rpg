@@ -181,9 +181,9 @@ class Dungeon(DataModel):
         self.level = level
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
-        self.maze = MazeModel(walls, peeps, player, items, logger=Logger(self))
+        self.maze_model = MazeModel(walls, peeps, player, items, logger=Logger(self))
 
-        self.title = self.maze
+        self.title = self.maze_model
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
@@ -202,7 +202,7 @@ class Dungeon(DataModel):
         self.banner_model.replace(lines)
 
     def is_player(self, peep):
-        return peep == self.maze.player
+        return peep == self.maze_model.player
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")

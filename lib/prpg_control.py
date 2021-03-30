@@ -25,8 +25,8 @@ class PrpgControl:
         main_panel.window(WIN.TITLE, Con(40,3,0,3))
 
         # Center Row
-        maze_h = len(model.maze.walls.text) + 2
-        maze_w = len(model.maze.walls.text[0]) + 2
+        maze_h = len(model.maze_model.walls.text) + 2
+        maze_w = len(model.maze_model.walls.text[0]) + 2
         banner_h = 4
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
@@ -53,7 +53,7 @@ class PrpgControl:
             name = getattr(m, '"name" ', '')
             model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
-        # model.maze.subscribe(log_event_fn)
+        # model.maze_model.subscribe(log_event_fn)
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
@@ -63,10 +63,10 @@ class PrpgControl:
         def win(name):
             return self.root_layout.info.comp_by_name[name].window
 
-        win(WIN.TITLE).model = dungeon.maze.player
-        win(WIN.STATS).model = dungeon.maze.player
-        win(WIN.EQUIP).model = dungeon.maze.player
-        win(WIN.MAZE).model = dungeon.maze
+        win(WIN.TITLE).model = dungeon.maze_model.player
+        win(WIN.STATS).model = dungeon.maze_model.player
+        win(WIN.EQUIP).model = dungeon.maze_model.player
+        win(WIN.MAZE).model = dungeon.maze_model
         win(WIN.BANNER).model = dungeon.banner_model
         win(WIN.MESSAGES).model = dungeon.message_model
         win(WIN.LOG).model = dungeon.log_model

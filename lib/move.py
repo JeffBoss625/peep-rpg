@@ -86,13 +86,13 @@ def adjacent_pos(src_pos, direct):
 # Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
 # failed (hit a wall)
 def move_peep(dungeon, peep, dst_pos):
-    dst = peep_at_pos(dungeon.maze.peeps, dst_pos)
+    dst = peep_at_pos(dungeon.maze_model.peeps, dst_pos)
     if not dst:
         # players and ammo strike wall
-        char = dungeon.maze.wall_at(dst_pos)
+        char = dungeon.maze_model.wall_at(dst_pos)
         if char:
             if peep.type == 'projectile':
-                wall = create_wally(dungeon.maze, dst_pos)
+                wall = create_wally(dungeon.maze_model, dst_pos)
                 dst = wall
             else:
                 return False # peep tried wall - did not move

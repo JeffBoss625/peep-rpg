@@ -101,8 +101,8 @@ def test_handle_enemy_move():
     ]
     model = Dungeon(peeps=peeps, walls=walls, player=peeps[0])
     enemy = peeps[1]
-    dx = model.maze.player.pos[0] - enemy.pos[0]
-    dy = model.maze.player.pos[0] - enemy.pos[0]
+    dx = model.maze_model.player.pos[0] - enemy.pos[0]
+    dy = model.maze_model.player.pos[0] - enemy.pos[0]
     edir = mlib.direction_from_vector(dx, dy)
 
     mlib.move_peep(model, enemy, mlib.adjacent_pos(enemy.pos, edir))
