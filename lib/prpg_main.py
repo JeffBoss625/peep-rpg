@@ -44,8 +44,7 @@ def player_turn(control):
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
             return 'q'
-        elif input_key == '>' or input_key == '<':
-            return input_key
+
         elif input_key == 'm':
             morph_peeps = list(p for p in mm.peeps if p.type == 'monster')
             if len(morph_peeps) > 1:
@@ -60,14 +59,14 @@ def player_turn(control):
             player_aim(control)
             return input_key
         elif input_key == '>':
-            if mm.walls.text[player.pos[1]][player.pos[0]] == '<':
+            if mm.walls.text[player.pos[1]][player.pos[0]] == '>':
                 change_level('>', mm.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase down')
                 key = control.get_key()
                 continue
         elif input_key == '<':
-            if mm.walls.text[player.pos[1]][player.pos[0]] == '>':
+            if mm.walls.text[player.pos[1]][player.pos[0]] == '<':
                 change_level('<', mm.level, control)
             else:
                 dungeon.message(f'you are not standing at a staircase up')
@@ -77,6 +76,22 @@ def player_turn(control):
             dungeon.message(f'unknown command: "{input_key}"')
             # continue
 
+def change_level(dir, level, level_set, control):
+    if dir == '>':
+        dir = -1
+    if dir == '<':
+        dir = 1
+    else:
+        dir = 0
+    level.depth = level.depth + dir
+    if level_set != None:
+        level.depth = level_set
+    return create_dungeon(level.depth, control)
+
+def get_level(level_depth, control):
+    for l in control.model.levels:
+        if l.depth == level_depth:
+            return l
 
 def player_aim(control):
     dungeon = control.model
@@ -304,21 +319,19 @@ def target_for_direction(origin, direction, maze):
         y = y - d
     return x, y
 
-def change_level(dir, level, control):
-    if dir == '<':
-        create_dungeon(level + 1, control)
-    else:
-        create_dungeon(level - 1, control)
-
 def create_dungeon(num, control):
+    level = None
+    for l in control.model.levels:
+        if l.depth == num:
+            info = l
+            return Dungeon(
+                walls=info['walls'],
+                peeps=info['peeps'],
+                player=control.model.maze_model.player,
+                items=info.get('items', []),
+            )
+        continue
+
     if DUNGEONS.get('level_' + str(num), None) == None:
         control.model.message('This staircase has been caved in.')
         return None
-    else:
-        info = DUNGEONS.get('level_' + str(num), None)
-        return Dungeon(
-            walls=info['walls'],
-            peeps=info['peeps'],
-            player=control.model.maze_model.player,
-            items=info.get('items', []),
-        )
