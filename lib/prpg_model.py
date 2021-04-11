@@ -198,10 +198,12 @@ class GameModel(DataModel):
     def is_player(self, peep):
         return peep == self.maze_model.player
 
-    def set_player(self, peep, placement='>'):
-        self.maze_model.peeps.append(peep)
-        self.maze_model.player = peep
-        self.maze_model.player.pos = self.maze_model.pos_of(placement)
+    def set_player(self, peep, placement='<'):
+        mm = self.maze_model
+        mm.peeps.append(peep)
+        mm.player = peep
+        pos = 1,1
+        mm.player.pos = pos
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
