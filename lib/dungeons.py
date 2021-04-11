@@ -64,7 +64,6 @@ DUNGEONS = {
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1, 1)),
             create_peep('giant rat', name='Scraggle', pos=(24, 1)),
             create_peep('giant rat', name='Scriggy', pos=(25, 1)),
             create_peep('giant rat', name='Scritch', pos=(24, 2)),
@@ -102,7 +101,6 @@ DUNGEONS = {
             '%%%%%%%%%%%%%%%%%%%%%',
         ],
         'peeps':[
-            create_peep('human', name='Super Dad', pos=(10,1)),
             create_peep('balrog', name='Bolrog', pos=(10,18)),
         ],
         'level': 2,
@@ -153,7 +151,6 @@ def create_game(info):
     return GameModel(
         walls=info['walls'],
         peeps=info['peeps'],
-        player=info['peeps'][0],
         items=info.get('items', []),
         level=info.get('level', 1),
     )

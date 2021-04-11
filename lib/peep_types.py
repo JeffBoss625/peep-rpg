@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
-from lib.jjv_items import item_by_name
 from lib.body import create_humanoid, RACE
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
