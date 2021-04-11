@@ -1,5 +1,5 @@
 import time
-from lib.dungeons import DUNGEONS
+from lib.dungeons import get_dungeon
 from lib.dungeon import Dungeon
 import lib.move as mlib
 from lib import dungeons
@@ -311,11 +311,11 @@ def change_level(dir, level, control):
         create_dungeon(level - 1, control)
 
 def create_dungeon(num, control):
-    if DUNGEONS.get('level_' + str(num), None) == None:
+    if get_dungeon('level_' + str(num)) is None:
         control.model.message('This staircase has been caved in.')
         return None
     else:
-        info = DUNGEONS.get('level_' + str(num), None)
+        info = get_dungeon('level_' + str(num))
         return Dungeon(
             walls=info['walls'],
             peeps=info['peeps'],
