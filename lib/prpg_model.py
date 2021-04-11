@@ -217,6 +217,7 @@ class GameModel(DataModel):
         pos = mm.pos_of(placement)
         mm.player.pos = pos
 
+
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
         src.exp += dst.exp_value()

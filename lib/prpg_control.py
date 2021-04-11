@@ -44,7 +44,7 @@ class PrpgControl:
         main_panel.window(WIN.LOG, Con(30,4))
 
         init_windows(root_layout)
-        self.set_dungeon(model)
+        self.set_model(model)
         self.root_win = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
@@ -57,19 +57,24 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
-    def set_dungeon(self, game):
+    def set_model(self, game):
         self.model = game
-
         def win(name):
             return self.root_layout.info.comp_by_name[name].window
 
-        win(WIN.TITLE).model = game.maze_model.player
-        win(WIN.STATS).model = game.maze_model.player
-        win(WIN.EQUIP).model = game.maze_model.player
-        win(WIN.MAZE).model = game.maze_model
+        self.set_maze(game.maze_model)
         win(WIN.BANNER).model = game.banner_model
         win(WIN.MESSAGES).model = game.message_model
         win(WIN.LOG).model = game.log_model
+
+    def set_maze(self, maze_model):
+        def win(name):
+            return self.root_layout.info.comp_by_name[name].window
+
+        win(WIN.MAZE).model = maze_model
+        win(WIN.TITLE).model = maze_model.player
+        win(WIN.STATS).model = maze_model.player
+        win(WIN.EQUIP).model = maze_model.player
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
