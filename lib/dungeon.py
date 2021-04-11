@@ -178,8 +178,6 @@ class Dungeon(DataModel):
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
         self.maze_model = MazeModel(walls, peeps, player, items, logger=Logger(self))
-
-        self.title = self.maze_model
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
