@@ -171,7 +171,7 @@ class Logger:
     def log(self, s):
         self.logger.log(s)
 
-class Dungeon(DataModel):
+class GameModel(DataModel):
     def __init__(self, walls=(), peeps=(), player=None, items=(), level=1, seed=0):
         super().__init__()
         self.level = level

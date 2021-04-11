@@ -45,8 +45,8 @@ def level_calc(xp, factor, base):
 def get_pclass(name):
     return PCLASSES_BY_NAME[name]
 
-def handle_level_up(src, level, dungeon):
+def handle_level_up(src, level, game):
     while src.level < level:
         src.maxhp += round(roll_dice(src.hitdice) * src.hitdicefac)
         src.level += 1
-        dungeon.message(f'{src.name} is now level {src.level}!')
+        game.message(f'{src.name} is now level {src.level}!')

@@ -2,7 +2,6 @@ import os
 import curses
 
 from lib.logger import Logger
-from lib.prpg_control import PrpgControl
 from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
 import lib.dungeons as dungeons
@@ -24,8 +23,8 @@ import lib.dungeons as dungeons
 w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
-    dungeon = dungeons.get_dungeon('level_1')
-    main(root_layout, dungeon)
+    game = dungeons.create_game('level_1')
+    main(root_layout, game)
 
 
 curses.wrapper(cb)

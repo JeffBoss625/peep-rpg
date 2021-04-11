@@ -1,6 +1,4 @@
-import time
-from lib.dungeons import get_dungeon
-from lib.dungeon import Dungeon
+from lib.prpg_model import GameModel
 import lib.move as mlib
 from lib import dungeons
 from lib.attack import peep_regenhp, choose_ranged_attack
@@ -33,13 +31,13 @@ def player_turn(control):
     player.hp += peep_regenhp(player.maxhp, player.speed, player.regen_fac)
     if player.hp > player.maxhp: player.hp = player.maxhp
     while True:
-        dungeon = control.model
-        mm = dungeon.maze_model
+        game = control.model
+        mm = game.maze_model
         player = mm.player
         input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
             dst_pos = mlib.adjacent_pos(mm.player.pos, DIRECTION_KEYS[input_key])
-            if mlib.move_peep(dungeon, mm.player, dst_pos):
+            if mlib.move_peep(game, mm.player, dst_pos):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -51,9 +49,9 @@ def player_turn(control):
                 while mm.player == player:
                     player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
                 mm.player = player
-                dungeon.message("You are now " + player.name)
+                game.message("You are now " + player.name)
             else:
-                dungeon.message("You have nothing in range to brain-swap with")
+                game.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
             player_aim(control)
@@ -62,18 +60,18 @@ def player_turn(control):
             if mm.walls.text[player.pos[1]][player.pos[0]] == '>':
                 change_level('>', mm, 'None', control)
             else:
-                dungeon.message(f'you are not standing at a staircase down')
+                game.message(f'you are not standing at a staircase down')
                 key = control.get_key()
                 continue
         elif input_key == '<':
             if mm.walls.text[player.pos[1]][player.pos[0]] == '<':
                 change_level('<', mm, 'None', control)
             else:
-                dungeon.message(f'you are not standing at a staircase up')
+                game.message(f'you are not standing at a staircase up')
             key = control.get_key()
             continue
         else:
-            dungeon.message(f'unknown command: "{input_key}"')
+            game.message(f'unknown command: "{input_key}"')
             # continue
 
 def change_level(dir, level, level_set, control):
@@ -90,12 +88,12 @@ def change_level(dir, level, level_set, control):
     return create_dungeon(level.depth, control)
 
 def player_aim(control):
-    dungeon = control.model
-    mm = dungeon.maze_model
+    game = control.model
+    mm = game.maze_model
     player = mm.player
     mm.cursorvis = 1
     mm.cursorpos = (3, 3)
-    dungeon.message('Where do you want to shoot? (* to target)')
+    game.message('Where do you want to shoot? (* to target)')
     key = control.get_key()
     target = 'UNSET'
     while target == 'UNSET':
@@ -106,7 +104,7 @@ def player_aim(control):
         elif key == 'q' or key == Key.CTRL_Q:
             target = None
         else:
-            dungeon.message(f'{key} is not a valid direction to shoot')
+            game.message(f'{key} is not a valid direction to shoot')
             key = control.get_key()
             continue
 
@@ -118,8 +116,8 @@ def player_aim(control):
 
 
 def monster_turn(control, monster):
-    dungeon = control.model
-    mm = dungeon.maze_model
+    game = control.model
+    mm = game.maze_model
     player = mm.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
     ranged_attack = choose_ranged_attack(monster)
@@ -134,9 +132,9 @@ def monster_turn(control, monster):
         if monster.pos_i < len(monster.pos_path) - 1:
             monster.pos_i += 1
             dst_pos = monster.pos_path[monster.pos_i]
-            mlib.move_peep(dungeon, monster, dst_pos)
+            mlib.move_peep(game, monster, dst_pos)
         else:
-            dungeon.message(f'{monster.name} hits the ground')
+            game.message(f'{monster.name} hits the ground')
             monster.hp = 0  # todo: convert to item with chance of breaking
         return True
     elif monster.move_tactic == 'hunt':
@@ -152,7 +150,7 @@ def monster_turn(control, monster):
             direct = mlib.direction_from_vector(dx, dy)
 
         dst_pos = mlib.adjacent_pos(monster.pos, direct)
-        if mlib.move_peep(dungeon, monster, dst_pos):
+        if mlib.move_peep(game, monster, dst_pos):
             return True
 
         # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
@@ -160,19 +158,19 @@ def monster_turn(control, monster):
         while rotation <= 4:
             d2 = mlib.direction_relative(direct, rotation)
             dst_pos = mlib.adjacent_pos(monster.pos, d2)
-            if mlib.move_peep(dungeon, monster, dst_pos):
+            if mlib.move_peep(game, monster, dst_pos):
                 return True
             d2 = mlib.direction_relative(direct, -rotation)
             dst_pos = mlib.adjacent_pos(monster.pos, d2)
-            if mlib.move_peep(dungeon, monster, dst_pos):
+            if mlib.move_peep(game, monster, dst_pos):
                 return True
             rotation += 1
 
     return True
 
 
-def main(root_layout, dungeon, get_key=None):
-    control = PrpgControl(root_layout, dungeon)
+def main(root_layout, game, get_key=None):
+    control = PrpgControl(root_layout, game)
     if get_key is not None:
         control.get_key = get_key
     if sys.platform != "win32" and hasattr(control, 'resize_handler'):
@@ -185,16 +183,16 @@ def main(root_layout, dungeon, get_key=None):
         if res == 'quit' or res == 'player_died':
             return 0
         if res == 'down_level':
-            control.set_dungeon(dungeons.get_dungeon(f'level_{control.model.level + 1}'))
+            control.set_dungeon(dungeons.create_game(f'level_{control.model.level + 1}'))
         if res == 'up_level':
-            control.set_dungeon(dungeons.get_dungeon(f'level_{control.model.level - 1}'))
+            control.set_dungeon(dungeons.create_game(f'level_{control.model.level - 1}'))
 
         control.model.maze_model.elapse_time()
 
 
 def execute_turn_seq(control):
-    dungeon = control.model
-    mm = dungeon.maze_model
+    game = control.model
+    mm = game.maze_model
     while not mm.new_peeps and mm.ti < len(mm.turn_seq):
         # print(f'turn_seq {mm.ti}/{mm.turn_seq}')
         peep_indexes = mm.turn_seq[mm.ti]
@@ -208,7 +206,7 @@ def execute_turn_seq(control):
             peep = mm.peeps[peep_index]
             if peep.hp <= 0:
                 continue
-            if dungeon.is_player(peep):
+            if game.is_player(peep):
                 res = player_turn(control)
                 if res == 'q':
                     return 'quit'
@@ -228,30 +226,30 @@ def execute_turn_seq(control):
 # Interactively select a target to shoot
 # Return a selected peep or position (int, int) for the target.
 def choose_target(control, src_peep):
-    dungeon = control.model
-    mm = dungeon.maze_model
+    game = control.model
+    mm = game.maze_model
     top = f'*: choose next, t: target, q: quit'
     targets = target_list(src_peep, mm.peeps)  # peeps sorted in order of distance and relative angle from origin
     ti = next_target(src_peep, targets, mm.walls, 0)  # return None if no target
     if ti == -1:
-        dungeon.message('No targets in sight')
+        game.message('No targets in sight')
         return None  # todo: start cursor on self to allow manual selection
     while True:
         mm.target_path = tuple(line_points(src_peep.pos, targets[ti].pos))  # draws the target path
-        dungeon.banner([top, f'Aiming at {targets[ti].name}'])
+        game.banner([top, f'Aiming at {targets[ti].name}'])
         input_key = control.get_key()
         if input_key == 't':
             mm.target_path = ()
-            dungeon.banner('')
+            game.banner('')
             return targets[ti]
         elif input_key == 'q' or input_key == Key.CTRL_Q:
             mm.target_path = ()
-            dungeon.banner('')
+            game.banner('')
             return None
         elif input_key == '*':
             ti = next_target(src_peep, targets, mm.walls, ti + 1)
         else:
-            dungeon.message(f'unknown command "{input_key}"')
+            game.message(f'unknown command "{input_key}"')
 
 
 # return the index of the next target in the list (by distance from origin)
@@ -321,7 +319,7 @@ def create_dungeon(num, control):
         if l.depth == num:
             info = l
             level = 'found'
-            return Dungeon(
+            return GameModel(
                 walls=info['walls'],
                 peeps=info['peeps'],
                 player=control.model.maze_model.player,
