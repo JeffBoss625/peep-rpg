@@ -1,7 +1,7 @@
 import lib.move as mlib
 from lib.move import Direction
 from lib.peeps import Peep, Attack
-from lib.dungeons import Dungeon
+from lib.dungeon import Dungeon
 from lib.dungeon import elapse_time
 import sys
 

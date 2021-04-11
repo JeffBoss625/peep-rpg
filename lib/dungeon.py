@@ -174,10 +174,6 @@ class Logger:
 class Dungeon(DataModel):
     def __init__(self, walls=(), peeps=(), player=None, items=(), level=1, seed=0):
         super().__init__()
-        peepmodel = ModelList()
-        peepmodel.extend(peeps)
-        itemsmodel = ModelList()
-        itemsmodel.extend(items)
         self.level = level
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
