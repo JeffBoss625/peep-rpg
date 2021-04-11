@@ -318,6 +318,7 @@ def create_dungeon(num, control):
     level = None
     for d in DUNGEONS:
         if d == (f'level_{num}'):
+            info = DUNGEONS[d]
             return GameModel(
                 walls=info['walls'],
                 peeps=info['peeps'],
