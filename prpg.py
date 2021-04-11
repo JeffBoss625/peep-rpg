@@ -4,7 +4,9 @@ import curses
 from lib.logger import Logger
 from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
+from lib.peep_types import create_peep
 import lib.dungeons as dungeons
+
 
 # note - to set terminal size on windows machines: os.system("mode con cols=120 lines=40")
 #       on mac: os.system("resize -s 40 120")  (rows, cols)
@@ -24,6 +26,8 @@ w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
     game = dungeons.create_game('level_1')
+    game.set_player(create_peep('human', name='Super Dad'), placement='>')
+
     main(root_layout, game)
 
 
