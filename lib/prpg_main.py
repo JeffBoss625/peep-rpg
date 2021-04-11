@@ -1,3 +1,4 @@
+from lib.dungeons import DUNGEONS
 from lib.prpg_model import GameModel
 import lib.move as mlib
 from lib import dungeons
@@ -315,16 +316,22 @@ def target_for_direction(origin, direction, maze):
 
 def create_dungeon(num, control):
     level = None
-    for l in control.model.levels:
-        if l.depth == num:
-            info = l
-            level = 'found'
+    for d in DUNGEONS:
+        if d == (f'level_{num}'):
             return GameModel(
                 walls=info['walls'],
                 peeps=info['peeps'],
                 player=control.model.maze_model.player,
                 items=info.get('items', []),
             )
+            # info = d
+            # level = 'found'
+            # return GameModel(
+            #     walls=info['walls'],
+            #     peeps=info['peeps'],
+            #     player=control.model.maze_model.player,
+            #     items=info.get('items', []),
+            # )
         continue
     if level == None:
         control.model.message('This staircase has been caved in.')

@@ -41,6 +41,16 @@ class MazeModel(DataModel):
         if ret == '#' or ret == '%':
             return ret
 
+    def pos_of(self, char):
+        x = -1
+        y = -1
+        for l in self.walls.text:
+            y += 1
+            for c in self.walls.text.l:
+                x += 1
+                if c == char:
+                    return x, y
+
     def create_projectile(self, src, ptype, targetpath, attacks):
         shot = create_peep(ptype, pos=targetpath[0], attacks=attacks)
         shot.pos_path = targetpath
