@@ -4,7 +4,6 @@ from lib.peep_types import create_peep
 from lib.players import player_by_name
 from lib.dungeon import Dungeon
 from lib.items.item import Item
-# import lib.items.bow
 
 DUNGEONS = {
     'dungeon1': {
@@ -145,10 +144,13 @@ DUNGEONS = {
     }
 }
 
-def create_dungeon(info):
-    if isinstance(info, str):
-        info = DUNGEONS[info]
+def get_dungeon(name):
+    info = DUNGEONS.get(name, None)
+    if info is None:
+        return None
+    return create_dungeon(info)
 
+def create_dungeon(info):
     return Dungeon(
         walls=info['walls'],
         peeps=info['peeps'],

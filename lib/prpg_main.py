@@ -1,5 +1,5 @@
 import time
-from lib.dungeons import DUNGEONS
+from lib.dungeons import get_dungeon
 from lib.dungeon import Dungeon
 import lib.move as mlib
 from lib import dungeons
@@ -189,9 +189,9 @@ def main(root_layout, dungeon, get_key=None):
         if res == 'quit' or res == 'player_died':
             return 0
         if res == 'down_level':
-            control.set_dungeon(dungeons.create_dungeon(f'level_{control.model.level + 1}'))
+            control.set_dungeon(dungeons.get_dungeon(f'level_{control.model.level + 1}'))
         if res == 'up_level':
-            control.set_dungeon(dungeons.create_dungeon(f'level_{control.model.level - 1}'))
+            control.set_dungeon(dungeons.get_dungeon(f'level_{control.model.level - 1}'))
 
         control.model.maze_model.elapse_time()
 
