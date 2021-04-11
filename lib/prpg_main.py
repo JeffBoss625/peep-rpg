@@ -60,14 +60,14 @@ def player_turn(control):
             return input_key
         elif input_key == '>':
             if mm.walls.text[player.pos[1]][player.pos[0]] == '>':
-                change_level('>', mm.level, control)
+                change_level('>', mm, 'None', control)
             else:
                 dungeon.message(f'you are not standing at a staircase down')
                 key = control.get_key()
                 continue
         elif input_key == '<':
             if mm.walls.text[player.pos[1]][player.pos[0]] == '<':
-                change_level('<', mm.level, control)
+                change_level('<', mm, 'None', control)
             else:
                 dungeon.message(f'you are not standing at a staircase up')
             key = control.get_key()
@@ -77,21 +77,17 @@ def player_turn(control):
             # continue
 
 def change_level(dir, level, level_set, control):
+    level.depth = control.model.level
     if dir == '>':
-        dir = -1
-    if dir == '<':
         dir = 1
+    elif dir == '<':
+        dir = -1
     else:
         dir = 0
     level.depth = level.depth + dir
-    if level_set != None:
+    if level_set != 'None':
         level.depth = level_set
     return create_dungeon(level.depth, control)
-
-def get_level(level_depth, control):
-    for l in control.model.levels:
-        if l.depth == level_depth:
-            return l
 
 def player_aim(control):
     dungeon = control.model
