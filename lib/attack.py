@@ -44,10 +44,10 @@ def calc_hit(ac, thaco):
 
 # attack dst with src/src_attack.
 # return True if the attack hits, False if missed
-def attack_dst(src, dst, src_attack, dungeon):
+def attack_dst(src, dst, src_attack, game):
     if src == dst:
         return False
-    dungeon.log(f'attack({src}, {dst}, {src_attack})')
+    game.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
     if hit:
         dice_info = parse_dice(src_attack.damage)
@@ -66,31 +66,31 @@ def attack_dst(src, dst, src_attack, dungeon):
             dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
         tot_hp_loss *= dmg_multiplier
         if dmg_multiplier == 0.3:
-            dungeon.message('the blow hit the helmet')
+            game.message('the blow hit the helmet')
         if dmg_multiplier == 1:
-            dungeon.message('the blow hit the torso')
+            game.message('the blow hit the torso')
         if dmg_multiplier == 0.15:
-            dungeon.message('the blow hit the shield')
+            game.message('the blow hit the shield')
         if dmg_multiplier == 2:
-            dungeon.message('the blow hit the head')
+            game.message('the blow hit the head')
         if dmg_multiplier == 0.75:
-            dungeon.message('the blow hit the legs')
-        dungeon.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
+            game.message('the blow hit the legs')
+        game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
-            dungeon.monster_killed(src, src_attack, dst)
+            game.monster_killed(src, src_attack, dst)
         else:
-            dungeon.message(f'  {dst.name} has {round(dst.hp)} points remaining')
+            game.message(f'  {dst.name} has {round(dst.hp)} points remaining')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
-                dungeon.message(f'  {src.name} is destroyed')
+                game.message(f'  {src.name} is destroyed')
             else:
                 # todo: convert arrow into item
                 src.speed = 0   # todo: remove remaining moves in turn_seq
                 src.attacks = ()
     else:
-        dungeon.message(f'the {src.name} missed the {dst.name}')
+        game.message(f'the {src.name} missed the {dst.name}')
         return False
 
 # return chance of deflecting a blow

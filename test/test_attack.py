@@ -25,7 +25,7 @@ class Out:
     def log(self, *args):
         self.args.append(args)
 
-def assert_dungeon(model, keys, paint=False):
+def assert_game(model, keys, paint=False):
     root_layout = dummy_root(dim=Dim(110, 14), logger=Logger('dbg.py'))
 
     control = PrpgControl(root_layout, model)
@@ -161,4 +161,4 @@ def test_shield_block():
     p = model.maze.peeps[0]
     model.maze.peeps[0].inventory.hand1 = shield()
     print(p)
-    assert_dungeon(model, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=True)
+    assert_game(model, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=True)

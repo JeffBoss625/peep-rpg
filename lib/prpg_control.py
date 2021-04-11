@@ -57,19 +57,19 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
-    def set_dungeon(self, dungeon):
-        self.model = dungeon
+    def set_dungeon(self, game):
+        self.model = game
 
         def win(name):
             return self.root_layout.info.comp_by_name[name].window
 
-        win(WIN.TITLE).model = dungeon.maze_model.player
-        win(WIN.STATS).model = dungeon.maze_model.player
-        win(WIN.EQUIP).model = dungeon.maze_model.player
-        win(WIN.MAZE).model = dungeon.maze_model
-        win(WIN.BANNER).model = dungeon.banner_model
-        win(WIN.MESSAGES).model = dungeon.message_model
-        win(WIN.LOG).model = dungeon.log_model
+        win(WIN.TITLE).model = game.maze_model.player
+        win(WIN.STATS).model = game.maze_model.player
+        win(WIN.EQUIP).model = game.maze_model.player
+        win(WIN.MAZE).model = game.maze_model
+        win(WIN.BANNER).model = game.banner_model
+        win(WIN.MESSAGES).model = game.message_model
+        win(WIN.LOG).model = game.log_model
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]

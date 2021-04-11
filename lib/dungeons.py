@@ -2,7 +2,7 @@ from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
 from lib.players import player_by_name
-from lib.dungeon import Dungeon
+from lib.prpg_model import GameModel
 from lib.items.item import Item
 
 DUNGEONS = {
@@ -144,14 +144,13 @@ DUNGEONS = {
     }
 }
 
-def get_dungeon(name):
-    info = DUNGEONS.get(name, None)
-    if info is None:
-        return None
-    return create_dungeon(info)
+def create_game(info):
+    if isinstance(info, str):
+        info = DUNGEONS.get(info, None)
+        if info is None:
+            return None
 
-def create_dungeon(info):
-    return Dungeon(
+    return GameModel(
         walls=info['walls'],
         peeps=info['peeps'],
         player=info['peeps'][0],

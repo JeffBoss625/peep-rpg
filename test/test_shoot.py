@@ -10,10 +10,10 @@ from lib.constants import Key
 from lib.win_layout import Dim
 
 
-def assert_dungeon(dungeon, keys, paint=False):
+def assert_game(game, keys, paint=False):
     root_layout = dummy_root(dim=Dim(110, 14), logger=Logger('dbg.py'))
 
-    control = PrpgControl(root_layout, dungeon)
+    control = PrpgControl(root_layout, game)
 
     def get_key():
         if paint:
@@ -21,12 +21,12 @@ def assert_dungeon(dungeon, keys, paint=False):
         ret = keys.pop(0)
         return ret
 
-    main(root_layout, dungeon, get_key)
+    main(root_layout, game, get_key)
 
 
 def test_shoot_wall():
     random.seed = 1
-    dungeon =  dungeons.create_dungeon({
+    game =  dungeons.create_dungeon({
         'walls': [
             '%%%%',
             '%..%',
@@ -36,12 +36,12 @@ def test_shoot_wall():
             create_peep('human', name='Super Dad', pos=(1,1)),
         ]
     })
-    assert_dungeon(dungeon, ['a', 'l', '.', '.', Key.CTRL_Q])
+    assert_game(game, ['a', 'l', '.', '.', Key.CTRL_Q])
 
 
 def test_shoot_thru_monster():
     random.seed = 1
-    dungeon =  dungeons.create_dungeon({
+    game =  dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%....%',
@@ -52,11 +52,11 @@ def test_shoot_thru_monster():
             create_peep('dodger', name='Dummy', pos=(4,1))
         ]
     })
-    assert_dungeon(dungeon, ['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
+    assert_game(game, ['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
 
 def test_shoot_monster():
     random.seed = 1
-    dungeon =  dungeons.create_dungeon({
+    game =  dungeons.create_dungeon({
         'walls': [
             '%%%%%%',
             '%....%',
@@ -67,11 +67,11 @@ def test_shoot_monster():
             create_peep('goblin', name='Gark', pos=(4,1))
         ]
     })
-    assert_dungeon(dungeon, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
+    assert_game(game, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
 
 def test_shoot_monster_blocked():
     random.seed = 1
-    dungeon =  dungeons.create_dungeon({
+    game =  dungeons.create_dungeon({
         'walls': [
             '%%%%%%',
             '%..%.%',
@@ -82,12 +82,12 @@ def test_shoot_monster_blocked():
             create_peep('goblin', name='Gark', pos=(4,1))
         ]
     })
-    assert_dungeon(dungeon, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
+    assert_game(game, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
 
 
 def test_balrog_whip():
     random.seed = 1
-    dungeon = dungeons.create_dungeon({
+    game = dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%....%',
@@ -98,5 +98,5 @@ def test_balrog_whip():
             create_peep('balrog', name='Gark', pos=(3,1))
         ]
     })
-    assert_dungeon(dungeon, ['.', '.', '.', Key.CTRL_Q], paint=True)
+    assert_game(game, ['.', '.', '.', Key.CTRL_Q], paint=True)
     print('hi')

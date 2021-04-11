@@ -1,8 +1,8 @@
 import lib.move as mlib
 from lib.move import Direction
 from lib.peeps import Peep, Attack
-from lib.dungeon import Dungeon
-from lib.dungeon import elapse_time
+from lib.game import GameModel
+from lib.game import elapse_time
 import sys
 
 def printe(s):
@@ -49,7 +49,7 @@ def test_move_peep():
         '......',        # monster here at [4,3]
     ]
     player = peeps[0]
-    model = Dungeon(walls=walls, peeps=peeps)
+    model = GameModel(walls=walls, peeps=peeps)
     mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.RIGHT))
     assert player.pos == (1,0) # x changed!
 
@@ -80,7 +80,7 @@ def test_move_attack():
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = Dungeon(peeps=peeps, walls=walls)
+    model = GameModel(peeps=peeps, walls=walls)
     # Run into monster at [0,2]
     mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN))
     assert player.pos == (0,1)
@@ -99,7 +99,7 @@ def test_handle_enemy_move():
         '......',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = Dungeon(peeps=peeps, walls=walls, player=peeps[0])
+    model = GameModel(peeps=peeps, walls=walls, player=peeps[0])
     enemy = peeps[1]
     dx = model.maze_model.player.pos[0] - enemy.pos[0]
     dy = model.maze_model.player.pos[0] - enemy.pos[0]
