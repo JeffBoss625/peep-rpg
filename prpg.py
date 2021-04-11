@@ -26,7 +26,7 @@ w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
     game = dungeons.create_game('level_1')
-    game.set_player(create_peep('human', name='Super Dad'), placement='>')
+    game.set_player(create_peep('human', name='Super Dad'), placement='<')
 
     main(root_layout, game)
 

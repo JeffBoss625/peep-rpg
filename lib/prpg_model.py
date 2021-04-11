@@ -46,10 +46,12 @@ class MazeModel(DataModel):
         y = -1
         for l in self.walls.text:
             y += 1
-            for c in self.walls.text.l:
+            x = -1
+            for c in self.walls.text[y]:
                 x += 1
                 if c == char:
                     return x, y
+        raise LookupError (f'Character "{char}" not found in maze')
 
     def create_projectile(self, src, ptype, targetpath, attacks):
         shot = create_peep(ptype, pos=targetpath[0], attacks=attacks)
