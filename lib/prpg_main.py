@@ -324,6 +324,7 @@ def create_dungeon(num, control):
     for l in control.model.levels:
         if l.depth == num:
             info = l
+            level = 'found'
             return Dungeon(
                 walls=info['walls'],
                 peeps=info['peeps'],
@@ -331,7 +332,6 @@ def create_dungeon(num, control):
                 items=info.get('items', []),
             )
         continue
-
-    if DUNGEONS.get('level_' + str(num), None) == None:
+    if level == None:
         control.model.message('This staircase has been caved in.')
         return None
