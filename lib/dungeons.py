@@ -144,10 +144,13 @@ DUNGEONS = {
     }
 }
 
-def create_dungeon(info):
-    if isinstance(info, str):
-        info = DUNGEONS[info]
+def get_dungeon(name):
+    info = DUNGEONS.get(name, None)
+    if info is None:
+        return None
+    return create_dungeon(info)
 
+def create_dungeon(info):
     return Dungeon(
         walls=info['walls'],
         peeps=info['peeps'],
