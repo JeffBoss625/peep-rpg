@@ -214,7 +214,7 @@ class GameModel(DataModel):
         mm = self.maze_model
         mm.peeps.append(peep)
         mm.player = peep
-        pos = 1,1
+        pos = mm.pos_of(placement)
         mm.player.pos = pos
 
     def monster_killed(self, src, src_attack, dst):
