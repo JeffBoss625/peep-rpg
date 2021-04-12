@@ -1,3 +1,4 @@
+from lib import dungeons
 from lib.constants import Key
 from lib.prpg_window import *
 from lib.win_layout import Con, Orient
@@ -57,24 +58,47 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
+    def change_level(self, dir_char):
+        if dir_char == '>':
+            direction = 1
+            start_char = '<'
+        elif dir_char == '<':
+            direction = -1
+            start_char = '>'
+        else:
+            return
+
+        self.model.level = self.model.level + direction
+
+        maze = dungeons.create_maze(f'level_{self.model.level}')
+        if maze is None:
+            self.model.message('This staircase has been caved in.')
+            return
+
+        maze.set_player(self.model.maze_model.player)
+        self.set_maze(maze, start_char)
+
+    def _win(self, name):
+        return self.root_layout.info.comp_by_name[name].window
+
     def set_model(self, game):
         self.model = game
-        def win(name):
-            return self.root_layout.info.comp_by_name[name].window
 
-        self.set_maze(game.maze_model)
-        win(WIN.BANNER).model = game.banner_model
-        win(WIN.MESSAGES).model = game.message_model
-        win(WIN.LOG).model = game.log_model
+        self.set_maze(game.maze_model, '<')
+        self._win(WIN.BANNER).model = game.banner_model
+        self._win(WIN.MESSAGES).model = game.message_model
+        self._win(WIN.LOG).model = game.log_model
 
-    def set_maze(self, maze_model):
-        def win(name):
-            return self.root_layout.info.comp_by_name[name].window
+    def set_maze(self, maze_model, start_char):
+        player = self.model.maze_model.player
+        self.model.maze_model = maze_model
+        if player:
+            self.model.set_player(player, start_char)
 
-        win(WIN.MAZE).model = maze_model
-        win(WIN.TITLE).model = maze_model.player
-        win(WIN.STATS).model = maze_model.player
-        win(WIN.EQUIP).model = maze_model.player
+        self._win(WIN.MAZE).model = maze_model
+        self._win(WIN.TITLE).model = maze_model.player
+        self._win(WIN.STATS).model = maze_model.player
+        self._win(WIN.EQUIP).model = maze_model.player
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]

@@ -58,35 +58,22 @@ def player_turn(control):
             player_aim(control)
             return input_key
         elif input_key == '>':
-            if mm.walls.text[player.pos[1]][player.pos[0]] == '>':
-                change_level('>', mm, 'None', control)
+            if mm.char_at(*player.pos) == '>':
+                return input_key
             else:
                 game.message(f'you are not standing at a staircase down')
-                key = control.get_key()
+                control.get_key()
                 continue
         elif input_key == '<':
-            if mm.walls.text[player.pos[1]][player.pos[0]] == '<':
-                change_level('<', mm, 'None', control)
+            if mm.char_at(*player.pos) == '<':
+                return input_key
             else:
                 game.message(f'you are not standing at a staircase up')
-            key = control.get_key()
+            control.get_key()
             continue
         else:
             game.message(f'unknown command: "{input_key}"')
             # continue
-
-def change_level(dir, level, level_set, control):
-    level.depth = control.model.level
-    if dir == '>':
-        dir = 1
-    elif dir == '<':
-        dir = -1
-    else:
-        dir = 0
-    level.depth = level.depth + dir
-    if level_set != 'None':
-        level.depth = level_set
-    return create_dungeon(level.depth, control)
 
 def player_aim(control):
     game = control.model
@@ -184,9 +171,13 @@ def main(root_layout, game, get_key=None):
         if res == 'quit' or res == 'player_died':
             return 0
         if res == 'down_level':
-            control.set_model(dungeons.create_game(f'level_{control.model.level + 1}'))
+            maze = dungeons.create_maze(f'level_{control.model.level + 1}')
+            control.set_maze(maze, '<')
+            control.model.level += 1
         if res == 'up_level':
-            control.set_model(dungeons.create_game(f'level_{control.model.level - 1}'))
+            maze = dungeons.create_maze(f'level_{control.model.level - 1}')
+            control.set_maze(maze, '>')
+            control.model.level -= 1
 
         control.model.maze_model.elapse_time()
 
@@ -313,27 +304,3 @@ def target_for_direction(origin, direction, maze):
         x = x - d
         y = y - d
     return x, y
-
-def create_dungeon(num, control):
-    level = None
-    for d in DUNGEONS:
-        if d == (f'level_{num}'):
-            info = DUNGEONS[d]
-            return GameModel(
-                walls=info['walls'],
-                peeps=info['peeps'],
-                player=control.model.maze_model.player,
-                items=info.get('items', []),
-            )
-            # info = d
-            # level = 'found'
-            # return GameModel(
-            #     walls=info['walls'],
-            #     peeps=info['peeps'],
-            #     player=control.model.maze_model.player,
-            #     items=info.get('items', []),
-            # )
-        continue
-    if level == None:
-        control.model.message('This staircase has been caved in.')
-        return None

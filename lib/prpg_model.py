@@ -16,19 +16,21 @@ from lib.peep_types import create_peep
 
 
 class MazeModel(DataModel):
-    def __init__(self, walls, peeps, player=None, items=(), logger=None):
+    def __init__(self, walls, peeps, items=(), logger=None):
         super().__init__()
         self.walls = TextModel('walls', walls)
         self.peeps = ModelList()
         self.peeps.extend(peeps)
         self.target_path = ()          # line of points (from source and target) drawn to select targets on the screen
-
-        self.player = player
         self.items = items
+
+        self.player = None
         self.new_peeps = []
         self.turn_seq = None
-        self.logger = logger
         self.ti = 0
+
+        self.logger = logger
+
         self.cursorpos = (0,0)
         self.cursorvis = 0
 
@@ -40,6 +42,23 @@ class MazeModel(DataModel):
         ret = self.walls.char_at(*pos)
         if ret == '#' or ret == '%':
             return ret
+
+    def char_at(self, x, y):
+        return self.walls.char_at(x, y)
+
+    def set_player(self, player):
+        if self.player == player:
+            return
+
+        if self.player and self.player != player:
+            raise RuntimeError('player is already set')
+
+        self.peeps.append(player)
+        self.player = player
+
+    def remove_player(self):
+        if self.player is None:
+            raise RuntimeError('no player to remove')
 
     def pos_of(self, char):
         x = -1
@@ -65,9 +84,6 @@ class MazeModel(DataModel):
     def log(self, s):
         if self.logger:
             self.logger.log(s)
-        else:
-            sys.stderr.write(s)
-            sys.stderr.write('\n')
 
     def elapse_time(self):
         if self.new_peeps:
@@ -184,12 +200,12 @@ class Logger:
         self.logger.log(s)
 
 class GameModel(DataModel):
-    def __init__(self, walls=(), peeps=(), player=None, items=(), level=1, seed=0):
+    def __init__(self, maze_model, level=1, seed=0):
         super().__init__()
         self.level = level
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
-        self.maze_model = MazeModel(walls, peeps, player, items, logger=Logger(self))
+        self.maze_model = maze_model
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
@@ -212,11 +228,9 @@ class GameModel(DataModel):
 
     def set_player(self, peep, placement='<'):
         mm = self.maze_model
-        mm.peeps.append(peep)
-        mm.player = peep
+        mm.set_player(peep)
         pos = mm.pos_of(placement)
         mm.player.pos = pos
-
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")

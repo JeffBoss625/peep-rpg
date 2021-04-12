@@ -1,8 +1,9 @@
+from lib.logger import Logger
 from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
 from lib.players import player_by_name
-from lib.prpg_model import GameModel
+from lib.prpg_model import GameModel, MazeModel
 from lib.items.item import Item
 
 DUNGEONS = {
@@ -47,7 +48,7 @@ DUNGEONS = {
     'level_1':{
         'walls': [
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-            '%<........................%',
+            '%<..>.....................%',
             '%.........................%',
             '%.........................%',
             '%.........................%',
@@ -142,15 +143,21 @@ DUNGEONS = {
     }
 }
 
-def create_game(info):
+def create_maze(info):
     if isinstance(info, str):
         info = DUNGEONS.get(info, None)
         if info is None:
             return None
 
-    return GameModel(
-        walls=info['walls'],
-        peeps=info['peeps'],
+    return MazeModel(
+        info['walls'],
+        info['peeps'],
         items=info.get('items', []),
-        level=info.get('level', 1),
     )
+
+def create_game(info):
+    mm = create_maze(info)
+    if mm is None:
+        return None
+
+    return GameModel(mm)

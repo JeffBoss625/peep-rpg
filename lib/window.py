@@ -161,7 +161,7 @@ class Window:
             self.log(f'no scr to paint in {self.name}')
             return
         if self.parent and not self.model:
-            raise RuntimeError(f'no model to paint in {self.name}')
+            raise RuntimeError(f'no model to paint in window "{self.name}"')
 
         if self.needs_paint or force:
             self.clear()
