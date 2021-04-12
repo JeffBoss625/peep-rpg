@@ -70,6 +70,14 @@ class MazeModel(DataModel):
                 x += 1
                 if c == char:
                     return x, y
+
+        # python conventional way to loop with index: use enumerate()
+        #
+        # for y, line in enumerate(self.walls.text):
+        #    for x, c in enumerate(line):
+        #        if c == char:
+        #            return x, y
+
         raise LookupError (f'Character "{char}" not found in maze')
 
     def create_projectile(self, src, ptype, targetpath, attacks):
