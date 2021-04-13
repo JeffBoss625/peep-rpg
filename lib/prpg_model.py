@@ -99,7 +99,7 @@ class MazeModel(DataModel):
             self.log(f'tseq {self.turn_seq} {self.ti}')
             self.log(f'move_counts {move_counts}')
 
-            new_move_counts = elapse_time(self.new_peeps, self.ti/len(self.turn_seq))
+            new_move_counts = elapse_time(self.new_peeps, (len(self.turn_seq) - self.ti)/len(self.turn_seq))
             move_counts.extend(new_move_counts)
             self.peeps.extend(self.new_peeps)
             self.new_peeps = []
@@ -118,8 +118,7 @@ class MazeModel(DataModel):
 
 # update time for peeps
 # return an array of same length as peeps with the number of moves for each peep, rounded down.
-# store unused remainder tics into peep.tics.
-#
+# e.g. : [1, 1, 1, 1, 1, 1, 1, 1, 2, 3]. store unused remainder tics into peep.tics.
 # peeps: array of movable items with "speed" and "tics" properties
 # fac: factor to apply to speed to represent only a fraction of a turn (for peeps that enter part-way through a turn)
 def elapse_time(peeps, fac):
@@ -140,8 +139,6 @@ def peeps_by_clicks(move_counts):
             peepidx_by_mc[mc].append(peep_index)
 
     # peepidx_by_mc is something like {1:[0,2,3], 3:[4], 7:[1]}  (indexes of peeps moving once, three times and seven times)
-    # peepidx_by_mc.keys would be [1,3,7]
-    # peepidx_by_mc.keys[1] would be [0,2,3]                     (indexes of peeps moving only once)
 
     # calculate total clicks (= 1 * 2 * 3, in the example)
     tot_clicks = 1
@@ -158,22 +155,22 @@ def peeps_by_clicks(move_counts):
 
 
 # create an array the length of all clicks and put at each
-# click/index where there is a move an array of monster (indexes) that get a move at
+# click/index where there is a move an array of peep (indexes) that get a move at
 # that click.
 #
-# For example, in the returned array below, m1 has a move at clicks 1, 5, and 9.
-# m2 has a move at clicks 3 and 7
-# m3 has a move only at click 5 (simultaneously with m1's second move)
+# For example, in the returned array below, p0 has a move at clicks 1, 5, and 9.
+# p1 has a move at clicks 3 and 7
+# p2 has a move only at click 5 (simultaneously with p0's second move)
 # [
-#   1       [m1]
+#   1       [p0]
 #   2       []
-#   3       [m2]
+#   3       [p1]
 #   4       []
-#   5       [m1,m3]
+#   5       [p0,p2]
 #   6       []
-#   7       [m2]
+#   7       [p1]
 #   8       []
-#   9       [m1]
+#   9       [p0]
 # ]
 def _calc_turn_sequence(peepsbyclicks, tot_clicks):
     # walk through tot_clicks and sequence monster moves for every click
