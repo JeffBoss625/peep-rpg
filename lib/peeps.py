@@ -66,7 +66,7 @@ class Peep(DataModel):
     ldata: Tuple[LevelData] = field(default=())
     maxhp: int = 0
     thaco: int = 20
-    speed: int = 10
+    speed: float = 1.0
     ac: int = 10
     height: int = 5
     move_tactic: str = 'hunt'

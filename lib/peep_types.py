@@ -49,7 +49,7 @@ class PType:
 
     # todo: calculate these from other stats
     thaco: int = 0
-    speed: int = 0
+    speed: float = 0
     ac: int = 0
 
     # todo: separate move information for projectiles
@@ -71,7 +71,7 @@ MONSTERS = [
         hitdice='1d6',
         regen_fac=1.0,
         thaco=18,
-        speed=13,
+        speed=1.3,
         ac=19,
         attacks=(
             AttackInfo('bite', '1d3'),
@@ -88,7 +88,7 @@ MONSTERS = [
         fgcolor=COLOR.YELLOW,
         hitdice='1d4',
         thaco=19,
-        speed=13,
+        speed=1.3,
         ac=10,
         attacks=(
             AttackInfo('bite', '1d3'),
@@ -104,7 +104,7 @@ MONSTERS = [
         fgcolor=COLOR.YELLOW,
         hitdice='3d12',
         thaco=19,
-        speed=20,
+        speed=2.0,
         ac=10,
         attacks=(
             AttackInfo('bite', '2d4'),
@@ -121,7 +121,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='3d8',
         thaco=17,
-        speed=19,
+        speed=1.9,
         ac=8,
         attacks=(
             AttackInfo('beak', '1d10'),
@@ -140,7 +140,7 @@ MONSTERS = [
         hitdice='8d10',
         regen_fac=2.0,
         thaco=10,
-        speed=20,
+        speed=2.0,
         ac=10,
         attacks=(
             AttackInfo('bite', '1d10'),
@@ -158,7 +158,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='12d10',
         thaco=3,
-        speed=75,
+        speed=7.5,
         ac=3,
         attacks=(
             AttackInfo('bite', '1d30'),
@@ -175,7 +175,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='12d20',
         thaco=3,
-        speed=75,
+        speed=7.5,
         ac=3,
         attacks=(
             AttackInfo('bite', '1d30'),
@@ -195,7 +195,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='10d30',
         thaco=2,
-        speed=30,
+        speed=3.0,
         ac=2,
         attacks=(
             AttackInfo('burn', '1d30'),
@@ -208,7 +208,7 @@ MONSTERS = [
         type='monster',
         hitdice='5d10',
         thaco=19,
-        speed=33,
+        speed=3.3,
         ac=10,
         attacks=(
             AttackInfo('teeth', '1d10'),
@@ -222,7 +222,7 @@ MONSTERS = [
         type='monster',
         hitdice='1000d10',
         thaco=0,
-        speed=1,
+        speed=1.0,
         ac=0,
         attacks=(
             AttackInfo('absolute destruction', '10d10000000'),
@@ -235,7 +235,7 @@ MONSTERS = [
         type='monster',
         hitdice='3d8',
         thaco=19,
-        speed=30,
+        speed=3.0,
         ac=10,
         attacks=(
             AttackInfo('karate-chop', '5d8'),
@@ -286,7 +286,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='1d2',
         thaco=20,
-        speed=100,
+        speed=10.0,
         ac=-10,
         attacks=(
         ),
@@ -300,7 +300,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=100,
+        speed=10.0,
         ac=-10,
         attacks=(
         ),
@@ -314,7 +314,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=30,
+        speed=3.0,
         ac=-10,
         attacks=(
         ),
@@ -328,7 +328,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=100,
+        speed=10.0,
         ac=-10,
         attacks=(
         ),
@@ -342,7 +342,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=100,
+        speed=10.0,
         ac=-10,
         attacks=(
 
@@ -357,7 +357,7 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='2d8',
         thaco=20,
-        speed=100,
+        speed=10.0,
         ac=-10,
         attacks=(
 
@@ -393,7 +393,6 @@ def create_peep(
     level = level_calc(exp, factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
     regen_fac = pt.regen_fac
     attacks = attacks if len(attacks) else pt.attacks # todo: combine type and passed in?
-
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
