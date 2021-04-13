@@ -191,30 +191,21 @@ def execute_turn_seq(control):
     mm = game.maze_model
     while not mm.new_peeps and mm.ti < len(mm.turn_seq):
         # print(f'turn_seq {mm.ti}/{mm.turn_seq}')
-        peep_indexes = mm.turn_seq[mm.ti]
-        # this loop moves simultaneous peeps - all moves complete together (before adding new projectiles/peeps/etc)
-        for peep_index in peep_indexes:
-            pnames = tuple(p.name for p in mm.peeps)
-            # print(f'peep_index {peep_index}/{pnames}')
-            # if there are new peeps in the new_peeps list, break out of loop.
-            # When broken out of loop take remaining clicks to go through from the turns variable
-            # Add those remaining turns into a function that adds the new peeps's turns to it
-            peep = mm.peeps[peep_index]
-            if peep.hp <= 0:
-                continue
-            if game.is_player(peep):
-                res = player_turn(control)
-                if res == 'q':
-                    return 'quit'
-                elif res == '>':
-                    return 'down_level'
-                elif res == '<':
-                    return 'up_level'
-            else:
-                if not monster_turn(control, peep):
-                    return 'player_died'
-
+        peep = mm.turn_seq[mm.ti]
         mm.ti += 1
+        if peep.hp <= 0:
+            continue
+        if game.is_player(peep):
+            res = player_turn(control)
+            if res == 'q':
+                return 'quit'
+            elif res == '>':
+                return 'down_level'
+            elif res == '<':
+                return 'up_level'
+        else:
+            if not monster_turn(control, peep):
+                return 'player_died'
 
     return True
 

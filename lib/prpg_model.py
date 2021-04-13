@@ -96,19 +96,10 @@ class MazeModel(DataModel):
     def elapse_time(self):
         if self.new_peeps:
             # moves by index. e.g. [2, 0, 1]
-            move_counts = remaining_moves(self.turn_seq, self.ti, len(self.peeps))
-            # self.log(f'tseq {self.turn_seq} {self.ti}')
-            # self.log(f'move_counts {move_counts}')
-
-            # moves by index for fraction of time remaining e.g. [0,3]
-            new_move_counts = elapse_time(self.new_peeps, (len(self.turn_seq) - self.ti)/len(self.turn_seq))
-            move_counts.extend(new_move_counts)
             self.peeps.extend(self.new_peeps)
             self.new_peeps = []
-        else:
-            move_counts = elapse_time(self.peeps, 1.0)
 
-        self.turn_seq = calc_turn_sequence(move_counts)
+        self.turn_seq = elapse_time(self.peeps)
         self.ti = 0
 
     def max_x(self):
@@ -117,90 +108,25 @@ class MazeModel(DataModel):
     def max_y(self):
         return len(self.walls.text)
 
+# NEW
+# Add the smallest increment of time (the fastest peep) to all peep stored movement (tics). Wrap around
+# (mod increment) tics that equal or exceed this incremented amount and return the list of such
+# peeps sorted by highest-to-lowest tics value - the order of peeps to move.
+def elapse_time(peeps):
+    ret = []
 
-# update time for peeps
-# return an array of same length as peeps with the number of moves for each peep, rounded down.
-# e.g. : [1, 1, 1, 1, 1, 1, 1, 1, 2, 3]. store unused remainder tics into peep.tics.
-# peeps: array of movable items with "speed" and "tics" properties
-# fac: factor to apply to speed to represent only a fraction of a turn (for peeps that enter part-way through a turn)
-def elapse_time(peeps, fac):
-    move_counts = []                        # same array indexes as peeps
+    peeps.sort(key=lambda p: -p.speed)
+    inc = round(1/peeps[0].speed, 5)   # increment for the fastest peep (smallest increment)
     for p in peeps:
-        tics = (p.speed * fac) + p.tics
-        move_counts.append(int(tics))       # round-down
-        p.tics = round(tics % 1, 5)         # store remaining ticks with 5 decimal precision
+        if p.speed > 0:
+            p.tics = round(p.tics + inc, 5)
+            thresh = 1/p.speed
+            if p.tics >= thresh:
+                p.tics = round(p.tics - thresh, 5)
+                ret.append(p)
 
-    return move_counts
-
-# return peep indexes by clicks and total clicks:
-# e.g. {6:[0,2,3], 3:[4], 2:[1]}, 6
-def peeps_by_clicks(move_counts):
-    peepidx_by_mc = {}
-    for peep_index, mc in enumerate(move_counts):
-        if mc != 0:
-            if mc not in peepidx_by_mc:
-                peepidx_by_mc[mc] = []
-            peepidx_by_mc[mc].append(peep_index)
-
-    # peepidx_by_mc is something like {1:[0,2,3], 3:[4], 7:[1]}  (indexes of peeps moving once, three times and seven times)
-
-    # calculate total clicks (= 1 * 2 * 3, in the example)
-    tot_clicks = 1
-    for move_count in peepidx_by_mc.keys():
-        tot_clicks = tot_clicks * move_count
-
-    # create a new structured keyed by CLICKS per move, not moves (clicks = tot_clicks/moves)
-    # = {6:[0,2,3], 3:[4], 2:[1]} for this example
-    peepsbyclicks = {}
-    for move_count in peepidx_by_mc.keys():
-        peepsbyclicks[int(tot_clicks / move_count)] = peepidx_by_mc[move_count]
-
-    return [peepsbyclicks, tot_clicks]
-
-
-# create an array the length of all clicks and put at each
-# click/index where there is a move an array of peep (indexes) that get a move at
-# that click.
-#
-# For example, in the returned array below, p0 has a move at clicks 1, 5, and 9.
-# p1 has a move at clicks 3 and 7
-# p2 has a move only at click 5 (simultaneously with p0's second move)
-# [
-#   1       [p0]
-#   2       []
-#   3       [p1]
-#   4       []
-#   5       [p0,p2]
-#   6       []
-#   7       [p1]
-#   8       []
-#   9       [p0]
-# ]
-def _calc_turn_sequence(peepsbyclicks, tot_clicks):
-    # walk through tot_clicks and sequence monster moves for every click
-    ret = [[] for _ in range(tot_clicks)]
-    for click_count in range(1, tot_clicks + 1):
-        for clicks in peepsbyclicks.keys():
-            if click_count % clicks == 0:
-                peeps = peepsbyclicks[clicks]
-                for p in peeps:
-                    ret[click_count - 1].append(p)
+    ret.sort(key=lambda p: -p.tics)
     return ret
-
-# return the number of remaining moves for each peep (by offset in the returned array):
-# [2,0,1]  means two moves for p0, zero moves for p1 and one move for p2
-def remaining_moves(turn_seq, turn_offset, npeeps):
-    ret = [0 for _ in range(npeeps)]
-    for tsi in range(turn_offset, len(turn_seq)):
-        peep_idxs = turn_seq[tsi]
-        for pi in peep_idxs:
-            ret[pi] += 1
-    return ret
-
-
-def calc_turn_sequence(move_counts):
-    p_by_clicks, tot_clicks = peeps_by_clicks(move_counts)
-    return _calc_turn_sequence(p_by_clicks, tot_clicks)
 
 @dataclass
 class Logger:
