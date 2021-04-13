@@ -124,11 +124,11 @@ class MazeModel(DataModel):
 # peeps: array of movable items with "speed" and "tics" properties
 # fac: factor to apply to speed to represent only a fraction of a turn (for peeps that enter part-way through a turn)
 def elapse_time(peeps, fac):
-    move_counts = []                    # same array indexes as peeps
+    move_counts = []                        # same array indexes as peeps
     for p in peeps:
         tics = (p.speed * fac) + p.tics
-        move_counts.append(int(tics / 10))  # round-down
-        p.tics = round(tics % 10, 5)        # store remaining ticks with 5 decimal precision
+        move_counts.append(int(tics))       # round-down
+        p.tics = round(tics % 1, 5)         # store remaining ticks with 5 decimal precision
 
     return move_counts
 
