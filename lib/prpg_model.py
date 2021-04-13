@@ -126,8 +126,8 @@ def elapse_time(peeps, fac):
     move_counts = []                    # same array indexes as peeps
     for p in peeps:
         tics = (p.speed * fac) + p.tics
-        move_counts.append(int(tics / 10))  # round-down division operator (python 3+)
-        p.tics = round(tics % 10, 5)        # store remaining ticks (MOD operator)
+        move_counts.append(int(tics / 10))  # round-down
+        p.tics = round(tics % 10, 5)        # store remaining ticks with 5 decimal precision
 
     return move_counts
 
