@@ -58,26 +58,6 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
-    def change_level(self, dir_char):
-        if dir_char == '>':
-            direction = 1
-            start_char = '<'
-        elif dir_char == '<':
-            direction = -1
-            start_char = '>'
-        else:
-            return
-
-        self.model.level = self.model.level + direction
-
-        maze = dungeons.create_maze(f'level_{self.model.level}')
-        if maze is None:
-            self.model.message('This staircase has been caved in.')
-            return
-
-        maze.set_player(self.model.maze_model.player)
-        self.set_maze(maze, start_char)
-
     def _win(self, name):
         return self.root_layout.info.comp_by_name[name].window
 
@@ -90,6 +70,8 @@ class PrpgControl:
         self._win(WIN.LOG).model = game.log_model
 
     def set_maze(self, maze_model, start_char):
+        if not maze_model:
+            raise RuntimeError('missing maze_model')
         player = self.model.maze_model.player
         self.model.maze_model = maze_model
         if player:

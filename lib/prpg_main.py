@@ -1,5 +1,3 @@
-from lib.dungeons import DUNGEONS
-from lib.prpg_model import GameModel
 import lib.move as mlib
 from lib import dungeons
 from lib.attack import peep_regenhp, choose_ranged_attack
@@ -170,14 +168,20 @@ def main(root_layout, game, get_key=None):
         res = execute_turn_seq(control)
         if res == 'quit' or res == 'player_died':
             return 0
-        if res == 'down_level':
-            maze = dungeons.create_maze(f'level_{control.model.level + 1}')
-            control.set_maze(maze, '<')
-            control.model.level += 1
-        if res == 'up_level':
-            maze = dungeons.create_maze(f'level_{control.model.level - 1}')
-            control.set_maze(maze, '>')
-            control.model.level -= 1
+        if res == 'down_level' or res == 'up_level':
+            if res == 'down_level':
+                new_level = control.model.level + 1
+                start_char = '<'
+            else: # up_level
+                new_level = control.model.level - 1
+                start_char = '>'
+
+            maze = dungeons.create_maze(f'level_{new_level}')
+            if maze:
+                control.set_maze(maze, start_char)
+                control.model.level = new_level
+            else:
+                control.model.message('This staircase has been caved in.')
 
         control.model.maze_model.elapse_time()
 
