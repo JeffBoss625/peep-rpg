@@ -132,6 +132,8 @@ def elapse_time(peeps, fac):
 
     return move_counts
 
+# return peep indexes by clicks and total clicks:
+# e.g. {6:[0,2,3], 3:[4], 2:[1]}, 6
 def peeps_by_clicks(move_counts):
     peepidx_by_mc = {}
     for peep_index, mc in enumerate(move_counts):
