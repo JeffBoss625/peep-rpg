@@ -95,10 +95,12 @@ class MazeModel(DataModel):
 
     def elapse_time(self):
         if self.new_peeps:
+            # moves by index. e.g. [2, 0, 1]
             move_counts = remaining_moves(self.turn_seq, self.ti, len(self.peeps))
-            self.log(f'tseq {self.turn_seq} {self.ti}')
-            self.log(f'move_counts {move_counts}')
+            # self.log(f'tseq {self.turn_seq} {self.ti}')
+            # self.log(f'move_counts {move_counts}')
 
+            # moves by index for fraction of time remaining e.g. [0,3]
             new_move_counts = elapse_time(self.new_peeps, (len(self.turn_seq) - self.ti)/len(self.turn_seq))
             move_counts.extend(new_move_counts)
             self.peeps.extend(self.new_peeps)
@@ -183,6 +185,8 @@ def _calc_turn_sequence(peepsbyclicks, tot_clicks):
                     ret[click_count - 1].append(p)
     return ret
 
+# return the number of remaining moves for each peep (by offset in the returned array):
+# [2,0,1]  means two moves for p0, zero moves for p1 and one move for p2
 def remaining_moves(turn_seq, turn_offset, npeeps):
     ret = [0 for _ in range(npeeps)]
     for tsi in range(turn_offset, len(turn_seq)):
