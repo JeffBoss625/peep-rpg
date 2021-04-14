@@ -24,7 +24,6 @@ class MazeModel(DataModel):
         self.target_path = ()          # line of points (from source and target) drawn to select targets on the screen
         self.items = items
 
-        self.player = None
         self.new_peeps = []
         self.turn_seq = None
         self.ti = 0
@@ -46,19 +45,24 @@ class MazeModel(DataModel):
     def char_at(self, x, y):
         return self.walls.char_at(x, y)
 
-    def set_player(self, player):
-        if self.player == player:
-            return
+    def add_peep(self, peep):
+        if self.peeps.count(peep) or self.new_peeps.count(peep):
+            return False
+        self.new_peeps.append(peep)
+        return True
 
-        if self.player and self.player != player:
-            raise RuntimeError('player is already set')
-
-        self.peeps.append(player)
-        self.player = player
-
-    def remove_player(self):
-        if self.player is None:
-            raise RuntimeError('no player to remove')
+    def remove_peep(self, peep):
+        try:
+            self.peeps.remove(peep)
+            return True
+        except ValueError:
+            pass
+        try:
+            self.new_peeps.remove(peep)
+            return True
+        except ValueError:
+            pass
+        return False
 
     def pos_of(self, char):
         x = -1
@@ -146,6 +150,7 @@ class GameModel(DataModel):
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
+        self.player = None
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array
@@ -161,13 +166,15 @@ class GameModel(DataModel):
         self.banner_model.replace(lines)
 
     def is_player(self, peep):
-        return peep == self.maze_model.player
+        return peep == self.player
 
     def set_player(self, peep, placement='<'):
         mm = self.maze_model
-        mm.set_player(peep)
-        pos = mm.pos_of(placement)
-        mm.player.pos = pos
+        if mm:
+            mm.add_peep(peep)
+            peep.pos = mm.pos_of(placement)
+
+        self.player = peep
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")

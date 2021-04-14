@@ -26,17 +26,17 @@ DIRECTION_KEYS = {
 
 
 def player_turn(control):
-    player = control.model.maze_model.player
+    player = control.model.player
     player.hp += peep_regenhp(player.maxhp, player.speed, player.regen_fac)
     if player.hp > player.maxhp: player.hp = player.maxhp
     while True:
         game = control.model
         mm = game.maze_model
-        player = mm.player
+        player = game.player
         input_key = control.get_key()
         if input_key in DIRECTION_KEYS:
-            dst_pos = mlib.adjacent_pos(mm.player.pos, DIRECTION_KEYS[input_key])
-            if mlib.move_peep(game, mm.player, dst_pos):
+            dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
+            if mlib.move_peep(game, game.player, dst_pos):
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -45,9 +45,9 @@ def player_turn(control):
         elif input_key == 'm':
             morph_peeps = list(p for p in mm.peeps if p.type == 'monster')
             if len(morph_peeps) > 1:
-                while mm.player == player:
+                while game.player == player:
                     player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
-                mm.player = player
+                game.player = player
                 game.message("You are now " + player.name)
             else:
                 game.message("You have nothing in range to brain-swap with")
@@ -76,7 +76,7 @@ def player_turn(control):
 def player_aim(control):
     game = control.model
     mm = game.maze_model
-    player = mm.player
+    player = game.player
     mm.cursorvis = 1
     mm.cursorpos = (3, 3)
     game.message('Where do you want to shoot? (* to target)')
@@ -104,7 +104,7 @@ def player_aim(control):
 def monster_turn(control, monster):
     game = control.model
     mm = game.maze_model
-    player = mm.player
+    player = game.player
     monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
     ranged_attack = choose_ranged_attack(monster)
     if monster.type != 'projectile' \

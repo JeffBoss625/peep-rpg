@@ -68,19 +68,18 @@ class PrpgControl:
         self._win(WIN.BANNER).model = game.banner_model
         self._win(WIN.MESSAGES).model = game.message_model
         self._win(WIN.LOG).model = game.log_model
+        self._win(WIN.TITLE).model = game.player
+        self._win(WIN.STATS).model = game.player
+        self._win(WIN.EQUIP).model = game.player
 
     def set_maze(self, maze_model, start_char):
         if not maze_model:
             raise RuntimeError('missing maze_model')
-        player = self.model.maze_model.player
         self.model.maze_model = maze_model
-        if player:
-            self.model.set_player(player, start_char)
+        if self.model.player:
+            self.model.set_player(self.model.player, start_char)
 
         self._win(WIN.MAZE).model = maze_model
-        self._win(WIN.TITLE).model = maze_model.player
-        self._win(WIN.STATS).model = maze_model.player
-        self._win(WIN.EQUIP).model = maze_model.player
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
