@@ -66,21 +66,21 @@ def attack_dst(src, dst, src_attack, game):
             dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
         tot_hp_loss *= dmg_multiplier
         if dmg_multiplier == 0.3:
-            game.message('the blow hit the helmet')
+            game.message('The blow hit the helmet.')
         if dmg_multiplier == 1:
-            game.message('the blow hit the torso')
+            game.message('The blow hit the torso.')
         if dmg_multiplier == 0.15:
-            game.message('the blow hit the shield')
+            game.message('The blow hit the shield.')
         if dmg_multiplier == 2:
-            game.message('the blow hit the head')
+            game.message('The blow hit the head.')
         if dmg_multiplier == 0.75:
-            game.message('the blow hit the legs')
-        game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! (for {tot_hp_loss} damage)')
+            game.message('The blow hit the legs.')
+        game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
             game.monster_killed(src, src_attack, dst)
         else:
-            game.message(f'  {dst.name} has {round(dst.hp)} points remaining')
+            game.message(f'{dst.name} has {round(dst.hp)} points.')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
@@ -90,7 +90,7 @@ def attack_dst(src, dst, src_attack, game):
                 src.speed = 0   # todo: remove remaining moves in turn_seq
                 src.attacks = ()
     else:
-        game.message(f'the {src.name} missed the {dst.name}')
+        game.message(f'{src.name} missed {dst.name}.')
         return False
 
 # return chance of deflecting a blow

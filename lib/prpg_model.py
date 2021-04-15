@@ -205,7 +205,7 @@ class GameModel(DataModel):
         peep.publish_update(None, peep)
 
     def monster_killed(self, src, src_attack, dst):
-        self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")
+        self.message(f"{dst.name} has died to the {src.name}'s {src_attack.name}!")
         src.exp += dst.exp_value()
         current_level = level_calc(src.exp, src.level_factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
         handle_level_up(src, current_level, self)

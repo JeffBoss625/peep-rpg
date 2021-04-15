@@ -68,11 +68,9 @@ class PrpgControl:
 
         def game_change_fn(src_model, etype, **kwargs):
             if etype == 'update':
-                attrib = kwargs.get('attrib', None)
-                if attrib == 'maze_model':
-                    maze_model = kwargs['new']
+                if src_model == game.maze_model:
                     mazewin = self._win(WIN.MAZE)
-                    mazewin.model = maze_model
+                    mazewin.model = game.maze_model
                     mazewin.needs_paint = True
                 elif src_model == game.player or kwargs['new'] == game.player:
                     set_player = (kwargs['new'] == game.player)
@@ -87,7 +85,7 @@ class PrpgControl:
         if game.player:
             game.publish_update(None, game.player)
         if game.maze_model:
-            game.publish_update(None, game.maze_model, attrib='maze_model')
+            game.publish_update(None, game.maze_model)
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
