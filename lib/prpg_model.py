@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 from lib import dungeons
 from lib.constants import GAME_SETTINGS
+from lib.items.item import Item
 from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
 from lib.peep_types import create_peep
@@ -39,6 +40,19 @@ class MazeModel(DataModel):
     def update_wall(self, pos, char):
         x, y = pos
         self.walls.replace_region(x, y, [char])
+
+    def items_at(self, pos):
+        c = self.walls.char_at(*pos)
+        name = ''
+        if c == '<':
+            name = 'stairs going up'
+        elif c == '>':
+            name = 'stairs going down'
+        if name:
+            return (Item(name, c),)
+
+        return tuple(t for t in self.items if t.pos == pos)
+
 
     def wall_at(self, pos):
         ret = self.walls.char_at(*pos)

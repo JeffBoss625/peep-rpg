@@ -36,6 +36,7 @@ def player_turn(control):
         if input_key in DIRECTION_KEYS:
             dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
             if mlib.move_peep(game, game.player, dst_pos):
+                post_player_move(control)
                 return input_key
             # else didn't spend turn
         elif input_key == Key.CTRL_Q:
@@ -98,6 +99,7 @@ def player_aim(control):
         path = list(line_points(player.pos, target_pos))[0:]
         attack = choose_ranged_attack(player)
         mm.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
+        game.banner(['', '                TWANG!'])
 
 
 def monster_turn(control, monster):
@@ -152,6 +154,19 @@ def monster_turn(control, monster):
             rotation += 1
 
     return True
+
+def post_player_move(control):
+    game = control.game_model
+    mm = game.maze_model
+    player = game.player
+    on_items = mm.items_at(player.pos)
+    nitems = len(on_items)
+    if nitems == 1:
+        game.banner(['You see a ' + on_items[0].name,''])
+    elif nitems > 1:
+        game.banner([f'You see {nitems} items',''])
+    else:
+        game.banner(['',''])
 
 
 def main(root_layout, game, get_key=None):
@@ -216,7 +231,6 @@ def choose_target(control, src_peep):
         input_key = control.get_key()
         if input_key == 't':
             mm.target_path = ()
-            game.banner(['                                            ', '                TWANG!                  '])
             return targets[ti]
         elif input_key == 'q' or input_key == Key.CTRL_Q:
             mm.target_path = ()
