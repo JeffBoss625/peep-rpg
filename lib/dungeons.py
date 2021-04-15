@@ -74,7 +74,9 @@ DUNGEONS = {
             create_peep('giant rat', name='Squeak', pos=(25, 4)),
             create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
         ],
-        'level': 1,
+        'items': [
+            Item("belt", '=', Size(3,5,4), 10, '', pos=(8,3))
+        ]
     },
     'level_2':{
         'walls': [
@@ -103,7 +105,6 @@ DUNGEONS = {
         'peeps':[
             create_peep('balrog', name='Bolrog', pos=(10,18)),
         ],
-        'level': 2,
     },
     'open':{
         'walls': [
