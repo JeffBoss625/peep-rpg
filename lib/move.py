@@ -131,5 +131,5 @@ def create_wally(maze, pos):
         raise ValueError(f'no wall located at {pos}')
 
     maze.walls.replace_region(pos[0], pos[1], ['.'])
-    maze.new_peeps.append(wall)
+    maze.peeps.append(wall)
     return wall

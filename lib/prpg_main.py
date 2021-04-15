@@ -178,7 +178,7 @@ def main(root_layout, game, get_key=None):
 def execute_turn_seq(control):
     game = control.game_model
     mm = game.maze_model
-    while not mm.new_peeps and mm.ti < len(mm.turn_seq):
+    while mm.ti < len(mm.turn_seq):
         # print(f'turn_seq {mm.ti}/{mm.turn_seq}')
         peep = mm.turn_seq[mm.ti]
         mm.ti += 1

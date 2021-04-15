@@ -26,7 +26,6 @@ class MazeModel(DataModel):
         self.target_path = ()          # line of points (from source and target) drawn to select targets on the screen
         self.items = items
 
-        self.new_peeps = []
         self.turn_seq = None
         self.ti = 0
 
@@ -50,9 +49,9 @@ class MazeModel(DataModel):
         return self.walls.char_at(x, y)
 
     def add_peep(self, peep):
-        if self.peeps.count(peep) or self.new_peeps.count(peep):
+        if self.peeps.count(peep):
             return False
-        self.new_peeps.append(peep)
+        self.peeps.append(peep)
         return True
 
     def remove_peep(self, peep):
@@ -60,13 +59,7 @@ class MazeModel(DataModel):
             self.peeps.remove(peep)
             return True
         except ValueError:
-            pass
-        try:
-            self.new_peeps.remove(peep)
-            return True
-        except ValueError:
-            pass
-        return False
+            return False
 
     def pos_of(self, char):
         x = -1
@@ -93,7 +86,7 @@ class MazeModel(DataModel):
         shot.pos_path = targetpath
         shot.pos_i = 0
 
-        self.new_peeps.append(shot)
+        self.peeps.append(shot)
         self.log(f'{src.name} shoots {shot.name}')
         return shot
 
@@ -102,11 +95,6 @@ class MazeModel(DataModel):
             self.logger.log(s)
 
     def elapse_time(self):
-        if self.new_peeps:
-            # moves by index. e.g. [2, 0, 1]
-            self.peeps.extend(self.new_peeps)
-            self.new_peeps = []
-
         self.turn_seq = elapse_time(self.peeps)
         self.ti = 0
 
