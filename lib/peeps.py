@@ -81,14 +81,14 @@ class Peep(DataModel):
     level_factor: int = 2
     hitdice: str = '1d1'
     hitdicefac: int = 0
-    tics: int = 0
+    _tics: int = 0              # private- events don't propogate for this attribute
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
     inventory: Inventory = field(default_factory=Inventory)
 
     body: Body = None
 
-    _yaml_ignore = {'tics', 'pos'}
+    _yaml_ignore = {'_tics', 'pos'}
 
     def equip(self, holder, item):
         pass

@@ -5,6 +5,7 @@ from lib.logger import Logger
 from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
 from lib.peep_types import create_peep
+from lib.prpg_model import GameModel
 import lib.dungeons as dungeons
 
 
@@ -25,8 +26,8 @@ import lib.dungeons as dungeons
 w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
-    game = dungeons.create_game('level_1')
-    game.set_player(create_peep('human', name='Super Dad'), placement='<')
+    game = GameModel(create_peep('human', name='Super Dad'))
+    game.goto_level(1, placement='<')
 
     main(root_layout, game)
 

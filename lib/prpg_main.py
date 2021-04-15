@@ -27,8 +27,7 @@ DIRECTION_KEYS = {
 
 def player_turn(control):
     player = control.model.player
-    player.hp += peep_regenhp(player.maxhp, player.speed, player.regen_fac)
-    if player.hp > player.maxhp: player.hp = player.maxhp
+    peep_regenhp(player)
     while True:
         game = control.model
         mm = game.maze_model
@@ -105,7 +104,7 @@ def monster_turn(control, monster):
     game = control.model
     mm = game.maze_model
     player = game.player
-    monster.hp += peep_regenhp(monster.maxhp, monster.speed, monster.regen_fac)
+    peep_regenhp(monster)
     ranged_attack = choose_ranged_attack(monster)
     if monster.type != 'projectile' \
             and ranged_attack is not None \
@@ -168,20 +167,10 @@ def main(root_layout, game, get_key=None):
         res = execute_turn_seq(control)
         if res == 'quit' or res == 'player_died':
             return 0
-        if res == 'down_level' or res == 'up_level':
-            if res == 'down_level':
-                new_level = control.model.level + 1
-                start_char = '<'
-            else: # up_level
-                new_level = control.model.level - 1
-                start_char = '>'
-
-            maze = dungeons.create_maze(f'level_{new_level}')
-            if maze:
-                control.set_maze(maze, start_char)
-                control.model.level = new_level
-            else:
-                control.model.message('This staircase has been caved in.')
+        elif res == 'down_level':
+            control.model.goto_level(control.model.maze_model.level + 1, '<')
+        elif res == 'up_level':
+            control.model.goto_level(control.model.maze_model.level - 1, '>')
 
         control.model.maze_model.elapse_time()
 

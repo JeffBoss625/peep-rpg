@@ -131,11 +131,13 @@ def attack_dst2(src, dst, _attack, out, seed=0):
 
     pass
 
-def peep_regenhp(peepmaxhp, peepspeed, regen_fac):
-    speedhealfac = 10 / peepspeed
-    amount_heal = peepmaxhp * regen_fac * GAME_SETTINGS.REGEN_RATE
-    ret = speedhealfac * amount_heal
-    return ret
+def peep_regenhp(peep):
+    if peep.hp == peep.maxhp:
+        return
+    speedhealfac = peep.speed
+    amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
+    hp = peep.hp + speedhealfac * amount_heal
+    peep.hp = min(hp, peep.maxhp)
 
 def shield_in_hand(inventory):
     if inventory.hand1 == '':

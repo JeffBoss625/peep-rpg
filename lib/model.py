@@ -23,9 +23,9 @@ class PubSub:
         for sm in self.submodels():
             sm.unsubscribe(fn)
 
-    def publish(self, model, msg, **kwds):
+    def publish(self, model, event_type, **kwds):
         for fn in self._subscribers:
-            fn(model, msg, **kwds)
+            fn(model, event_type, **kwds)
 
     def publish_update(self, prev_val, new_val, **kwds):
         vlen = getattr(kwds, 'len', 1)  # len indicates multiple values were changed (prev and new are lists)

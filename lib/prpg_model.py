@@ -9,6 +9,8 @@
 # that will be costly to change, but easier to work with and understand.
 import sys
 from dataclasses import dataclass
+
+from lib import dungeons
 from lib.constants import GAME_SETTINGS
 from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
@@ -27,6 +29,8 @@ class MazeModel(DataModel):
         self.new_peeps = []
         self.turn_seq = None
         self.ti = 0
+
+        self.level = -1
 
         self.logger = logger
 
@@ -123,13 +127,13 @@ def elapse_time(peeps):
     inc = round(1/peeps[0].speed, 5)   # increment for the fastest peep (smallest increment)
     for p in peeps:
         if p.speed > 0:
-            p.tics = round(p.tics + inc, 5)
+            p._tics = round(p._tics + inc, 5)
             thresh = 1/p.speed
-            if p.tics >= thresh:
-                p.tics = round(p.tics - thresh, 5)
+            if p._tics >= thresh:
+                p._tics = round(p._tics - thresh, 5)
                 ret.append(p)
 
-    ret.sort(key=lambda p: -p.tics)
+    ret.sort(key=lambda p: -p._tics)
     return ret
 
 @dataclass
@@ -141,16 +145,15 @@ class Logger:
         self.logger.log(s)
 
 class GameModel(DataModel):
-    def __init__(self, maze_model, level=1, seed=0):
+    def __init__(self, player=None, seed=0):
         super().__init__()
-        self.level = level
 
         # passing self as logger creates a PubSub subscribe() cycle, so use dict instead.
-        self.maze_model = maze_model
+        self.maze_model = None
+        self.player = player
         self.message_model = TextModel('messages')
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
-        self.player = None
         self.seed = seed
 
     # add a message or all messages in an iterable to the messages array
@@ -168,13 +171,38 @@ class GameModel(DataModel):
     def is_player(self, peep):
         return peep == self.player
 
-    def set_player(self, peep, placement='<'):
-        mm = self.maze_model
-        if mm:
-            mm.add_peep(peep)
-            peep.pos = mm.pos_of(placement)
+    def goto_level(self, level, placement=None):
+        if self.maze_model and self.maze_model.level == level:
+            self.maze_model.add_peep(self.player)
+            if placement:
+                self.player.pos = self.maze_model.pos_of(placement)
+            return
+
+        maze = dungeons.create_level(level)
+        if not maze:
+            self.message('This staircase has been caved in.')
+            return
+
+        if self.maze_model:
+            self.maze_model.remove_peep(self.player)
+        maze.add_peep(self.player)
+        if placement:
+            self.player.pos = maze.pos_of(placement)
+
+        pmaze = self.maze_model
+        self.maze_model = maze
+
+        self.publish_update(pmaze, maze, attrib='maze_model')
+
+    def set_player(self, peep, placement=None):
+        if peep == self.player:
+            return
+
+        if self.maze_model:
+            self.goto_level(self.maze_model.level, placement)
 
         self.player = peep
+        peep.publish_update(None, peep)
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"the {dst.name} has died to the {src.name}'s {src_attack.name}!")

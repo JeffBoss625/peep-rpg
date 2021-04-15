@@ -1,4 +1,3 @@
-from lib.logger import Logger
 from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
@@ -143,6 +142,12 @@ DUNGEONS = {
     }
 }
 
+def create_level(level):
+    ret = create_maze(f'level_{level}')
+    if ret:
+        ret.level = level
+    return ret
+
 def create_maze(info):
     if isinstance(info, str):
         info = DUNGEONS.get(info, None)
@@ -156,8 +161,4 @@ def create_maze(info):
     )
 
 def create_game(info):
-    mm = create_maze(info)
-    if mm is None:
-        return None
-
-    return GameModel(mm)
+    return GameModel(create_maze(info))

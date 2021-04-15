@@ -62,24 +62,32 @@ class PrpgControl:
         return self.root_layout.info.comp_by_name[name].window
 
     def set_model(self, game):
-        self.model = game
-
-        self.set_maze(game.maze_model, '<')
         self._win(WIN.BANNER).model = game.banner_model
         self._win(WIN.MESSAGES).model = game.message_model
         self._win(WIN.LOG).model = game.log_model
-        self._win(WIN.TITLE).model = game.player
-        self._win(WIN.STATS).model = game.player
-        self._win(WIN.EQUIP).model = game.player
 
-    def set_maze(self, maze_model, start_char):
-        if not maze_model:
-            raise RuntimeError('missing maze_model')
-        self.model.maze_model = maze_model
-        if self.model.player:
-            self.model.set_player(self.model.player, start_char)
+        def game_change_fn(src_model, etype, **kwargs):
+            if etype == 'update':
+                attrib = kwargs.get('attrib', None)
+                if attrib == 'maze_model':
+                    maze_model = kwargs['new']
+                    mazewin = self._win(WIN.MAZE)
+                    mazewin.model = maze_model
+                    mazewin.needs_paint = True
+                elif src_model == game.player or kwargs['new'] == game.player:
+                    set_player = (kwargs['new'] == game.player)
+                    for win_name in (WIN.TITLE, WIN.STATS, WIN.EQUIP):
+                        win = self._win(win_name)
+                        win.needs_paint = True
+                        if set_player:
+                            win.model = game.player
 
-        self._win(WIN.MAZE).model = maze_model
+        self.model = game
+        game.subscribe(game_change_fn)
+        if game.player:
+            game.publish_update(None, game.player)
+        if game.maze_model:
+            game.publish_update(None, game.maze_model, attrib='maze_model')
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
