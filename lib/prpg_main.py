@@ -78,7 +78,7 @@ def player_aim(control):
     player = game.player
     mm.cursorvis = 1
     mm.cursorpos = (3, 3)
-    game.message('Where do you want to shoot? (* to target)')
+    game.banner(['Where do you want to shoot?', '  (* to target)'])
     key = control.get_key()
     target = 'UNSET'
     while target == 'UNSET':
@@ -216,7 +216,7 @@ def choose_target(control, src_peep):
         input_key = control.get_key()
         if input_key == 't':
             mm.target_path = ()
-            game.banner('')
+            game.banner(['                                            ', '                TWANG!                  '])
             return targets[ti]
         elif input_key == 'q' or input_key == Key.CTRL_Q:
             mm.target_path = ()

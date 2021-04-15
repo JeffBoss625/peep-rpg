@@ -79,6 +79,8 @@ class PrpgControl:
                         win.needs_paint = True
                         if set_player:
                             win.model = game.player
+                elif src_model == game.banner_model:
+                    self._win(WIN.BANNER).needs_paint = True
 
         self.model = game
         game.subscribe(game_change_fn)
