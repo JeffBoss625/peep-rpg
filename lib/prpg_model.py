@@ -189,10 +189,7 @@ class GameModel(DataModel):
         if placement:
             self.player.pos = maze.pos_of(placement)
 
-        pmaze = self.maze_model
         self.maze_model = maze
-
-        self.publish_update(pmaze, maze, attrib='maze_model')
 
     def set_player(self, peep, placement=None):
         if peep == self.player:

@@ -1,4 +1,3 @@
-from lib import dungeons
 from lib.constants import Key
 from lib.prpg_window import *
 from lib.win_layout import Con, Orient
@@ -16,9 +15,9 @@ class WIN:
 
 #
 class PrpgControl:
-    def __init__(self, root_layout, model):
+    def __init__(self, root_layout, game):
         self.root_layout = root_layout
-        self.model = model
+        self.game_model = game
 
         main_panel = root_layout.panel('root_panel', Orient.VERT, None, None)
 
@@ -26,8 +25,8 @@ class PrpgControl:
         main_panel.window(WIN.TITLE, Con(40,3,0,3))
 
         # Center Row
-        maze_h = len(model.maze_model.walls.text) + 2
-        maze_w = len(model.maze_model.walls.text[0]) + 2
+        maze_h = len(game.maze_model.walls.text) + 2
+        maze_w = len(game.maze_model.walls.text[0]) + 2
         banner_h = 4
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
@@ -45,14 +44,14 @@ class PrpgControl:
         main_panel.window(WIN.LOG, Con(30,4))
 
         init_windows(root_layout)
-        self.set_model(model)
+        self.set_model(game)
         self.root_win = root_layout.window
 
         root_layout.do_layout()           # reset layouts to current terminal size and builds curses windows
 
         def log_event_fn(m, msg, **kwds):
             name = getattr(m, '"name" ', '')
-            model.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
+            game.log_model.print(f'{msg}: {m.__class__.__name__} {name}{kwds}')
 
         # model.maze_model.subscribe(log_event_fn)
         self.root_win.curses.raw()
@@ -62,32 +61,21 @@ class PrpgControl:
         return self.root_layout.info.comp_by_name[name].window
 
     def set_model(self, game):
-        self._win(WIN.BANNER).model = game.banner_model
-        self._win(WIN.MESSAGES).model = game.message_model
-        self._win(WIN.LOG).model = game.log_model
+        self._win(WIN.BANNER).set_model(game.banner_model)
+        self._win(WIN.MESSAGES).set_model(game.message_model)
+        self._win(WIN.LOG).set_model(game.log_model)
+        self._win(WIN.STATS).set_model(game.player)
+        self._win(WIN.TITLE).set_model(game.player)
+        self._win(WIN.EQUIP).set_model(game.player)
+        self._win(WIN.MAZE).set_model(game.maze_model)
 
-        def game_change_fn(src_model, etype, **kwargs):
-            if etype == 'update':
-                if src_model == game.maze_model:
-                    mazewin = self._win(WIN.MAZE)
-                    mazewin.model = game.maze_model
-                    mazewin.needs_paint = True
-                elif src_model == game.player or kwargs['new'] == game.player:
-                    set_player = (kwargs['new'] == game.player)
-                    for win_name in (WIN.TITLE, WIN.STATS, WIN.EQUIP):
-                        win = self._win(win_name)
-                        win.needs_paint = True
-                        if set_player:
-                            win.model = game.player
-                elif src_model == game.banner_model:
-                    self._win(WIN.BANNER).needs_paint = True
+        def handle_game_update(model, _etype, **kargs):
+            if model == game and kargs.get('key', '') == 'maze_model':
+                self._win(WIN.MAZE).set_model(kargs['new'])
 
-        self.model = game
-        game.subscribe(game_change_fn)
-        if game.player:
-            game.publish_update(None, game.player)
-        if game.maze_model:
-            game.publish_update(None, game.maze_model)
+        game.subscribe(handle_game_update)
+
+        self.game_model = game
 
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
@@ -98,7 +86,7 @@ class PrpgControl:
         # return self.win(WIN.MAZE).window.get_key()
 
     def player_died(self):
-        self.model.banner('  YOU DIED! (press "q" to exit)')
+        self.game_model.banner('  YOU DIED! (press "q" to exit)')
         while self.get_key() not in ('q', Key.CTRL_Q):
             pass
 

@@ -26,10 +26,10 @@ DIRECTION_KEYS = {
 
 
 def player_turn(control):
-    player = control.model.player
+    player = control.game_model.player
     peep_regenhp(player)
     while True:
-        game = control.model
+        game = control.game_model
         mm = game.maze_model
         player = game.player
         input_key = control.get_key()
@@ -73,7 +73,7 @@ def player_turn(control):
             # continue
 
 def player_aim(control):
-    game = control.model
+    game = control.game_model
     mm = game.maze_model
     player = game.player
     mm.cursorvis = 1
@@ -101,7 +101,7 @@ def player_aim(control):
 
 
 def monster_turn(control, monster):
-    game = control.model
+    game = control.game_model
     mm = game.maze_model
     player = game.player
     peep_regenhp(monster)
@@ -163,20 +163,20 @@ def main(root_layout, game, get_key=None):
 
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
-        control.model.maze_model.elapse_time()
+        control.game_model.maze_model.elapse_time()
         res = execute_turn_seq(control)
         if res == 'quit' or res == 'player_died':
             return 0
         elif res == 'down_level':
-            control.model.goto_level(control.model.maze_model.level + 1, '<')
+            control.game_model.goto_level(control.game_model.maze_model.level + 1, '<')
         elif res == 'up_level':
-            control.model.goto_level(control.model.maze_model.level - 1, '>')
+            control.game_model.goto_level(control.game_model.maze_model.level - 1, '>')
 
-        control.model.maze_model.elapse_time()
+        control.game_model.maze_model.elapse_time()
 
 
 def execute_turn_seq(control):
-    game = control.model
+    game = control.game_model
     mm = game.maze_model
     while not mm.new_peeps and mm.ti < len(mm.turn_seq):
         # print(f'turn_seq {mm.ti}/{mm.turn_seq}')
@@ -202,7 +202,7 @@ def execute_turn_seq(control):
 # Interactively select a target to shoot
 # Return a selected peep or position (int, int) for the target.
 def choose_target(control, src_peep):
-    game = control.model
+    game = control.game_model
     mm = game.maze_model
     top = f'*: choose next, t: target, q: quit'
     targets = target_list(src_peep, mm.peeps)  # peeps sorted in order of distance and relative angle from origin

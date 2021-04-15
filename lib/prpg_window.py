@@ -52,6 +52,10 @@ class StatsWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
+    def handle_update_event(self, _model, _msg, **kwds):
+        if kwds.get('key', '') in {'hp', 'maxhp', 'level', 'speed', 'xp'}:
+            self.needs_paint = True
+
     def do_paint(self):
         p = self.model  # player
 
@@ -86,6 +90,9 @@ class StatsWindow(Window):
 class EquipWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
+
+    def handle_update_event(self, _model, _msg, **_kwds):
+        return
 
     def do_paint(self):
         p = self.model

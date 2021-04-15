@@ -19,9 +19,12 @@ class PubSub:
             sm.subscribe(fn)
 
     def unsubscribe(self, fn):
-        self._subscribers.remove(fn)
-        for sm in self.submodels():
-            sm.unsubscribe(fn)
+        try:
+            self._subscribers.remove(fn)
+            for sm in self.submodels():
+                sm.unsubscribe(fn)
+        except ValueError:
+            pass
 
     def publish(self, model, event_type, **kwds):
         for fn in self._subscribers:

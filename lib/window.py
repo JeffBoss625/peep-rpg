@@ -28,14 +28,9 @@ class Window:
         self.y_margin = params.get('y_margin')
         self.curses = params.get('curses', None)        # curses library or instance of lib.DummyCurses
         self.scr = params.get('scr', None)              # curses root window or instance of lib.DummyWin
-        self.model = params.get('model', None)
-
+        self.model = None
         self.needs_paint = True
-
-        if self.model:
-            def update_fn(_model, _msg, **_kwds):
-                self.needs_paint = True
-            self.model.subscribe(update_fn)
+        self.set_model(params.get('model', None))
 
         if parent:
             self.curses = parent.curses
@@ -62,6 +57,24 @@ class Window:
             raise ValueError(f'multiple components with the same name: "{self.name}"')
 
         root.info.win_by_name[self.name] = self
+
+    # override this function for tighter/efficient repaint control
+    def handle_update_event(self, _model, _msg, **_kwds):
+        self.needs_paint = True
+
+    def set_model(self, model):
+        if model == self.model:
+            return
+
+        def update_fn(m, msg, **kwds):
+            self.handle_update_event(m, msg, **kwds)
+
+        if self.model:
+            self.model.unsubscribe(update_fn)
+
+        self.model = model
+        self.model.subscribe(update_fn)
+        self.needs_paint = True
 
     def __repr__(self):
         return f'Window"{self.name}": margin:[{self.x_margin} {self.y_margin}] scr:{self.scr}'
