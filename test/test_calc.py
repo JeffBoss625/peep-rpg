@@ -147,9 +147,9 @@ class shield:
     width: int=3
 
 
-def test_calc_dmg_multiplier():
-    print(calc_dmg_multiplier(target, shield))
-    print(calc_dmg_multiplier(target, shield))
-    print(calc_dmg_multiplier(target, shield))
-    print(calc_dmg_multiplier(target, shield))
-    print(calc_dmg_multiplier(target, shield))
+# def test_calc_dmg_multiplier():
+#     print(calc_dmg_multiplier(target, shield))
+#     print(calc_dmg_multiplier(target, shield))
+#     print(calc_dmg_multiplier(target, shield))
+#     print(calc_dmg_multiplier(target, shield))
+#     print(calc_dmg_multiplier(target, shield))

@@ -161,5 +161,10 @@ def create_maze(info):
         items=info.get('items', []),
     )
 
+# convenient set up for testing
 def create_game(info):
-    return GameModel(create_maze(info))
+    game = GameModel()
+    maze = create_maze(info)
+    game.player = maze.peeps[0]
+    game.maze_model = maze
+    return game

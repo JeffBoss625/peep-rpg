@@ -33,7 +33,7 @@ class BodyPart:
 class Body:
     body_type: str = ''
     size: Size = ()
-    weight: int = 0
+    weight: float = 0
     parts: Tuple[BodyPart] = field(default_factory=tuple)      # BodyParts in order top to bottom
 
     # hide reproducable state
@@ -67,7 +67,7 @@ class Body:
             ret[p.name] = p
         return ret
 
-# average height in mm: Elf: 1800, Human: 1750, Dwarf: 1350, Hobbit: 1050
+# average male height in cm: Dunadain: 180, Human: 175, Dwarf: 135, Hobbit: 105
 def update_human_proportions(body, body2head):
     # humanoid size ratios
     # body-to-head: normal Human 7.5, Dunadain and Elves are 8, Dwarves are 6.
@@ -142,7 +142,7 @@ def create_body(body_type, kwds):
 
     return ret
 
-def create_humanoid(height=1800, weight=90000, body2head=7.5):
+def create_humanoid(height=1.0, weight=1.0, body2head=7.5):
     slot_definitions = (
         # Upper Bodywear
         ('head', ('head',)),    # helmet, crown, hood, hat, ...
@@ -152,12 +152,10 @@ def create_humanoid(height=1800, weight=90000, body2head=7.5):
             'torso_over'        # plate, cuirass
             'garment_outer',    # cloak, jacket, ...
             'on_back',          # backpack, quiver-sling (ammo and bow), ...
-            'on_shoulder1',      # quiver, sack, ...
-            'on_shoulder2',      # quiver, sack, ...
+            'on_shoulder',      # quiver, sack, ...
         )),
         ('waist', (
-            'waist_upper',      # belt, sash, scabbard, knife-belt, dart-belt, ...
-            'waist_lower',      # belt, sash, scabbard, knife-belt, dart-belt, ...
+            'waist',            # belt, sash, scabbard, knife-belt, dart-belt, ...
         )),
 
         # Hands / Arms
@@ -234,7 +232,8 @@ def create_dragon(height=2.0, weight=20.0):
 register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
-    body = create_dragon(height=203, weight=120)
+    # body = create_dragon(height=203, weight=120)
+    body = create_humanoid()
     print(dump(body.parts, sort_keys=False))
     # bslots = body.body_slots()
     # bslots.torso.on_shoulder1.item = Bow()

@@ -12,7 +12,7 @@ class Belt:
     material: str = 'leather'
     size: Size = Size(45, 45, 5)
     weight: int = 300
-    slot_type: Tuple[BODY_SLOT] = (BODY_SLOT.WAIST_LOWER,)
+    slot_type: Tuple[BODY_SLOT] = (BODY_SLOT.WAIST,)
 
 
 @dataclass

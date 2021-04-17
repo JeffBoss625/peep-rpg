@@ -1,6 +1,6 @@
 import yaml
 
-from lib.model import ModelList, ModelDict, Size, register_yaml, TextModel
+from lib.model import ModelList, ModelDict, Size, size, register_yaml, TextModel
 from lib.monsters import MONSTERS_BY_NAME
 
 
@@ -19,6 +19,7 @@ def test_model_list():
     hec1 = Hector()
     hec2 = Hector()
     brog = MONSTERS_BY_NAME['Brog']
+    brog.hp = 65
     spark = MONSTERS_BY_NAME['Spark']
 
     a = ModelList()
@@ -32,7 +33,7 @@ def test_model_list():
     a.unsubscribe(hec2.collect)
 
     brog.hp = 333
-    assert hec1.args.pop() == (brog, 'update', 0, 333, 'hp')
+    assert hec1.args.pop() == (brog, 'update', 65, 333, 'hp')
     assert hec2.args == []
     a[0] = spark
 
@@ -46,7 +47,7 @@ def test_model_list():
 def test_yaml():
     register_yaml([Size])
 
-    s = Size(3,4,5)
+    s = size(3,4,5)
     sstr = yaml.dump({'s': s})
     assert sstr == 's: 3x4x5\n'
 

@@ -88,8 +88,8 @@ def test_draw_target():
     })
     root_layout = dummy_root(dim=Dim(100, 22), logger=Logger('dbg.py'))
     control = PrpgControl(root_layout, game)
-    player = game.maze.peeps[0]
+    player = game.maze_model.peeps[0]
     for target in data:
         tp = (player.pos[0] + target[0], player.pos[1] + target[1])
-        game.maze.target = tuple(line_points(player.pos, tp))
+        game.maze_model.target = tuple(line_points(player.pos, tp))
         control.root_layout.window.paint()

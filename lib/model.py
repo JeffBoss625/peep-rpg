@@ -223,8 +223,11 @@ class TextModel(PubSub):
     def char_at(self, x, y):
         return self.text[y][x]
 
+
+# Size normalized to float with a unit 1.0 equal to roughly human male height (175cm)
+# Sizes serialize to and from millimeters for readability and storage.
 @dataclass
-class Size:
+class ISize:
     h: int = 0
     w: int = 0
     d: int = 0
@@ -232,15 +235,55 @@ class Size:
     def volume(self):
         return self.h * self.w * self.d
 
+class UNIT:
+    NORM = 'norm'
+    INCHES = 'inches'
+    FEET = 'feet'
+    MM = 'mm'
+    CM = 'cm'
+    METERS = 'meters'
+
+
+UNIT_FAC = {
+    UNIT.NORM: (1.0, 4),
+    UNIT.FEET: (5.74146, 3),
+    UNIT.INCHES: (68.8976, 2),
+    UNIT.MM: (1750.0, 0),
+    UNIT.CM: (175.0, 1),
+    UNIT.METERS: (1.75, 4),
+}
+
+def size(h, w, d, unit=UNIT.MM):
+    fac, r = UNIT_FAC[unit]
+    return Size(h/fac, w/fac, d/fac)
+
+
+@dataclass
+class Size:
+    h: float = 0
+    w: float = 0
+    d: float = 0
+
+    def volume(self):
+        return self.h * self.w * self.d
+
+    def as_tuple(self, unit=UNIT.MM):
+        fac, r = UNIT_FAC[unit]
+        h, w, d = round(self.h * fac, r), round(self.w * fac, r), round(self.d * fac, r)
+        if r == 0:
+            h, w, d = int(h), int(w), int(d)
+        return h, w, d
+
     @classmethod
     def from_yaml(cls, loader, node):
         v = loader.construct_scalar(node)
         h, w, d = map(int, v.split('x'))
-        return Size(h, w, d)
+        return size(h, w, d)        # convert from mm integers
 
     @classmethod
     def to_yaml(cls, dumper, v):
-        return dumper.represent_scalar('!size', f'{v.h}x{v.w}x{v.d}')
+        h, w, d = v.as_tuple()      # convert to mm integers
+        return dumper.represent_scalar('!size', f'{h}x{w}x{d}')
 
     @classmethod
     def yaml_pattern(cls):

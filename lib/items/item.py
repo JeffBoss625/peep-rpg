@@ -16,8 +16,7 @@ class BODY_SLOT:
     GARMENT_OUTER = 'garment_outer'
     ON_BACK = 'on_back'
     ON_SHOULDER = 'on_shoulder'
-    WAIST_UPPER = 'waist_upper'
-    WAIST_LOWER = 'waist_lower'
+    WAIST = 'waist'
     # todo: consider upper-arm lower-arm arm-holster...
     L_HAND = 'l_hand'
     L_HAND_HOLDING = 'l_hand_holding'
@@ -63,7 +62,7 @@ class Item:
     char: str = '?'
     size: Size = field(default_factory=Size)  # height, width, depth in mm ** when placed in storage or slot **
     weight: int = 1
-    slot_type: str = ''
+    slot_type: str = ''         # fits in slot type
     pos: Tuple[int,int] = field(default_factory=tuple)
 
     fgcolor: str = COLOR.WHITE
@@ -82,8 +81,7 @@ class GeneralContainer(Item):
     #
     # # AT-READY
     # QUIVER: 'QUIVER'                # on back: bolts, arrows, ...
-    # BELT_UPPER: 'BELT_UPPER'        # on waist: throwing knives, sword, darts, pick-axe, throwing axes, bag of sling shot, ...
-    # BELT_LOWER: 'BELT_LOWER'        # on waist: throwing knives, sword, darts, pick-axe, throwing axes, bag of sling shot, ...
+    # BELT: 'BELT'                    # on waist: throwing knives, sword, darts, pick-axe, throwing axes, bag of sling shot, ...
     # WEAPON_SLOT: 'WEAPON_SLOT'      # wielding: sword that fires small blades, double-crossbow with 2 loaded rounds
     # POCKET: 'POCKET'                # pants and jackets may have pockets that can hold rings, shot, etc.
     #

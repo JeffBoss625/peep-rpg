@@ -26,7 +26,7 @@ def assert_game(game, keys, paint=False):
 
 def test_shoot_wall():
     random.seed = 1
-    game =  dungeons.create_dungeon({
+    game =  dungeons.create_game({
         'walls': [
             '%%%%',
             '%..%',
@@ -56,7 +56,7 @@ def test_shoot_thru_monster():
 
 def test_shoot_monster():
     random.seed = 1
-    game =  dungeons.create_dungeon({
+    game =  dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%....%',
@@ -71,7 +71,7 @@ def test_shoot_monster():
 
 def test_shoot_monster_blocked():
     random.seed = 1
-    game =  dungeons.create_dungeon({
+    game =  dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%..%.%',
@@ -98,5 +98,4 @@ def test_balrog_whip():
             create_peep('balrog', name='Gark', pos=(3,1))
         ]
     })
-    assert_game(game, ['.', '.', '.', Key.CTRL_Q], paint=True)
-    print('hi')
+    assert_game(game, ['.', '.', '.', Key.CTRL_Q], paint=False)

@@ -36,8 +36,8 @@ def assert_game(model, keys, paint=False):
         ret = keys.pop(0)
         return ret
 
-    control.get_key = get_key
-    main(control, model)
+    main(root_layout, model, get_key=get_key)
+
 
 def test_calc_deflection():
     data = (
@@ -71,9 +71,14 @@ def test_attack():
     attack_dst(p1, m1, p1.attacks[0], out)
     assert m1.hp == 3
     attack_dst(m1, p1, m1.attacks[0], out)
+    attack_dst(m1, p1, m1.attacks[0], out)
+    attack_dst(m1, p1, m1.attacks[0], out)
+    attack_dst(m1, p1, m1.attacks[0], out)
+    attack_dst(m1, p1, m1.attacks[0], out)
+    attack_dst(m1, p1, m1.attacks[0], out)
     assert p1.hp == 1
     attack_dst(p1, m1, p1.attacks[0], out)
-    assert m1.hp == 2
+    assert m1.hp == 0.75
 
     # try this.... not changing.
     # attack(p1, p2, 'teeth', out, 3)
@@ -136,12 +141,12 @@ def test_level_calc():
     )
     for xp, factor, exp in data:
         lc = level_calc(xp, factor, 100)
-        print(f'level_calc({xp}, {factor}) = {lc}/{exp})')
+        # print(f'level_calc({xp}, {factor}) = {lc}/{exp})')
         # assert lc == exp
 
 def test_shield_block():
     random.seed = 1
-    model = dungeons.create_dungeon({
+    game = dungeons.create_game({
         'walls': [
             '%%%%',
             '%..%',
@@ -158,7 +163,7 @@ def test_shield_block():
         height: int = 2
         width: int = 2
 
-    p = model.maze.peeps[0]
-    model.maze.peeps[0].inventory.hand1 = shield()
+    p = game.maze_model.peeps[0]
+    game.maze_model.peeps[0].inventory.hand1 = shield()
     print(p)
-    assert_game(model, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=True)
+    assert_game(game, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=False)

@@ -1,8 +1,9 @@
 import lib.move as mlib
 from lib.move import Direction
 from lib.peeps import Peep, Attack
-from lib.game import GameModel
-from lib.game import elapse_time
+import lib.dungeons as dungeons
+from lib.prpg_model import elapse_time
+
 import sys
 
 def printe(s):
@@ -16,24 +17,27 @@ def test_elapse_time():
         Peep(name='p02', speed=2),
     ]
     data = (
-        # fac  moves  tics remaining
-        ( 1.0, [1,0,0], (0.0, 7.0, 2.0) ),
-        ( 1.0, [1,1,0], (0.0, 4.0, 4.0) ),
-        ( 1.0, [1,1,0], (0.0, 1.0, 6.0) ),
-        ( 1.0, [1,0,0], (0.0, 8.0, 8.0) ),
-        ( 1.0, [1,1,1], (0.0, 5.0, 0.0) ),
-        ( 0.5, [0,0,0], (5.0, 8.5, 1.0) ),
-        ( 0.1, [0,0,0], (6.0, 9.2, 1.2) ),
-        ( 0.2, [0,1,0], (8.0, 0.6, 1.6) ),
-        ( 0.3, [1,0,0], (1.0, 2.7, 2.2) ),
+        ['p10'],
+        ['p07', 'p10'],
+        ['p07', 'p10'],
+        ['p10'],
+        ['p07','p10','p02'],
+        ['p07','p10'],
+        ['p10'],
+        ['p07','p10'],
+        ['p07','p10'],
+        ['p10','p02'],
+        ['p07','p10'],
+        ['p07','p10'],
     )
-    for t, expmoves, exptics in data:
-        printe(f'{t} {expmoves} {exptics}')
-        moves = elapse_time(peeps, t)
-        tics = tuple(p.tics for p in peeps)
-        assert moves == expmoves
-        assert tics == exptics
 
+    # print(f'thresholds: {tuple(round(1/p.speed, 5) for p in peeps)}')
+    for expmoves in data:
+        moved = elapse_time(peeps)
+        moved_names = list(p.name for p in moved)
+        tics = list(p._tics for p in peeps)
+        # print(f'{tics}  {moved_names}')
+        assert moved_names == expmoves
 
 def test_move_peep():
     peeps = [
@@ -49,7 +53,7 @@ def test_move_peep():
         '......',        # monster here at [4,3]
     ]
     player = peeps[0]
-    model = GameModel(walls=walls, peeps=peeps)
+    model = dungeons.create_game({'walls':walls, 'peeps':peeps})
     mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.RIGHT))
     assert player.pos == (1,0) # x changed!
 
@@ -80,34 +84,34 @@ def test_move_attack():
         '.#....',        # monster here on the left at [0,2].
         '......',        # monster here at [4,3]
     ]
-    model = GameModel(peeps=peeps, walls=walls)
+    model = dungeons.create_game({'peeps':peeps, 'walls':walls})
     # Run into monster at [0,2]
     mlib.move_peep(model, player, mlib.adjacent_pos(player.pos, mlib.Direction.DOWN))
     assert player.pos == (0,1)
 
 
 def test_handle_enemy_move():
-    peeps = [
-        Peep(name='p1', pos=(0,0)),
-        Peep(name='m1', pos=(1,2)),
-        Peep(name='m2', pos=(4,3)),
-    ]
-
-    walls = [
-        '..####',
-        '..####',
-        '......',        # monster here on the left at [0,2].
-        '......',        # monster here at [4,3]
-    ]
-    model = GameModel(peeps=peeps, walls=walls, player=peeps[0])
-    enemy = peeps[1]
-    dx = model.maze_model.player.pos[0] - enemy.pos[0]
-    dy = model.maze_model.player.pos[0] - enemy.pos[0]
+    game = dungeons.create_game({
+        'peeps': [
+            Peep(name='p1', pos=(0,0)),
+            Peep(name='m1', pos=(1,2)),
+            Peep(name='m2', pos=(4,3)),
+        ],
+        'walls': [
+            '..####',
+            '..####',
+            '......',        # monster here on the left at [0,2].
+            '......',        # monster here at [4,3]
+        ],
+    })
+    enemy = game.maze_model.peeps[1]
+    dx = game.player.pos[0] - enemy.pos[0]
+    dy = game.player.pos[0] - enemy.pos[0]
     edir = mlib.direction_from_vector(dx, dy)
 
-    mlib.move_peep(model, enemy, mlib.adjacent_pos(enemy.pos, edir))
+    mlib.move_peep(game, enemy, mlib.adjacent_pos(enemy.pos, edir))
     assert enemy.pos == (0,1)
-    mlib.move_peep(model, enemy, mlib.adjacent_pos(enemy.pos, edir))
+    mlib.move_peep(game, enemy, mlib.adjacent_pos(enemy.pos, edir))
     assert enemy.pos == (0,1)
 
 def test_direction_relative():
