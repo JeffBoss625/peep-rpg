@@ -25,7 +25,7 @@ def test_line_points():
 
     for p1, p2, exp in data:
         points = tuple(line_points(p1,p2))
-        print(f'line_points({p1}, {p2}) = {points}')
+        # print(f'line_points({p1}, {p2}) = {points}')
 
         # assert points == exp
 
@@ -91,5 +91,5 @@ def test_draw_target():
     player = game.maze_model.peeps[0]
     for target in data:
         tp = (player.pos[0] + target[0], player.pos[1] + target[1])
-        game.maze_model.target = tuple(line_points(player.pos, tp))
+        game.maze_model.target_path = tuple(line_points(player.pos, tp))
         control.root_layout.window.paint()
