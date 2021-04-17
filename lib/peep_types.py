@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
-from lib.body import create_humanoid, RACE
+from lib.body import create_humanoid, RACE, create_body
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
 from lib.pclass import get_pclass, level_calc
 
-from lib.stat import roll_dice
+from lib.stats import roll_dice
 
 
 
@@ -382,7 +382,9 @@ def create_peep(
         pclass="FIGHTER",
         name='',
         pos=(0, 0),
-        body_stats=None,
+        height=1.0,
+        weight=1.0,
+        body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
     ):
@@ -414,7 +416,7 @@ def create_peep(
         height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
-        body=create_humanoid(**body_stats) if body_stats else None,
+        body=create_body('humanoid', height, weight, body2head=body2head),
         move_tactic=pt.move_tactic,
     )
     return ret

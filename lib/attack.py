@@ -2,7 +2,7 @@ import random
 
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
-from lib.stat import calc_pct
+from lib.stats import calc_pct
 
 def parse_dice(dstring):
     parts = dstring.split("d")

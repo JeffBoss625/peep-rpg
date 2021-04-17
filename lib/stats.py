@@ -44,8 +44,8 @@
 # godlike where a 300 lb god would lift 9,000-22,500 lbs. - the weight of one or two african bull elephants or react
 # 20 times faster than a normal human.
 
-from random import randint
 from dataclasses import dataclass
+from random import randint
 
 @dataclass
 class HarmStats:

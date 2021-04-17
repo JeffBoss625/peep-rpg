@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from lib.constants import GAME_SETTINGS
 import math
 
-from lib.stat import roll_dice
+from lib.stats import roll_dice
 
 
 class PCLASSES:

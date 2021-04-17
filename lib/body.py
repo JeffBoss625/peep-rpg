@@ -3,9 +3,9 @@ from typing import Tuple
 
 from yaml import dump
 
-from lib.items.belt import SoldiersBelt
-from lib.items.bow import Arrow, Bow
-from lib.items.holster import Quiver
+# from lib.items.belt import SoldiersBelt
+# from lib.items.bow import Arrow, Bow
+# from lib.items.holster import Quiver
 from lib.items.item import Item
 from lib.model import Size, register_yaml
 from lib.util import DotDict
@@ -134,15 +134,17 @@ def update_dragon_proportions(body, head):
         ratio = dratio[part.name]
         part.size = Size(ratio[0] * head[0], ratio[1] * head[1], ratio[2] * head[2])
 
-def create_body(body_type, kwds):
+def create_body(body_type, height=1.0, weight=1.0, **kwds):
     if body_type == 'humanoid':
-        ret = create_humanoid(**kwds)
+        ret = create_humanoid(height, weight, **kwds)
+    elif body_type == 'dragon':
+        ret = create_dragon(height, weight)
     else:
         raise ValueError(f'body_type {body_type}')
 
     return ret
 
-def create_humanoid(height=1.0, weight=1.0, body2head=7.5):
+def create_humanoid(height, weight, body2head=7.5):
     slot_definitions = (
         # Upper Bodywear
         ('head', ('head',)),    # helmet, crown, hood, hat, ...
@@ -201,7 +203,10 @@ def create_humanoid(height=1.0, weight=1.0, body2head=7.5):
     update_human_proportions(ret, body2head)
     return ret
 
-def create_dragon(height=2.0, weight=20.0):
+def create_dragon(height, weight):
+    height *= 2
+    weight *= 20
+
     slot_definitions = (
         # Upper Bodywear
         ('head', ()),
@@ -233,7 +238,7 @@ register_yaml((BodySlot, BodyPart, Body))
 
 if __name__ == '__main__':
     # body = create_dragon(height=203, weight=120)
-    body = create_humanoid()
+    body = create_body('humanoid')
     print(dump(body.parts, sort_keys=False))
     # bslots = body.body_slots()
     # bslots.torso.on_shoulder1.item = Bow()
