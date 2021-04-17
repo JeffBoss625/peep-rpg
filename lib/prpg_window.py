@@ -96,6 +96,13 @@ class EquipWindow(Window):
 
     def do_paint(self):
         p = self.model
-        self.write_lines([
-            'equip',
-        ])
+        lines = ['Equipment']
+        for part in p.body.parts:
+            for slot in part.slots:
+                if slot.item:
+                    lines.append(part.name)
+                    lines.append(f'  {slot.item.name}')
+
+        if len(lines) == 1:
+            lines.append(' you are naked.')
+        self.write_lines(lines)

@@ -42,7 +42,7 @@ class Body:
         for part in self.parts:
             for slot in part.slots:
                 if slot.item:
-                    items_by_slot[slot.name] = slot.item
+                    items_by_slot[f'{part.name}:{slot.name}'] = slot.item
 
         # state arguments to create_humanoid() that will recreate this body
         return {
@@ -147,51 +147,41 @@ def create_body(body_type, height=1.0, weight=1.0, **kwds):
 def create_humanoid(height, weight, body2head=7.5):
     slot_definitions = (
         # Upper Bodywear
-        ('head', ('head',)),    # helmet, crown, hood, hat, ...
-        ('neck', ('neck',)),    # necklass, amulet, neck scarf, ...
+        ('head', ('cover',)),        # helmet, crown, hood, hat, ...
+        ('neck', ('around',)),      # necklass, amulet, neck scarf, ...
         ('torso',(
-            'torso_under',      # chain mail, jerkin, ...
-            'torso_over'        # plate, cuirass
-            'garment_outer',    # cloak, jacket, ...
-            'on_back',          # backpack, quiver-sling (ammo and bow), ...
-            'on_shoulder',      # quiver, sack, ...
+            'cover',         # chain mail, jerkin, ...
+            'cover',         # plate, cuirass
+            'cover',         # cloak, jacket, ...
+            'back',         # backpack, quiver-sling (ammo and bow), ...
+            'shoulder',     # quiver, sack, ...
         )),
         ('waist', (
-            'waist',            # belt, sash, scabbard, knife-belt, dart-belt, ...
+            'around',            # belt, sash, scabbard, knife-belt, dart-belt, ...
         )),
 
         # Hands / Arms
         ('l_hand', (
-            'l_hand',           # glove, gauntlet, OR rings
-            'l_hand_holding',   # shield, weapon, bag, cup, wand, staff, any item, ...
+            'cover',              # glove, gauntlet, OR rings
+            'holding',           # shield, weapon, bag, cup, wand, staff, any item, ...
+            'fingers'            # rings (cannot be warn over gauntlets, but perhpas held?)
         )),
         ('r_hand', (
-            'r_hand',           # glove, gauntlet, OR rings
-            'r_hand_holding',   # shield, weapon, bag, cup, wand, staff, any item, ...
+            'cover',             # glove, gauntlet, OR rings
+            'holding',           # shield, weapon, bag, cup, wand, staff, any item, ...
+            'fingers'            # rings (cannot be warn over gauntlets, but perhpas held?)
         )),
 
-        # rings cannot be warn over gauntlets (but perhaps may be held?)
-        # rings left
-        ('l_finger1', ('l_finger1',)),
-        ('l_finger2', ('l_finger2',)),
-        ('l_finger3', ('l_finger3',)),
-        ('l_finger4', ('l_finger4',)),
-        # rings right
-        ('r_finger1', ('r_finger1',)),
-        ('r_finger2', ('r_finger2',)),
-        ('r_finger3', ('r_finger3',)),
-        ('r_finger4', ('r_finger4',)),
-
-        ('l_arm', ('l_wrist',)),
-        ('r_arm', ('r_wrist',)),
+        ('l_arm', ('cover',)),  # bracers
+        ('r_arm', ('cover',)),  # bracers
 
         ('legs', (
-            'legs_inner',  # breeches, pants, leather-leggings, cargo-pants (pockets!), ...
-            'legs_outer',  # leg guards, samurai armor, poleyn, chausses (chain), full plate, ...
+            'cover',    # breeches, pants, leather-leggings, cargo-pants (pockets!), ...
+            'cover',     # leg guards, samurai armor, poleyn, chausses (chain), full plate, ...
         )),
         ('feet', (
-            'foot_inner',  # socks-of-cold-protection, ...
-            'foot_outer',  # boots, sandles, shoes, slippers, ...
+            'cover',    # socks-of-cold-protection, ...
+            'cover',     # boots, sandles, shoes, slippers, ...
         )),
     )
     parts = []
@@ -239,6 +229,7 @@ register_yaml((BodySlot, BodyPart, Body))
 if __name__ == '__main__':
     # body = create_dragon(height=203, weight=120)
     body = create_body('humanoid')
+    slots = body.body_slots()
     print(dump(body.parts, sort_keys=False))
     # bslots = body.body_slots()
     # bslots.torso.on_shoulder1.item = Bow()
