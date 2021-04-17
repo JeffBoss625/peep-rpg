@@ -38,34 +38,19 @@ class Body:
 
     # hide reproducable state
     def __getstate__(self):
-        items_by_slot = {}
+        items = []
         for part in self.parts:
             for slot in part.slots:
                 if slot.item:
-                    items_by_slot[f'{part.name}:{slot.name}'] = slot.item
+                    items.append((f'{part.name}:{slot.name}', slot.item))
 
         # state arguments to create_humanoid() that will recreate this body
         return {
             'body_type': self.body_type,
             'height': self.size.h,
             'weight': self.weight,
-            'items': items_by_slot,
+            'items': items,
         }
-
-    def body_slots(self):
-        ret = DotDict()
-        for p in self.parts:
-            slots = DotDict()
-            for s in p.slots:
-                slots[s.name] = s
-            ret[p.name] = slots
-        return ret
-
-    def parts_by_name(self):
-        ret = DotDict()
-        for p in self.parts:
-            ret[p.name] = p
-        return ret
 
 # average male height in cm: Dunadain: 180, Human: 175, Dwarf: 135, Hobbit: 105
 def update_human_proportions(body, body2head):
@@ -146,14 +131,18 @@ def create_body(body_type, height=1.0, weight=1.0, **kwds):
 
 def create_humanoid(height, weight, body2head=7.5):
     slot_definitions = (
-        # Upper Bodywear
-        ('head', ('cover',)),        # helmet, crown, hood, hat, ...
-        ('neck', ('around',)),      # necklass, amulet, neck scarf, ...
+        # Bodywear
+        ('head', (
+            'cover',        # helmet, crown, hood, hat, ...
+        )),
+        ('neck', (
+            'around',       # necklass, amulet, neck scarf, ...
+        )),
         ('torso',(
-            'cover',         # chain mail, jerkin, ...
-            'cover',         # plate, cuirass
-            'cover',         # cloak, jacket, ...
-            'back',         # backpack, quiver-sling (ammo and bow), ...
+            'cover',        # chain mail, jerkin, ...
+            'cover',        # plate, cuirass, ...
+            'front',        # breast plate
+            'back',         # backpack, shield strapped to back.
             'shoulder',     # quiver, sack, ...
         )),
         ('waist', (
@@ -190,6 +179,7 @@ def create_humanoid(height, weight, body2head=7.5):
         parts.append(BodyPart(name, slots=bslots))
 
     ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, tuple(parts))
+    ret.slot = BodySlot('cover')
     update_human_proportions(ret, body2head)
     return ret
 
@@ -199,20 +189,22 @@ def create_dragon(height, weight):
 
     slot_definitions = (
         # Upper Bodywear
-        ('head', ()),
-        ('neck', ('neck',)),    # necklass, amulet, neck scarf, ...
+        ('head', (
+            'cover',    # dragon helm (like horse helm)
+            'on',       # crown - only over supple materials like cloth/flexible leather
+        )),
+        ('neck', ('around',)),      # huge necklass, collar, belt as collar...
         ('body',(
-            'on_back',          # for a saddle
+            'cover',                # dragon armor - cover all except bottom/under-side
+            'under',                # under-armor/plate/shield
+            'on',                   # saddle, pack
         )),
         # Hands / Arms
-        ('l_arm', ('l_wrist',)),
-        ('r_arm', ('r_wrist',)),
+        ('l_arm', ('around',)),     # huge bracelet, band, belt as band
+        ('r_arm', ('around',)),
 
-        # rings cannot be warn over gauntlets (but perhaps may be held?)
-        # rings right
-
-        ('l_leg', ('l_ankle',)),
-        ('r_leg', ('r_ankle',)),
+        ('l_leg', ('around',)),     # huge bracelet, band, belt as band
+        ('r_leg', ('around',)),
     )
     parts = []
     for name, slotnames in slot_definitions:
