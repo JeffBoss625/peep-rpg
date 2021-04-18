@@ -119,7 +119,7 @@ MONSTERS = [
         type='monster',
         fgcolor=COLOR.WHITE,
         bgcolor=COLOR.BLACK,
-        hitdice='3d8',
+        hitdice='5d10',
         thaco=17,
         speed=1.9,
         ac=8,
@@ -127,6 +127,7 @@ MONSTERS = [
             AttackInfo('beak', '1d10'),
             AttackInfo('talons', '2d7'),
             AttackInfo('wing_blow', '6d1'),
+            AttackInfo('air_strike', '5d1', range=5, blowback=100)
         )
     ),
 
@@ -283,6 +284,20 @@ MONSTERS = [
         char='-',
         type='projectile',
         fgcolor=COLOR.YELLOW,
+        bgcolor=COLOR.BLACK,
+        hitdice='1d2',
+        thaco=20,
+        speed=10.0,
+        ac=-10,
+        attacks=(
+        ),
+        move_tactic='pos_path',
+    ),
+    PType(
+        name='air_strike',
+        char='§',
+        type='projectile',
+        fgcolor=COLOR.WHITE,
         bgcolor=COLOR.BLACK,
         hitdice='1d2',
         thaco=20,
