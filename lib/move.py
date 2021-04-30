@@ -112,6 +112,7 @@ def move_peep(game, peep, dst_pos):
 
     # move
     peep.pos = dst_pos
+    peep._tics = peep._tics - 1/peep.speed
     return True
 
 

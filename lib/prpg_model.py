@@ -123,20 +123,33 @@ class MazeModel(DataModel):
 # (mod increment) tics that equal or exceed this incremented amount and return the list of such
 # peeps sorted by highest-to-lowest tics value - the order of peeps to move.
 def elapse_time(peeps):
-    ret = []
+    ret = _elapse_time(peeps, False)
+    if not ret:
+        ret = _elapse_time(peeps,True)
+    return ret
 
+def _elapse_time(peeps, add_tics):
+    ret = []
     peeps.sort(key=lambda p: -p.speed)
     inc = round(1/peeps[0].speed, 5)   # increment for the fastest peep (smallest increment)
     for p in peeps:
+        handle_passing_time(p, inc)
         if p.speed > 0:
-            p._tics = round(p._tics + inc, 5)
+            if p.hp <= 0:
+                continue
+            if add_tics is True: p._tics = round(p._tics + inc, 5)
             thresh = 1/p.speed
             if p._tics >= thresh:
-                p._tics = round(p._tics - thresh, 5)
                 ret.append(p)
-
     ret.sort(key=lambda p: -p._tics)
     return ret
+
+def handle_passing_time(peep, inc):
+    if peep.hp == peep.maxhp or peep.hp <= 0:
+        return
+    amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
+    hp = peep.hp + amount_heal * inc
+    peep.hp = min(hp, peep.maxhp)
 
 @dataclass
 class Logger:

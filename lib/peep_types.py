@@ -13,6 +13,7 @@ from lib.stats import roll_dice
 class AttackInfo:
     name: str = ''
     damage: str = '1d1'
+    speed: float = 1.0
     range: int = 0
     reach: int = 1.5
     # blowback is multiplied by damage done and applied to attacker. positive causes damage negative
@@ -91,9 +92,9 @@ MONSTERS = [
         speed=1.3,
         ac=10,
         attacks=(
-            AttackInfo('bite', '1d3'),
-            AttackInfo('scratch', '2d2'),
-            AttackInfo('tail', '2d1'),
+            AttackInfo('bite', '1d1', speed=3),
+            # AttackInfo('scratch', '2d2'),
+            # AttackInfo('tail', '2d1'),
         )
     ),
 
@@ -126,8 +127,8 @@ MONSTERS = [
         attacks=(
             AttackInfo('beak', '1d10'),
             AttackInfo('talons', '2d7'),
-            AttackInfo('wing_blow', '6d1'),
-            AttackInfo('air_strike', '5d1', range=5, blowback=100)
+            AttackInfo('wing_blow', '6d1', speed=0.95,),
+            AttackInfo('air_strike', '5d1', speed=0.5, range=5, blowback=100)
         )
     ),
 
@@ -147,7 +148,7 @@ MONSTERS = [
             AttackInfo('bite', '1d10'),
             AttackInfo('scratch', '2d7'),
             AttackInfo('tail', '3d5'),
-            AttackInfo('fire_breath', '2d10', range=15, blowback=100),
+            AttackInfo('fire_breath', '2d10', speed=0.2, range=15, blowback=100),
         )
     ),
     # The Black Dragon
@@ -165,7 +166,7 @@ MONSTERS = [
             AttackInfo('bite', '1d30'),
             AttackInfo('scratch', '2d21'),
             AttackInfo('tail', '3d15'),
-            AttackInfo('acid_breath', '2d30', range=15, blowback=100),
+            AttackInfo('acid_breath', '2d30', speed=0.2, range=15, blowback=100),
         ),
     ),
     PType(
@@ -185,7 +186,7 @@ MONSTERS = [
             AttackInfo('acid_breath', '2d30', range=15, blowback=100),
             AttackInfo('fire_breath', '2d30', range=15, blowback=100),
             AttackInfo('ice_breath', '2d30', range=15, blowback=100),
-            AttackInfo('lightning_breath', '2d30', range=15, blowback=100),
+            AttackInfo('lightning_breath', '2d30', speed=0.2, range=15, blowback=100),
         ),
     ),
     PType(
@@ -200,7 +201,7 @@ MONSTERS = [
         ac=2,
         attacks=(
             AttackInfo('burn', '1d30'),
-            AttackInfo('fire_whip', '5d10', range=3, blowback=100),
+            AttackInfo('fire_whip', '5d10', range=3, speed=.3, blowback=100),
         ),
     ),
     PType(
@@ -236,11 +237,11 @@ MONSTERS = [
         type='monster',
         hitdice='3d8',
         thaco=19,
-        speed=3.0,
+        speed=1.3,
         ac=10,
         attacks=(
             AttackInfo('karate-chop', '5d8'),
-            AttackInfo('head-butt', '4d4'),
+            AttackInfo('head-butt', '3d12'),
             AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
@@ -256,6 +257,7 @@ MONSTERS = [
         type='wall',
         fgcolor=COLOR.YELLOW,
         hitdice='20d100',
+        regen_fac=0,
         thaco=20,
         speed=0,
         ac=100,
@@ -388,6 +390,7 @@ def create_attack(attack_info):
     return Attack(
         name=attack_info.name,
         damage=attack_info.damage,
+        speed=attack_info.speed,
         range=attack_info.range,
         blowback=attack_info.blowback,
     )
