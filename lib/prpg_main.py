@@ -3,6 +3,7 @@ from lib import dungeons
 from lib.attack import choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
+from lib.items.item import Item
 from lib.move import Direction
 import random
 import sys
@@ -80,12 +81,27 @@ def player_turn(control):
                 pick_up(on_items[0], player, mm)
             if nitems == 0:
                 game.message(f'You are not standing on any items to pick up.')
+        elif input_key == 'd':
+            if len(player.stuff) >= 1:
+                game.message(f'What would you like to drop?')
+                num = control.get_key()
+                if int(num) > len(player.stuff) - 1:
+                    game.message(f'That is an empty slot')
+                    continue
+                drop(num, player, mm, game)
+            else:
+                game.message(f"You don't have anything to drop")
             # continue
 
 def pick_up(item, peep, mm):
     peep.stuff.append(item)
     mm.items.remove(item)
 
+def drop(num, peep, mm, game):
+    item = peep.stuff[int(num)]
+    peep.stuff.pop(int(num))
+    mm.items.append(Item(item.name, item.char, item.size, 10, pos=peep.pos))
+    game.message(f'You dropped the {item.name}')
 
 def player_aim(control):
     game = control.game_model
