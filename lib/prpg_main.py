@@ -99,7 +99,7 @@ def player_aim(control):
         attack = choose_ranged_attack(player)
         mm.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
         game.banner(['', '                TWANG!'])
-        player._tics = player._tics - 1/player.speed * attack.speed
+        player._tics = player._tics - 1/player.speed * 1/attack.speed
 
 
 def monster_turn(control, monster):
@@ -113,7 +113,7 @@ def monster_turn(control, monster):
             and distance(monster.pos, player.pos) < ranged_attack.range:
         path = list(line_points(monster.pos, player.pos))
         mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
-        monster._tics -= monster._tics * (1 / ranged_attack.speed)
+        monster._tics -= monster._tics - 1/monster.speed * (1 / ranged_attack.speed)
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
