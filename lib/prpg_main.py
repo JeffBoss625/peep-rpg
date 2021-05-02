@@ -26,8 +26,6 @@ DIRECTION_KEYS = {
 
 
 def player_turn(control):
-    player = control.game_model.player
-    peep_regenhp(player)
     while True:
         game = control.game_model
         mm = game.maze_model
