@@ -57,12 +57,18 @@ class ITEM_SLOT:
 
 
 @dataclass
+class FitInfo:
+    slot_name: str = ''     # cover (shirt, cloak, boots), around (finger, waist), strap (shoulder/back)
+    fit: str = ''           # fit detail for cover or around: fitted, loose, fitted-clasp...
+    body_part: str = ''     # if for a specific body part, name the part here (hand, foot, waist...)
+
+@dataclass
 class Item:
     name: str = ''
     char: str = '?'
     size: Size = field(default_factory=Size)  # height, width, depth in mm ** when placed in storage or slot **
-    weight: int = 1
-    slot_type: str = ''         # fits in slot type
+    fit_info: FitInfo = None    # information on wearing on the body
+    weight: float = 1.0
     pos: Tuple[int,int] = field(default_factory=tuple)
 
     fgcolor: str = COLOR.WHITE

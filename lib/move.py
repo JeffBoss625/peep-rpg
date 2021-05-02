@@ -87,6 +87,12 @@ def adjacent_pos(src_pos, direct):
 # failed (hit a wall)
 def move_peep(game, peep, dst_pos):
     dst = peep_at_pos(game.maze_model.peeps, dst_pos)
+    # todo: separate projectile move from monster melee attack (speed and handling)
+    # if peep.type == 'projectile':
+    #   ...
+    # else:
+    #   ...
+
     if not dst:
         # players and ammo strike wall
         char = game.maze_model.wall_at(dst_pos)

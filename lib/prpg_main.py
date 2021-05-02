@@ -27,7 +27,6 @@ DIRECTION_KEYS = {
 
 
 def player_turn(control):
-    player = control.game_model.player
     while True:
         game = control.game_model
         mm = game.maze_model
@@ -69,6 +68,10 @@ def player_turn(control):
                 game.message(f'you are not standing at a staircase up')
             control.get_key()
             continue
+        elif input_key == 'w':
+            items = game.maze_model.items_at(player.pos)
+
+            game.banner('')
         elif input_key == 'g':
             on_items = mm.items_at(player.pos, False)
             nitems = len(on_items)
@@ -91,6 +94,9 @@ def player_turn(control):
                 drop(num, player, mm, game)
             else:
                 game.message(f"You don't have anything to drop")
+
+        else:
+            game.message(f'unknown command: "{input_key}"')
             # continue
 
 def pick_up(item, peep, mm):

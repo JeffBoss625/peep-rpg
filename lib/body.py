@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
-from typing import Tuple
+from typing import Tuple, ClassVar, AnyStr, List, Dict
 
 from yaml import dump
 
 # from lib.items.belt import SoldiersBelt
 # from lib.items.bow import Arrow, Bow
 # from lib.items.holster import Quiver
+from lib.items.cloak import cloak
 from lib.items.item import Item
 from lib.model import Size, register_yaml
 from lib.util import DotDict
@@ -14,107 +15,106 @@ from lib.util import DotDict
 class RACE:
     HUMAN = 'human'
 
+# a logical "place" ody on the bthat can hold, wear, or bear one or more items.
 @dataclass
 class BodySlot:
+    # nature of wearing items relative to part  - 'cover', 'around', 'front', 'back', 'strap'
     name: str = ''
-    weight_cap: int = 0
-    size_cap: Size = None
-    item: Item = None
+
+    # limit to number of items
+    #   cover: number of layers for this part (e.g. shirt & mail)
+    #   carry: number carried (e.g. hung on shoulder)
+    #   around: number worn (e.g. rings on a finger)
+    max_count: int = 1
+
+    # type of fit to go with name
+    #   cover: loose or fitted
+    #   carry: strapped, hung, held
+    #   around: loose, fitted, or fitted-clasp
+    fit: Tuple[str] = field(default_factory=tuple)
+
+    # weight_cap: int = 0
+    # size_min: Size = None
+    # size_max: Size = None
+    items: List[Item] = field(default_factory=list)  # items in order. e.g. cover: under (shirt) then over (jacket).
+
 
 @dataclass
 class BodyPart:
-    name: str = ''
-    size: Size = None
-    weight: int = 0
-    weight_cap: int = 0         # capacity to carry
-    slots: Tuple[BodySlot] = field(default_factory=list)
+    name: ''                        # head, hand, waist...
+    size: Size = ()
+    labels: Tuple = field(default_factory=tuple)
+    weight: float = 0
+    weight_cap: float = 0                       # weight capacity this part can carry
+    slots: List = field(default_factory=list)   # number, volume and types of items this part can wear or carry
 
 @dataclass
 class Body:
-    body_type: str = ''
+    body_type: str = ''  # name of body type - humanoid, dragon...
     size: Size = ()
     weight: float = 0
-    parts: Tuple[BodyPart] = field(default_factory=tuple)      # BodyParts in order top to bottom
+    parts: Dict[str,Tuple[BodyPart]] = field(default_factory=dict)      # BodyParts by name: head, torso, finger...
 
     # hide reproducable state
     def __getstate__(self):
-        items_by_slot = {}
-        for part in self.parts:
-            for slot in part.slots:
-                if slot.item:
-                    items_by_slot[f'{part.name}:{slot.name}'] = slot.item
+        items = []
+        for index, part, slot, item in self.item_tuples():
+            items.append((slot.name, item))
 
         # state arguments to create_humanoid() that will recreate this body
         return {
             'body_type': self.body_type,
             'height': self.size.h,
             'weight': self.weight,
-            'items': items_by_slot,
+            'items': items,
         }
 
-    def body_slots(self):
-        ret = DotDict()
-        for p in self.parts:
-            slots = DotDict()
-            for s in p.slots:
-                slots[s.name] = s
-            ret[p.name] = slots
+    def wear(self, item):
+        finfo = item.fit_info
+        if not finfo:
+            return False
+
+        parts = self.parts.get(finfo.body_part, ())
+        if not parts:
+            return False
+
+        for p in parts:
+            for slot in p.slots:
+                if slot.name == finfo.slot_name and finfo.fit in slot.fit:
+                    if slot.max_count > len(slot.items):
+                        slot.items.append(item)
+                        return True
+
+        return False
+
+    # return items in context-tuples:
+    # (
+    #   index,          fixed index of slot container (Body or BodyPart)
+    #   body/part,      that which holds the slot,
+    #   slot,           the slot
+    #   item,           item in that slot
+    # )
+    def item_tuples(self):
+        ret = []
+        index = 0
+
+        for parts in self.parts.values():
+            for part in parts:
+                for slot in part.slots:
+                    for item in slot.items:
+                        ret.append((index, part, slot, item))
+                    index += 1
+
         return ret
 
-    def parts_by_name(self):
-        ret = DotDict()
-        for p in self.parts:
-            ret[p.name] = p
-        return ret
-
-# average male height in cm: Dunadain: 180, Human: 175, Dwarf: 135, Hobbit: 105
-def update_human_proportions(body, body2head):
-    # humanoid size ratios
-    # body-to-head: normal Human 7.5, Dunadain and Elves are 8, Dwarves are 6.
-    hratio = DotDict({
-        # heights (in proportion to overall height)
-        'head':  0.133,         # for 7.5 body-to-head ratio
-        'neck':  0.025,         # contribution to overall height. actual neck length is about 50% more
-        'torso': 0.305,         # torso/back
-        'waist': 0.030,
-        'legs':  0.470,         # waist-to-ankle
-        'feet':  0.037,         # ankle-to-heal
-        # above adds up to 1
-
-        # armspan components (in proportion to height)
-        # 'biacromial': 0.240,  # width between shoulder-blades
-        'arm':   0.265,         # shoulder-to-wrist
-        'hand':  0.115,         # wrist-to-fingertips
-        # above adds up to 1 (same as height)
-
-        'finger1': .043,
-        'finger2': .047,
-        'finger3': .043,
-        'finger4': .036,
-    })
-    # width-depth ratios (relative to height of that part)
-    wdratio = DotDict({
-        'head':     (0.6, 0.8),
-        'neck':     (3.0, 3.0),
-        'torso':    (0.787, 0.190),
-        'waist':    (9.0, 5.0),
-        'legs':     (0.26, 0.26),
-        'feet':     (1.0, 2.0),
-
-        'arm':      (0.125, 0.125),
-        'hand':     (0.8, 0.1),
-        'finger1':  (0.2, 0.2),
-        'finger2':  (0.2, 0.2),
-        'finger3':  (0.2, 0.2),
-        'finger4':  (0.2, 0.2),
-    })
-    for part in body.parts:
-        pn = part.name
-        if pn[0:2] in ['l_', 'r_']:
-            pn = pn[2:]
-        h = body.size.h * hratio[pn]
-        wdrat = wdratio[pn]
-        part.size = Size(int(h), int(h*wdrat[0]), int(h*wdrat[1]))
+    #
+    # for part in body.parts:
+    #     pn = part.name
+    #     if pn[0:2] in ['l_', 'r_']:
+    #         pn = pn[2:]
+    #     h = body.size.h * hratio[pn]
+    #     wdrat = wdratio[pn]
+    #     part.size = Size(int(h), int(h*wdrat[0]), int(h*wdrat[1]))
 
 def update_dragon_proportions(body, head):
     dratio = DotDict({
@@ -145,53 +145,94 @@ def create_body(body_type, height=1.0, weight=1.0, **kwds):
     return ret
 
 def create_humanoid(height, weight, body2head=7.5):
-    slot_definitions = (
-        # Upper Bodywear
-        ('head', ('cover',)),        # helmet, crown, hood, hat, ...
-        ('neck', ('around',)),      # necklass, amulet, neck scarf, ...
-        ('torso',(
-            'cover',         # chain mail, jerkin, ...
-            'cover',         # plate, cuirass
-            'cover',         # cloak, jacket, ...
-            'back',         # backpack, quiver-sling (ammo and bow), ...
-            'shoulder',     # quiver, sack, ...
-        )),
-        ('waist', (
-            'around',            # belt, sash, scabbard, knife-belt, dart-belt, ...
-        )),
 
-        # Hands / Arms
-        ('l_hand', (
-            'cover',              # glove, gauntlet, OR rings
-            'holding',           # shield, weapon, bag, cup, wand, staff, any item, ...
-            'fingers'            # rings (cannot be warn over gauntlets, but perhpas held?)
-        )),
-        ('r_hand', (
-            'cover',             # glove, gauntlet, OR rings
-            'holding',           # shield, weapon, bag, cup, wand, staff, any item, ...
-            'fingers'            # rings (cannot be warn over gauntlets, but perhpas held?)
-        )),
+    # body proportions in a straight standing position
+    # average male height in cm: Dunadain: 180, Human: 175, Dwarf: 135, Hobbit: 105
+    part_sizes = (
+        # height in proportion to overall height, (width, depth) in proportion to height
+        ('body', 1.000, (0.240, 0.08)),       # overall body proportions with 0.240 biacromial (between shoulderblades)
 
-        ('l_arm', ('cover',)),  # bracers
-        ('r_arm', ('cover',)),  # bracers
+        # standing proportions
+        ('head',  0.133, (0.6, 0.8)),         # for 7.5 body-to-head ratio
+        ('neck',  0.025, (3.0, 3.0)),         # contribution to overall height. actual neck length is about 50% more
+        ('torso', 0.305, (0.787, 0.190)),     # torso/back
+        ('waist', 0.030, (9.0, 5.0)),
+        ('legs',  0.470, (0.26, 0.26)),       # waist-to-ankle
+        ('foot',  0.037, (1.0, 2.0)),         # ankle-to-heal
+        # heights add up to 1
 
-        ('legs', (
-            'cover',    # breeches, pants, leather-leggings, cargo-pants (pockets!), ...
-            'cover',     # leg guards, samurai armor, poleyn, chausses (chain), full plate, ...
-        )),
-        ('feet', (
-            'cover',    # socks-of-cold-protection, ...
-            'cover',     # boots, sandles, shoes, slippers, ...
-        )),
+        # armspan components (in proportion to height)
+        ('arm',   0.265, (0.125, 0.125)),     # shoulder-to-wrist
+        ('wrist', 0.020, (2.5, 1.0)),         # wrist
+        ('hand',  0.115, (0.8, 0.1)),         # wrist-to-fingertips
+
+        ('back', 0.305, (0.787, 0.0)),        # 2-dimensional back of torso (hxw)
     )
-    parts = []
-    for name, slotnames in slot_definitions:
-        bslots = tuple(BodySlot(slotname) for slotname in slotnames)
-        parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body('humanoid', Size(height, int(height/4), int(height/10)), weight, tuple(parts))
-    update_human_proportions(ret, body2head)
-    return ret
+    finger_sizes = (
+        ('index',  .043, (0.2, 0.2)),
+        ('middle', .047, (0.2, 0.2)),
+        ('ring',   .043, (0.2, 0.2)),
+        ('pinky',  .036, (0.2, 0.2)),
+    )
+
+    # store parts by name with labels to define side (left/right) and detail (index finger)
+    symmetrical = {'foot', 'arm', 'wrist', 'hand'}
+    parts_by_name = {}
+    for name, h, (w_fac, d_fac), in part_sizes:
+        size = Size(h, h*w_fac, h*d_fac)
+        if name in symmetrical:
+            parts = (
+                BodyPart(name, size, ('left',)),
+                BodyPart(name, size, ('right',)),
+            )
+        else:
+            parts = (BodyPart(name, size),)
+
+        parts_by_name[name] = parts
+
+    fingers = []
+    for side in ('left', 'right'):
+        for name, h, (w_fac, d_fac), in finger_sizes:
+            size = Size(h, h*w_fac, h*d_fac)
+            fingers.append(BodyPart('finger', size, (side, name)))
+    parts_by_name['finger'] = tuple(fingers)
+
+    # worn items are 'cover' slots that support 1-2 layers
+    wear_info = (
+        ('body',  'cover', ('loose',), 1),      # 1: cloak, cape, ...
+        ('head',  'cover', ('fitted',), 2),     # 1: hood, padded cap, ... 2: helmet, crown, hat, ...
+        ('torso', 'cover', ('fitted',), 2),     # 1: jerkin, chainmail;  2: plate, cuirass, chest plate...
+        ('arm',   'cover', ('fitted',), 1),     # 1: bracers
+        ('hand',  'cover', ('fitted',), 1 ),    # 1 glove, gauntlet, OR rings
+        ('legs',  'cover', ('fitted',), 2),     # 1: breeches, pants, leather-leggings, cargo-pants, ...
+                                    # 2: leg guards, samurai armor, poleyn, chausses (chain), plate,
+        ('foot', 'cover', ('fitted',), 2),      # 1: wool-socks, .. 2: boots, sandles, shoes, slippers, ...
+    )
+
+    carry = (
+        ('back', 'strap', (), 2),       # strap over shoulder: backpack, shield, quiver, sack...
+        ('hand', 'held', (), 1),           # shield, weapon, bag, wand, staff, any item, ...
+    )
+
+    accessorize = (
+        # loose necklass, amulet, neck scarf, ...
+        # tight collar/protector or necklass with clasp
+        ('neck', 'around', ('loose', 'fitted-clasp'), 1),
+        # clapsed or tied tight: belt, sash, scabbard, knife-belt, dart-belt, ...
+        ('waist', 'around', ('fitted-clasp',), 1),
+        # loose bracelets that slip over the hand and tight bracelets with clasps
+        ('wrist', 'around', ('loose', 'fitted-clasp'), 1),
+        # fitted rings ('index', 'middle', 'ring', 'pinky')
+        ('finger', 'around', ('fitted',), 1),
+    )
+
+    for slot_defs in (wear_info, carry, accessorize):
+        for part_name, wear_type, fit, max_count in slot_defs:
+            for part in parts_by_name[part_name]:
+                part.slots.append(BodySlot(wear_type, max_count, fit))
+
+    return Body('humanoid', Size(height, height/4, height/8), weight, parts_by_name)
 
 def create_dragon(height, weight):
     height *= 2
@@ -199,51 +240,45 @@ def create_dragon(height, weight):
 
     slot_definitions = (
         # Upper Bodywear
-        ('head', ()),
-        ('neck', ('neck',)),    # necklass, amulet, neck scarf, ...
+        ('head', (
+            'cover',    # dragon helm (like horse helm)
+            'on',       # crown - only over supple materials like cloth/flexible leather
+        )),
+        ('neck', ('around',)),      # huge necklass, collar, belt as collar...
         ('body',(
-            'on_back',          # for a saddle
+            'cover',                # dragon armor - cover all except bottom/under-side
+            'under',                # under-armor/plate/shield
+            'on',                   # saddle, pack
         )),
         # Hands / Arms
-        ('l_arm', ('l_wrist',)),
-        ('r_arm', ('r_wrist',)),
+        ('l_arm', ('around',)),     # huge bracelet, band, belt as band
+        ('r_arm', ('around',)),
 
-        # rings cannot be warn over gauntlets (but perhaps may be held?)
-        # rings right
-
-        ('l_leg', ('l_ankle',)),
-        ('r_leg', ('r_ankle',)),
+        ('l_leg', ('around',)),     # huge bracelet, band, belt as band
+        ('r_leg', ('around',)),
     )
     parts = []
     for name, slotnames in slot_definitions:
-        bslots = tuple(BodySlot(slotname) for slotname in slotnames)
+        bslots = list(BodySlot(slotname) for slotname in slotnames)
         parts.append(BodyPart(name, slots=bslots))
 
-    ret = Body('dragon', Size(height, int(height/4), int(height/10)), weight, tuple(parts))
+    ret = Body('dragon', Size(height, int(height/4), int(height/10)), weight, list(parts))
     update_dragon_proportions(ret, (90, 70, 180))
     return ret
 
 
 register_yaml((BodySlot, BodyPart, Body))
 
-if __name__ == '__main__':
+def test():
     # body = create_dragon(height=203, weight=120)
     body = create_body('humanoid')
-    slots = body.body_slots()
-    print(dump(body.parts, sort_keys=False))
-    # bslots = body.body_slots()
-    # bslots.torso.on_shoulder1.item = Bow()
-    # bslots.torso.on_waist = SoldiersBelt()
-    # quiver = Quiver()
-    # slot = quiver.slots[0]
-    # slot.items = ((Arrow(), 20),)
-    # bslots.torso.on_shoulder2.item = quiver
-    # state = body.__getstate__()
-    # # print(state)
-    # del state['items']
-    # body2 = create_humanoid(**state)
-    # # print(dump(body2))
-    # # print(dump(body))
-    # print(dump(list(body.parts_by_name().values())))
+    c = cloak(1.1, 1.2)
+    body.wear(c)
+    # print(dump(body.parts, sort_keys=False))
+    body.parts['body'][0].slots[0].items.append(Item('cloak', ')', body.size.copy(1.05), 0.01, 'cover', 'fitted'))
+    body.parts[2].slots[0].item = Item('shirt')
+    for index, part, slot, item in body.item_tuples():
+        print(f'{index} {part.name} {slot.name} {item.name}')
 
-
+if __name__ == '__main__':
+    test()
