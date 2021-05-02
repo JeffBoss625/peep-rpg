@@ -17,6 +17,10 @@ from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
 from lib.peep_types import create_peep
 
+@dataclass
+class Thing:
+    name: str = ''
+    char: str = '?'
 
 class MazeModel(DataModel):
     def __init__(self, walls, peeps, items=(), logger=None):
@@ -41,7 +45,7 @@ class MazeModel(DataModel):
         x, y = pos
         self.walls.replace_region(x, y, [char])
 
-    def items_at(self, pos):
+    def items_at(self, pos, everything=True):
         c = self.walls.char_at(*pos)
         name = ''
         if c == '<':
@@ -49,7 +53,7 @@ class MazeModel(DataModel):
         elif c == '>':
             name = 'stairs going down'
         if name:
-            return (Item(name, c),)
+            return (Thing(name, c),)
 
         return tuple(t for t in self.items if t.pos == pos)
 

@@ -58,6 +58,7 @@ class PType:
     direct: int = -1
 
     body_stats: Dict[str,Any] = None
+    stuff = []
 
     # level_info: Tuple[LevelInfo] = field(default_factory=LevelInfo)
 
@@ -405,6 +406,7 @@ def create_peep(
         body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
+        stuff=()
     ):
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)
@@ -437,6 +439,8 @@ def create_peep(
         body=create_body('humanoid', height, weight, body2head=body2head),
         move_tactic=pt.move_tactic,
     )
+    if stuff:
+        ret.stuff.extend(stuff)
     return ret
 
 

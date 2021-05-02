@@ -68,9 +68,24 @@ def player_turn(control):
                 game.message(f'you are not standing at a staircase up')
             control.get_key()
             continue
-        else:
-            game.message(f'unknown command: "{input_key}"')
+        elif input_key == 'g':
+            on_items = mm.items_at(player.pos, False)
+            nitems = len(on_items)
+            if nitems > 1:
+                game.message(f'You picked up {nitems} items')
+                for i in on_items:
+                    pick_up(i, player, mm)
+            if nitems == 1:
+                game.message(f'You picked up a(n) {on_items[0].name}')
+                pick_up(on_items[0], player, mm)
+            if nitems == 0:
+                game.message(f'You are not standing on any items to pick up.')
             # continue
+
+def pick_up(item, peep, mm):
+    peep.stuff.append(item)
+    mm.items.remove(item)
+
 
 def player_aim(control):
     game = control.game_model
@@ -159,7 +174,7 @@ def post_player_move(control):
     game = control.game_model
     mm = game.maze_model
     player = game.player
-    on_items = mm.items_at(player.pos)
+    on_items = mm.items_at(player.pos, True)
     nitems = len(on_items)
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])

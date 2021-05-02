@@ -103,6 +103,9 @@ class EquipWindow(Window):
                     lines.append(part.name)
                     lines.append(f'  {slot.item.name}')
 
+        for item in p.stuff:
+            lines.append(f'{item.name}                      ')
+
         if len(lines) == 1:
             lines.append(' you are naked.')
         self.write_lines(lines)
