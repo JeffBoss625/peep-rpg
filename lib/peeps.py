@@ -13,6 +13,7 @@ import math
 class Attack(DataModel):
     name: str = ''
     damage: str = '1d1'
+    speed: float = 1.0
     range: int = 0
     # blowback is multiplied by damage done and applied to attacker. positive causes damage negative
     # *heals* hit points (life drain)

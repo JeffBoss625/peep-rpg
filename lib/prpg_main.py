@@ -1,6 +1,6 @@
 import lib.move as mlib
 from lib import dungeons
-from lib.attack import peep_regenhp, choose_ranged_attack
+from lib.attack import choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
 from lib.move import Direction
@@ -27,9 +27,9 @@ DIRECTION_KEYS = {
 
 def player_turn(control):
     player = control.game_model.player
-    game = control.game_model
     peep_regenhp(player)
     while True:
+        game = control.game_model
         mm = game.maze_model
         player = game.player
         input_key = control.get_key()
@@ -104,13 +104,13 @@ def player_aim(control):
         attack = choose_ranged_attack(player)
         mm.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
         game.banner(['', '                TWANG!'])
+        player._tics = player._tics - 1/player.speed * 1/attack.speed
 
 
 def monster_turn(control, monster):
     game = control.game_model
     mm = game.maze_model
     player = game.player
-    peep_regenhp(monster)
     ranged_attack = choose_ranged_attack(monster)
     if monster.type != 'projectile' \
             and ranged_attack is not None \
@@ -118,6 +118,7 @@ def monster_turn(control, monster):
             and distance(monster.pos, player.pos) < ranged_attack.range:
         path = list(line_points(monster.pos, player.pos))
         mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
+        monster._tics -= monster._tics - 1/monster.speed * (1 / ranged_attack.speed)
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:

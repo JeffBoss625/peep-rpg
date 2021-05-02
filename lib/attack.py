@@ -49,6 +49,7 @@ def attack_dst(src, dst, src_attack, game):
         return False
     game.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
+    src._tics = src._tics - 1/src.speed * 1/src_attack.speed
     if hit:
         dice_info = parse_dice(src_attack.damage)
         tot_hp_loss = 0
@@ -130,14 +131,6 @@ def attack_dst2(src, dst, _attack, out, seed=0):
     # 5. calculate blow-back damage or life-drain/healing
 
     pass
-
-def peep_regenhp(peep):
-    if peep.hp == peep.maxhp:
-        return
-    speedhealfac = peep.speed
-    amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
-    hp = peep.hp + speedhealfac * amount_heal
-    peep.hp = min(hp, peep.maxhp)
 
 def shield_in_hand(inventory):
     if inventory.hand1 == '':

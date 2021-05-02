@@ -90,7 +90,7 @@ DUNGEONS = {
             '%%%%.............%%%%',
             '%%%...............%%%',
             '%%.................%%',
-            '%...................%',
+            '%###################%',
             '%%.................%%',
             '%%%...............%%%',
             '%%%%.............%%%%',
@@ -103,8 +103,19 @@ DUNGEONS = {
             '%%%%%%%%%%%%%%%%%%%%%',
         ],
         'peeps':[
-            create_peep('balrog', name='Bolrog', pos=(10,18)),
+            create_peep('big bird', name='Steve', pos=(10,18)),
         ],
+        'items': [
+            Item("sword_of_justice", '|', Size(3, 5, 4), 10, '', pos=(10, 3)),
+            Item("shield_of_justice", 'O', Size(3, 5, 4), 10, '', pos=(11, 3)),
+            Item("bow_of_justice", '}', Size(3, 5, 4), 10, '', pos=(9, 3)),
+            Item("helm_of_justice", '^', Size(3, 5, 4), 10, '', pos=(10, 4)),
+            Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
+            Item("boots_of_justice", '‼', Size(3, 5, 4), 10, '', pos=(12, 4)),
+            Item("leggings_of_justice", '=', Size(3, 5, 4), 10, '', pos=(9, 4)),
+            Item("gloves_of_justice", '{', Size(3, 5, 4), 10, '', pos=(8, 4)),
+            Item("robes_of_justice", '(', Size(3, 5, 4), 10, '', pos=(10, 5)),
+        ]
     },
     'open':{
         'walls': [
