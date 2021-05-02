@@ -27,9 +27,9 @@ DIRECTION_KEYS = {
 
 def player_turn(control):
     player = control.game_model.player
+    game = control.game_model
     peep_regenhp(player)
     while True:
-        game = control.game_model
         mm = game.maze_model
         player = game.player
         input_key = control.get_key()
@@ -69,6 +69,10 @@ def player_turn(control):
                 game.message(f'you are not standing at a staircase up')
             control.get_key()
             continue
+        elif input_key == 'w':
+            items = game.maze_model.items_at(player.pos)
+
+            game.banner('')
         else:
             game.message(f'unknown command: "{input_key}"')
             # continue

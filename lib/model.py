@@ -244,6 +244,8 @@ class UNIT:
     METERS = 'meters'
 
 
+# Conversions from various units to NORM units where 1.0 is the height of an average male (175 cm)
+# Also, the rounding used by default for that unit type
 UNIT_FAC = {
     UNIT.NORM: (1.0, 4),
     UNIT.FEET: (5.74146, 3),
@@ -273,6 +275,9 @@ class Size:
         if r == 0:
             h, w, d = int(h), int(w), int(d)
         return h, w, d
+
+    def copy(self, fac=1.0):
+        return Size(self.h*fac, self.w*fac, self.d*fac)
 
     @classmethod
     def from_yaml(cls, loader, node):
