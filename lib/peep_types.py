@@ -406,7 +406,7 @@ def create_peep(
         body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
-        stuff=()
+        stuff=(),
     ):
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)

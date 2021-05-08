@@ -106,7 +106,7 @@ def pick_up(item, peep, mm):
 def drop(num, peep, mm, game):
     item = peep.stuff[int(num)]
     peep.stuff.pop(int(num))
-    mm.items.append(Item(item.name, item.char, item.size, 10, pos=peep.pos))
+    mm.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
     game.message(f'You dropped the {item.name}')
 
 def player_aim(control):
