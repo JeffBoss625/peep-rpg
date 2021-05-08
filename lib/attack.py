@@ -79,7 +79,10 @@ def attack_dst(src, dst, src_attack, game):
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
-            game.monster_killed(src, src_attack, dst)
+            if src.shooter:
+                game.monster_killed(src.shooter, src_attack, dst)
+            else:
+                game.monster_killed(src, src_attack, dst)
         else:
             game.message(f'{dst.name} has {round(dst.hp)} points.')
         if src_attack.blowback != 0:

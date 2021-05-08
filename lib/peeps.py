@@ -87,6 +87,7 @@ class Peep(DataModel):
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
     inventory: Inventory = field(default_factory=Inventory)
     stuff: ModelList = field(default_factory=ModelList)
+    shooter: Any = None
 
     body: Body = None
 

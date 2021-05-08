@@ -56,6 +56,7 @@ class PType:
     # todo: separate move information for projectiles
     move_tactic: str = 'hunt'
     direct: int = -1
+    shooter: Peep = None
 
     body_stats: Dict[str,Any] = None
     stuff = []
@@ -406,7 +407,8 @@ def create_peep(
         body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
-        stuff=()
+        stuff=(),
+        shooter=None
     ):
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)
@@ -438,6 +440,7 @@ def create_peep(
         pos=pos,
         body=create_body('humanoid', height, weight, body2head=body2head),
         move_tactic=pt.move_tactic,
+        shooter=shooter,
     )
     if stuff:
         ret.stuff.extend(stuff)
