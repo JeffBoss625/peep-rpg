@@ -4,7 +4,7 @@ from typing import Tuple, List, Any
 from lib.body import Body
 from lib.constants import COLOR
 from lib.constants import GAME_SETTINGS
-from lib.model import DataModel, register_yaml
+from lib.model import DataModel, register_yaml, ModelList
 import math
 
 
@@ -86,6 +86,7 @@ class Peep(DataModel):
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
     inventory: Inventory = field(default_factory=Inventory)
+    stuff: ModelList = field(default_factory=ModelList)
 
     body: Body = None
 

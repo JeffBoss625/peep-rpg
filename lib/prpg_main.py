@@ -3,6 +3,7 @@ from lib import dungeons
 from lib.attack import choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
+from lib.items.item import Item
 from lib.move import Direction
 import random
 import sys
@@ -71,9 +72,42 @@ def player_turn(control):
             items = game.maze_model.items_at(player.pos)
 
             game.banner('')
+        elif input_key == 'g':
+            on_items = mm.items_at(player.pos, False)
+            nitems = len(on_items)
+            if nitems > 1:
+                game.message(f'You picked up {nitems} items')
+                for i in on_items:
+                    pick_up(i, player, mm)
+            if nitems == 1:
+                game.message(f'You picked up a(n) {on_items[0].name}')
+                pick_up(on_items[0], player, mm)
+            if nitems == 0:
+                game.message(f'You are not standing on any items to pick up.')
+        elif input_key == 'd':
+            if len(player.stuff) >= 1:
+                game.message(f'What would you like to drop?')
+                num = control.get_key()
+                if int(num) > len(player.stuff) - 1:
+                    game.message(f'That is an empty slot')
+                    continue
+                drop(num, player, mm, game)
+            else:
+                game.message(f"You don't have anything to drop")
+
         else:
             game.message(f'unknown command: "{input_key}"')
             # continue
+
+def pick_up(item, peep, mm):
+    peep.stuff.append(item)
+    mm.items.remove(item)
+
+def drop(num, peep, mm, game):
+    item = peep.stuff[int(num)]
+    peep.stuff.pop(int(num))
+    mm.items.append(Item(item.name, item.char, item.size, 10, pos=peep.pos))
+    game.message(f'You dropped the {item.name}')
 
 def player_aim(control):
     game = control.game_model
@@ -162,7 +196,7 @@ def post_player_move(control):
     game = control.game_model
     mm = game.maze_model
     player = game.player
-    on_items = mm.items_at(player.pos)
+    on_items = mm.items_at(player.pos, True)
     nitems = len(on_items)
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])

@@ -100,6 +100,9 @@ class EquipWindow(Window):
         for index, part, slot, item in p.body.item_tuples():
             lines.append(f' {chr(index + 97)}) {item.name}')
 
+        for item in p.stuff:
+            lines.append(f'{item.name}                      ')
+
         if len(lines) == 1:
             lines.append(' you are naked.')
         self.write_lines(lines)
