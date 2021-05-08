@@ -6,7 +6,7 @@ from yaml import dump
 # from lib.items.belt import SoldiersBelt
 # from lib.items.bow import Arrow, Bow
 # from lib.items.holster import Quiver
-from lib.items.cloak import cloak
+import lib.items.clothes as clothes
 from lib.items.item import Item
 from lib.model import Size, register_yaml
 from lib.util import DotDict
@@ -18,7 +18,7 @@ class RACE:
 # a logical "place" ody on the bthat can hold, wear, or bear one or more items.
 @dataclass
 class BodySlot:
-    # nature of wearing items relative to part  - 'cover', 'around', 'front', 'back', 'strap'
+    # nature of wearing items relative to part  - 'cover', 'around', 'front', 'held', 'back', 'strap'
     name: str = ''
 
     # limit to number of items
@@ -31,6 +31,7 @@ class BodySlot:
     #   cover: loose or fitted
     #   carry: strapped, hung, held
     #   around: loose, fitted, or fitted-clasp
+    #   held: *typically* held in hand (shield or weapon)
     fit: Tuple[str] = field(default_factory=tuple)
 
     # weight_cap: int = 0
@@ -52,7 +53,7 @@ class BodyPart:
 class Body:
     body_type: str = ''  # name of body type - humanoid, dragon...
     size: Size = ()
-    weight: float = 0
+    weight: float = 1.0 # 1.0 = average human male weight (65 KG)
     parts: Dict[str,Tuple[BodyPart]] = field(default_factory=dict)      # BodyParts by name: head, torso, finger...
 
     # hide reproducable state
@@ -211,8 +212,8 @@ def create_humanoid(height, weight, body2head=7.5):
     )
 
     carry = (
-        ('back', 'strap', (), 2),       # strap over shoulder: backpack, shield, quiver, sack...
-        ('hand', 'held', (), 1),           # shield, weapon, bag, wand, staff, any item, ...
+        ('back', 'strap', ('strap',), 2),        # strap over shoulder: backpack, shield, quiver, sack...
+        ('hand', 'held', ('held',), 1),          # shield, weapon, bag, wand, staff, any item, ...
     )
 
     accessorize = (
@@ -272,7 +273,7 @@ register_yaml((BodySlot, BodyPart, Body))
 def test():
     # body = create_dragon(height=203, weight=120)
     body = create_body('humanoid')
-    c = cloak(1.1, 1.2)
+    c = clothes.cloak(1.1, 1.2)
     body.wear(c)
     # print(dump(body.parts, sort_keys=False))
     body.parts['body'][0].slots[0].items.append(Item('cloak', ')', body.size.copy(1.05), 0.01, 'cover', 'fitted'))

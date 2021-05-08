@@ -64,7 +64,7 @@ class FitInfo:
 
 @dataclass
 class Item:
-    name: str = ''
+    name: str = 'thing'
     char: str = '?'
     size: Size = field(default_factory=Size)  # height, width, depth in mm ** when placed in storage or slot **
     fit_info: FitInfo = None    # information on wearing on the body
