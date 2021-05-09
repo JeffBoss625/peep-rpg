@@ -221,6 +221,20 @@ MONSTERS = [
         ),
     ),
     PType(
+        name='dog',
+        char='d',
+        type='monster',
+        hitdice='5d10',
+        thaco=19,
+        speed=3.3,
+        ac=10,
+        attacks=(
+            AttackInfo('teeth', '1d10'),
+            AttackInfo('tail', '3d5'),
+            AttackInfo('scratch', '2d7'),
+        ),
+    ),
+    PType(
         name='dodger',
         char='d',
         type='monster',
