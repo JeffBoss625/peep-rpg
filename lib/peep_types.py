@@ -422,6 +422,7 @@ def create_peep(
         exp=0,
         attacks=(), # overrides ptype attacks if set
         stuff=(),
+        stuff=(),
         shooter=None
     ):
     pt = PTYPES_BY_NAME[ptype]
