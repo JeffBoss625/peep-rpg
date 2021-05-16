@@ -27,84 +27,92 @@ DIRECTION_KEYS = {
 
 
 def player_turn(control):
-    while True:
-        game = control.game_model
-        mm = game.maze_model
-        player = game.player
+    result = None
+    while not result:
         input_key = control.get_key()
-        if input_key in DIRECTION_KEYS:
-            dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
-            if mlib.move_peep(game, game.player, dst_pos):
-                post_player_move(control)
-                return input_key
-            # else didn't spend turn
-        elif input_key == Key.CTRL_Q:
-            return 'q'
+        result = do_player_turn(control, input_key)
 
-        elif input_key == 'm':
-            morph_peeps = list(p for p in mm.peeps if p.type == 'monster')
-            if len(morph_peeps) > 1:
-                while game.player == player:
-                    player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
-                game.player = player #todo: update stats window
-                game.message("You are now " + player.name)
-            else:
-                game.message("You have nothing in range to brain-swap with")
-        elif input_key == 'a':
-            attack = choose_ranged_attack(player)
-            if attack:
-                player_aim(attack, control)
-            else:
-                game.message(f'{player.name} has no ranged attack')
+    return result
+
+# returns None if the turn didn't happen and needs more input
+def do_player_turn(control, input_key):
+    game = control.game_model
+    mm = game.maze_model
+    player = game.player
+    if input_key in DIRECTION_KEYS:
+        dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
+        if mlib.move_peep(game, game.player, dst_pos):
+            post_player_move(control)
             return input_key
-        elif input_key == '>':
-            if mm.char_at(*player.pos) == '>':
-                return input_key
-            else:
-                game.message(f'you are not standing at a staircase down')
-                control.get_key()
-        elif input_key == '<':
-            if mm.char_at(*player.pos) == '<':
-                return input_key
-            else:
-                game.message(f'you are not standing at a staircase up')
-            control.get_key()
-        elif input_key == 'w':
-            items = game.maze_model.items_at(player.pos)
+        # else didn't spend turn
+    elif input_key == Key.CTRL_Q:
+        return 'q'
 
-            game.banner('')
-        elif input_key == 'g':
-            on_items = mm.items_at(player.pos, False)
-            nitems = len(on_items)
-            if nitems > 1:
-                game.message(f'You picked up {nitems} items')
-                for i in on_items:
-                    pick_up(i, player, mm)
-            if nitems == 1:
-                game.message(f'You picked up a(n) {on_items[0].name}')
-                pick_up(on_items[0], player, mm)
-            if nitems == 0:
-                game.message(f'You are not standing on any items to pick up.')
-        elif input_key == 'd':
-            if len(player.stuff) >= 1:
-                game.message(f'What would you like to drop?')
-                num = control.get_key()
-                if int(num) > len(player.stuff) - 1:
-                    game.message(f'That is an empty slot')
-                drop(num, player, mm, game)
-            else:
-                game.message(f"You don't have anything to drop")
-
+    elif input_key == 'm':
+        morph_peeps = list(p for p in mm.peeps if p.type == 'monster')
+        if len(morph_peeps) > 1:
+            while game.player == player:
+                player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
+            game.player = player #todo: update stats window
+            game.message("You are now " + player.name)
         else:
-            game.message(f'unknown command: "{input_key}"')
-            game.message(f'would you like to macro "{input_key}"? (y/n)')
+            game.message("You have nothing in range to brain-swap with")
+    elif input_key == 'a':
+        attack = choose_ranged_attack(player)
+        if attack:
+            player_aim(attack, control)
+        else:
+            game.message(f'{player.name} has no ranged attack')
+        return input_key
+    elif input_key == '>':
+        if mm.char_at(*player.pos) == '>':
+            return input_key
+        else:
+            game.message(f'you are not standing at a staircase down')
+            control.get_key()
+    elif input_key == '<':
+        if mm.char_at(*player.pos) == '<':
+            return input_key
+        else:
+            game.message(f'you are not standing at a staircase up')
+        control.get_key()
+    elif input_key == 'w':
+        items = game.maze_model.items_at(player.pos)
+
+        game.banner('')
+    elif input_key == 'g':
+        on_items = mm.items_at(player.pos, False)
+        nitems = len(on_items)
+        if nitems > 1:
+            game.message(f'You picked up {nitems} items')
+            for i in on_items:
+                pick_up(i, player, mm)
+        if nitems == 1:
+            game.message(f'You picked up a(n) {on_items[0].name}')
+            pick_up(on_items[0], player, mm)
+        if nitems == 0:
+            game.message(f'You are not standing on any items to pick up.')
+    elif input_key == 'd':
+        if len(player.stuff) >= 1:
+            game.message(f'What would you like to drop?')
+            num = control.get_key()
+            if int(num) > len(player.stuff) - 1:
+                game.message(f'That is an empty slot')
+            drop(num, player, mm, game)
+        else:
+            game.message(f"You don't have anything to drop")
+
+    else:
+        game.message(f'unknown command: "{input_key}"')
+        game.message(f'would you like to macro "{input_key}"? (y/n)')
+        answer = control.get_key()
+        while answer not in ('y', 'n'):
+            game.message(f'"{answer}" is not y or n. Please input y or n')
             answer = control.get_key()
-            while answer not in ('y', 'n'):
-                game.message(f'"{answer}" is not y or n. Please input y or n')
-                answer = control.get_key()
-            if answer == 'y':
-                game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
-                macro(input_key, game, control)
+        if answer == 'y':
+            game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
+            macro(input_key, game, control)
+
 
 def macro(input_key, game, control):
     keybinds = []
