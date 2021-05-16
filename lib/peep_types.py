@@ -124,13 +124,13 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='5d10',
         thaco=17,
-        speed=1.9,
+        speed=1.5,
         ac=8,
         attacks=(
             AttackInfo('beak', '1d10'),
-            AttackInfo('talons', '2d7'),
-            AttackInfo('wing_blow', '6d1', speed=0.95,),
-            AttackInfo('air_strike', '5d1', speed=0.5, range=5, blowback=100)
+            AttackInfo('talons', '2d3'),
+            AttackInfo('wing_blow', '5d1', speed=0.95,),
+            AttackInfo('air_strike', '3d1', speed=0.2, range=5, blowback=100)
         )
     ),
 
@@ -236,11 +236,11 @@ MONSTERS = [
     ),
     PType(
         name='queen mosquito',
-        char='m',
+        char='M',
         type='monster',
         hitdice='6d10',
-        thaco=20,
-        speed=3,
+        thaco=0,
+        speed=4,
         ac=18,
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
@@ -275,14 +275,14 @@ MONSTERS = [
         name='human',
         char='h',
         type='monster',
-        hitdice='3d8',
+        hitdice='10d8',
         thaco=19,
-        speed=1.3,
+        speed=2,
         ac=10,
         attacks=(
             AttackInfo('karate-chop', '5d8'),
             AttackInfo('head-butt', '3d12'),
-            AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
+            # AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
             'btype': 'humanoid',

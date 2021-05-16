@@ -89,10 +89,11 @@ def attack_dst(src, dst, src_attack, game):
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
                 game.message(f'  {src.name} is destroyed')
-            else:
-                # todo: convert arrow into item
-                src.speed = 0   # todo: remove remaining moves in turn_seq
-                src.attacks = ()
+            if src.hp >= src.maxhp: src.hp = src.maxhp
+            # else:
+            #     todo: convert arrow into item
+                # src.speed = 0   # todo: remove remaining moves in turn_seq
+                # src.attacks = ()
     else:
         game.message(f'{src.name} missed {dst.name}.')
         return False
