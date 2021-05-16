@@ -276,8 +276,12 @@ class Size:
             h, w, d = int(h), int(w), int(d)
         return h, w, d
 
-    def copy(self, fac=1.0):
-        return Size(self.h*fac, self.w*fac, self.d*fac)
+    def copy(self, hfac=1.0, wfac=1.0, dfac=1.0):
+        return Size(self.h*hfac, self.w*wfac, self.d*dfac)
+
+    # return cube surface area minus the bottom (used for calculation of cloak, helm, shirt...
+    def cover_area(self, ):
+        return self.h * self.w * 2 + self.h * self.d * 2 + self.w * self.d
 
     @classmethod
     def from_yaml(cls, loader, node):

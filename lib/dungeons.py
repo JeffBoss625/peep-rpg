@@ -41,7 +41,7 @@ DUNGEONS = {
             create_peep('giant rat', name='Scriggle', pos=(19,4)),
         ],
         'items': [
-            Item("belt", '=', Size(3,5,4), 10, '', pos=(1,1))
+            Item("belt", '=', pos=(1,1))
         ]
     },
     'level_1':{

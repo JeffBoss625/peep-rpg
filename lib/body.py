@@ -273,11 +273,9 @@ register_yaml((BodySlot, BodyPart, Body))
 def test():
     # body = create_dragon(height=203, weight=120)
     body = create_body('humanoid')
-    c = clothes.cloak(1.1, 1.2)
+    c = clothes.cloak(1.1, 1.2, 1.2, 1.1)
     body.wear(c)
     # print(dump(body.parts, sort_keys=False))
-    body.parts['body'][0].slots[0].items.append(Item('cloak', ')', body.size.copy(1.05), 0.01, 'cover', 'fitted'))
-    body.parts[2].slots[0].item = Item('shirt')
     for index, part, slot, item in body.item_tuples():
         print(f'{index} {part.name} {slot.name} {item.name}')
 
