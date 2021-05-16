@@ -79,17 +79,21 @@ def attack_dst(src, dst, src_attack, game):
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
-            game.monster_killed(src, src_attack, dst)
+            if src.shooter:
+                game.monster_killed(src.shooter, src_attack, dst)
+            else:
+                game.monster_killed(src, src_attack, dst)
         else:
             game.message(f'{dst.name} has {round(dst.hp)} points.')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
                 game.message(f'  {src.name} is destroyed')
-            else:
-                # todo: convert arrow into item
-                src.speed = 0   # todo: remove remaining moves in turn_seq
-                src.attacks = ()
+            if src.hp >= src.maxhp: src.hp = src.maxhp
+            # else:
+            #     todo: convert arrow into item
+                # src.speed = 0   # todo: remove remaining moves in turn_seq
+                # src.attacks = ()
     else:
         game.message(f'{src.name} missed {dst.name}.')
         return False

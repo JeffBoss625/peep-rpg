@@ -56,6 +56,7 @@ class PType:
     # todo: separate move information for projectiles
     move_tactic: str = 'hunt'
     direct: int = -1
+    shooter: Peep = None
 
     body_stats: Dict[str,Any] = None
     stuff = []
@@ -123,13 +124,13 @@ MONSTERS = [
         bgcolor=COLOR.BLACK,
         hitdice='5d10',
         thaco=17,
-        speed=1.9,
+        speed=1.5,
         ac=8,
         attacks=(
             AttackInfo('beak', '1d10'),
-            AttackInfo('talons', '2d7'),
-            AttackInfo('wing_blow', '6d1', speed=0.95,),
-            AttackInfo('air_strike', '5d1', speed=0.5, range=5, blowback=100)
+            AttackInfo('talons', '2d3'),
+            AttackInfo('wing_blow', '5d1', speed=0.95,),
+            AttackInfo('air_strike', '3d1', speed=0.2, range=5, blowback=100)
         )
     ),
 
@@ -220,6 +221,44 @@ MONSTERS = [
         ),
     ),
     PType(
+        name='cat',
+        char='d',
+        type='monster',
+        hitdice='5d9',
+        thaco=19,
+        speed=3.5,
+        ac=10,
+        attacks=(
+            AttackInfo('teeth', '1d10'),
+            AttackInfo('tail', '3d5'),
+            AttackInfo('scratch', '2d7'),
+        ),
+    ),
+    PType(
+        name='queen mosquito',
+        char='M',
+        type='monster',
+        hitdice='6d10',
+        thaco=0,
+        speed=4,
+        ac=18,
+        attacks=(
+            AttackInfo('big slurp', '3d3', blowback=-1),
+        ),
+    ),
+    PType(
+        name='mosquito',
+        char='m',
+        type='monster',
+        hitdice='1d1',
+        thaco=20,
+        speed=2,
+        ac=2,
+        attacks=(
+            AttackInfo('little slurp', '1d1', blowback=-1),
+        ),
+    ),
+    PType(
         name='dodger',
         char='d',
         type='monster',
@@ -236,14 +275,14 @@ MONSTERS = [
         name='human',
         char='h',
         type='monster',
-        hitdice='3d8',
+        hitdice='10d8',
         thaco=19,
-        speed=1.3,
+        speed=2,
         ac=10,
         attacks=(
             AttackInfo('karate-chop', '5d8'),
             AttackInfo('head-butt', '3d12'),
-            AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
+            # AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
             'btype': 'humanoid',
@@ -407,6 +446,7 @@ def create_peep(
         exp=0,
         attacks=(), # overrides ptype attacks if set
         stuff=(),
+        shooter=None
     ):
     pt = PTYPES_BY_NAME[ptype]
     pc = get_pclass(pclass)
@@ -438,6 +478,7 @@ def create_peep(
         pos=pos,
         body=create_body('humanoid', height, weight, body2head=body2head),
         move_tactic=pt.move_tactic,
+        shooter=shooter,
     )
     if stuff:
         ret.stuff.extend(stuff)

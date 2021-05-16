@@ -100,7 +100,7 @@ class MazeModel(DataModel):
         raise LookupError (f'Character "{char}" not found in maze')
 
     def create_projectile(self, src, ptype, targetpath, attacks):
-        shot = create_peep(ptype, pos=targetpath[0], attacks=attacks)
+        shot = create_peep(ptype, pos=targetpath[0], attacks=attacks, shooter=src)
         shot.pos_path = targetpath
         shot.pos_i = 0
 

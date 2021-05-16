@@ -46,7 +46,7 @@ def player_turn(control):
             if len(morph_peeps) > 1:
                 while game.player == player:
                     player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
-                game.player = player
+                game.player = player #todo: update stats window
                 game.message("You are now " + player.name)
             else:
                 game.message("You have nothing in range to brain-swap with")
@@ -150,7 +150,7 @@ def monster_turn(control, monster):
             and distance(monster.pos, player.pos) < ranged_attack.range:
         path = list(line_points(monster.pos, player.pos))
         mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
-        monster._tics -= monster._tics - 1/monster.speed * (1 / ranged_attack.speed)
+        monster._tics -= monster._tics - 1/monster.speed * ranged_attack.speed
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
