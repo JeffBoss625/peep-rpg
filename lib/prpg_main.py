@@ -50,7 +50,6 @@ def player_turn(control):
                 game.message("You are now " + player.name)
             else:
                 game.message("You have nothing in range to brain-swap with")
-                # continue
         elif input_key == 'a':
             attack = choose_ranged_attack(player)
             if attack:
@@ -64,14 +63,12 @@ def player_turn(control):
             else:
                 game.message(f'you are not standing at a staircase down')
                 control.get_key()
-                continue
         elif input_key == '<':
             if mm.char_at(*player.pos) == '<':
                 return input_key
             else:
                 game.message(f'you are not standing at a staircase up')
             control.get_key()
-            continue
         elif input_key == 'w':
             items = game.maze_model.items_at(player.pos)
 
@@ -94,7 +91,6 @@ def player_turn(control):
                 num = control.get_key()
                 if int(num) > len(player.stuff) - 1:
                     game.message(f'That is an empty slot')
-                    continue
                 drop(num, player, mm, game)
             else:
                 game.message(f"You don't have anything to drop")
@@ -106,12 +102,9 @@ def player_turn(control):
             while answer not in ('y', 'n'):
                 game.message(f'"{answer}" is not y or n. Please input y or n')
                 answer = control.get_key()
-            if answer == 'n':
-                continue
-            else:
+            if answer == 'y':
                 game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
                 macro(input_key, game, control)
-            # continue
 
 def macro(input_key, game, control):
     keybinds = []
