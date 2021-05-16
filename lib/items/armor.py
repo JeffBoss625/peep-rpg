@@ -4,7 +4,17 @@ from lib.items.item import Item, FitInfo
 from lib.model import register_yaml, Size
 
 # todo: add material and calculate weight
-#
+
+# Full suite of plate 15-25 kg, jousting armor could be twice that
+# “An entire suit of field armor (that is, armor for battle) usually weighs between 45 and 55 lbs. (20 to 25 kg),
+# with the helmet weighing between 4 and 8 lbs. (2 to 4 kg)—less than the full equipment of a fireman with oxygen gear,
+# or what most modern soldiers have carried into battle since the nineteenth century.
+# https://www.sarahwoodbury.com/medieval-swords-and-armor-were-not-heavy/#:~:text=%E2%80%9CAn%20entire%20suit%20of%20field,battle%20since%20the%20nineteenth%20century.
+
+AVERAGE_HELM_SIZE = Size(0.133, 0.10, 0.09) # average human head height is 2/15 of total height or 0.133 units
+AVERAGE_HELM_THICK = 0.5 / 175
+AVERAGE_HELM_WEIGHT = 3 / 65
+
 # Armor that covers the body and is 'fitted' is normalized at the fit of an average male of 175 cm height and
 # normal girth:
 #   height=1.0, (tallness)
@@ -27,13 +37,15 @@ class Helm(Item):
     char: str = '^'
     fit_info: str = FitInfo('cover', 'fitted', 'head')
 
-def helm(h=1.0, w=1.0, d=1.0):
-    # average human head height is 2/15 of total height or 0.133 units
-    # average
+# depth is the thickness of material
+def helm(h=1.0, w=1.0, d=1.0, thick=1.0):
     ret = Helm()
-    ret.size = Size(h * 0.133, w * 0.10, d * 0.09)
-    ret.circ = ret.size.w * ret.size.d * 2
-    ret.weight = ret.size.h * ret.circ
+    ret.size = AVERAGE_HELM_SIZE.copy(h, w, d)
+    ret.thick = thick * AVERAGE_HELM_THICK
+    vol = ret.thick * ret.size.cover_area()
+    avol = AVERAGE_HELM_THICK * AVERAGE_HELM_SIZE.cover_area()
+    ret.weight = AVERAGE_HELM_WEIGHT * (vol/avol)
+
     return ret
 
 @dataclass
@@ -59,11 +71,18 @@ class Shield(Item):
     fit_info: str = FitInfo('held', 'held', 'hand')
     shape = 'round'
 
+
+# averages in human units
+AVERAGE_SHIELD_WEIGHT = 2.5 / 65                    # 2.5 kg / 65 kg.
+AVERAGE_SHIELD_THICK = 0.75 / 65
+AVERAGE_SHIELD_SIZE = Size(0.48, 0.40, 0.061)       # 84 cm x 70 cm x 4 cm
+
 # shield width and height is expressed relative to average human male height (175 cm, about 5ft 9 inches).
-#   Viking large round shield:      105cm diameter (.866 sq m), 0.6 cm, 4.5 kg
+#   Viking large round shield:      105cm diameter (.866 sq m), 0.6 cm thick, 4.5 kg
 #   Round greek aspis:               90cm diameter (.636 sq m), 3 cm thick, 7.3 kg
 #   Viking small round shield:       70cm diameter (.385 sq m), 1.2 cm thick, 3.0 kg (guess)
 #
+# Depth is the curvature of the shield
 #   Roman Scutum (square plywood curving around)  100 cm x 40cm x 30cm (0.60 sq m), 0.6 cm thick, 6-8 kg
 #
 # Kite (70% of square)
@@ -87,10 +106,13 @@ class Shield(Item):
 #
 # Average Human Shield is 84cm x 70cm (0.48 x 0.40)
 # A very tall shield would be 119 cm (0.68)
-def shield(height, width):
+def shield(h=1.0, w=1.0, d=1.0, thick=1.0):
     ret = Shield()
-    ret.size = Size(height, width, 0.007)
-    ret.weight = ret.size.h * ret.size.w
+    ret.size = AVERAGE_SHIELD_SIZE.copy(h, w, d)
+    ret.thick = thick * AVERAGE_SHIELD_THICK
+    vol = ret.size.h * ret.size.w * thick   # todo: factor in curvature of shield (d)
+    avol = AVERAGE_SHIELD_SIZE.h * AVERAGE_SHIELD_SIZE.w * AVERAGE_SHIELD_THICK
+    ret.weight = AVERAGE_SHIELD_WEIGHT * (vol/avol)
     return ret
 
 

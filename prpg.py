@@ -29,9 +29,9 @@ w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
     game = GameModel(create_peep('human', name='Super Dad'))
-    game.player.body.wear(clothes.cloak(1.1, 1.1))
-    game.player.body.wear(armor.helm(1.15, 1.1))
-    game.player.body.wear(armor.shield(1.4, 1.1))
+    game.player.body.wear(clothes.cloak(1.1, 1.1, 1.1, 1.0))
+    game.player.body.wear(armor.helm(1.15, 1.1, 1.1, 1.0))
+    game.player.body.wear(armor.shield(1.4, 1.1, 1.0, 1.1))
 
     game.goto_level(1, placement='<')
 
