@@ -282,7 +282,7 @@ MONSTERS = [
         attacks=(
             AttackInfo('karate-chop', '5d8'),
             AttackInfo('head-butt', '3d12'),
-            # AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
+            AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
             'btype': 'humanoid',

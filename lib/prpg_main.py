@@ -52,7 +52,11 @@ def player_turn(control):
                 game.message("You have nothing in range to brain-swap with")
                 # continue
         elif input_key == 'a':
-            player_aim(control)
+            attack = choose_ranged_attack(player)
+            if attack:
+                player_aim(attack, control)
+            else:
+                game.message(f'{player.name} has no ranged attack')
             return input_key
         elif input_key == '>':
             if mm.char_at(*player.pos) == '>':
@@ -109,7 +113,7 @@ def drop(num, peep, mm, game):
     mm.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
     game.message(f'You dropped the {item.name}')
 
-def player_aim(control):
+def player_aim(attack, control):
     game = control.game_model
     mm = game.maze_model
     player = game.player
@@ -133,7 +137,6 @@ def player_aim(control):
     if target is not None:
         target_pos = getattr(target, 'pos', target)  # target may be a peep or a position
         path = list(line_points(player.pos, target_pos))[0:]
-        attack = choose_ranged_attack(player)
         mm.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
         game.banner(['', '                TWANG!'])
         player._tics = player._tics - 1/player.speed * 1/attack.speed
