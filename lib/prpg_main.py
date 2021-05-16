@@ -30,7 +30,11 @@ def player_turn(control):
     result = None
     while not result:
         input_key = control.get_key()
-        result = do_player_turn(control, input_key)
+        if input_key in control.game_model.macros:
+            for key in control.game_model.macros[input_key]:
+                result = do_player_turn(control, key)
+        else:
+            result = do_player_turn(control, input_key)
 
     return result
 
@@ -111,7 +115,7 @@ def do_player_turn(control, input_key):
             answer = control.get_key()
         if answer == 'y':
             game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
-            macro(input_key, game, control)
+            control.game_model.macros[input_key] = macro(input_key, game, control)
 
 
 def macro(input_key, game, control):
