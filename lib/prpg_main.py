@@ -97,7 +97,33 @@ def player_turn(control):
 
         else:
             game.message(f'unknown command: "{input_key}"')
+            game.message(f'would you like to macro "{input_key}"? (y/n)')
+            answer = control.get_key()
+            while answer not in ('y', 'n'):
+                game.message(f'"{answer}" is not y or n. Please input y or n')
+                answer = control.get_key()
+            if answer == 'n':
+                continue
+            else:
+                game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
+                macro(input_key, game, control)
             # continue
+
+def macro(input_key, game, control):
+    keybinds = []
+    game.message(f'Start hitting keys to macro')
+    key = control.get_key()
+    while key not in (input_key, 'q'):
+        game.message(f'Added "{key}"')
+        keybinds.append(key)
+        key = control.get_key()
+
+    if key == 'q':
+        game.message(f'Canceled macro')
+        return None
+    else:
+        game.message(f'Macro set')
+        return keybinds
 
 def pick_up(item, peep, mm):
     peep.stuff.append(item)

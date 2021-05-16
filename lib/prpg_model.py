@@ -174,6 +174,7 @@ class GameModel(DataModel):
         self.log_model = TextModel('log')
         self.banner_model = TextModel('banner')
         self.seed = seed
+        self.macros = {}
 
     # add a message or all messages in an iterable to the messages array
     def message(self, *args):
