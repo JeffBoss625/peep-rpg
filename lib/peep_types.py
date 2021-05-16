@@ -221,17 +221,41 @@ MONSTERS = [
         ),
     ),
     PType(
-        name='dog',
+        name='cat',
         char='d',
         type='monster',
-        hitdice='5d10',
+        hitdice='5d9',
         thaco=19,
-        speed=3.3,
+        speed=3.5,
         ac=10,
         attacks=(
             AttackInfo('teeth', '1d10'),
             AttackInfo('tail', '3d5'),
             AttackInfo('scratch', '2d7'),
+        ),
+    ),
+    PType(
+        name='queen mosquito',
+        char='m',
+        type='monster',
+        hitdice='6d10',
+        thaco=20,
+        speed=3,
+        ac=18,
+        attacks=(
+            AttackInfo('big slurp', '3d3', blowback=-1),
+        ),
+    ),
+    PType(
+        name='mosquito',
+        char='m',
+        type='monster',
+        hitdice='1d1',
+        thaco=20,
+        speed=2,
+        ac=2,
+        attacks=(
+            AttackInfo('little slurp', '1d1', blowback=-1),
         ),
     ),
     PType(
@@ -421,7 +445,6 @@ def create_peep(
         body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
-        stuff=(),
         stuff=(),
         shooter=None
     ):
