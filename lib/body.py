@@ -70,9 +70,17 @@ class Body:
             'items': items,
         }
 
-    def protection(self, part_name):
+    def _parts(self, part_name, labels=()):
         ret = []
         for p in self.parts[part_name]:
+            if labels and intersect(labels, p.labels) != list(labels):
+                continue
+            ret.append(p)
+        return ret
+
+    def protection(self, part_name, labels=()):
+        ret = []
+        for p in self._parts(part_name, labels):
             for s in p.slots:
                 for i in s.items:
                     ret.append(i)
@@ -116,6 +124,12 @@ class Body:
 
         return ret
 
+def intersect(a, b):
+    ret = []
+    for i in a:
+        if i in b:
+            ret.append(i)
+    return ret
     #
     # for part in body.parts:
     #     pn = part.name
