@@ -70,6 +70,14 @@ class Body:
             'items': items,
         }
 
+    def protection(self, part_name):
+        ret = []
+        for p in self.parts[part_name]:
+            for s in p.slots:
+                for i in s.items:
+                    ret.append(i)
+        return ret
+
     def wear(self, item):
         finfo = item.fit_info
         if not finfo:

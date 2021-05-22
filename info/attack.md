@@ -25,8 +25,8 @@
      a savvy dwarf to crush his exposed foot with a hammer.
      
 2. The attacker rolls for hitting their target. For small targets, the lightness and design of the
-   weapon and lightness of overall weight of equipment increases chance to hit along with 
-   familiarity with the weapon, experience, training strength and dexterity. Attacker
+   weapon and lightness of overall weight of weapon increases chance to hit along with 
+   familiarity with the weapon, experience, training, strength and dexterity. Attacker
    advantages are compared with defender experience, agility, weight, class and so on to 
    determine chance of hit.  Trained fighters, thieves and assassins, samorai, get evade/dodge bonuses 
    over other classes.

@@ -35,7 +35,7 @@ AVERAGE_HELM_WEIGHT = 3 / 65
 class Helm(Item):
     name: str = 'helm'
     char: str = '^'
-    fit_info: str = FitInfo('cover', 'fitted', 'head')
+    fit_info: FitInfo = FitInfo('cover', 'fitted', 'head')
 
 # depth is the thickness of material
 def helm(h=1.0, w=1.0, d=1.0, thick=1.0):
@@ -52,7 +52,7 @@ def helm(h=1.0, w=1.0, d=1.0, thick=1.0):
 class Boots(Item):
     name: str = 'boots'
     char: str = '['
-    fit_info: str = FitInfo('cover', 'fitted', 'foot')
+    fit_info: FitInfo = FitInfo('cover', 'fitted', 'foot')
     circ: float = 0.0
 
 # height relates to foot length
@@ -68,7 +68,7 @@ def boots(h=1.0, w=1.0, d=1.0):
 class Shield(Item):
     name: str = 'shield'
     char: str = ')'
-    fit_info: str = FitInfo('held', 'held', 'hand')
+    fit_info: FitInfo = FitInfo('held', 'held', 'hand')
     shape = 'round'
 
 
