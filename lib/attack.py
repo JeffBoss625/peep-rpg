@@ -47,7 +47,6 @@ def calc_hit(ac, thaco):
 def attack_dst(src, dst, src_attack, game):
     if src == dst:
         return False
-    game.log(f'attack({src}, {dst}, {src_attack})')
     hit = (calc_hit(dst.ac, src.thaco))
     src._tics = src._tics - 1/src.speed * 1/src_attack.speed
     if hit:
