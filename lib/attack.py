@@ -56,26 +56,12 @@ def attack_dst(src, dst, src_attack, game):
         for i in range(1, dice_info['num_dice'] + 1):
             hp_loss = random.randint(1, dice_info['num_sides'])
             tot_hp_loss += hp_loss
-        if shield_in_hand(dst.inventory) != 'None':
-            if shield_in_hand(dst.inventory) == 0:
-                dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.inventory.hand1)
-            elif shield_in_hand(dst.inventory) == 1:
-                dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, dst.inventory.hand2)
-            else:
-                dmg_multiplier = 1
+        if shield_in_hand(dst) != 'None':
+            dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, shield_in_hand)
         else:
             dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
-        tot_hp_loss *= dmg_multiplier
-        if dmg_multiplier == 0.3:
-            game.message('The blow hit the helmet.')
-        if dmg_multiplier == 1:
-            game.message('The blow hit the torso.')
-        if dmg_multiplier == 0.15:
-            game.message('The blow hit the shield.')
-        if dmg_multiplier == 2:
-            game.message('The blow hit the head.')
-        if dmg_multiplier == 0.75:
-            game.message('The blow hit the legs.')
+        tot_hp_loss *= dmg_multiplier[0]
+        game.message(f'The {dst.name} was hit in the {dmg_multiplier[1]}')
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
@@ -136,13 +122,12 @@ def attack_dst2(src, dst, _attack, out, seed=0):
 
     pass
 
-def shield_in_hand(inventory):
-    if inventory.hand1 == '':
-        if inventory.hand2 == '':
-            return 'None'
-        return 1
-    else:
-        return 0
+def shield_in_hand(peep):
+    in_hand = peep.body.protection('hand')
+    for h in in_hand:
+        if h == 'Shield':
+            return h
+    else: return 'None'
 
 if __name__ == '__main__':
     print("HERE")
