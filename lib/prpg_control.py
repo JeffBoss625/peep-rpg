@@ -38,10 +38,10 @@ class PrpgControl:
         center_col2.window(WIN.BANNER, Con(maze_w,banner_h,60,banner_h))
         center_col2.window(WIN.MAZE, Con(maze_w,maze_h,60,0))
 
-        center.window(WIN.MESSAGES, Con(maze_w,6,0,0))
+        center.window(WIN.LOG, Con(maze_w,6,0,0))
 
         # Bottom Row
-        main_panel.window(WIN.LOG, Con(30,4))
+        main_panel.window(WIN.MESSAGES, Con(30,6))
 
         init_windows(root_layout)
         self.set_model(game)

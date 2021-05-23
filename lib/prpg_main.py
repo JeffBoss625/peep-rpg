@@ -81,9 +81,13 @@ def do_player_turn(control, input_key):
             game.message(f'you are not standing at a staircase up')
         control.get_key()
     elif input_key == 'w':
-        items = game.maze_model.items_at(player.pos)
-
-        game.banner('')
+        if not player.stuff:
+            game.message("you don't have any stuff to wear")
+        else:
+            item = choose_item(player.stuff)
+            if item:
+                player.wear(item)
+                game.banner(f'you are wearing a {item.name}')
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
@@ -117,6 +121,8 @@ def do_player_turn(control, input_key):
             game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
             control.game_model.macros[input_key] = macro(input_key, game, control)
 
+def choose_item(list):
+    return
 
 def macro(input_key, game, control):
     keybinds = []

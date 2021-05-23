@@ -183,7 +183,7 @@ class GameModel(DataModel):
     # To keep parameter passing to a reasonable level, model, which is passed to many handlers provides an
     # alternative for stdout. When using terminal curses library, output is switched to the messages area
     def log(self, *args):
-        self.log_model.print(*args)
+        self.message_model.print(*args)
 
     def banner(self, lines):
         self.banner_model.replace(lines)
