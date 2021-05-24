@@ -133,7 +133,7 @@ def move_peep(game, peep, dst_pos):
                     return True
                 else:
                     # missed
-                    if peep.type is not 'projectile':
+                    if peep.type != 'projectile':
                         # used up move with miss
                         return True
                     # else continue to move (below)
