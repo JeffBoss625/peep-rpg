@@ -71,6 +71,7 @@ class Peep(DataModel):
     ac: int = 10
     height: int = 5
     move_tactic: str = 'hunt'
+    hunt_target: any = None
     direct: int = -1
     pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
     pos_i = 0

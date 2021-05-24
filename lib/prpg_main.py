@@ -204,13 +204,18 @@ def monster_turn(control, monster):
             monster.hp = 0  # todo: convert to item with chance of breaking
         return True
     elif monster.move_tactic == 'hunt':
-        dx = player.pos[0] - monster.pos[0]
-        dy = player.pos[1] - monster.pos[1]
+        if monster.hunt_target:
+            if monster.hunt_target.hp <= 0:
+                monster.hunt_target = choose_monster_target(monster, control)
+        else:
+            monster.hunt_target = choose_monster_target(monster, control)
+        dx = monster.hunt_target.pos[0] - monster.pos[0]
+        dy = monster.hunt_target.pos[1] - monster.pos[1]
         if player.hp <= 0:
             control.player_died()
             return False
 
-        if monster.hp / monster.maxhp < 0.3:
+        if monster.hp / monster.maxhp < 0.2:
             direct = mlib.direction_from_vector(-dx, -dy)  # If low health, run away
         else:
             direct = mlib.direction_from_vector(dx, dy)
@@ -233,6 +238,9 @@ def monster_turn(control, monster):
             rotation += 1
 
     return True
+
+def choose_monster_target(monster, control):
+    return control.game_model.player
 
 def post_player_move(control):
     game = control.game_model
