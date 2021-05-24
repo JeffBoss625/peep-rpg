@@ -104,7 +104,7 @@ def move_peep(game, peep, dst_pos):
                 return False # peep tried wall - did not move
 
     if dst:
-        if peep.type is 'projectile':
+        if peep.type == 'projectile':
             src_attack = choose_melee_attack(peep)
             if src_attack:
                 if attack_dst(peep, dst, src_attack, game):
@@ -119,7 +119,7 @@ def move_peep(game, peep, dst_pos):
                         return True
                     else:
                         # missed
-                        if peep.type is not 'projectile':
+                        if peep.type != 'projectile':
                             # used up move with miss
                             return True
                         # else continue to move (below)
