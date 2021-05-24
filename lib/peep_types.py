@@ -55,6 +55,7 @@ class PType:
 
     # todo: separate move information for projectiles
     move_tactic: str = 'hunt'
+    hunt_target: any =  None
     direct: int = -1
     shooter: Peep = None
 
@@ -252,7 +253,7 @@ MONSTERS = [
         type='monster',
         hitdice='1d1',
         thaco=20,
-        speed=2,
+        speed=3,
         ac=2,
         attacks=(
             AttackInfo('little slurp', '1d1', blowback=-1),
