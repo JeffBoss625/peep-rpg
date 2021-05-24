@@ -34,6 +34,13 @@ class MazeWindow(Window):
             self.scr.move(y, x)
             self.log(f'move({y}, {x})')
 
+        if self.model.overlay.text:
+            text_h = len(self.model.overlay.text)
+            text_w = len(self.model.overlay.text[0])
+            params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
+            self.write_lines(self.model.overlay.text, **params)
+
+
 class TitleWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
@@ -91,8 +98,11 @@ class EquipWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 
-    def handle_update_event(self, _model, _msg, **_kwds):
-        return
+    def handle_update_event(self, _model, _msg, **kwds):
+        key = kwds.get('key', '')
+        if key == 'pos':
+            return False
+        self.needs_paint = True
 
     def do_paint(self):
         p = self.model

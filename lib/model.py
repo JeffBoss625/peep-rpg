@@ -21,17 +21,18 @@ class PubSub:
     def unsubscribe(self, fn):
         try:
             self._subscribers.remove(fn)
-            for sm in self.submodels():
-                sm.unsubscribe(fn)
         except ValueError:
             pass
+
+        for sm in self.submodels():
+            sm.unsubscribe(fn)
 
     def publish(self, model, event_type, **kwds):
         for fn in self._subscribers:
             fn(model, event_type, **kwds)
 
     def publish_update(self, prev_val, new_val, **kwds):
-        vlen = getattr(kwds, 'len', 1)  # len indicates multiple values were changed (prev and new are lists)
+        vlen = getattr(kwds, 'len', 1)  # len > 1 indicates multiple values were changed (prev and new are lists)
         prev_list = []
         new_list = []
         if prev_val:
@@ -41,11 +42,11 @@ class PubSub:
 
         for s in self._subscribers:
             for pv in prev_list:
-                if pv and isinstance(pv, PubSub):
+                if isinstance(pv, PubSub):
                     pv.unsubscribe(s)
 
             for nv in new_list:
-                if nv and isinstance(nv, PubSub):
+                if isinstance(nv, PubSub):
                     nv.subscribe(s)
 
         self.publish(self, 'update', prev=prev_val, new=new_val, **kwds)
@@ -157,7 +158,7 @@ class DataModel(PubSub):
     def submodels(self):
         ret = []
         for v in self.__dict__.values():
-            if v and isinstance(v, PubSub):
+            if isinstance(v, PubSub):
                 ret.append(v)
         return ret
 

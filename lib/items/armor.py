@@ -53,7 +53,6 @@ class Boots(Item):
     name: str = 'boots'
     char: str = '['
     fit_info: FitInfo = FitInfo('cover', 'fitted', 'foot')
-    circ: float = 0.0
 
 # height relates to foot length
 # width relates to foot width

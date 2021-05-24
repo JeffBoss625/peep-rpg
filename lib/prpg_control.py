@@ -98,6 +98,26 @@ class PrpgControl:
         except Exception as e:
             self.root_layout.log(e)
 
+    def choose_item(self, msg, items):
+        lines = []
+        for index, item in enumerate(items):
+            lines.append((index, f'{item.name}'))
+        idx = self.choose_line(msg, lines)
+        return items[idx]
+
+    def choose_line(self, msg, lines):
+        text = []
+        text.append(msg)
+        for index, line in lines:
+            text.append(f' {chr(index + 97)}) {line}')
+        self.game_model.maze_model.overlay.replace(text)
+        ret = -1
+        while ret < 0 or ret > len(lines)-1:
+            ret = ord(self.get_key()) - 97
+        self.game_model.maze_model.overlay.replace([])
+        return ret
+
+
 def init_windows(root_layout):
     def win(name):
         return root_layout.info.comp_by_name[name]

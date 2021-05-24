@@ -25,10 +25,18 @@ def cloak(h=1.0, w=1.0, d=1.0, thick=1.0):
 
 
 @dataclass
-class Belt:
+class Belt(Item):
     name: str = 'belt'
     char: str = '_'
-    fit_info: FitInfo = FitInfo('')
+    fit_info: FitInfo = FitInfo('around', 'fitted-clasp', 'waist')
+
+def belt(h=1.0, w=1.0, d=1.0, thick=1.0, pos=(0,0)):
+    ret = Belt()
+    ret.size = Size(0.01, 0.2, 0.15)
+    ret.thick = 0.5 / 175
+    ret.weigth = 0.2/65
+    ret.pos = pos
+    return ret
 
 @dataclass
 class SoldiersBelt(Belt, Item):

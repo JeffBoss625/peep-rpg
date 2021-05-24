@@ -7,12 +7,10 @@
 # Model is designed to be open and simple - an understandable collection of simple data structures that reflects
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
-import sys
 from dataclasses import dataclass
 
 from lib import dungeons
 from lib.constants import GAME_SETTINGS
-from lib.items.item import Item
 from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
 from lib.peep_types import create_peep
@@ -26,6 +24,7 @@ class MazeModel(DataModel):
     def __init__(self, walls, peeps, items=(), logger=None):
         super().__init__()
         self.walls = TextModel('walls', walls)
+        self.overlay = TextModel('overlay', [])   # text that overlays/writes underlying map
         self.peeps = ModelList()
         self.peeps.extend(peeps)
         self.target_path = ()          # line of points (from source and target) drawn to select targets on the screen

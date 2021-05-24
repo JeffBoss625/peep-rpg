@@ -4,6 +4,7 @@ from lib.peep_types import create_peep
 from lib.players import player_by_name
 from lib.prpg_model import GameModel, MazeModel
 from lib.items.item import Item
+import lib.items.clothes as clothes
 
 DUNGEONS = {
     'dungeon1': {
@@ -41,7 +42,7 @@ DUNGEONS = {
             create_peep('giant rat', name='Scriggle', pos=(19,4)),
         ],
         'items': [
-            Item("belt", '=', pos=(1,1))
+            clothes.belt(pos=(1,1))
         ]
     },
     'town':{
@@ -113,7 +114,7 @@ DUNGEONS = {
             # create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
         ],
         'items': [
-            Item("belt", '=', pos=(8,3))
+            clothes.belt(pos=(6,3))
         ]
     },
     'level_2':{

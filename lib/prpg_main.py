@@ -84,10 +84,13 @@ def do_player_turn(control, input_key):
         if not player.stuff:
             game.message("you don't have any stuff to wear")
         else:
-            item = choose_item(player.stuff)
+            item = control.choose_item('what will you wear?', player.stuff)
             if item:
-                player.wear(item)
-                game.banner(f'you are wearing a {item.name}')
+                if player.body.wear(item):
+                    player.stuff.remove(item)
+                    game.banner(f'you are wearing a {item.name}')
+                else:
+                    game.banner(f'you cannot wear the {item.name}')
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
@@ -120,9 +123,8 @@ def do_player_turn(control, input_key):
         if answer == 'y':
             game.message(f'Hit keystrokes and end with "{input_key}" to macro this key, q to cancel.')
             control.game_model.macros[input_key] = macro(input_key, game, control)
-
-def choose_item(list):
-    return
+        else:
+            game.message('Macro aborted.')
 
 def macro(input_key, game, control):
     keybinds = []
