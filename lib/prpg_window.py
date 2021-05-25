@@ -37,7 +37,12 @@ class MazeWindow(Window):
         if self.model.overlay.text:
             text_h = len(self.model.overlay.text)
             text_w = len(self.model.overlay.text[0])
-            params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
+            params = {**self.params, **{
+                'align_x': SIDE.LEFT,
+                'align_y': SIDE.TOP,
+                'text_w': text_w,
+                'text_h': text_h
+            }}
             self.write_lines(self.model.overlay.text, **params)
 
 

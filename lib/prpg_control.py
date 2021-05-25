@@ -104,13 +104,17 @@ class PrpgControl:
         return items[idx]
 
     def choose_line(self, msg, lines):
-        textblock = []
-        textblock.append(msg)
+        lmarg = '  '
+        rmarg = '  '
+        textblock = ['', lmarg + msg + rmarg]
         justlen = max(len(line) for line in lines)
         for index, line in lines:
-            s = f' {chr(index + 97)}) {line.rjust(justlen)}'
+            s = lmarg + f' {chr(index + 97)}) {line.rjust(justlen)}' + rmarg
             textblock.append(s)
+        textblock.append('')
 
+        maxw = max((len(line) for line in textblock))
+        textblock = (line.ljust(maxw) for line in textblock)
         self.game_model.maze_model.overlay.replace(textblock)
         ret = -1
         while ret < 0 or ret > len(lines)-1:
