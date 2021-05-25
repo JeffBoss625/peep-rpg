@@ -99,18 +99,19 @@ class PrpgControl:
             self.root_layout.log(e)
 
     def choose_item(self, msg, items):
-        lines = []
-        for index, item in enumerate(items):
-            lines.append((index, f'{item.name}'))
-        idx = self.choose_line(msg, lines)
+        idx_line = tuple((index, f'{item.name}') for index, item in enumerate(items))
+        idx = self.choose_line(msg, idx_line)
         return items[idx]
 
     def choose_line(self, msg, lines):
-        text = []
-        text.append(msg)
+        textblock = []
+        textblock.append(msg)
+        justlen = max(len(line) for line in lines)
         for index, line in lines:
-            text.append(f' {chr(index + 97)}) {line}')
-        self.game_model.maze_model.overlay.replace(text)
+            s = f' {chr(index + 97)}) {line.rjust(justlen)}'
+            textblock.append(s)
+
+        self.game_model.maze_model.overlay.replace(textblock)
         ret = -1
         while ret < 0 or ret > len(lines)-1:
             ret = ord(self.get_key()) - 97
