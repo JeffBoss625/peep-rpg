@@ -5,6 +5,7 @@ from lib.players import player_by_name
 from lib.prpg_model import GameModel, MazeModel
 from lib.items.item import Item
 import lib.items.clothes as clothes
+import lib.items.armor as armor
 
 DUNGEONS = {
     'dungeon1': {
@@ -113,7 +114,8 @@ DUNGEONS = {
             create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
         ],
         'items': [
-            clothes.belt(pos=(6,3))
+            clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),
         ]
     },
     'level_2':{
@@ -145,7 +147,7 @@ DUNGEONS = {
         ],
         'items': [
             Item("sword_of_justice", '|', Size(3, 5, 4), 10, '', pos=(10, 3)),
-            Item("shield_of_justice", 'O', Size(3, 5, 4), 10, '', pos=(11, 3)),
+            armor.shield(name="shield_of_justice", pos=(11, 3)),
             Item("bow_of_justice", '}', Size(3, 5, 4), 10, '', pos=(9, 3)),
             Item("helm_of_justice", '^', Size(3, 5, 4), 10, '', pos=(10, 4)),
             Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),

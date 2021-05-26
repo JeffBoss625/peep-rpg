@@ -13,9 +13,9 @@ class Cloak(Item):
     char: str = '('
     fit_info: FitInfo = FitInfo('cover', 'loose', 'body')
 
-def cloak(h=1.0, w=1.0, d=1.0, thick=1.0):
+def cloak(h=1.0, w=1.0, d=1.0, thick=1.0, **params):
     # average human body dimensions (h,w,d) are 1.0 x 0.25 x 0.125
-    ret = Cloak()
+    ret = Cloak(**params)
     ret.size = AVERAGE_CLOAK_SIZE.copy(h, w, d)
     ret.thick = thick * AVERAGE_CLOAK_THICK
     vol = ret.thick * ret.size.cover_area()
@@ -30,21 +30,13 @@ class Belt(Item):
     char: str = '_'
     fit_info: FitInfo = FitInfo('around', 'fitted-clasp', 'waist')
 
-def belt(h=1.0, w=1.0, d=1.0, thick=1.0, pos=(0,0)):
-    ret = Belt()
-    ret.size = Size(0.01, 0.2, 0.15)
-    ret.thick = 0.5 / 175
+def belt(size=Size(1.0, 1.0, 1.0), thick=1.0, pos=(0,0), **params):
+    ret = Belt(**params)
+    ret.size = size.copy(0.01, 0.2, 0.15)
+    ret.thick = thick * 0.5 / 175
     ret.weigth = 0.2/65
     ret.pos = pos
     return ret
-
-@dataclass
-class SoldiersBelt(Belt, Item):
-    name: str = 'soldiers-belt'
-    # slots: Tuple[HolsterSlot] = (HolsterSlot(ITEM_SLOT.SWORD, 1, 42000, Size(80, 10, 2)),)
-
-
-register_yaml((SoldiersBelt,))
 
 
 register_yaml((Cloak,))

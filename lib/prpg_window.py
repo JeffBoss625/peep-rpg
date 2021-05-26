@@ -112,12 +112,20 @@ class EquipWindow(Window):
     def do_paint(self):
         p = self.model
         lines = ['Wearing']
-        for index, part, slot, item in p.body.item_tuples():
-            lines.append(f' {chr(index + 97)}) {item.name}')
+        item_tuples = p.body.item_tuples()
+        if item_tuples:
+            for index, part, slot, item in item_tuples:
+                lines.append(f' {chr(index + 97)}) {item.name}     ')
+        else:
+            lines.append(' you are naked.                       ')
 
-        for item in p.stuff:
-            lines.append(f'{item.name}                      ')
+        lines.append('')
+        lines.append('Stuff')
+        if p.stuff:
+            for item in p.stuff:
+                lines.append(f'  {item.name}                    ')
+        else:
+            lines.append(' nothin.                ')
 
-        if len(lines) == 1:
-            lines.append(' you are naked.')
         self.write_lines(lines)
+

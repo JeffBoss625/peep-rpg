@@ -4,6 +4,7 @@ import curses
 import lib.items.clothes as clothes
 import lib.items.armor as armor
 from lib.logger import Logger
+from lib.model import Size
 from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
 from lib.peep_types import create_peep
@@ -31,7 +32,7 @@ def cb(scr):
     game = GameModel(create_peep('human', name='Super Dad'))
     game.player.body.wear(clothes.cloak(1.1, 1.1, 1.1, 1.0))
     game.player.body.wear(armor.helm(1.15, 1.1, 1.1, 1.0))
-    game.player.body.wear(armor.shield(1.4, 1.1, 1.0, 1.1))
+    game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))
 
     game.goto_level(1, placement='<')
 

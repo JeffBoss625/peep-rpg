@@ -69,28 +69,38 @@ def do_player_turn(control, input_key):
             game.message(f'{player.name} has no ranged attack')
         return input_key
     elif input_key == '>':
+
         if mm.char_at(*player.pos) == '>':
             return input_key
         else:
             game.message(f'you are not standing at a staircase down')
             control.get_key()
+
     elif input_key == '<':
         if mm.char_at(*player.pos) == '<':
             return input_key
         else:
             game.message(f'you are not standing at a staircase up')
         control.get_key()
+
     elif input_key == 'w':
         if not player.stuff:
             game.message("you don't have any stuff to wear")
         else:
             item = control.choose_item('what will you wear?', player.stuff)
             if item:
-                if player.body.wear(item):
+                slots = player.body.slots_for(item.fit_info)
+                if slots:
+                    prev = slots[0].put(item)
                     player.stuff.remove(item)
-                    game.banner(f'you are wearing a {item.name}')
+                    msg = [f'you are wearing a {item.name}']
+                    if prev:
+                        player.stuff.extend(prev)
+                        msg.append(f'...you put other items back in your bag')
+                    game.banner(msg)
                 else:
                     game.banner(f'you cannot wear the {item.name}')
+
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
@@ -103,6 +113,7 @@ def do_player_turn(control, input_key):
             pick_up(on_items[0], player, mm)
         if nitems == 0:
             game.message(f'You are not standing on any items to pick up.')
+
     elif input_key == 'd':
         if len(player.stuff) >= 1:
             game.message(f'What would you like to drop?')

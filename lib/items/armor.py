@@ -105,11 +105,11 @@ AVERAGE_SHIELD_SIZE = Size(0.48, 0.40, 0.061)       # 84 cm x 70 cm x 4 cm
 #
 # Average Human Shield is 84cm x 70cm (0.48 x 0.40)
 # A very tall shield would be 119 cm (0.68)
-def shield(h=1.0, w=1.0, d=1.0, thick=1.0):
-    ret = Shield()
-    ret.size = AVERAGE_SHIELD_SIZE.copy(h, w, d)
+def shield(size=Size(1.0,1.0,1.0), thick=1.0, **params):
+    ret = Shield(**params)
+    ret.size = AVERAGE_SHIELD_SIZE.copy(size.h, size.w, size.d)
     ret.thick = thick * AVERAGE_SHIELD_THICK
-    vol = ret.size.h * ret.size.w * thick   # todo: factor in curvature of shield (d)
+    vol = ret.size.h * ret.size.w * ret.thick   # todo: factor in curvature of shield (d)
     avol = AVERAGE_SHIELD_SIZE.h * AVERAGE_SHIELD_SIZE.w * AVERAGE_SHIELD_THICK
     ret.weight = AVERAGE_SHIELD_WEIGHT * (vol/avol)
     return ret

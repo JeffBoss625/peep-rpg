@@ -39,6 +39,13 @@ class BodySlot:
     # size_max: Size = None
     items: List[Item] = field(default_factory=list)  # items in order. e.g. cover: under (shirt) then over (jacket).
 
+    # put the item in the slot, removing and returning previous item(s) if room is needed.
+    def put(self, item):
+        self.items.append(item)
+        if len(self.items) <= self.max_count:
+            return []
+        else:
+            return [self.items.pop(0)]
 
 @dataclass
 class BodyPart:
@@ -86,23 +93,28 @@ class Body:
                     ret.append(i)
         return ret
 
-    def wear(self, item):
-        finfo = item.fit_info
-        if not finfo:
-            return False
+    def slots_for(self, fit_info):
+        ret = []
+        if not fit_info:
+            return ret
 
-        parts = self.parts.get(finfo.body_part, ())
+        parts = self.parts.get(fit_info.body_part, ())
         if not parts:
-            return False
+            return ret
 
         for p in parts:
             for slot in p.slots:
-                if slot.name == finfo.slot_name and finfo.fit in slot.fit:
-                    if slot.max_count > len(slot.items):
-                        slot.items.append(item)
-                        return True
+                if slot.name == fit_info.slot_name and fit_info.fit in slot.fit:
+                    ret.append(slot)
 
-        return False
+        return ret
+
+    # a conveniece function to simply equip a body quickly, (throwing away prior items in any slots)
+    def wear(self, item):
+        slots = self.slots_for(item.fit_info)
+        if not slots:
+            return False
+        slots[0].put(item)
 
     # return items in context-tuples:
     # (
