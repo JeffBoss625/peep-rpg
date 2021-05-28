@@ -11,10 +11,6 @@ from lib.model import register_yaml, Size
 # or what most modern soldiers have carried into battle since the nineteenth century.
 # https://www.sarahwoodbury.com/medieval-swords-and-armor-were-not-heavy/#:~:text=%E2%80%9CAn%20entire%20suit%20of%20field,battle%20since%20the%20nineteenth%20century.
 
-AVERAGE_HELM_SIZE = Size(0.133, 0.10, 0.09) # average human head height is 2/15 of total height or 0.133 units
-AVERAGE_HELM_THICK = 0.5 / 175
-AVERAGE_HELM_WEIGHT = 3 / 65
-
 # Armor that covers the body and is 'fitted' is normalized at the fit of an average male of 175 cm height and
 # normal girth:
 #   height=1.0, (tallness)
@@ -31,17 +27,21 @@ AVERAGE_HELM_WEIGHT = 3 / 65
 #
 # So a Titan of human proportions could be expressed:
 #   2.0, 2.0, 2.0
+
+AVERAGE_HELM_SIZE = Size(0.133, 0.10, 0.09) # average human head height is 2/15 of total height or 0.133 units
+AVERAGE_HELM_THICK = 0.5 / 175
+AVERAGE_HELM_WEIGHT = 3 / 65
+
 @dataclass
 class Helm(Item):
     name: str = 'helm'
     char: str = '^'
     fit_info: FitInfo = FitInfo('cover', 'fitted', 'head')
 
-# depth is the thickness of material
-def helm(h=1.0, w=1.0, d=1.0, thick=1.0):
-    ret = Helm()
-    ret.size = AVERAGE_HELM_SIZE.copy(h, w, d)
-    ret.thick = thick * AVERAGE_HELM_THICK
+def helm(size=Size(1.0,1.0,1.0), thick=1.0, **params):
+    ret = Helm(**params)
+    ret.size = size.copy(*AVERAGE_HELM_SIZE.as_tuple())
+    ret.thick = AVERAGE_HELM_THICK * thick
     vol = ret.thick * ret.size.cover_area()
     avol = AVERAGE_HELM_THICK * AVERAGE_HELM_SIZE.cover_area()
     ret.weight = AVERAGE_HELM_WEIGHT * (vol/avol)
@@ -57,10 +57,11 @@ class Boots(Item):
 # height relates to foot length
 # width relates to foot width
 # depth relates to
-def boots(h=1.0, w=1.0, d=1.0):
+def boots(size=Size(1.0,1.0,1.0), thick=1.0, **params):
     # average human head height is 2/15 of total height or 0.133 units
-    ret = Boots()
-    ret.size = Size(h * 0.090, w * 0.060, d * 0.167)
+    ret = Boots(**params)
+    ret.size = size.copy(0.090, 0.060, 0.167)
+    ret.thick = thick
     return ret
 
 @dataclass
@@ -70,11 +71,6 @@ class Shield(Item):
     fit_info: FitInfo = FitInfo('held', 'held', 'hand')
     shape = 'round'
 
-
-# averages in human units
-AVERAGE_SHIELD_WEIGHT = 2.5 / 65                    # 2.5 kg / 65 kg.
-AVERAGE_SHIELD_THICK = 0.75 / 65
-AVERAGE_SHIELD_SIZE = Size(0.48, 0.40, 0.061)       # 84 cm x 70 cm x 4 cm
 
 # shield width and height is expressed relative to average human male height (175 cm, about 5ft 9 inches).
 #   Viking large round shield:      105cm diameter (.866 sq m), 0.6 cm thick, 4.5 kg
@@ -105,6 +101,12 @@ AVERAGE_SHIELD_SIZE = Size(0.48, 0.40, 0.061)       # 84 cm x 70 cm x 4 cm
 #
 # Average Human Shield is 84cm x 70cm (0.48 x 0.40)
 # A very tall shield would be 119 cm (0.68)
+# averages in human units
+
+AVERAGE_SHIELD_WEIGHT = 2.5 / 65                    # 2.5 kg / 65 kg.
+AVERAGE_SHIELD_THICK = 0.75 / 65
+AVERAGE_SHIELD_SIZE = Size(0.48, 0.40, 0.061)       # 84 cm x 70 cm x 4 cm
+
 def shield(size=Size(1.0,1.0,1.0), thick=1.0, **params):
     ret = Shield(**params)
     ret.size = AVERAGE_SHIELD_SIZE.copy(size.h, size.w, size.d)

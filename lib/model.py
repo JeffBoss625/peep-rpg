@@ -246,7 +246,7 @@ class UNIT:
 
 
 # Conversions from various units to NORM units where 1.0 is the height of an average male (175 cm)
-# Also, the rounding used by default for that unit type
+# Also, the rounding precision used by default for that unit type
 UNIT_FAC = {
     UNIT.NORM: (1.0, 4),
     UNIT.FEET: (5.74146, 3),
@@ -270,7 +270,7 @@ class Size:
     def volume(self):
         return self.h * self.w * self.d
 
-    def as_tuple(self, unit=UNIT.MM):
+    def as_tuple(self, unit=UNIT.NORM):
         fac, r = UNIT_FAC[unit]
         h, w, d = round(self.h * fac, r), round(self.w * fac, r), round(self.d * fac, r)
         if r == 0:

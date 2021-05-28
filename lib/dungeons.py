@@ -4,6 +4,7 @@ from lib.peep_types import create_peep
 from lib.players import player_by_name
 from lib.prpg_model import GameModel, MazeModel
 from lib.items.item import Item
+import lib.items.weapons as weapons
 import lib.items.clothes as clothes
 import lib.items.armor as armor
 
@@ -146,12 +147,12 @@ DUNGEONS = {
             create_peep('big bird', name='Steve', pos=(10,18)),
         ],
         'items': [
-            Item("sword_of_justice", '|', Size(3, 5, 4), 10, '', pos=(10, 3)),
-            armor.shield(name="shield_of_justice", pos=(11, 3)),
+            weapons.sword(name="sword_of_justice", size=Size(1.2,1.1,1.0), pos=(10, 3)),
+            armor.shield(name="shield_of_justice", size=Size(1.1, 1.1, 1.1), pos=(11, 3)),
             Item("bow_of_justice", '}', Size(3, 5, 4), 10, '', pos=(9, 3)),
-            Item("helm_of_justice", '^', Size(3, 5, 4), 10, '', pos=(10, 4)),
+            armor.helm(name="helm_of_justice", size=Size(1.1,1.1,1.1), pos=(10, 4)),
             Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
-            Item("boots_of_justice", '‼', Size(3, 5, 4), 10, '', pos=(12, 4)),
+            armor.boots(name="boots_of_justice", size=Size(1.1,1.1,1.1), pos=(12, 4)),
             Item("leggings_of_justice", '=', Size(3, 5, 4), 10, '', pos=(9, 4)),
             Item("gloves_of_justice", '{', Size(3, 5, 4), 10, '', pos=(8, 4)),
             Item("robes_of_justice", '(', Size(3, 5, 4), 10, '', pos=(10, 5)),

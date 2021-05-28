@@ -9,7 +9,6 @@ from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
 from lib.peep_types import create_peep
 from lib.prpg_model import GameModel
-import lib.dungeons as dungeons
 
 
 # note - to set terminal size on windows machines: os.system("mode con cols=120 lines=40")
@@ -30,8 +29,8 @@ w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
     game = GameModel(create_peep('human', name='Super Dad'))
-    game.player.body.wear(clothes.cloak(1.1, 1.1, 1.1, 1.0))
-    game.player.body.wear(armor.helm(1.15, 1.1, 1.1, 1.0))
+    game.player.body.wear(clothes.cloak(size=Size(1.1, 1.1, 1.1), thick=1.0))
+    game.player.body.wear(armor.helm(size=Size(1.15, 1.1, 1.1), thick=1.0))
     game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))
 
     game.goto_level(1, placement='<')
