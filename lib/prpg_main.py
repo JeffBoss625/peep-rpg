@@ -88,7 +88,9 @@ def do_player_turn(control, input_key):
             game.message("you don't have any stuff to wear")
         else:
             item = control.choose_item('what will you wear?', player.stuff)
-            if item:
+            if item == -1:
+                pass
+            elif item:
                 slots = player.body.slots_for(item.fit_info)
                 if slots:
                     prev = slots[0].put(item)
