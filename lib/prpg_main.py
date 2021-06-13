@@ -88,7 +88,9 @@ def do_player_turn(control, input_key):
             game.message("you don't have any stuff to wear")
         else:
             item = control.choose_item('what will you wear?', player.stuff)
-            if item:
+            if item == -1:
+                pass
+            elif item:
                 slots = player.body.slots_for(item.fit_info)
                 if slots:
                     prev = slots[0].put(item)
@@ -116,11 +118,14 @@ def do_player_turn(control, input_key):
 
     elif input_key == 'd':
         if len(player.stuff) >= 1:
-            game.message(f'What would you like to drop?')
+            game.message(f'What would you like to drop? (Number)')
             num = control.get_key()
-            if int(num) > len(player.stuff) - 1:
-                game.message(f'That is an empty slot')
-            drop(num, player, mm, game)
+            if int(num):
+                if int(num) > len(player.stuff) - 1:
+                    game.message(f'That is an empty slot')
+                drop(num, player, mm, game)
+            else:
+                game.message(f'"{num}" was not a number. Drop cancelled.')
         else:
             game.message(f"You don't have anything to drop")
 
