@@ -88,9 +88,7 @@ def do_player_turn(control, input_key):
             game.message("you don't have any stuff to wear")
         else:
             item = control.choose_item('what will you wear?', player.stuff)
-            if item == -1:
-                pass
-            elif item:
+            if item:
                 slots = player.body.slots_for(item.fit_info)
                 if slots:
                     prev = slots[0].put(item)
@@ -108,8 +106,11 @@ def do_player_turn(control, input_key):
         nitems = len(on_items)
         if nitems > 1:
             item = control.choose_item('What will you pick up?', on_items,)
-            game.message(f'You picked up {nitems} items')
-            pick_up(item, player, mm)
+            if item:
+                game.message(f'You picked up the {item.name}')
+                pick_up(item, player, mm)
+            else:
+                game.message(f'Pick up aborted')
         if nitems == 1:
             game.message(f'You picked up a(n) {on_items[0].name}')
             pick_up(on_items[0], player, mm)
@@ -119,7 +120,10 @@ def do_player_turn(control, input_key):
     elif input_key == 'd':
         if len(player.stuff) >= 1:
             item = control.choose_item('What would you like to drop?', player.stuff)
-            drop(item, player, mm, game)
+            if item:
+                drop(item, player, mm, game)
+            else:
+                game.message(f'Drop aborted')
         else:
             game.message(f"You don't have anything to drop")
 
