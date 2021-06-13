@@ -61,6 +61,7 @@ class FitInfo:
     slot_name: str = ''     # cover (shirt, cloak, boots), around (finger, waist), strap (shoulder/back)
     fit: str = ''           # fit detail for cover or around: fitted, loose, fitted-clasp...
     body_part: str = ''     # if for a specific body part, name the part here (hand, foot, waist...)
+    fit_pref: Tuple[str] = field(default_factory=tuple)  # other fit detail: dom(inant)/subdom(inant) for weapons/shields
 
 @dataclass
 class Item:

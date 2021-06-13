@@ -3,6 +3,7 @@ import curses
 
 import lib.items.clothes as clothes
 import lib.items.armor as armor
+from lib.items import weapons
 from lib.logger import Logger
 from lib.model import Size
 from lib.win_layout import RootLayout, Dim
@@ -31,7 +32,8 @@ def cb(scr):
     game = GameModel(create_peep('human', name='Super Dad'))
     game.player.body.wear(clothes.cloak(size=Size(1.1, 1.1, 1.1), thick=1.0))
     game.player.body.wear(armor.helm(size=Size(1.15, 1.1, 1.1), thick=1.0))
-    game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))
+    # game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))
+    game.player.body.wear(weapons.sword(size=Size(1.0,1.0,1.0)))
 
     game.goto_level(1, placement='<')
 

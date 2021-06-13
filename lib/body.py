@@ -1,11 +1,7 @@
 from dataclasses import dataclass, field
+from operator import itemgetter
 from typing import Tuple, ClassVar, AnyStr, List, Dict
 
-from yaml import dump
-
-# from lib.items.belt import SoldiersBelt
-# from lib.items.bow import Arrow, Bow
-# from lib.items.holster import Quiver
 import lib.items.clothes as clothes
 from lib.items.item import Item
 from lib.model import Size, register_yaml
@@ -31,7 +27,7 @@ class BodySlot:
     #   cover: loose or fitted
     #   carry: strapped, hung, held
     #   around: loose, fitted, or fitted-clasp
-    #   held: *typically* held in hand (shield or weapon)
+    #   held: dominant, subdominant (preferred hand)
     fit: Tuple[str] = field(default_factory=tuple)
 
     # weight_cap: int = 0
@@ -93,6 +89,7 @@ class Body:
                     ret.append(i)
         return ret
 
+    # return
     def slots_for(self, fit_info):
         ret = []
         if not fit_info:
@@ -102,18 +99,18 @@ class Body:
         if not parts:
             return ret
 
-        for p in parts:
-            for slot in p.slots:
+        for part in parts:
+            for slot in part.slots:
                 if slot.name == fit_info.slot_name and fit_info.fit in slot.fit:
-                    ret.append(slot)
+                    ret.append([part, slot, fit_match(part, slot, fit_info)])
 
-        return ret
+        ret.sort(key=itemgetter(2), reverse=True)
+
+        return list(stuple[1] for stuple in ret)
 
     # a conveniece function to simply equip a body quickly, (throwing away prior items in any slots)
     def wear(self, item):
         slots = self.slots_for(item.fit_info)
-        if not slots:
-            return False
         slots[0].put(item)
 
     # return items in context-tuples:
@@ -169,6 +166,18 @@ def update_dragon_proportions(body, head):
         ratio = dratio[part.name]
         part.size = Size(ratio[0] * head[0], ratio[1] * head[1], ratio[2] * head[2])
 
+# return a match weight for the given slot for the information given taking into account existing items
+#   Empty slots have priority
+#   Then fit preferences are taken into account
+def fit_match(part, slot, fit_info):
+    ret = 0
+    if len(slot.items) < slot.max_count:
+        ret += 100
+    for fp in fit_info.fit_pref:
+        if fp in part.labels:
+            ret += 1
+    return ret
+
 def create_body(body_type, height=1.0, weight=1.0, **kwds):
     if body_type == 'humanoid':
         ret = create_humanoid(height, weight, **kwds)
@@ -218,8 +227,8 @@ def create_humanoid(height, weight, body2head=7.5):
         size = Size(h, h*w_fac, h*d_fac)
         if name in symmetrical:
             parts = (
-                BodyPart(name, size, ('left',)),
-                BodyPart(name, size, ('right',)),
+                BodyPart(name, size, ('left', 'subdom')),
+                BodyPart(name, size, ('right', 'dom')),     # right dominant
             )
         else:
             parts = (BodyPart(name, size),)

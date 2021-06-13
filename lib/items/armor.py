@@ -68,7 +68,7 @@ def boots(size=Size(1.0,1.0,1.0), thick=1.0, **params):
 class Shield(Item):
     name: str = 'shield'
     char: str = ')'
-    fit_info: FitInfo = FitInfo('held', 'held', 'hand')
+    fit_info: FitInfo = FitInfo('held', 'held', 'hand', ('subdom',))
     shape = 'round'
 
 

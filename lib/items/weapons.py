@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
 
-from lib.items.item import BODY_SLOT
 from lib.model import Size
 from lib.items.item import Item, FitInfo
 
@@ -12,7 +10,7 @@ AVERAGE_SWORD_WEIGHT = 3 / 65
 class Sword(Item):
     name: str = 'sword'
     char: str = '/'
-    fit_info: FitInfo = FitInfo('held', 'held', 'hand')
+    fit_info: FitInfo = FitInfo('held', 'held', 'hand', ('dom',))
 
 # depth is the thickness of the sword.
 def sword(size=Size(1.0,1.0,1.0), **params):
