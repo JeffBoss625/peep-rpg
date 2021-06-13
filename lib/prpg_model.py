@@ -199,7 +199,7 @@ class GameModel(DataModel):
 
         maze = dungeons.create_level(level)
         if not maze:
-            self.message('This staircase has been caved in.')
+            self.message('This staircase has caved in.')
             return
 
         if self.maze_model:

@@ -73,15 +73,13 @@ def do_player_turn(control, input_key):
         if mm.char_at(*player.pos) == '>':
             return input_key
         else:
-            game.message(f'you are not standing at a staircase down')
-            control.get_key()
+            game.message(f'you are not standing at a down staircase')
 
     elif input_key == '<':
         if mm.char_at(*player.pos) == '<':
             return input_key
         else:
-            game.message(f'you are not standing at a staircase up')
-        control.get_key()
+            game.message(f'you are not standing at an up staircase')
 
     elif input_key == 'w':
         if not player.stuff:
@@ -106,18 +104,20 @@ def do_player_turn(control, input_key):
     elif input_key == 't':
         items = player.body.item_tuples()
         if items:
-            items_by_char = {chr(index + 97): (slot, item) for index, part, slot, item in items}
+            # 'a' is ascii 97
+            items_by_code = {index + 97: (slot, item) for index, part, slot, item in items}
             game.banner(['what do you remove?'])
-            choice = control.get_key()
-            while ord(choice) != 27 and choice not in items_by_char:
-                game.banner(['what do you remove?', '(invalid choice - choice a letter you are Wearing)'])
-                choice = control.get_key()
-            if ord(choice) == 27:
+            choice = control.get_ch()
+            while choice != 27 and choice not in items_by_code:
+                game.banner(['what do you remove?', f'  invalid choice "{chr(choice)}"'])
+                choice = control.get_ch()
+            if choice == 27:
                 game.banner([])
             else:
-                slot, item = items_by_char[choice]
+                slot, item = items_by_code[choice]
                 slot.items.remove(item)
                 player.stuff.append(item)
+                game.banner([f'{item.name} removed'])
 
 
     elif input_key == 'g':

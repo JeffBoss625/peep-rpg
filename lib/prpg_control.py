@@ -80,6 +80,10 @@ class PrpgControl:
     def win(self, name):
         return self.root_layout.info.comp_by_name[name]
 
+    def get_ch(self):
+        self.root_layout.window.paint()
+        return self.root_layout.window.get_ch()
+
     def get_key(self):
         self.root_layout.window.paint()
         return self.root_layout.window.get_key()

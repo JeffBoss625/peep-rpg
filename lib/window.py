@@ -6,8 +6,13 @@ from lib.util import min0
 
 
 IGNORED_KEYS = {
-    'KEY_RESIZE': 1,
-    'KEY_F(8)': 1,
+    'KEY_RESIZE',
+    'KEY_F(8)',
+}
+
+IGNORED_CHARS = {
+    -1,
+    410,        # resize
 }
 
 @dataclass
@@ -197,6 +202,17 @@ class Window:
 
     def doupdate(self):
         self.curses.doupdate()
+
+    def get_ch(self):
+        while 1:
+            try:
+                ret = self.scr.getch()
+                if ret not in IGNORED_CHARS:
+                    return ret
+
+            except Exception as e:
+                # self.log(f'get_key failed: type:"{str(e)}", trace: {"".join(traceback.format_tb(e.__traceback__))}')
+                pass        # ignore interrupts to getkey() following resize events etc.
 
     def get_key(self):
         while 1:
