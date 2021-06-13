@@ -122,7 +122,6 @@ class PrpgControl:
         while ret < 0 or ret > len(lines)-1:
             key_in = self.get_key()
             if ord(key_in) == 27:
-                self.game_model.message('Wear aborted')
                 ret = -1
                 break
             else:

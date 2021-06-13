@@ -100,7 +100,8 @@ def do_player_turn(control, input_key):
                     game.banner(msg)
                 else:
                     game.banner(f'you cannot wear the {item.name}')
-
+            else:
+                game.message(f'Wear aborted')
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
