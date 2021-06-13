@@ -102,7 +102,7 @@ class PrpgControl:
         idx_line = tuple((index, f'{item.name}') for index, item in enumerate(items))
         idx = self.choose_line(msg, idx_line)
         if idx == -1:
-            return -1
+            return None
         return items[idx]
 
     def choose_line(self, msg, lines):
@@ -122,10 +122,10 @@ class PrpgControl:
         while ret < 0 or ret > len(lines)-1:
             key_in = self.get_key()
             if ord(key_in) == 27:
-                self.game_model.message('Wear aborted')
-                self.game_model.maze_model.overlay.replace([])
-                return -1
-            ret = ord(key_in) - 97
+                ret = -1
+                break
+            else:
+                ret = ord(key_in) - 97
         self.game_model.maze_model.overlay.replace([])
         return ret
 

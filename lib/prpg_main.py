@@ -88,9 +88,7 @@ def do_player_turn(control, input_key):
             game.message("you don't have any stuff to wear")
         else:
             item = control.choose_item('what will you wear?', player.stuff)
-            if item == -1:
-                pass
-            elif item:
+            if item:
                 slots = player.body.slots_for(item.fit_info)
                 if slots:
                     prev = slots[0].put(item)
@@ -102,6 +100,8 @@ def do_player_turn(control, input_key):
                     game.banner(msg)
                 else:
                     game.banner(f'you cannot wear the {item.name}')
+            else:
+                game.message(f'Wear aborted')
 
     elif input_key == 't':
         items = player.body.item_tuples()
@@ -124,9 +124,12 @@ def do_player_turn(control, input_key):
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
         if nitems > 1:
-            game.message(f'You picked up {nitems} items')
-            for i in on_items:
-                pick_up(i, player, mm)
+            item = control.choose_item('What will you pick up?', on_items,)
+            if item:
+                game.message(f'You picked up the {item.name}')
+                pick_up(item, player, mm)
+            else:
+                game.message(f'Pick up aborted')
         if nitems == 1:
             game.message(f'You picked up a(n) {on_items[0].name}')
             pick_up(on_items[0], player, mm)
@@ -135,14 +138,11 @@ def do_player_turn(control, input_key):
 
     elif input_key == 'd':
         if len(player.stuff) >= 1:
-            game.message(f'What would you like to drop? (Number)')
-            num = control.get_key()
-            if int(num):
-                if int(num) > len(player.stuff) - 1:
-                    game.message(f'That is an empty slot')
-                drop(num, player, mm, game)
+            item = control.choose_item('What would you like to drop?', player.stuff)
+            if item:
+                drop(item, player, mm, game)
             else:
-                game.message(f'"{num}" was not a number. Drop cancelled.')
+                game.message(f'Drop aborted')
         else:
             game.message(f"You don't have anything to drop")
 
@@ -179,9 +179,8 @@ def pick_up(item, peep, mm):
     peep.stuff.append(item)
     mm.items.remove(item)
 
-def drop(num, peep, mm, game):
-    item = peep.stuff[int(num)]
-    peep.stuff.pop(int(num))
+def drop(item, peep, mm, game):
+    peep.stuff.remove(item)
     mm.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
     game.message(f'You dropped the {item.name}')
 
