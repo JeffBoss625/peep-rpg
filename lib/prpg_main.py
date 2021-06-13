@@ -103,6 +103,23 @@ def do_player_turn(control, input_key):
                 else:
                     game.banner(f'you cannot wear the {item.name}')
 
+    elif input_key == 't':
+        items = player.body.item_tuples()
+        if items:
+            items_by_char = {chr(index + 97): (slot, item) for index, part, slot, item in items}
+            game.banner(['what do you remove?'])
+            choice = control.get_key()
+            while ord(choice) != 27 and choice not in items_by_char:
+                game.banner(['what do you remove?', '(invalid choice - choice a letter you are Wearing)'])
+                choice = control.get_key()
+            if ord(choice) == 27:
+                game.banner([])
+            else:
+                slot, item = items_by_char[choice]
+                slot.items.remove(item)
+                player.stuff.append(item)
+
+
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
