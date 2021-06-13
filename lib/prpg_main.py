@@ -107,9 +107,9 @@ def do_player_turn(control, input_key):
         on_items = mm.items_at(player.pos, False)
         nitems = len(on_items)
         if nitems > 1:
+            item = control.choose_item('What will you pick up?', on_items,)
             game.message(f'You picked up {nitems} items')
-            for i in on_items:
-                pick_up(i, player, mm)
+            pick_up(item, player, mm)
         if nitems == 1:
             game.message(f'You picked up a(n) {on_items[0].name}')
             pick_up(on_items[0], player, mm)
@@ -118,14 +118,8 @@ def do_player_turn(control, input_key):
 
     elif input_key == 'd':
         if len(player.stuff) >= 1:
-            game.message(f'What would you like to drop? (Number)')
-            num = control.get_key()
-            if int(num):
-                if int(num) > len(player.stuff) - 1:
-                    game.message(f'That is an empty slot')
-                drop(num, player, mm, game)
-            else:
-                game.message(f'"{num}" was not a number. Drop cancelled.')
+            item = control.choose_item('What would you like to drop?', player.stuff)
+            drop(item, player, mm, game)
         else:
             game.message(f"You don't have anything to drop")
 
@@ -162,9 +156,8 @@ def pick_up(item, peep, mm):
     peep.stuff.append(item)
     mm.items.remove(item)
 
-def drop(num, peep, mm, game):
-    item = peep.stuff[int(num)]
-    peep.stuff.pop(int(num))
+def drop(item, peep, mm, game):
+    peep.stuff.remove(item)
     mm.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
     game.message(f'You dropped the {item.name}')
 
