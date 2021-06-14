@@ -35,10 +35,10 @@ class PrpgControl:
         center_col1.window(WIN.EQUIP, Con(30,20,30,0))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
-        center_col2.window(WIN.BANNER, Con(maze_w,banner_h,60,banner_h))
-        center_col2.window(WIN.MAZE, Con(maze_w,maze_h,60,0))
+        center_col2.window(WIN.BANNER, Con(maze_w,banner_h,0,banner_h))
+        center_col2.window(WIN.MAZE, Con(maze_w,maze_h,0,0))
 
-        center.window(WIN.LOG, Con(maze_w,6,0,0))
+        center.window(WIN.LOG, Con(10,6,0,0))
 
         # Bottom Row
         main_panel.window(WIN.MESSAGES, Con(30,6))
