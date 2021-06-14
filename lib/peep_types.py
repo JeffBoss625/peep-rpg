@@ -58,10 +58,10 @@ class PType:
     hunt_target: any =  None
     direct: int = -1
     shooter: Peep = None
+    gold: str = '1d1'
 
     body_stats: Dict[str,Any] = None
     stuff = []
-    gold = int = 10
 
     # level_info: Tuple[LevelInfo] = field(default_factory=LevelInfo)
 
@@ -78,6 +78,7 @@ MONSTERS = [
         thaco=18,
         speed=1.3,
         ac=19,
+        gold="500d4",
         attacks=(
             AttackInfo('bite', '1d3'),
             AttackInfo('scratch', '2d2'),
@@ -95,6 +96,7 @@ MONSTERS = [
         thaco=19,
         speed=1.3,
         ac=10,
+        gold="0d1",
         attacks=(
             AttackInfo('bite', '1d1', speed=3),
             # AttackInfo('scratch', '2d2'),
@@ -111,6 +113,7 @@ MONSTERS = [
         thaco=19,
         speed=2.0,
         ac=10,
+        gold="10d2",
         attacks=(
             AttackInfo('bite', '2d4'),
             AttackInfo('scratch', '4d2'),
@@ -128,6 +131,7 @@ MONSTERS = [
         thaco=17,
         speed=1.5,
         ac=8,
+        gold="10d3",
         attacks=(
             AttackInfo('beak', '1d10'),
             AttackInfo('talons', '2d3'),
@@ -148,6 +152,7 @@ MONSTERS = [
         thaco=10,
         speed=2.0,
         ac=10,
+        gold="500d2",
         attacks=(
             AttackInfo('bite', '1d10'),
             AttackInfo('scratch', '2d7'),
@@ -166,6 +171,7 @@ MONSTERS = [
         thaco=3,
         speed=7.5,
         ac=3,
+        gold="500d3",
         attacks=(
             AttackInfo('bite', '1d30'),
             AttackInfo('scratch', '2d21'),
@@ -183,6 +189,7 @@ MONSTERS = [
         thaco=3,
         speed=7.5,
         ac=3,
+        gold="500d4",
         attacks=(
             AttackInfo('bite', '1d30'),
             AttackInfo('scratch', '2d21'),
@@ -203,6 +210,7 @@ MONSTERS = [
         thaco=2,
         speed=3.0,
         ac=2,
+        gold='500d2',
         attacks=(
             AttackInfo('burn', '1d30'),
             AttackInfo('fire_whip', '5d10', range=3, speed=.3, blowback=100),
@@ -216,6 +224,7 @@ MONSTERS = [
         thaco=19,
         speed=3.3,
         ac=10,
+        gold='3d3',
         attacks=(
             AttackInfo('teeth', '1d10'),
             AttackInfo('tail', '3d5'),
@@ -230,6 +239,7 @@ MONSTERS = [
         thaco=19,
         speed=3.5,
         ac=10,
+        gold='3d3',
         attacks=(
             AttackInfo('teeth', '1d10'),
             AttackInfo('tail', '3d5'),
@@ -244,6 +254,7 @@ MONSTERS = [
         thaco=0,
         speed=4,
         ac=18,
+        gold="5d3",
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
         ),
@@ -256,6 +267,7 @@ MONSTERS = [
         thaco=20,
         speed=3,
         ac=2,
+        gold="0d1",
         attacks=(
             AttackInfo('little slurp', '1d1', blowback=-1),
         ),
@@ -303,6 +315,7 @@ MONSTERS = [
         thaco=20,
         speed=0,
         ac=100,
+        gold="0d1",
         attacks=(
             # AttackInfo('crush', '2d4'),
         ),
@@ -317,6 +330,7 @@ MONSTERS = [
         thaco=15,
         speed=0,
         ac=100,
+        gold="0d1",
         attacks=(
             # AttackInfo('smush', '5d10'),
             # AttackInfo('bury', '2d12'),
@@ -333,6 +347,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
         ),
         move_tactic='pos_path',
@@ -347,6 +362,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
         ),
         move_tactic='pos_path',
@@ -361,6 +377,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
         ),
         move_tactic='pos_path',
@@ -375,6 +392,7 @@ MONSTERS = [
         thaco=20,
         speed=3.0,
         ac=-10,
+        gold="0d1",
         attacks=(
         ),
         move_tactic='pos_path',
@@ -389,6 +407,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
         ),
         move_tactic='pos_path',
@@ -403,6 +422,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
 
         ),
@@ -418,6 +438,7 @@ MONSTERS = [
         thaco=20,
         speed=10.0,
         ac=-10,
+        gold="0d1",
         attacks=(
 
         ),
@@ -457,7 +478,7 @@ def create_peep(
     level = level_calc(exp, factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
     regen_fac = pt.regen_fac
     attacks = attacks if len(attacks) else pt.attacks # todo: combine type and passed in?
-    gold = pt.gold
+    gold = roll_dice(pt.gold)
 
     ret = Peep(
         name=name if name else 'a ' + ptype,

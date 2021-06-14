@@ -65,7 +65,7 @@ class StatsWindow(Window):
         super().__init__(name, parent, **params)
 
     def handle_update_event(self, _model, _msg, **kwds):
-        if kwds.get('key', '') in {'hp', 'maxhp', 'level', 'speed', 'xp'}:
+        if kwds.get('key', '') in {'hp', 'maxhp', 'level', 'speed', 'xp', 'gold'}:
             self.needs_paint = True
 
     def do_paint(self):
@@ -96,6 +96,7 @@ class StatsWindow(Window):
             f'xp:     {floor(p.exp)}/{floor(xptolevel_calc(p.level, p.level_factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL))}',
             f'hp:     {hp_str}',
             f'speed:  {p.speed}',
+            f'gold:   {p.gold}',
             # 'height: ' + str(p.body.size.h)
         ])
 

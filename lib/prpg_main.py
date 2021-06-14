@@ -279,7 +279,17 @@ def post_player_move(control):
     mm = game.maze_model
     player = game.player
     on_items = mm.items_at(player.pos, True)
+    for i in on_items:
+        if i.name == 'gold':
+            player.gold = player.gold + i.amount
+            mm.items.remove(i)
+            game.message(f'You have scrounged {i.amount} gold')
+    on_items = mm.items_at(player.pos, True)
     nitems = len(on_items)
+    for i in on_items:
+        if i.name == 'gold':
+            player.gold = player.gold + i.amount
+            mm.items.remove(i)
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])
     elif nitems > 1:
