@@ -61,6 +61,7 @@ class PType:
 
     body_stats: Dict[str,Any] = None
     stuff = []
+    gold = int = 10
 
     # level_info: Tuple[LevelInfo] = field(default_factory=LevelInfo)
 
@@ -456,6 +457,7 @@ def create_peep(
     level = level_calc(exp, factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
     regen_fac = pt.regen_fac
     attacks = attacks if len(attacks) else pt.attacks # todo: combine type and passed in?
+    gold = pt.gold
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
@@ -480,6 +482,7 @@ def create_peep(
         body=create_body('humanoid', height, weight, body2head=body2head),
         move_tactic=pt.move_tactic,
         shooter=shooter,
+        gold=gold,
     )
     if stuff:
         ret.stuff.extend(stuff)

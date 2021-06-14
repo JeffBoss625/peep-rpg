@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from lib import dungeons
 from lib.constants import GAME_SETTINGS
+from lib.items.item import Item
 from lib.model import ModelList, DataModel, TextModel
 from lib.pclass import level_calc, handle_level_up
 from lib.peep_types import create_peep
@@ -224,5 +225,11 @@ class GameModel(DataModel):
         self.message(f"{dst.name} has died to the {src.name}'s {src_attack.name}!")
         src.exp += dst.exp_value()
         current_level = level_calc(src.exp, src.level_factor, GAME_SETTINGS.BASE_EXP_TO_LEVEL)
+        drop_stuff(self, dst)
         handle_level_up(src, current_level, self)
 
+def drop_stuff(game_model, peep):
+    for item in peep.stuff:
+        game_model.maze_model.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
+    game_model.maze_model.items.append(Item("gold", '$', amount=peep.gold, pos=peep.pos))
+    game_model.maze_model.items.append(Item(f'{peep.name} corpse', '†', pos=peep.pos))

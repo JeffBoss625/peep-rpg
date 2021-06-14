@@ -71,6 +71,7 @@ class Item:
     fit_info: FitInfo = None    # information on wearing on the body
     weight: float = 1.0
     pos: Tuple[int,int] = field(default_factory=tuple)
+    amount: int = 1
 
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK
