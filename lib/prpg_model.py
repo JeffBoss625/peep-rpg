@@ -52,6 +52,26 @@ class MazeModel(DataModel):
             name = 'stairs going up'
         elif c == '>':
             name = 'stairs going down'
+        if c == '1':
+            name = 'shop 1'
+        if c == '2':
+            name = 'shop 2'
+        if c == '3':
+            name = 'shop 3'
+        if c == '3':
+            name = 'shop 3'
+        if c == '4':
+            name = 'shop 4'
+        if c == '5':
+            name = 'shop 5'
+        if c == '6':
+            name = 'shop 6'
+        if c == '7':
+            name = 'shop 7'
+        if c == '8':
+            name = 'shop 8'
+        if c == '9':
+            name = 'shop 9'
         if name:
             return (Thing(name, c),)
 

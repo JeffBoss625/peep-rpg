@@ -257,10 +257,24 @@ MONSTERS = [
         gold="5d3",
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
+            # AttackInfo('summoned_mosquito', range=20, speed=0.1)
         ),
     ),
     PType(
         name='mosquito',
+        char='m',
+        type='monster',
+        hitdice='1d1',
+        thaco=20,
+        speed=3,
+        ac=2,
+        gold="0d1",
+        attacks=(
+            AttackInfo('little slurp', '1d1', blowback=-1),
+        ),
+    ),
+    PType(
+        name='summoned_mosquito',
         char='m',
         type='monster',
         hitdice='1d1',
