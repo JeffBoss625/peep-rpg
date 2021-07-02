@@ -104,12 +104,12 @@ class PrpgControl:
 
     def choose_item(self, msg, items):
         idx_line = tuple((index, f'{item.name}') for index, item in enumerate(items))
-        idx = self.choose_line(msg, idx_line)
+        idx = self.show_lines(msg, idx_line, True)
         if idx == -1:
             return None
         return items[idx]
 
-    def choose_line(self, msg, lines):
+    def show_lines(self, msg, lines, choose):
         lmarg = '  '
         rmarg = '  '
         textblock = ['', lmarg + msg + rmarg]
@@ -118,10 +118,14 @@ class PrpgControl:
             s = lmarg + f' {chr(index + 97)}) {line.rjust(justlen)}' + rmarg
             textblock.append(s)
         textblock.append('')
-
         maxw = max((len(line) for line in textblock))
         textblock = (line.ljust(maxw) for line in textblock)
         self.game_model.maze_model.overlay.replace(textblock)
+        if choose:
+            ret = self.choose_line(msg, lines, textblock)
+            return ret
+
+    def choose_line(self, msg, lines, textblock):
         ret = -1
         while ret < 0 or ret > len(lines)-1:
             key_in = self.get_key()

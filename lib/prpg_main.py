@@ -3,6 +3,7 @@ from lib import dungeons
 from lib.attack import choose_ranged_attack
 from lib.calc import target_list
 from lib.constants import Key
+from lib.items import clothes
 from lib.items.item import Item
 from lib.move import Direction
 import random
@@ -290,6 +291,39 @@ def post_player_move(control):
         if i.name == 'gold':
             player.gold = player.gold + i.amount
             mm.items.remove(i)
+        numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        for n in numbers:
+            if i.name == f'shop {n}':
+                store_inventory = {1: ("belt"),
+                                   2: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   3: ("sheild"),
+                                   4: ("robe"),
+                                   5: ("book"),
+                                   6: ("chestplate"),
+                                   7: ("food"),
+                                   8: ("ring"),
+                                   9: ("torch")}
+                idx_line = tuple((index, f'{store_inventory[n][1].name}') for index, item in enumerate(store_inventory[n]))
+                control.show_lines('You walk into a store and see lines of items to buy. b to buy, s to sell, q to quit', idx_line, False)
+                input = 0
+                while input not in ['q', 'b', 's']:
+                    if input != 0:
+                        control.game_model.message("Please select a key 'q', 'b', or 's' please")
+                    input = control.get_key()
+                if input == 'q':
+                    control.game_model.maze_model.overlay.replace([])
+                elif input == 'b':
+                    control.game_model.maze_model.overlay.replace([])
+                    item = control.choose_item('What would you like to buy?', store_inventory[n])
+                    player.stuff.append(item)
+                    player.gold -= 10
+                elif input == 's':
+                    control.game_model.maze_model.overlay.replace([])
+                    item = control.choose_item('What would you like to sell?', player.stuff)
+                    player.stuff.remove(item)
+                    player.gold += 7
+
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])
     elif nitems > 1:
