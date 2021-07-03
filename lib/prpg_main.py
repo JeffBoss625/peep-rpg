@@ -225,7 +225,7 @@ def monster_turn(control, monster):
             and distance(monster.pos, player.pos) < ranged_attack.range:
         path = list(line_points(monster.pos, player.pos))
         mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
-        monster._tics -= monster._tics - 1/monster.speed * ranged_attack.speed
+        monster._tics = monster._tics - 1/monster.speed * 1/ranged_attack.speed
     if monster.hp > monster.maxhp: monster.hp = monster.maxhp
     if monster.move_tactic == 'pos_path':
         if monster.pos_i < len(monster.pos_path) - 1:
@@ -269,6 +269,9 @@ def monster_turn(control, monster):
             if mlib.move_peep(game, monster, dst_pos):
                 return True
             rotation += 1
+            if abs(rotation) >= 5:
+                monster._tics = monster._tics - 1 / monster.speed
+                continue
 
     return True
 
