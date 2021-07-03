@@ -307,25 +307,37 @@ def post_player_move(control):
                                    7: ("food"),
                                    8: ("ring"),
                                    9: ("torch")}
-                idx_line = tuple((index, f'{store_inventory[n][1].name}') for index, item in enumerate(store_inventory[n]))
-                control.show_lines('You walk into a store and see lines of items to buy. b to buy, s to sell, q to quit', idx_line, False)
                 input = 0
-                while input not in ['q', 'b', 's']:
-                    if input != 0:
-                        control.game_model.message("Please select a key 'q', 'b', or 's' please")
-                    input = control.get_key()
-                if input == 'q':
-                    control.game_model.maze_model.overlay.replace([])
-                elif input == 'b':
-                    control.game_model.maze_model.overlay.replace([])
-                    item = control.choose_item('What would you like to buy?', store_inventory[n])
-                    player.stuff.append(item)
-                    player.gold -= 10
-                elif input == 's':
-                    control.game_model.maze_model.overlay.replace([])
-                    item = control.choose_item('What would you like to sell?', player.stuff)
-                    player.stuff.remove(item)
-                    player.gold += 7
+                while input != 'q':
+                    idx_line = tuple((index, f'{store_inventory[n][0].name}') for index, item in enumerate(store_inventory[n]))
+                    control.show_lines('You walk into a store and see lines of items to buy. b to buy, s to sell, q to quit', idx_line, False)
+                    input = 0
+                    while input not in ['q', 'b', 's']:
+                        if input != 0:
+                            control.game_model.message("Please select a key 'q', 'b', or 's' please")
+                        input = control.get_key()
+                    if input == 'q':
+                        control.game_model.maze_model.overlay.replace([])
+                    elif input == 'b':
+                        control.game_model.maze_model.overlay.replace([])
+                        if player.gold < 10:
+                            control.game_model.message(f"You don't have enough gold to buy anything")
+                        else:
+                            item = control.choose_item('What would you like to buy?', store_inventory[n])
+                            player.stuff.append(item)
+                            player.gold -= 10
+                    elif input == 's':
+                        control.game_model.maze_model.overlay.replace([])
+                        if len(player.stuff) == 0:
+                            control.game_model.message(f"You don't have anything to sell")
+                        elif len(player.stuff) == 1:
+                            item = player.stuff[0]
+                            player.stuff.remove(item)
+                            player.gold += 7
+                        else:
+                            item = control.choose_item('What would you like to sell?', player.stuff)
+                            player.stuff.remove(item)
+                            player.gold += 7
 
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])
