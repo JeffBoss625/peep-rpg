@@ -71,7 +71,7 @@ class Peep(DataModel):
     ac: int = 10
     height: int = 5
     move_tactic: str = 'hunt'
-    hunt_target: any = None
+    _hunt_target: any = None
     direct: int = -1
     pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
     pos_i = 0
@@ -84,6 +84,7 @@ class Peep(DataModel):
     hitdice: str = '1d1'
     hitdicefac: int = 0
     _tics: int = 0              # private- events don't propogate for this attribute
+
     pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
     inventory: Inventory = field(default_factory=Inventory)

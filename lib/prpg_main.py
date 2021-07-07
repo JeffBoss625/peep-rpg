@@ -259,13 +259,13 @@ def monster_turn(control, monster):
             monster.hp = 0  # todo: convert to item with chance of breaking
         return True
     elif monster.move_tactic == 'hunt':
-        if monster.hunt_target:
-            if monster.hunt_target.hp <= 0:
-                monster.hunt_target = choose_monster_target(monster, control)
+        if monster._hunt_target:
+            if monster._hunt_target.hp <= 0:
+                monster._hunt_target = choose_monster_target(monster, control)
         else:
-            monster.hunt_target = choose_monster_target(monster, control)
-        dx = monster.hunt_target.pos[0] - monster.pos[0]
-        dy = monster.hunt_target.pos[1] - monster.pos[1]
+            monster._hunt_target = choose_monster_target(monster, control)
+        dx = monster._hunt_target.pos[0] - monster.pos[0]
+        dy = monster._hunt_target.pos[1] - monster.pos[1]
         if player.hp <= 0:
             control.player_died()
             return False

@@ -157,8 +157,8 @@ class DataModel(PubSub):
 
     def submodels(self):
         ret = []
-        for v in self.__dict__.values():
-            if isinstance(v, PubSub):
+        for k, v in self.__dict__.items():
+            if k[0] != '_' and isinstance(v, PubSub):
                 ret.append(v)
         return ret
 
