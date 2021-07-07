@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
-from lib.body import create_humanoid, RACE, create_body
+from lib.body import create_body
+from lib.items import weapons
+from lib.items.item import Item
+from lib.model import Size
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
 from lib.pclass import get_pclass, level_calc
@@ -61,7 +64,7 @@ class PType:
     gold: str = '1d1'
 
     body_stats: Dict[str,Any] = None
-    stuff = []
+    stuff: List[Any] = field(default_factory=list)
 
     # level_info: Tuple[LevelInfo] = field(default_factory=LevelInfo)
 
@@ -253,12 +256,13 @@ MONSTERS = [
         hitdice='6d10',
         thaco=0,
         speed=4,
-        ac=5,
+        ac=10,
         gold="5d3",
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
-            AttackInfo('summoned_mosquito', range=10, speed=0.1)
+            # AttackInfo('summoned_mosquito', '1d2', range=10, speed=0.1, blowback=-1)
         ),
+        stuff=[Item(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), pos=(10, 3)))],
     ),
     PType(
         name='mosquito',
@@ -482,7 +486,6 @@ def create_peep(
         body2head=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
-        stuff=(),
         shooter=None
     ):
     pt = PTYPES_BY_NAME[ptype]
@@ -519,8 +522,8 @@ def create_peep(
         shooter=shooter,
         gold=gold,
     )
-    if stuff:
-        ret.stuff.extend(stuff)
+    if pt.stuff:
+        ret.stuff.extend(pt.stuff)
     return ret
 
 
