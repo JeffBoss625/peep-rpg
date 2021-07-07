@@ -128,12 +128,12 @@ def do_player_turn(control, input_key):
             item = control.choose_item('What will you pick up?', on_items,)
             if item:
                 game.message(f'You picked up the {item.name}')
-                pick_up(item, player, mm)
+                pick_up(control, item, player, mm)
             else:
                 game.message(f'Pick up aborted')
         if nitems == 1:
             game.message(f'You picked up a(n) {on_items[0].name}')
-            pick_up(on_items[0], player, mm)
+            pick_up(control, on_items[0], player, mm)
         if nitems == 0:
             game.message(f'You are not standing on any items to pick up.')
 
@@ -141,7 +141,7 @@ def do_player_turn(control, input_key):
         if len(player.stuff) >= 1:
             item = control.choose_item('What would you like to drop?', player.stuff)
             if item:
-                drop(item, player, mm, game)
+                drop(control, item, player, mm, game)
             else:
                 game.message(f'Drop aborted')
         else:
@@ -176,14 +176,36 @@ def macro(input_key, game, control):
         game.message(f'Macro set')
         return keybinds
 
-def pick_up(item, peep, mm):
+def pick_up(control, item, peep, mm):
     peep.stuff.append(item)
     mm.items.remove(item)
+    game = control.game_model
+    mm = game.maze_model
+    player = game.player
+    on_items = mm.items_at(player.pos, True)
+    nitems = len(on_items)
+    if nitems == 1:
+        game.banner(['You see a ' + on_items[0].name,''])
+    elif nitems > 1:
+        game.banner([f'You see {nitems} items',''])
+    else:
+        game.banner(['',''])
 
-def drop(item, peep, mm, game):
+def drop(control, item, peep, mm, game):
     peep.stuff.remove(item)
     mm.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
     game.message(f'You dropped the {item.name}')
+    game = control.game_model
+    mm = game.maze_model
+    player = game.player
+    on_items = mm.items_at(player.pos, True)
+    nitems = len(on_items)
+    if nitems == 1:
+        game.banner(['You see a ' + on_items[0].name,''])
+    elif nitems > 1:
+        game.banner([f'You see {nitems} items',''])
+    else:
+        game.banner(['',''])
 
 def player_aim(attack, control):
     game = control.game_model
@@ -318,7 +340,8 @@ def post_player_move(control):
                 input = 0
                 while input != 'q':
                     idx_line = tuple((index, f'{item.name}') for index, item in enumerate(store_inventory[n]))
-                    control.show_lines('You walk into a store and see lines of items to buy. b to buy, s to sell, q to quit', idx_line, False)
+                    game.banner(['b to buy, s to sell, q to quit'])
+                    control.show_lines('You walk into a store and see lines of items to buy.', idx_line, False)
                     input = 0
                     while input not in ['q', 'b', 's']:
                         if input != 0:
@@ -334,6 +357,7 @@ def post_player_move(control):
                             item = control.choose_item('What would you like to buy?', store_inventory[n])
                             player.stuff.append(item)
                             player.gold -= 10
+                            control.game_model.message(f'You bought a {item.name} for 10 gold')
                     elif input == 's':
                         control.game_model.maze_model.overlay.replace([])
                         if len(player.stuff) == 0:
@@ -342,10 +366,12 @@ def post_player_move(control):
                             item = player.stuff[0]
                             player.stuff.remove(item)
                             player.gold += 7
+                            control.game_model.message(f'You sold a {item.name} for 7 gold')
                         else:
                             item = control.choose_item('What would you like to sell?', player.stuff)
                             player.stuff.remove(item)
                             player.gold += 7
+                            control.game_model.message(f'You sold a {item.name} for 7 gold')
 
     if nitems == 1:
         game.banner(['You see a ' + on_items[0].name,''])

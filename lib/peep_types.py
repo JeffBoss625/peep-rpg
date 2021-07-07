@@ -270,7 +270,7 @@ MONSTERS = [
         ac=2,
         gold="0d1",
         attacks=(
-            AttackInfo('little slurp', '1d1', blowback=-1),
+            AttackInfo('little slurp', '1d2', blowback=-1),
         ),
     ),
     PType(
@@ -278,12 +278,12 @@ MONSTERS = [
         char='m',
         type='monster',
         hitdice='1d1',
-        thaco=20,
+        thaco=10,
         speed=3,
         ac=2,
         gold="0d1",
         attacks=(
-            AttackInfo('little slurp', '1d1', blowback=-1),
+            AttackInfo('little slurp', '1d2', blowback=-1),
         ),
     ),
     PType(
