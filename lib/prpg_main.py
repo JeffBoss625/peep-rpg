@@ -297,19 +297,27 @@ def post_player_move(control):
         numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for n in numbers:
             if i.name == f'shop {n}':
-                store_inventory = {1: ("belt"),
+                store_inventory = {1: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
                                    2: (clothes.belt(name='leather belt', pos=(4,3)),
             clothes.belt(name='metal belt', pos=(4,4)),),
-                                   3: ("sheild"),
-                                   4: ("robe"),
-                                   5: ("book"),
-                                   6: ("chestplate"),
-                                   7: ("food"),
-                                   8: ("ring"),
-                                   9: ("torch")}
+                                   3: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   4: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   5: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   6: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   7: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   8: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),),
+                                   9: (clothes.belt(name='leather belt', pos=(4,3)),
+            clothes.belt(name='metal belt', pos=(4,4)),)}
                 input = 0
                 while input != 'q':
-                    idx_line = tuple((index, f'{store_inventory[n][0].name}') for index, item in enumerate(store_inventory[n]))
+                    idx_line = tuple((index, f'{item.name}') for index, item in enumerate(store_inventory[n]))
                     control.show_lines('You walk into a store and see lines of items to buy. b to buy, s to sell, q to quit', idx_line, False)
                     input = 0
                     while input not in ['q', 'b', 's']:
