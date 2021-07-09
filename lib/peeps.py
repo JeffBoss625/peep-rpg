@@ -105,6 +105,27 @@ class Peep(DataModel):
         # very basic - todo: use attacks and other info to calculate experience
         return b * math.pow(self.maxhp, 0.5) * self.regen_fac
 
+    def put_item(self, slot, item, game):
+        self.stuff.remove(item)
+        if item.attack:
+            self.attacks = list(self.attacks)
+            self.attacks.append(item.attack)
+        msg = [f'you are wearing a {item.name}']
+        prev = slot.put(item)
+        msg = [f'you are wearing a {item.name}']
+        if prev:
+            self.remove_item(slot, prev, game)
+            msg.append(f'...you put other items back in your bag')
+            game.banner(msg)
+
+    def remove_item(self, slot, item, game):
+        slot.items.remove(item)
+        if item.attack:
+            for a in self.attacks:
+                if a == item.attack:
+                    self.attacks.remove(a)
+
+
 
 def printargs(model, msg, **args):
     print(model.__class__.__name__, model.name, msg, args)

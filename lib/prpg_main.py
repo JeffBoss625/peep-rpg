@@ -90,13 +90,8 @@ def do_player_turn(control, input_key):
             if item:
                 slots = player.body.slots_for(item.fit_info)
                 if slots:
-                    prev = slots[0].put(item)
-                    player.stuff.remove(item)
-                    msg = [f'you are wearing a {item.name}']
-                    if prev:
-                        player.stuff.extend(prev)
-                        msg.append(f'...you put other items back in your bag')
-                    game.banner(msg)
+                    player.put_item(slots[0], item, game)
+
                 else:
                     game.banner(f'you cannot wear the {item.name}')
             else:
@@ -116,7 +111,8 @@ def do_player_turn(control, input_key):
                 game.banner([])
             else:
                 slot, item = items_by_code[choice]
-                slot.items.remove(item)
+                player.remove_item(slot, item, game) # slot.items.remove(item)
+
                 player.stuff.append(item)
                 game.banner([f'{item.name} removed'])
 

@@ -250,6 +250,7 @@ class GameModel(DataModel):
 
 def drop_stuff(game_model, peep):
     for item in peep.stuff:
-        game_model.maze_model.items.append(Item(item.name, item.char, item.size, pos=peep.pos))
+        game_model.maze_model.items.append(item)
+        item.pos = peep.pos
     game_model.maze_model.items.append(Item("gold", '$', amount=peep.gold, pos=peep.pos))
     game_model.maze_model.items.append(Item(f'{peep.name} corpse', '†', pos=peep.pos))

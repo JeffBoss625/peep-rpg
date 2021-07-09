@@ -1,3 +1,4 @@
+from lib.attack import AttackInfo
 from lib.model import Size
 from lib.monsters import monster_by_name
 from lib.peep_types import create_peep
@@ -132,9 +133,9 @@ DUNGEONS = {
             create_peep('big bird', name='Steve', pos=(10,18)),
         ],
         'items': [
-            weapons.sword(name="sword_of_justice", size=Size(1.2,1.1,1.0), pos=(10, 3)),
+            weapons.sword(name="sword_of_justice", size=Size(1.2,1.1,1.0), attack=AttackInfo('righteous_slice', '5d3'), pos=(10, 3)),
             armor.shield(name="shield_of_justice", size=Size(1.1, 1.1, 1.1), pos=(11, 3)),
-            Item("bow_of_justice", '}', Size(3, 5, 4), 10, '', pos=(9, 3)),
+            Item("bow_of_justice", char='}', size=Size(3, 5, 4), pos=(9, 3)),
             armor.helm(name="helm_of_justice", size=Size(1.1,1.1,1.1), pos=(10, 4)),
             Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
             armor.boots(name="boots_of_justice", size=Size(1.1,1.1,1.1), pos=(12, 4)),

@@ -1,8 +1,20 @@
 import random
+from dataclasses import dataclass
 
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
 from lib.stats import calc_pct
+
+@dataclass
+class AttackInfo:
+    name: str = ''
+    damage: str = '1d1'
+    speed: float = 1.0
+    range: int = 0
+    reach: int = 1.5
+    # blowback is multiplied by damage done and applied to attacker. positive causes damage negative
+    # *heals* hit points (life drain)
+    blowback: float = 0
 
 def parse_dice(dstring):
     parts = dstring.split("d")

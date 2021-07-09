@@ -1,27 +1,15 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
+
+from lib.attack import AttackInfo
 from lib.body import create_body
 from lib.items import weapons
-from lib.items.item import Item
 from lib.model import Size
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
 from lib.pclass import get_pclass, level_calc
 
 from lib.stats import roll_dice
-
-
-
-@dataclass
-class AttackInfo:
-    name: str = ''
-    damage: str = '1d1'
-    speed: float = 1.0
-    range: int = 0
-    reach: int = 1.5
-    # blowback is multiplied by damage done and applied to attacker. positive causes damage negative
-    # *heals* hit points (life drain)
-    blowback: float = 0
 
 @dataclass
 class IntRange:
@@ -260,9 +248,9 @@ MONSTERS = [
         gold="5d3",
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
-            # AttackInfo('summoned_mosquito', '1d2', range=10, speed=0.1, blowback=-1)
+            AttackInfo('summoned_mosquito', '1d2', range=10, speed=0.1, blowback=-1)
         ),
-        stuff=[Item(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), pos=(10, 3)))],
+        stuff=[(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), attack=AttackInfo('blood_slice', '3d5', blowback=-0.5), pos=(10, 3)))],
     ),
     PType(
         name='mosquito',
