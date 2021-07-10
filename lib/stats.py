@@ -75,16 +75,16 @@ class PlayerStats:
     # 5.0 is heroic, legendary strength - a 200lb man dead lifting 1500lbs! (world record for deadlift is 425 lb man lifting 1,100 lbs)
     str: float = 1.0
 
-    # intelligence combines multiple traits of intelligence, including intuition, knowledge, quick-wittedness,
-    # perception, cunning... it represents all these things in different measures for different characters.
+    # intelligence represents multiple traits of intuition, knowledge, perceptiveness, cunning and quick-thinking.
+    # It represents all these things in different measures for different characters.
     # 1.0 is intelligence of a somewhat thoughtful human who has had some studies/schooling, but nothing intensive.
     # 0.5 is intelligence of an unschooled human who doesn't have tendency to think much.
     # 0.3 is unusually slow and/or unobservant who has a hard time figuring out most puzzles/tricks/challenges.
     # 0.1 is truly limited in understanding and cannot learn all but the simple things. For example, may simply
     #     bang rocks together or go around bashing things with a heavy club.
-    # 2.0 is a very clever and highly studied person
-    # 3.0 is true genius intelligence and very rare
-    # 5.0 is unheard of demi-god like intelligence and perceptiveness. this level of intelligence sees through
+    # 2.0 is a unusually clever, perceptive and/or highly studied person.
+    # 3.0 is true genius intelligence, master cunning, and very rare.
+    # 5.0 is unheard of demi-god like intelligence and perceptiveness. this level of intelligence sees through.
     #     almost any challenge, scheme or puzzle like child's play.
     int: float = 1.0
 

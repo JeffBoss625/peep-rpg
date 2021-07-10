@@ -9,7 +9,7 @@ class MAT:
     MITHRIL =   'mithril'
     TITANIUM =  'titanium'
     STEEL =     'steel'     # modern high-grade steel
-    BRONZE =    'bronze'    # weapon-grade brass (work-hardened high-tin content)
+    BRONZE =    'bronze'    # weapon-grade brass (work-hardened high tin content)
     IRON =      'iron'
     LEATHER =   'leather'
     OAK =       'oak'
@@ -57,8 +57,8 @@ def mat_by_name():
         ('iron',     'metal',   'blue',    1.00,  7.680,   20000),  # worked iron
         ('hard-leather', 'leather', 'red', 1.00,  1.100,   11000),
         ('oak',      'wood',    'red',     4.00,  0.900,   10000),  # heavy oak
-        ('pine',     'wood',    'red',     4.00,  0.550,    5000),
         ('leather',  'leather', 'red',     1.00,  0.980,    5000),  # soft leather
+        ('pine',     'wood',    'red',     4.00,  0.550,    4000),  # normal pine (soft)
         ('wicker',   'wicker',  'white',   1.50,  0.210,    1100),
         ('felt',     'cloth',   'white',   2.00,  0.220,    4000),  # warm, thick, buffering fabric
         ('flax',     'cloth',   'white',   0.20,  0.150,    1500),  # light strong fabric

@@ -73,21 +73,21 @@
       blow. Slashing weapons do more damage to leather and cloth than crushing weapons, for example.
       Thick felt can absorb some damage from heavy crushing attacks, and so on.
       
-      For blocks, the portion of damage and force that penetrates the item may hit underlying layers of 
+      For blocked blows, the portion of damage and force that penetrates the item may hit underlying layers of 
       protection such as an arming doublet undershirt which in turn may absorb some damage before 
       the remaining power of the attack then affects the defender.
       
    Example: A blocked, but penetrating attack:
 
 
-        A goblin thrusts his spear at a novice fighter. The spear rips through his shield and
+        A goblin thrusts his spear at a novice fighter. The spear knocks aside his shield and penetrates his
         jack-of-plate doublet hitting the novice's torso and causing 5 points damage.
         
         Details:
     
         A goblin thrusts a spear at a novice fighter. The fighter could not move enough avoid the thrust but
-        does manage to move his light-weight wood/leather shield up to block. 
-        The block has a poor deflection and 95% of the thrust is delivered to the shield and 
+        does manage to move his light wood-and-leather shield to block. 
+        The block has a poor deflection and 95% of the thrust delivered to the shield and 
         penetrates clean through. The shield absorbs only 15% of the thrust.
         The remaining 80% of the thrust strikes the fighter's jack-of-plate doublet. 
         The doublet does not deflect the blow.  The spear hit lands between metal plates in the 
