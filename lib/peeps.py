@@ -110,11 +110,9 @@ class Peep(DataModel):
         if item.attack:
             self.attacks = list(self.attacks)
             self.attacks.append(item.attack)
-        msg = [f'you are wearing a {item.name}']
         prev = slot.put(item)
         msg = [f'you are wearing a {item.name}']
         if prev:
-            self.remove_item(slot, prev, game)
             msg.append(f'...you put other items back in your bag')
             game.banner(msg)
 

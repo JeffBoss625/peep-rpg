@@ -214,7 +214,7 @@ MONSTERS = [
         hitdice='5d10',
         thaco=19,
         speed=3.3,
-        ac=10,
+        ac=17,
         gold='3d3',
         attacks=(
             AttackInfo('teeth', '1d10'),
@@ -229,7 +229,7 @@ MONSTERS = [
         hitdice='5d9',
         thaco=19,
         speed=3.5,
-        ac=10,
+        ac=17,
         gold='3d3',
         attacks=(
             AttackInfo('teeth', '1d10'),
@@ -250,7 +250,7 @@ MONSTERS = [
             AttackInfo('big slurp', '3d3', blowback=-1),
             AttackInfo('summoned_mosquito', '1d2', range=10, speed=0.1, blowback=-1)
         ),
-        stuff=[(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), attack=AttackInfo('blood_slice', '3d5', blowback=-0.5), pos=(10, 3)))],
+        stuff=[(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), attack=AttackInfo('blood_slice', '5d5', blowback=-0.5), pos=(10, 3)))],
     ),
     PType(
         name='mosquito',
@@ -300,8 +300,8 @@ MONSTERS = [
         speed=2,
         ac=10,
         attacks=(
-            AttackInfo('karate-chop', '5d8'),
-            AttackInfo('head-butt', '3d12'),
+            AttackInfo('karate-chop', '3d5'),
+            AttackInfo('head-butt', '1d9'),
             AttackInfo('arrow', '1d6', range=100, blowback=100) #Blowback is for projectile
         ),
         body_stats={
