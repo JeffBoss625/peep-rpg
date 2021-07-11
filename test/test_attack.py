@@ -164,9 +164,12 @@ def test_shield_block():
 
 def choose_melee_attack(src):
     numattacks = len(src.attacks)
+    attacks = []
     for a in src.attacks:
         if a.range > 0:
             numattacks -= 1
+        else:
+            attacks.append(a)
     if numattacks == 0:
         return None
     elif numattacks == 1:
@@ -177,7 +180,7 @@ def choose_melee_attack(src):
         # att = max(by_dmg, 0)
         dmg = 0
         attack = None
-        for a in src.attacks:
+        for a in attacks:
             parts = a.damage.split('d')
             a_dmg = avg_dmg(int(parts[0]), int(parts[1]))
             if a_dmg >= dmg:
@@ -190,7 +193,7 @@ def avg_dmg(n, q):
 
 def test_choose_melee_attack():
     p1 = Peep(name='p1', hp=4, attacks=(Attack('teeth', damage='1d3'), Attack('punch', damage='2d3'), Attack('stab', damage='3d2')), body=create_body('humanoid'))
-    m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'), Attack('bite', damage='1d2'),), body=create_body('humanoid'))
+    m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'), Attack('shoot', damage='17d17', range=5), Attack('bite', damage='1d2'),), body=create_body('humanoid'))
     out = Out()
     attack_dst(p1, m1, choose_melee_attack(p1), out)
     attack = choose_melee_attack(p1)
