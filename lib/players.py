@@ -2,7 +2,7 @@ from lib.peep_types import create_peep
 
 _PEEPS = [
     create_peep('dog', name='Bo Bo the Destroyer'),
-    create_peep('human', name='Super Dad', height=1.3, weight=1.5, body2head=8.0 ),
+    create_peep('human', name='Super Dad', height=1.3, weight=1.5, head2body=8.0 ),
 ]
 
 _PEEPS_BY_NAME = {m.name: m for m in _PEEPS}

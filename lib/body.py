@@ -188,7 +188,19 @@ def create_body(body_type, height=1.0, weight=1.0, **kwds):
 
     return ret
 
-def create_humanoid(height, weight, body2head=7.5):
+# height and weight are in human units (1.0, 1.0 = 175 cm, 65 kg)
+# head2body indicates body stature/proportion where 1.0 is normal proportion (7.5 head-to-body ratio)
+# Greek heros are depicted with longer limb proportions while Dwarves would have shorter proportions relative to head.
+# A Hobbit would actually be short, but tend to have higher body2head than a dwarf.
+#
+# STATURE
+#                                                                   Greek
+#   4-yrs                                   Short   Avg     Tall    Hero
+#   Child   Goblin  Dwarf           Hobbit                                          Alien
+#   4.0     4.5     5.5     6.0     6.5     7.0     7.5     8.0     8.5     9.0     9.5
+#   0.500   0.600   0.733   0.800   0.867   0.933   1.000   1.067   1.133   1.200   1.267
+#
+def create_humanoid(height, weight, head2body=7.5):
 
     # body proportions in a straight standing position
     # average male height in cm: Dunadain: 180, Human: 175, Dwarf: 135, Hobbit: 105

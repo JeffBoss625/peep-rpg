@@ -471,7 +471,7 @@ def create_peep(
         pos=(0, 0),
         height=1.0,
         weight=1.0,
-        body2head=7.5,
+        head2body=7.5,
         exp=0,
         attacks=(), # overrides ptype attacks if set
         shooter=None
@@ -505,7 +505,7 @@ def create_peep(
         height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
-        body=create_body('humanoid', height, weight, body2head=body2head),
+        body=create_body('humanoid', height, weight, head2body=head2body),
         move_tactic=pt.move_tactic,
         shooter=shooter,
         gold=gold,
