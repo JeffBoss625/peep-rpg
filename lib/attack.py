@@ -47,12 +47,25 @@ def choose_melee_attack(src):
     elif numattacks == 1:
         return src.attacks[0]
     else:
-        i = random.randint(1, numattacks-1)
-        return src.attacks[i]
+        # parsed = ((att.damage.split('d'), att) for att in src.attacks)
+        # by_dmg = ((avg_dmg(atup[0][0], atup[0][1]), atup[1]) for atup in parsed)
+        # att = max(by_dmg, 0)
+        dmg = 0
+        attack = None
+        for a in src.attacks:
+            parts = a.damage.split('d')
+            a_dmg = avg_dmg(int(parts[0]), int(parts[1]))
+            if a_dmg >= dmg:
+                dmg = a_dmg
+                attack = a
+        return attack
 
 def calc_hit(ac, thaco):
     chance = thaco - ac
     return random.randint(1, 20) >= chance
+
+def avg_dmg(n, q):
+    return n * ((q+1)/2)
 
 # attack dst with src/src_attack.
 # return True if the attack hits, False if missed
