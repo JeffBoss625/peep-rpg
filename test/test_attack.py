@@ -1,5 +1,5 @@
 from lib import dungeons
-from lib.attack import calc_deflection, attack_dst
+from lib.attack import calc_deflection, attack_dst, choose_attack
 from lib.constants import Key
 from lib.logger import Logger
 from lib.pclass import level_calc
@@ -162,31 +162,6 @@ def test_shield_block():
     print(p)
     assert_game(game, ['a', 'l', '.', '.',  '.', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
 
-def choose_melee_attack(src):
-    numattacks = len(src.attacks)
-    attacks = []
-    for a in src.attacks:
-        if a.range > 0:
-            numattacks -= 1
-        else:
-            attacks.append(a)
-    if numattacks == 0:
-        return None
-    elif numattacks == 1:
-        return src.attacks[0]
-    else:
-        # parsed = ((att.damage.split('d'), att) for att in src.attacks)
-        # by_dmg = ((avg_dmg(atup[0][0], atup[0][1]), atup[1]) for atup in parsed)
-        # att = max(by_dmg, 0)
-        dmg = 0
-        attack = None
-        for a in attacks:
-            parts = a.damage.split('d')
-            a_dmg = avg_dmg(int(parts[0]), int(parts[1]))
-            if a_dmg >= dmg:
-                dmg = a_dmg
-                attack = a
-        return attack
 
 def avg_dmg(n, q):
     return n * ((q+1)/2)
@@ -195,8 +170,18 @@ def test_choose_melee_attack():
     p1 = Peep(name='p1', hp=4, attacks=(Attack('teeth', damage='1d3'), Attack('punch', damage='2d3'), Attack('stab', damage='3d2')), body=create_body('humanoid'))
     m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'), Attack('shoot', damage='17d17', range=5), Attack('bite', damage='1d2'),), body=create_body('humanoid'))
     out = Out()
-    attack_dst(p1, m1, choose_melee_attack(p1), out)
-    attack = choose_melee_attack(p1)
+    # attack_dst(p1, m1, choose_melee_attack(p1), out)
+    attack = choose_attack(p1, True)
     assert attack.name == 'stab'
-    attack2 = choose_melee_attack(m1)
+    attack2 = choose_attack(m1, True)
     assert attack2.name == 'kick'
+
+def test_choose_ranged_attack():
+    p1 = Peep(name='p1', hp=4, attacks=(Attack('teeth', damage='1d3'), Attack('punch', damage='2d3'), Attack('stab', damage='3d2')), body=create_body('humanoid'))
+    m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'), Attack('shoot', damage='17d17', range=5), Attack('bite', damage='1d2'),), body=create_body('humanoid'))
+    out = Out()
+    # attack_dst(p1, m1, choose_melee_attack(p1), out)
+    # attack = choose_attack(p1, False)
+    # assert attack is None
+    attack2 = choose_attack(m1, False)
+    assert attack2.name == 'shoot'

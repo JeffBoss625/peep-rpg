@@ -1,4 +1,4 @@
-from lib.attack import attack_dst, choose_melee_attack
+from lib.attack import attack_dst, choose_attack
 from lib.peep_types import create_peep
 
 # x and y modifiers for each directions on keypad
@@ -105,14 +105,14 @@ def move_peep(game, peep, dst_pos):
 
     if dst:
         if peep.type == 'projectile':
-            src_attack = choose_melee_attack(peep)
+            src_attack = choose_attack(peep, True)
             if src_attack:
                 if attack_dst(peep, dst, src_attack, game):
                     # hit!
                     return True
         if peep != game.player:
             if dst == game.player:
-                src_attack = choose_melee_attack(peep)
+                src_attack = choose_attack(peep, True)
                 if src_attack:
                     if attack_dst(peep, dst, src_attack, game):
                         # hit!
@@ -126,7 +126,7 @@ def move_peep(game, peep, dst_pos):
             else:
                 return False # monster attacking monster
         else:
-            src_attack = choose_melee_attack(peep)
+            src_attack = choose_attack(peep, True)
             if src_attack:
                 if attack_dst(peep, dst, src_attack, game):
                     # hit!

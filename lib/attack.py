@@ -37,31 +37,20 @@ def choose_ranged_attack(src):
         i = random.randint(1, numattacks-1)
         return ranged_attacks[i]
 
-def choose_melee_attack(src):
-    numattacks = len(src.attacks)
-    attacks = []
-    for a in src.attacks:
-        if a.range > 0:
-            numattacks -= 1
-        else:
-            attacks.append(a)
-    if numattacks == 0:
-        return None
-    elif numattacks == 1:
-        return src.attacks[0]
+def choose_attack(src, mtrue): #mtrue means melee True or False, False is ranged
+    if mtrue:
+        attacks = list(a for a in src.attacks if a.range == 0)
     else:
-        # parsed = ((att.damage.split('d'), att) for att in src.attacks)
-        # by_dmg = ((avg_dmg(atup[0][0], atup[0][1]), atup[1]) for atup in parsed)
-        # att = max(by_dmg, 0)
-        dmg = 0
-        attack = None
-        for a in attacks:
-            parts = a.damage.split('d')
-            a_dmg = avg_dmg(int(parts[0]), int(parts[1]))
-            if a_dmg >= dmg:
-                dmg = a_dmg
-                attack = a
-        return attack
+        attacks = list(a for a in src.attacks if a.range > 0)
+    a_dmg = 0
+    attack = None
+    for a in attacks:
+        parts = a.damage.split('d')
+        d = avg_dmg(int(parts[0]), int(parts[1]))
+        if d > a_dmg:
+            a_dmg = d
+            attack = a
+    return attack
 
 def calc_hit(ac, thaco):
     chance = thaco - ac
