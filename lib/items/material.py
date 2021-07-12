@@ -2,7 +2,7 @@ import math
 from dataclasses import dataclass, field, astuple
 from typing import Tuple
 
-from lib.stat import HarmStats, PlayerStats
+from lib.stats import HarmStats, PlayerStats
 
 
 class MAT:
@@ -270,11 +270,12 @@ def calc_prot_layers(uexposure, nlayers):
 
 # return the extra stopping factor that results from combining layers
 #   nlayers: number of layers (unit size per material type)
-#   slow_compound: compounding factor of slowing a projectile
-#   slow_log_base: compounding logarithm rate. e.g. 1.5 will compound slowing for every 50% increase in thickness. 2
-#       will compound for every doubling of thickness
+#   compound: compounding factor of slowing a projectile
+#   log_base: compounding logarithm rate. e.g.
+#       1.5 compounds slowing for every 50% increase in thickness
+#       2.0 compounds for every doubling of thickness
 #   exponent: accelerates compounding to add more rapid asymptotic stopping of damage
-def stop_factor(nlayers, compound=0.98, log_base=1.5, exponent=2):
+def stop_factor(nlayers, compound=0.98, log_base=1.5, exponent=2.0):
     return (compound ** (math.log(nlayers, log_base))) ** (nlayers * exponent)
 
 # calculate the exposure of
