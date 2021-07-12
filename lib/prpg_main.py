@@ -1,6 +1,6 @@
 import lib.move as mlib
 from lib import dungeons
-from lib.attack import choose_ranged_attack
+from lib.attack import choose_ranged_attack, choose_attack
 from lib.calc import target_list
 from lib.constants import Key
 from lib.items import clothes
@@ -236,7 +236,7 @@ def monster_turn(control, monster):
     game = control.game_model
     mm = game.maze_model
     player = game.player
-    ranged_attack = choose_ranged_attack(monster)
+    ranged_attack = choose_attack(monster, False)
     if monster.type != 'projectile' \
             and ranged_attack is not None \
             and is_in_sight(monster, player.pos, mm.walls) \
