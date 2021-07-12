@@ -47,6 +47,13 @@ def choose_attack(src, mtrue): #mtrue means melee True or False, False is ranged
     for a in attacks:
         parts = a.damage.split('d')
         d = avg_dmg(int(parts[0]), int(parts[1]))
+        if d == a_dmg:
+            r = random.randint(1, 100)
+            if r > 50:
+                a_dmg = d
+                attack = a
+            else:
+                pass
         if d > a_dmg:
             a_dmg = d
             attack = a
