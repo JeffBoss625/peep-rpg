@@ -130,3 +130,19 @@ class EquipWindow(Window):
 
         self.write_lines(lines)
 
+class StatsWindow(Window):
+    def __init__(self, name, parent, **params):
+        super().__init__(name, parent, **params)
+
+    def handle_update_event(self, _model, _msg, **kwds):
+        key = kwds.get('key', '')
+        if key == 'pos':
+            return False
+        self.needs_paint = True
+
+    def do_paint(self):
+        p = self.model
+        lines = ['Stats']
+
+        self.write_lines(lines)
+

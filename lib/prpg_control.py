@@ -11,7 +11,6 @@ class WIN:
     MAZE = 'maze'
     MESSAGES = 'messages'
     ROOT = 'root'
-    LOG = 'log'
     BANNER = 'banner'
 
 #
@@ -33,13 +32,13 @@ class PrpgControl:
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
         center_col1.window(WIN.PLAYER, Con(30,10,30,10))
-        center_col1.window(WIN.EQUIP, Con(30,20,30,0))
+        center_col1.window(WIN.STATS, Con(30,20,30,0))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
         center_col2.window(WIN.BANNER, Con(maze_w,banner_h,0,banner_h))
         center_col2.window(WIN.MAZE, Con(maze_w,maze_h,0,0))
 
-        center.window(WIN.LOG, Con(10,6,0,0))
+        center.window(WIN.EQUIP, Con(10,6,0,0))
 
         # Bottom Row
         main_panel.window(WIN.MESSAGES, Con(30,6))
@@ -64,7 +63,7 @@ class PrpgControl:
     def set_model(self, game):
         self._win(WIN.BANNER).set_model(game.banner_model)
         self._win(WIN.MESSAGES).set_model(game.message_model)
-        self._win(WIN.LOG).set_model(game.log_model)
+        self._win(WIN.STATS).set_model(game.player)
         self._win(WIN.PLAYER).set_model(game.player)
         self._win(WIN.TITLE).set_model(game.player)
         self._win(WIN.EQUIP).set_model(game.player)
@@ -147,12 +146,12 @@ def init_windows(root_layout):
     win(WIN.TITLE).initwin(TitleWindow, trunc_y=SIDE.TOP)
     win(WIN.PLAYER).initwin(PlayerWindow)
     win(WIN.EQUIP).initwin(EquipWindow)
+    win(WIN.STATS).initwin(StatsWindow)
     win(WIN.MAZE).initwin(MazeWindow, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
     # standard windows
     win(WIN.BANNER).initwin(TextWindow, trunc_y=SIDE.TOP)
     win(WIN.MESSAGES).initwin(TextWindow, trunc_y=SIDE.TOP)
-    win(WIN.LOG).initwin(TextWindow, trunc_y=SIDE.TOP)
 
 
 # if __name__ == '__main__':
