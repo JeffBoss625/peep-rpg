@@ -60,7 +60,7 @@ class TitleWindow(Window):
             # age
         ])
 
-class StatsWindow(Window):
+class PlayerWindow(Window):
     def __init__(self, name, parent, **params):
         super().__init__(name, parent, **params)
 

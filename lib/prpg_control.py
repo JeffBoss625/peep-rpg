@@ -6,6 +6,7 @@ from lib.win_layout import Con, Orient
 class WIN:
     TITLE = 'title'
     STATS = 'stats'
+    PLAYER = 'player'
     EQUIP = 'equip'
     MAZE = 'maze'
     MESSAGES = 'messages'
@@ -31,7 +32,7 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(WIN.STATS, Con(30,10,30,10))
+        center_col1.window(WIN.PLAYER, Con(30,10,30,10))
         center_col1.window(WIN.EQUIP, Con(30,20,30,0))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
@@ -64,7 +65,7 @@ class PrpgControl:
         self._win(WIN.BANNER).set_model(game.banner_model)
         self._win(WIN.MESSAGES).set_model(game.message_model)
         self._win(WIN.LOG).set_model(game.log_model)
-        self._win(WIN.STATS).set_model(game.player)
+        self._win(WIN.PLAYER).set_model(game.player)
         self._win(WIN.TITLE).set_model(game.player)
         self._win(WIN.EQUIP).set_model(game.player)
         self._win(WIN.MAZE).set_model(game.maze_model)
@@ -144,7 +145,7 @@ def init_windows(root_layout):
 
     # custom windows
     win(WIN.TITLE).initwin(TitleWindow, trunc_y=SIDE.TOP)
-    win(WIN.STATS).initwin(StatsWindow)
+    win(WIN.PLAYER).initwin(PlayerWindow)
     win(WIN.EQUIP).initwin(EquipWindow)
     win(WIN.MAZE).initwin(MazeWindow, align_x=SIDE.CENTER, align_y=SIDE.CENTER)
 
