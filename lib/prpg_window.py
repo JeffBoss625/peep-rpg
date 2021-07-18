@@ -143,6 +143,13 @@ class StatsWindow(Window):
     def do_paint(self):
         p = self.model
         lines = ['Stats']
+        lines.append(' ')
+        lines.append(f'Str: {int(p.statscur.str * 100)} / {int(p.stats.str) * 100}       ')
+        lines.append(f'Int: {int(p.statscur.int * 100)} / {int(p.stats.int) * 100}       ')
+        lines.append(f'Wis: {int(p.statscur.wis * 100)} / {int(p.stats.wis) * 100}       ')
+        lines.append(f'Dex: {int(p.statscur.dex * 100)} / {int(p.stats.dex) * 100}       ')
+        lines.append(f'Con: {int(p.statscur.con * 100)} / {int(p.stats.con) * 100}       ')
+        lines.append(f'Cha: {int(p.statscur.cha * 100)} / {int(p.stats.cha) * 100}       ')
 
         self.write_lines(lines)
 

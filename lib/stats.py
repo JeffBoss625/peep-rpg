@@ -63,7 +63,7 @@ class HarmStats:
 
 
 @dataclass
-class PlayerStats:
+class Stats:
     # average strength lifting varies by training from lifting 80% of one's weight to almost 350% (a 4X difference)
     # strength varies by nature and by training and profession
     # 1.0 is strength of an average man who is active and lightly trained and can lift 1.5 x his weight.

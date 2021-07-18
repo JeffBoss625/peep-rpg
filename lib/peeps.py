@@ -1,12 +1,11 @@
 from dataclasses import dataclass, field, replace
 from typing import Tuple, List, Any
-
 from lib.body import Body
 from lib.constants import COLOR
 from lib.constants import GAME_SETTINGS
 from lib.model import DataModel, register_yaml, ModelList
 import math
-
+from lib.stats import Stats
 
 
 @dataclass
@@ -69,6 +68,8 @@ class Peep(DataModel):
     thaco: int = 20
     speed: float = 1.0
     ac: int = 10
+    statscur: Stats = field(default_factory=Stats)
+    stats: Stats = field(default_factory=Stats)
     height: int = 5
     move_tactic: str = 'hunt'
     _hunt_target: any = None

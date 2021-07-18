@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import Tuple, Dict, Any, List
-
 from lib.attack import AttackInfo
 from lib.body import create_body
 from lib.items import weapons
@@ -8,8 +7,8 @@ from lib.model import Size
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
 from lib.pclass import get_pclass, level_calc
+from lib.stats import roll_dice, Stats
 
-from lib.stats import roll_dice
 
 @dataclass
 class IntRange:
@@ -43,6 +42,8 @@ class PType:
     thaco: int = 0
     speed: float = 0
     ac: int = 0
+    statscur: Stats = field(default_factory=Stats)
+    stats: Stats = field(default_factory=Stats)
 
     # todo: separate move information for projectiles
     move_tactic: str = 'hunt'
@@ -502,6 +503,8 @@ def create_peep(
         thaco=pt.thaco,
         speed=pt.speed,
         ac=pt.ac,
+        statscur=pt.stats,
+        stats=pt.stats,
         height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,

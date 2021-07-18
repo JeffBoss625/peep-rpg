@@ -31,7 +31,7 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(WIN.PLAYER, Con(30,10,30,10))
+        center_col1.window(WIN.PLAYER, Con(30,15,30,15))
         center_col1.window(WIN.STATS, Con(30,20,30,0))
 
         center_col2 = center.panel('center_col2', Orient.VERT, None)
