@@ -360,6 +360,21 @@ MONSTERS = [
         move_tactic='pos_path',
     ),
     PType(
+        name='righteous_arrow',
+        char='-',
+        type='projectile',
+        fgcolor=COLOR.YELLOW,
+        bgcolor=COLOR.BLACK,
+        hitdice='1d5',
+        thaco=20,
+        speed=10.0,
+        ac=-10,
+        gold='0d1',
+        attacks=(
+        ),
+        move_tactic='pos_path',
+    ),
+    PType(
         name='air_strike',
         char='§',
         type='projectile',

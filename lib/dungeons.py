@@ -8,6 +8,7 @@ from lib.items.item import Item
 import lib.items.weapons as weapons
 import lib.items.clothes as clothes
 import lib.items.armor as armor
+from lib.peeps import Attack
 
 DUNGEONS = {
     'dungeon1': {
@@ -135,7 +136,7 @@ DUNGEONS = {
         'items': [
             weapons.sword(name="sword_of_justice", size=Size(1.2,1.1,1.0), attack=AttackInfo('righteous_slice', '5d3'), pos=(10, 3)),
             armor.shield(name="shield_of_justice", size=Size(1.1, 1.1, 1.1), pos=(11, 3)),
-            Item("bow_of_justice", char='}', size=Size(3, 5, 4), pos=(9, 3)),
+            weapons.bow(name="bow_of_justice", size=Size(1.2, 1.1, 1), attack=Attack('righteous_arrow', '5d4', speed=0.7, range=20, blowback=100), pos=(9, 3)),
             armor.helm(name="helm_of_justice", size=Size(1.1,1.1,1.1), pos=(10, 4)),
             Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
             armor.boots(name="boots_of_justice", size=Size(1.1,1.1,1.1), pos=(12, 4)),
