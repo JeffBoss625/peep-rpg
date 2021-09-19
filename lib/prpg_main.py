@@ -63,7 +63,7 @@ def do_player_turn(control, input_key):
         else:
             game.message("You have nothing in range to brain-swap with")
     elif input_key == 'a':
-        attack = choose_ranged_attack(player)
+        attack = choose_attack(player, False)
         if attack:
             player_aim(attack, control)
         else:
