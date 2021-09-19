@@ -1,6 +1,5 @@
 import random
 from dataclasses import dataclass
-
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
 from lib.stats import calc_pct

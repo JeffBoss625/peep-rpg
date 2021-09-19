@@ -48,9 +48,9 @@ class MazeModel(DataModel):
     def items_at(self, pos, everything=True):
         c = self.walls.char_at(*pos)
         name = ''
-        if c == '<':
+        if c == GAME_SETTINGS.CHARS.STAIR_UP:
             name = 'stairs going up'
-        elif c == '>':
+        elif c == GAME_SETTINGS.CHARS.STAIR_DOWN:
             name = 'stairs going down'
         if c == '1':
             name = 'shop 1'
@@ -252,5 +252,5 @@ def drop_stuff(game_model, peep):
     for item in peep.stuff:
         game_model.maze_model.items.append(item)
         item.pos = peep.pos
-    game_model.maze_model.items.append(Item("gold", '$', amount=peep.gold, pos=peep.pos))
+    game_model.maze_model.items.append(Item("gold", GAME_SETTINGS.CHARS.MONEY, amount=peep.gold, pos=peep.pos))
     game_model.maze_model.items.append(Item(f'{peep.name} corpse', '†', pos=peep.pos))

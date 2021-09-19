@@ -32,6 +32,28 @@ class COLOR:
     WHITE = 'white'
     YELLOW = 'yellow'
 
+class ASCII_CHARS:
+    MONEY = '$'
+    SWORD = '|'
+    BOW = '{'
+    ARROW = '-'
+    FIRE = '*'
+    SHIELD = ''
+    BOOTS = ''
+    STAIR_UP = '<'
+    STAIR_DOWN = '>'
+
+class FANCY_CHARS:
+    MONEY = '¢'
+    SWORD = '|'
+    BOW = '{'
+    ARROW = '→'
+    FIRE = '☼'
+    SHIELD = 'Θ'
+    BOOTS = '╚'
+    STAIR_UP = '<'
+    STAIR_DOWN = '>'
+
 class SIDE:
     TOP = 'TOP'
     LEFT = 'LEFT'
@@ -54,3 +76,4 @@ class GAME_SETTINGS:
     BASE_EXP_TO_LEVEL = 100.00   # base xp is 100 to level 2
     LEVEL_UP_FACTOR =     2.00   # Altered by other factors
     BASE_KILL_EXP =     1.00   # basic experience for killing a monster (before modifications)
+    CHARS = ASCII_CHARS

@@ -1,6 +1,6 @@
 import lib.move as mlib
 from lib import dungeons
-from lib.attack import choose_ranged_attack, choose_attack
+from lib.attack import choose_attack
 from lib.calc import target_list
 from lib.constants import Key
 from lib.items import clothes
@@ -11,7 +11,7 @@ import sys
 import signal
 from lib.calc import distance
 from lib.prpg_control import PrpgControl
-
+from lib.constants import GAME_SETTINGS
 from lib.target import line_points
 
 DIRECTION_KEYS = {
@@ -71,13 +71,13 @@ def do_player_turn(control, input_key):
         return input_key
     elif input_key == '>':
 
-        if mm.char_at(*player.pos) == '>':
+        if mm.char_at(*player.pos) == GAME_SETTINGS.CHARS.STAIR_DOWN:
             return input_key
         else:
             game.message(f'you are not standing at a down staircase')
 
     elif input_key == '<':
-        if mm.char_at(*player.pos) == '<':
+        if mm.char_at(*player.pos) == GAME_SETTINGS.CHARS.STAIR_UP:
             return input_key
         else:
             game.message(f'you are not standing at an up staircase')
@@ -391,9 +391,9 @@ def main(root_layout, game, get_key=None):
         if res == 'quit' or res == 'player_died':
             return 0
         elif res == 'down_level':
-            control.game_model.goto_level(control.game_model.maze_model.level + 1, '<')
+            control.game_model.goto_level(control.game_model.maze_model.level + 1, GAME_SETTINGS.CHARS.STAIR_UP)
         elif res == 'up_level':
-            control.game_model.goto_level(control.game_model.maze_model.level - 1, '>')
+            control.game_model.goto_level(control.game_model.maze_model.level - 1, GAME_SETTINGS.CHARS.STAIR_DOWN)
 
         control.game_model.maze_model.elapse_time()
 

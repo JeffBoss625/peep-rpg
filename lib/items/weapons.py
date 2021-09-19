@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from lib.constants import GAME_SETTINGS
 from lib.attack import AttackInfo
 from lib.model import Size
 from lib.items.item import Item, FitInfo
@@ -10,7 +10,7 @@ AVERAGE_SWORD_WEIGHT = 3 / 65
 @dataclass
 class Sword(Item):
     name: str = 'sword'
-    char: str = '/'
+    char: str = GAME_SETTINGS.CHARS.SWORD
     fit_info: FitInfo = FitInfo('held', 'held', 'hand', ('dom',))
 
 # depth is the thickness of the sword.
@@ -31,7 +31,7 @@ AVERAGE_BOW_WEIGHT = 2 / 65
 @dataclass
 class Bow(Item):
     name: str = 'bow'
-    char: str = '{'
+    char: str = GAME_SETTINGS.CHARS.BOW
     fit_info: FitInfo = FitInfo('held', 'held', 'hand', ('dom',))
 
 def bow(size=Size(1.0,1.0,1.0), attack=AttackInfo('shot', '1d1', range=10), **params):
