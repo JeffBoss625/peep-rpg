@@ -66,7 +66,7 @@ class PrpgControl:
         self._win(WIN.STATS).set_model(game)
         self._win(WIN.PLAYER).set_model(game)
         self._win(WIN.TITLE).set_model(game.player)
-        self._win(WIN.EQUIP).set_model(game.player)
+        self._win(WIN.EQUIP).set_model(game)
         self._win(WIN.MAZE).set_model(game.maze_model)
 
         def handle_game_update(model, _etype, **kargs):
