@@ -58,7 +58,7 @@ def do_player_turn(control, input_key):
         if len(morph_peeps) > 1:
             while game.player == player:
                 player = morph_peeps[random.randint(0, len(morph_peeps) - 1)]
-            game.player = player #todo: update stats window
+            game.set_player(player)
             game.message("You are now " + player.name)
         else:
             game.message("You have nothing in range to brain-swap with")

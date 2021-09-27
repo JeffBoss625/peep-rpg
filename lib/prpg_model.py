@@ -239,7 +239,6 @@ class GameModel(DataModel):
             self.goto_level(self.maze_model.level, placement)
 
         self.player = peep
-        peep.publish_update(None, peep)
 
     def monster_killed(self, src, src_attack, dst):
         self.message(f"{dst.name} has died to the {src.name}'s {src_attack.name}!")
