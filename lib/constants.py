@@ -38,8 +38,10 @@ class ASCII_CHARS:
     BOW = '{'
     ARROW = '-'
     FIRE = '*'
-    SHIELD = ''
-    BOOTS = ''
+    SHIELD = '0'
+    BOOT = '='
+    GAUNTLETS = '"'
+    CHESTPLATE = '+'
     STAIR_UP = '<'
     STAIR_DOWN = '>'
 
@@ -50,7 +52,9 @@ class FANCY_CHARS:
     ARROW = '→'
     FIRE = '☼'
     SHIELD = 'Θ'
-    BOOTS = '╚'
+    BOOT = '╚'
+    GAUNTLETS = ''
+    CHESTPLATE = ''
     STAIR_UP = '<'
     STAIR_DOWN = '>'
 

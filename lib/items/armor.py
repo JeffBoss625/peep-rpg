@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from lib.constants import GAME_SETTINGS
 from lib.items.item import Item, FitInfo
 from lib.model import register_yaml, Size
 
@@ -51,7 +52,7 @@ def helm(size=Size(1.0,1.0,1.0), thick=1.0, **params):
 @dataclass
 class Boots(Item):
     name: str = 'boots'
-    char: str = '['
+    char: str = GAME_SETTINGS.CHARS.BOOT
     fit_info: FitInfo = FitInfo('cover', 'fitted', 'foot')
 
 # height relates to foot length
@@ -67,9 +68,10 @@ def boots(size=Size(1.0,1.0,1.0), thick=1.0, **params):
 @dataclass
 class Shield(Item):
     name: str = 'shield'
-    char: str = ')'
+    char: str = GAME_SETTINGS.CHARS.SHIELD
     fit_info: FitInfo = FitInfo('held', 'held', 'hand', ('subdom',))
     shape = 'round'
+
 
 
 # shield width and height is expressed relative to average human male height (175 cm, about 5ft 9 inches).
@@ -119,6 +121,46 @@ def shield(size=Size(1.0,1.0,1.0), thick=1.0, **params):
 
 register_yaml((Helm,Shield))
 
+AVERAGE_GAUNTLETS_SIZE = Size(0.133, 0.10, 0.09)
+AVERAGE_GAUNTLETS_THICK = 0.5 / 175
+AVERAGE_GAUNTLETS_WEIGHT = 3 / 65
+
+@dataclass
+class Gauntlets(Item):
+    name: str = 'gauntlets'
+    char: str = GAME_SETTINGS.CHARS.GAUNTLETS
+    fit_info: FitInfo = FitInfo('cover', 'fitted', 'hand')
+
+def gauntlets(size=Size(1.0,1.0,1.0), thick=1.0, **params):
+    ret = Gauntlets(**params)
+    ret.size = AVERAGE_GAUNTLETS_SIZE.copy(size.h, size.w, size.d)
+    ret.thick = thick * AVERAGE_GAUNTLETS_THICK
+    vol = ret.size.h * ret.size.w * ret.thick   # todo: factor in curvature of shield (d)
+    avol = AVERAGE_GAUNTLETS_THICK * AVERAGE_GAUNTLETS_SIZE.cover_area()
+    ret.weight = AVERAGE_GAUNTLETS_WEIGHT * (vol/avol)
+    return ret
+
+
+AVERAGE_CHESTPLATE_SIZE = Size(0.133, 0.10, 0.09)
+AVERAGE_CHESTPLATE_THICK = 0.5 / 175
+AVERAGE_CHESTPLATE_WEIGHT = 3 / 65
+
+
+@dataclass
+class Chestplate(Item):
+    name: str = 'chestplate'
+    char: str = GAME_SETTINGS.CHARS.CHESTPLATE
+    fit_info: FitInfo = FitInfo('cover', 'fitted', 'torso')
+
+
+def chestplate(size=Size(1.0, 1.0, 1.0), thick=1.0, **params):
+    ret = Chestplate(**params)
+    ret.size = AVERAGE_CHESTPLATE_SIZE.copy(size.h, size.w, size.d)
+    ret.thick = thick * AVERAGE_CHESTPLATE_THICK
+    vol = ret.size.h * ret.size.w * ret.thick  # todo: factor in curvature of shield (d)
+    avol = AVERAGE_CHESTPLATE_THICK * AVERAGE_CHESTPLATE_SIZE.cover_area()
+    ret.weight = AVERAGE_CHESTPLATE_WEIGHT * (vol / avol)
+    return ret
 # if __name__ == '__main__':
 # s = Shield(layers=(Layer('iron', 'plate', 2), Layer('oak', 'plate', 10)))
 # print(yaml.dump(s, sort_keys=False))

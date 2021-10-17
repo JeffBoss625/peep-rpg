@@ -138,10 +138,10 @@ DUNGEONS = {
             armor.shield(name="shield_of_justice", size=Size(1.1, 1.1, 1.1), pos=(11, 3)),
             weapons.bow(name="bow_of_justice", size=Size(1.2, 1.1, 1), attack=Attack('righteous_arrow', '5d4', speed=0.7, range=20, blowback=100), pos=(9, 3)),
             armor.helm(name="helm_of_justice", size=Size(1.1,1.1,1.1), pos=(10, 4)),
-            Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
+            armor.chestplate(name="chestplate_of_justice", size=Size(1.1,1.1,1.1), pos=(11, 4)),
             armor.boots(name="boots_of_justice", size=Size(1.1,1.1,1.1), pos=(12, 4)),
             Item("leggings_of_justice", '=', Size(3, 5, 4), 10, '', pos=(9, 4)),
-            Item("gloves_of_justice", '"', Size(3, 5, 4), 10, '', pos=(8, 4)),
+            armor.gauntlets(name="gloves_of_justice", size=Size(1.1,1.1,1.1), pos=(8, 4)),
             Item("robes_of_justice", '(', Size(3, 5, 4), 10, '', pos=(10, 5)),
         ]
     },
