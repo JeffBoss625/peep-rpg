@@ -2,6 +2,7 @@ import random
 from dataclasses import dataclass
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
+from lib.pclass import pability_by_name
 from lib.stats import calc_pct
 
 @dataclass
@@ -79,15 +80,24 @@ def attack_dst(src, dst, src_attack, game):
                 game.monster_killed(src, src_attack, dst)
         else:
             game.message(f'{dst.name} has {round(dst.hp)} points.')
+            for p in dst.pclass.pabilities:
+                p = pability_by_name(p.name)
+                if p.levelreq == dst.level and dst.hp <= p.healthreq * dst.maxhp:
+                    dst.pclass.apabilities.append(p)
+                    copypab = []
+                    for d in dst.pclass.pabilities:
+                        if d != p:
+                            copypab.append(d)
+                    dst.pclass.pabilities = copypab
+                    if dst == game.player:
+                        game.message(f'You have activated the {p.name} passive ability')
+                    else:
+                        game.message(f'{dst.name} has activated its passive ability: {p.name}')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:
                 game.message(f'  {src.name} is destroyed')
             if src.hp >= src.maxhp: src.hp = src.maxhp
-            # else:
-            #     todo: convert arrow into item
-                # src.speed = 0   # todo: remove remaining moves in turn_seq
-                # src.attacks = ()
     else:
         game.message(f'{src.name} missed {dst.name}.')
         return False

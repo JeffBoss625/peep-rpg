@@ -32,6 +32,7 @@ class PType:
     regen_fac: float = 1.0
     skill: float = 1.0
     height: int = 5
+    pclass: str = 'FIGHTER'
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level
@@ -527,6 +528,7 @@ def create_peep(
         move_tactic=pt.move_tactic,
         shooter=shooter,
         gold=gold,
+        pclass=pc,
     )
     if pt.stuff:
         ret.stuff.extend(pt.stuff)

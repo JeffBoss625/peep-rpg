@@ -68,6 +68,7 @@ class Peep(DataModel):
     thaco: int = 20
     speed: float = 1.0
     ac: int = 10
+    pclass: str = 'FIGHTER'
     statscur: Stats = field(default_factory=Stats)
     stats: Stats = field(default_factory=Stats)
     height: int = 5

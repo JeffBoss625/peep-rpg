@@ -10,6 +10,7 @@ import random
 import sys
 import signal
 from lib.calc import distance
+from lib.pclass import PABILITIES_BY_NAME, pability_by_name
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -44,6 +45,26 @@ def do_player_turn(control, input_key):
     game = control.game_model
     mm = game.maze_model
     player = game.player
+    for p in player.pclass.pabilities:
+        p = pability_by_name(p.name)
+        if p.levelreq == player.level and player.hp <= p.healthreq * player.maxhp:
+            player.pclass.apabilities.append(p)
+            copypab = []
+            for d in player.pclass.pabilities:
+                if d != p:
+                    copypab.append(d)
+            player.pclass.pabilities = copypab
+            game.message(f'You have activated the {p.name} passive ability')
+    for a in player.pclass.apabilities:
+        a = pability_by_name(a.name)
+        if player.hp > a.healthreq * player.maxhp:
+            player.pclass.pabilities.append(a)
+            copyapab = []
+            for d in player.pclass.apabilities:
+                if d != a:
+                    copyapab.append(a)
+            player.pclass.apabilities = copyapab
+            game.message(f"You're passive ability {a.name} has been deactivated")
     if input_key in DIRECTION_KEYS:
         dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
         if mlib.move_peep(game, game.player, dst_pos):
