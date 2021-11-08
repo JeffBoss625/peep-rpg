@@ -77,7 +77,9 @@ class Peep(DataModel):
     direct: int = -1
     pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
     pos_i = 0
-
+    pabilities: List[Any] = field(default_factory=list)
+    aabilities:List[Any] = field(default_factory=list)
+    states: List[Any] = field(default_factory=list)
     hp: int = 0
     regen_fac: float = 1.0
     exp: int = 1

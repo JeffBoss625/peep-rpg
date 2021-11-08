@@ -1,3 +1,4 @@
+from lib.pclass import peep_acquire_abilities, activate_pability
 from lib.peep_types import create_peep
 import yaml
 
@@ -19,6 +20,13 @@ def monster_by_name(name, pos=(0,0), maxhp=0):
         ret.hp = maxhp
     ret.hp = ret.maxhp
     ret.pos = pos
+    n = 0
+    while n <= ret.level:
+        peep_acquire_abilities(ret, n)
+        n += 1
+    for p in ret.pabilities:
+        activate_pability(ret, p)
+
     return ret
 
 def color_rep(dumper, data):

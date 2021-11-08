@@ -72,6 +72,11 @@ def attack_dst(src, dst, src_attack, game):
         tot_hp_loss *= dmg_multiplier[0]
         game.message(f'The {dst.name} was hit in the {dmg_multiplier[1]}')
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
+        if src.states:
+            for s in src.states:
+                if s.dmgboost:
+                    tot_hp_loss *= s.dmgboost
+                    game.message(f'You have attacked with multiplied damage because of your {s.name} ability')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
             if src.shooter:
@@ -80,19 +85,6 @@ def attack_dst(src, dst, src_attack, game):
                 game.monster_killed(src, src_attack, dst)
         else:
             game.message(f'{dst.name} has {round(dst.hp)} points.')
-            for p in dst.pclass.pabilities:
-                p = pability_by_name(p.name)
-                if p.levelreq == dst.level and dst.hp <= p.healthreq * dst.maxhp:
-                    dst.pclass.apabilities.append(p)
-                    copypab = []
-                    for d in dst.pclass.pabilities:
-                        if d != p:
-                            copypab.append(d)
-                    dst.pclass.pabilities = copypab
-                    if dst == game.player:
-                        game.message(f'You have activated the {p.name} passive ability')
-                    else:
-                        game.message(f'{dst.name} has activated its passive ability: {p.name}')
         if src_attack.blowback != 0:
             src.hp = int(src.hp - src_attack.blowback * tot_hp_loss)
             if src.hp <= 0:

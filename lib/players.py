@@ -1,3 +1,4 @@
+from lib.pclass import peep_acquire_abilities
 from lib.peep_types import create_peep
 
 _PEEPS = [
@@ -13,6 +14,10 @@ def player_by_name(name, pos=(0,0), maxhp=0):
         ret.maxhp = maxhp
     ret.hp = ret.maxhp
     ret.pos = pos
+    n = 0
+    while n <= ret.level:
+        peep_acquire_abilities(ret, n)
+        n += 1
     return ret
 
 
