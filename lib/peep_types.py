@@ -533,8 +533,12 @@ def create_peep(
     return ret
 
 
-if __name__ == '__main__':
+def test_out():
     for name in PTYPES_BY_NAME:
         p = create_peep(name)
         print(p)
         # print(yaml.dump(m, sort_keys=False, default_flow_style=False))
+
+
+if __name__ == '__main__':
+    test_out
