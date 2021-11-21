@@ -34,7 +34,7 @@ PCLASSES = [
         regen_factor=1.0,
         hitdicefac=1.0,
         abilitiesbylevel=[
-            [], #Level zero abilities
+            [Ability(name='charge', isactive=True)], #Level zero abilities
             [Ability(name='rage', isactive=False)],
         ],
         states=[],
@@ -47,43 +47,67 @@ class Pability:
     state: str = ''
     duration: int = 1
     healthreq: float = 1.0    #Percent health left required to activate
-    levelreq: int = 1         #Level required to use ability
+
+@dataclass
+class Ability:
+    name: str = ''
+    state: str = ''
+    duration: int = 1
+    healthreq: float = 1.0
+    cooldown: int = 1
+    halt_hit: bool = False
 
 @dataclass
 class PeepState:
     name: str = ''
     duration: float = 1.0
+
+
+@dataclass
+class PeepCharging (PeepState):
+    name: str = 'charging'
+    duration: float = 30
     dmgboost: float = 1.0     #Percent dmg boost
     hpboost: float = 1.0      #Percent hp boost
     speedboost: float = 0.1   #Percent speed boost
+    maxcompounded: int = 5
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
 
+@dataclass
+class PeepEnraged (PeepState):
+    dmgboost: float = 1.0     #Percent dmg boost
+    hpboost: float = 1.0      #Percent hp boost
+    speedboost: float = 0.1   #Percent speed boost
+    path: bool = False
+    num_mult: int = 0
 
-PEEPSTATES = [
-    PeepState(
-        name='Enraged',
-        dmgboost=1.5,
-        speedboost=.1,
+ABILITIES = [
+    Ability(
+        name='charge',
+        state='charging',
+        duration=30,
+        cooldown=7,
+        halt_hit=True,
     )
 ]
-
 
 PABILITIES = [
     Pability(
         name='rage',
-        state='Enraged',
+        state='enraged',
         duration=3,
         healthreq=0.25,
-        levelreq=1,
     ),
     Pability(
         name='sp_adr',
         state='Adr_Pump',
         healthreq=0.1,
-        levelreq=3,
     ),
 ]
 
-
+ABILITIES_BY_NAME = {i.name:i for i in ABILITIES}
 PABILITIES_BY_NAME = {i.name:i for i in PABILITIES}
 
 def pability_by_name(name):
@@ -91,7 +115,10 @@ def pability_by_name(name):
 
 PCLASSES_BY_NAME = {m.name:m for m in PCLASSES}
 
-PEEPSTATES_BY_NAME = {m.name:m for m in PEEPSTATES}
+STATECLASSES_BY_NAME = {
+    'enraged': PeepEnraged,
+    'charging': PeepCharging,
+}
 
 def xptolevel_calc(level, factor, base):
     ret = 0
@@ -122,36 +149,68 @@ def peep_acquire_abilities(src, lvl):
     for ability in abilities:
         if ability:
             if ability.isactive:
-                src.aabilities.append(ability)
+                src.aabilities.append(ABILITIES_BY_NAME[ability.name])
             else:
                 src.pabilities.append(PABILITIES_BY_NAME[ability.name])
 
 def activate_pability(peep, pability):
+    state = STATECLASSES_BY_NAME[pability.state]()
     if peep.hp <= pability.healthreq * peep.maxhp:
         if peep.states:
             for s in peep.states:
                 if s.name == pability.state:
                     if s.duration <= pability.duration:
-                        peep.states.remove(s)
-                        state = PEEPSTATES_BY_NAME[pability.state]
-                        state.duration = pability.duration
-                        peep.states.append(state)
-                        peep.speed = peep.speed + state.speedboost
+                        if s.compounded < s.maxcompounded:
+                            state.duration = pability.duration
+                            peep.speed = peep.speed - s.speedboost
+                            s.speedboost += state.speedboost
+                            s.dmgboost = s.dmgboost + (state.dmgboost - 1)
+                            peep.speed = peep.speed + s.speedboost
+                        else:
+                            state.duration = pability.duration
                 else:
-                    state = PEEPSTATES_BY_NAME[pability.state]
                     state.duration = pability.duration
                     peep.states.append(state)
                     peep.speed = peep.speed + state.speedboost
+                    break
         else:
-            state = PEEPSTATES_BY_NAME[pability.state]
             state.duration = pability.duration
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
 
+# todo: Make states into dictionary
+
+def activate_ability(peep, ability):
+    state = STATECLASSES_BY_NAME[ability.state]()
+    if peep.hp <= ability.healthreq * peep.maxhp:
+        if peep.states:
+            for s in peep.states:
+                if s.name == ability.state:
+                    if s.duration <= ability.duration:
+                        if s.compounded < s.maxcompounded - 1:
+                            s.compounded += 1
+                            state.duration = ability.duration
+                            peep.speed = peep.speed - s.speedboost
+                            s.speedboost += state.speedboost
+                            s.dmgboost = s.dmgboost + (state.dmgboost - 1)
+                            peep.speed = peep.speed + s.speedboost
+                        else:
+                            state.duration = ability.duration
+                else:
+                    state.duration = ability.duration
+                    peep.states.append(state)
+                    peep.speed = peep.speed + state.speedboost
+                    break
+        else:
+            state.duration = ability.duration
+            peep.states.append(state)
+            peep.speed = peep.speed + state.speedboost
 
 def check_states(peep, state, inc):
     state.duration -= inc
     if state.duration <= 0:
-        peep.states.remove(state)
-        peep.speed = peep.speed - state.speedboost
+        remove_state(peep, state)
 
+def remove_state(peep, state):
+    peep.states.remove(state)
+    peep.speed = peep.speed - state.speedboost

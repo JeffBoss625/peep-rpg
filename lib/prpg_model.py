@@ -161,7 +161,9 @@ def _elapse_time(peeps, add_tics):
         if p.speed > 0:
             if p.hp <= 0:
                 continue
-            if add_tics is True: p._tics = round(p._tics + inc, 5)
+            if add_tics:
+                p._tics = round(p._tics + inc, 5)
+                p._age += inc
             thresh = 1/p.speed
             if p._tics >= thresh:
                 ret.append(p)
@@ -169,15 +171,14 @@ def _elapse_time(peeps, add_tics):
     return ret
 
 def handle_passing_time(peep, inc):
-    if peep.hp == peep.maxhp or peep.hp <= 0:
-        return
     for p in peep.pabilities:
         activate_pability(peep, p)
     for s in peep.states:
         check_states(peep, s, inc)
-    amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
-    hp = peep.hp + amount_heal * inc
-    peep.hp = min(hp, peep.maxhp)
+    if peep.maxhp > peep.hp > 0:
+        amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
+        hp = peep.hp + amount_heal * inc
+        peep.hp = min(hp, peep.maxhp)
 
 @dataclass
 class Logger:

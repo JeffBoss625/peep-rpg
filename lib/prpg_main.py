@@ -10,7 +10,7 @@ import random
 import sys
 import signal
 from lib.calc import distance
-from lib.pclass import PABILITIES_BY_NAME, pability_by_name
+from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -63,6 +63,14 @@ def do_player_turn(control, input_key):
             game.message("You are now " + player.name)
         else:
             game.message("You have nothing in range to brain-swap with")
+    elif input_key == 'A':
+        if player.aabilities:
+            game.banner(['choose an ability to use'])
+            ability = control.choose_item('What ability will you use', player.aabilities)
+            activate_ability(player, ability)
+        else:
+            game.message('No ability to activate')
+
     elif input_key == 'a':
         attack = choose_attack(player, False)
         if attack:

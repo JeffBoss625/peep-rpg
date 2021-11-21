@@ -2,7 +2,7 @@ import random
 from dataclasses import dataclass
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
-from lib.pclass import pability_by_name
+from lib.pclass import pability_by_name, remove_state, STATECLASSES_BY_NAME
 from lib.stats import calc_pct
 
 @dataclass
@@ -78,6 +78,19 @@ def attack_dst(src, dst, src_attack, game):
                     tot_hp_loss *= s.dmgboost
                     game.message(f'You have attacked with multiplied damage because of your {s.name} ability')
         dst.hp = dst.hp - tot_hp_loss
+        if src.aabilities:
+            for a in src.aabilities:
+                if a.halt_hit is True:
+                    state = STATECLASSES_BY_NAME[a.state]
+                    states = []
+                    for s in src.states:
+                        if s.name != state.name:
+                            states.append(s)
+                        else:
+                            game.message(f"You're {a.name} has been deactivated because you hit an enemy")
+                            src.states = states
+                            src.speed = src.speed - s.speedboost
+                    src.states = states
         if dst.hp <= 0:
             if src.shooter:
                 game.monster_killed(src.shooter, src_attack, dst)
