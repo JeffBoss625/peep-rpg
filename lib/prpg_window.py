@@ -69,7 +69,7 @@ class PlayerWindow(Window):
             self.needs_paint = True
 
     def do_paint(self):
-        p = self.model  # player
+        p = self.model.player  # player
 
         # x = 0
         # y = 0
@@ -106,12 +106,12 @@ class EquipWindow(Window):
 
     def handle_update_event(self, _model, _msg, **kwds):
         key = kwds.get('key', '')
-        if key == 'pos':
+        if key != 'set_player':
             return False
         self.needs_paint = True
 
     def do_paint(self):
-        p = self.model
+        p = self.model.player
         lines = ['Wearing']
         item_tuples = p.body.item_tuples()
         if item_tuples:
@@ -136,12 +136,12 @@ class StatsWindow(Window):
 
     def handle_update_event(self, _model, _msg, **kwds):
         key = kwds.get('key', '')
-        if key == 'pos':
+        if key != 'set_player':
             return False
         self.needs_paint = True
 
     def do_paint(self):
-        p = self.model
+        p = self.model.player
         lines = ['Stats']
         lines.append(' ')
         lines.append(f'Str: {int(p.statscur.str * 100)} / {int(p.stats.str) * 100}       ')

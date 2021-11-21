@@ -6,7 +6,7 @@ from lib.items import weapons
 from lib.model import Size
 from lib.peeps import Peep, Attack
 from lib.constants import COLOR, GAME_SETTINGS
-from lib.pclass import get_pclass, level_calc
+from lib.pclass import get_pclass, level_calc, peep_acquire_abilities
 from lib.stats import roll_dice, Stats
 
 
@@ -32,6 +32,7 @@ class PType:
     regen_fac: float = 1.0
     skill: float = 1.0
     height: int = 5
+    pclass: str = 'FIGHTER'
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level
@@ -44,6 +45,9 @@ class PType:
     ac: int = 0
     statscur: Stats = field(default_factory=Stats)
     stats: Stats = field(default_factory=Stats)
+    pabilities: List[Any] = field(default_factory=list)
+    aabilities:List[Any] = field(default_factory=list)
+    states: List[Any] = field(default_factory=list)
 
     # todo: separate move information for projectiles
     move_tactic: str = 'hunt'
@@ -523,13 +527,21 @@ def create_peep(
         height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
+        pabilities=[],
+        aabilities=[],
+        states=[],
         body=create_body('humanoid', height, weight, head2body=head2body),
         move_tactic=pt.move_tactic,
         shooter=shooter,
         gold=gold,
+        pclass=pc,
     )
     if pt.stuff:
         ret.stuff.extend(pt.stuff)
+    n = 0
+    while n <= ret.level:
+        peep_acquire_abilities(ret, n)
+        n += 1
     return ret
 
 

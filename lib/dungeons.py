@@ -42,8 +42,8 @@ DUNGEONS = {
             monster_by_name('Spark', pos=(24,7), maxhp=50),
             monster_by_name('Brog', pos=(14,20), maxhp=200),
             monster_by_name('Crystal', pos=(36, 17), maxhp=500),
-            create_peep('big bird', name='Beaky', pos=(18,4)),
-            create_peep('giant rat', name='Scriggle', pos=(19,4)),
+            # create_peep('big bird', name='Beaky', pos=(18,4)),
+            # create_peep('giant rat', name='Scriggle', pos=(19,4)),
         ],
         'items': [
             clothes.belt(pos=(1,1))
@@ -52,7 +52,7 @@ DUNGEONS = {
     'level_0':{
         'walls': [
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
-            '%.........................↓........................%',
+            '%.........................>........................%',
             '%......#####...#####.............#####...#####.....%',
             '%.....######...######...........######...######....%',
             '%.....######...#####2...........5#####...#####6....%',
@@ -90,16 +90,17 @@ DUNGEONS = {
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%',
         ],
         'peeps': [
-            # create_peep('giant rat', name='Scraggle', pos=(24, 1)),
-            # create_peep('giant rat', name='Scriggy', pos=(24, 1)),
-            # create_peep('giant rat', name='Scritch', pos=(24, 2)),
-            # create_peep('giant rat', name='Wriggle', pos=(25, 2)),
-            # create_peep('giant rat', name='Scatter', pos=(24, 3)),
-            # create_peep('giant rat', name='Skitter', pos=(25, 3)),
-            # create_peep('giant rat', name='Skreet', pos=(24, 4)),
-            # create_peep('giant rat', name='Squeak', pos=(25, 4)),
-            # create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
-            create_peep('queen mosquito', name='Queen Bzzz the Bzzzt', pos=(25, 1)),
+            # player_by_name('Super Dad', pos=(1, 2), maxhp=40),
+            create_peep('giant rat', name='Scraggle', pos=(24, 1)),
+            create_peep('giant rat', name='Scriggy', pos=(24, 1)),
+            create_peep('giant rat', name='Scritch', pos=(24, 2)),
+            create_peep('giant rat', name='Wriggle', pos=(25, 2)),
+            create_peep('giant rat', name='Scatter', pos=(24, 3)),
+            create_peep('giant rat', name='Skitter', pos=(25, 3)),
+            create_peep('giant rat', name='Skreet', pos=(24, 4)),
+            create_peep('giant rat', name='Squeak', pos=(25, 4)),
+            create_peep('giant rat leader', name='Pipsqueak', pos=(14, 13)),
+            # create_peep('queen mosquito', name='Queen Bzzz the Bzzzt', pos=(25, 1)),
         ],
         'items': [
             clothes.belt(name='leather belt', pos=(4,3)),
@@ -138,10 +139,10 @@ DUNGEONS = {
             armor.shield(name="shield_of_justice", size=Size(1.1, 1.1, 1.1), pos=(11, 3)),
             weapons.bow(name="bow_of_justice", size=Size(1.2, 1.1, 1), attack=Attack('righteous_arrow', '5d4', speed=0.7, range=20, blowback=100), pos=(9, 3)),
             armor.helm(name="helm_of_justice", size=Size(1.1,1.1,1.1), pos=(10, 4)),
-            Item("chestplate_of_justice", '+', Size(3, 5, 4), 10, '', pos=(11, 4)),
+            armor.chestplate(name="chestplate_of_justice", size=Size(1.1,1.1,1.1), pos=(11, 4)),
             armor.boots(name="boots_of_justice", size=Size(1.1,1.1,1.1), pos=(12, 4)),
             Item("leggings_of_justice", '=', Size(3, 5, 4), 10, '', pos=(9, 4)),
-            Item("gloves_of_justice", '"', Size(3, 5, 4), 10, '', pos=(8, 4)),
+            armor.gauntlets(name="gloves_of_justice", size=Size(1.1,1.1,1.1), pos=(8, 4)),
             Item("robes_of_justice", '(', Size(3, 5, 4), 10, '', pos=(10, 5)),
         ]
     },
@@ -232,7 +233,7 @@ DUNGEONS = {
             '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(2,1)),
+            # create_peep('human', name='Super Dad', pos=(2,1)),
             create_peep('dodger', name='Dummy', pos=(29,1))
         ]
     }

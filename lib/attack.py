@@ -2,6 +2,7 @@ import random
 from dataclasses import dataclass
 import lib.calc
 from lib.constants import FACING, GAME_SETTINGS
+from lib.pclass import pability_by_name
 from lib.stats import calc_pct
 
 @dataclass
@@ -71,6 +72,11 @@ def attack_dst(src, dst, src_attack, game):
         tot_hp_loss *= dmg_multiplier[0]
         game.message(f'The {dst.name} was hit in the {dmg_multiplier[1]}')
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
+        if src.states:
+            for s in src.states:
+                if s.dmgboost:
+                    tot_hp_loss *= s.dmgboost
+                    game.message(f'You have attacked with multiplied damage because of your {s.name} ability')
         dst.hp = dst.hp - tot_hp_loss
         if dst.hp <= 0:
             if src.shooter:
@@ -84,10 +90,6 @@ def attack_dst(src, dst, src_attack, game):
             if src.hp <= 0:
                 game.message(f'  {src.name} is destroyed')
             if src.hp >= src.maxhp: src.hp = src.maxhp
-            # else:
-            #     todo: convert arrow into item
-                # src.speed = 0   # todo: remove remaining moves in turn_seq
-                # src.attacks = ()
     else:
         game.message(f'{src.name} missed {dst.name}.')
         return False

@@ -13,7 +13,7 @@ from lib import dungeons
 from lib.constants import GAME_SETTINGS
 from lib.items.item import Item
 from lib.model import ModelList, DataModel, TextModel
-from lib.pclass import level_calc, handle_level_up
+from lib.pclass import level_calc, handle_level_up, activate_pability, check_states
 from lib.peep_types import create_peep
 
 @dataclass
@@ -171,6 +171,10 @@ def _elapse_time(peeps, add_tics):
 def handle_passing_time(peep, inc):
     if peep.hp == peep.maxhp or peep.hp <= 0:
         return
+    for p in peep.pabilities:
+        activate_pability(peep, p)
+    for s in peep.states:
+        check_states(peep, s, inc)
     amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
     hp = peep.hp + amount_heal * inc
     peep.hp = min(hp, peep.maxhp)
