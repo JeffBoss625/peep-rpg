@@ -11,7 +11,7 @@ import sys
 import signal
 import copy
 from lib.calc import distance
-from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability, check_line
+from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability, check_line, AbilityCharge
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -46,6 +46,9 @@ def do_player_turn(control, input_key):
     game = control.game_model
     mm = game.maze_model
     player = game.player
+    for a in player.aabilities:
+        if a.name == 'charge':
+            a.compound(player)
     if input_key in DIRECTION_KEYS:
         dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
         for s in player.states:
