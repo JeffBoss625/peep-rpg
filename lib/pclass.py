@@ -56,6 +56,7 @@ class Ability:
     healthreq: float = 1.0
     cooldown: int = 1
     halt_hit: bool = False
+    time_activated: float = -100     #based on peep age
 
 @dataclass
 class PeepState:
@@ -83,15 +84,14 @@ class PeepEnraged (PeepState):
     path: bool = False
     num_mult: int = 0
 
-ABILITIES = [
-    Ability(
-        name='charge',
-        state='charging',
-        duration=30,
-        cooldown=7,
-        halt_hit=True,
-    )
-]
+@dataclass
+class ability_charge(Ability):
+    name: str = 'charge'
+    state: str = 'charging'
+    duration: int = 100
+    cooldown: int = 20
+    halt_hit: int = True
+
 
 PABILITIES = [
     Pability(
@@ -107,7 +107,10 @@ PABILITIES = [
     ),
 ]
 
-ABILITIES_BY_NAME = {i.name:i for i in ABILITIES}
+ABILITIES_BY_NAME = {
+    'charge': ability_charge,
+
+}
 PABILITIES_BY_NAME = {i.name:i for i in PABILITIES}
 
 def pability_by_name(name):
@@ -181,6 +184,11 @@ def activate_pability(peep, pability):
 # todo: Make states into dictionary
 
 def activate_ability(peep, ability):
+    for s in peep.states:
+        if s.name == ability.state:
+            time_elapsed = peep._age - s.time_activated
+            if time_elapsed < ability.cooldown:
+                return None
     state = STATECLASSES_BY_NAME[ability.state]()
     if peep.hp <= ability.healthreq * peep.maxhp:
         if peep.states:
@@ -194,17 +202,20 @@ def activate_ability(peep, ability):
                             s.speedboost += state.speedboost
                             s.dmgboost = s.dmgboost + (state.dmgboost - 1)
                             peep.speed = peep.speed + s.speedboost
+                            s.time_activated = peep._age
                         else:
                             state.duration = ability.duration
+                            s.time_activated = peep._age
                 else:
                     state.duration = ability.duration
-                    peep.states.append(state)
-                    peep.speed = peep.speed + state.speedboost
+                    s.time_activated = peep._age
                     break
         else:
             state.duration = ability.duration
+            state.time_activated = peep._age
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
+    return True
 
 def check_states(peep, state, inc):
     state.duration -= inc

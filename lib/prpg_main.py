@@ -67,7 +67,10 @@ def do_player_turn(control, input_key):
         if player.aabilities:
             game.banner(['choose an ability to use'])
             ability = control.choose_item('What ability will you use', player.aabilities)
-            activate_ability(player, ability)
+            if not activate_ability(player, ability):
+                game.message(f'Ability on cooldown')
+            else:
+                game.message(f'Used ability')
         else:
             game.message('No ability to activate')
 
