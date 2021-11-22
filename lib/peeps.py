@@ -91,6 +91,7 @@ class Peep(DataModel):
     _age: int = 0              #total time has passed since peep created.
 
     pos: Tuple[int,int] = field(default_factory=tuple)
+    prev_pos: Tuple[int,int] = field(default_factory=tuple)
     attacks: Tuple[Attack,...] = field(default_factory=tuple)
     inventory: Inventory = field(default_factory=Inventory)
     stuff: ModelList = field(default_factory=ModelList)

@@ -527,6 +527,7 @@ def create_peep(
         height=pt.height,
         attacks=tuple(create_attack(ai) for ai in attacks),
         pos=pos,
+        prev_pos=[],
         pabilities=[],
         aabilities=[],
         states=[],

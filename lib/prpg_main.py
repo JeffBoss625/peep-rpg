@@ -9,8 +9,9 @@ from lib.move import Direction
 import random
 import sys
 import signal
+import copy
 from lib.calc import distance
-from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability
+from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability, check_line
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -47,6 +48,11 @@ def do_player_turn(control, input_key):
     player = game.player
     if input_key in DIRECTION_KEYS:
         dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
+        for s in player.states:
+            if s.path:
+                if not check_line(player, dst_pos[0], dst_pos[1], s):
+                    game.message(f"Your state, {s.name}, deactivated because you did not follow a straight path.")
+        player.prev_pos = copy.copy(player.pos)
         if mlib.move_peep(game, game.player, dst_pos):
             post_player_move(control)
             return input_key

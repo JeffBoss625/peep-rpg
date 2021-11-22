@@ -73,7 +73,7 @@ class PeepCharging (PeepState):
     speedboost: float = 0.1   #Percent speed boost
     maxcompounded: int = 5
     compounded: int = 0
-    path: bool = False
+    path: bool = True
     num_mult: int = 0
 
 @dataclass
@@ -184,9 +184,9 @@ def activate_pability(peep, pability):
 # todo: Make states into dictionary
 
 def activate_ability(peep, ability):
-    for s in peep.states:
-        if s.name == ability.state:
-            time_elapsed = peep._age - s.time_activated
+    for a in peep.aabilities:
+        if a.name == ability.name:
+            time_elapsed = peep._age - a.time_activated
             if time_elapsed < ability.cooldown:
                 return None
     state = STATECLASSES_BY_NAME[ability.state]()
@@ -202,17 +202,17 @@ def activate_ability(peep, ability):
                             s.speedboost += state.speedboost
                             s.dmgboost = s.dmgboost + (state.dmgboost - 1)
                             peep.speed = peep.speed + s.speedboost
-                            s.time_activated = peep._age
+                            ability.time_activated = peep._age
                         else:
                             state.duration = ability.duration
-                            s.time_activated = peep._age
+                            ability.time_activated = peep._age
                 else:
                     state.duration = ability.duration
-                    s.time_activated = peep._age
+                    ability.time_activated = peep._age
                     break
         else:
             state.duration = ability.duration
-            state.time_activated = peep._age
+            ability.time_activated = peep._age
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
     return True
@@ -225,3 +225,12 @@ def check_states(peep, state, inc):
 def remove_state(peep, state):
     peep.states.remove(state)
     peep.speed = peep.speed - state.speedboost
+
+def check_line(peep, x, y, state):
+    change_x = peep.pos[0] - peep.prev_pos[0]
+    change_y = peep.pos[1] - peep.prev_pos[1]
+    if x - peep.pos[0] == change_x and y - peep.pos[1] == change_y:
+        return True
+    else:
+        remove_state(peep, state)
+        return False
