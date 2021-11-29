@@ -253,7 +253,7 @@ MONSTERS = [
         gold="5d3",
         attacks=(
             AttackInfo('big slurp', '3d3', blowback=-1),
-            AttackInfo('summoned_mosquito', '1d2', range=10, speed=0.1, blowback=-1)
+            AttackInfo('summoned_mosquito', '1d2', range=10, speed=10, blowback=-1)
         ),
         stuff=[(weapons.sword(name="mosquito_mouth_stabber", size=Size(1.2, 1.1, 1.0), attack=AttackInfo('blood_slice', '5d5', blowback=-0.5), pos=(10, 3)))],
     ),

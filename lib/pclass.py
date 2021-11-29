@@ -88,32 +88,35 @@ class PeepCharging (PeepState):
 
 @dataclass
 class PeepEnraged (PeepState):
-    dmgboost: float = 1.0     #Percent dmg boost
+    name: str = 'enraged'
+    dmgboost: float = 1.3     #Percent dmg boost
     hpboost: float = 1.0      #Percent hp boost
     speedboost: float = 0.1   #Percent speed boost
+    maxcompounded: int = 3
+    compounded: int = 0
     path: bool = False
     num_mult: int = 0
 
+class PabilityRage (Pability):
+    name: str = 'rage'
+    state: str = 'enraged'
+    duration: float = 3
+    healthreq: float = .4
 
-PABILITIES = [
-    Pability(
-        name='rage',
-        state='enraged',
-        duration=3,
-        healthreq=0.25,
-    ),
-    Pability(
-        name='sp_adr',
-        state='Adr_Pump',
-        healthreq=0.1,
-    ),
-]
+class PabilitySpeed_Adr (Pability):
+    name: str = 'speed_adr'
+    state: str = 'adr_pump'
+    duration: float = 10
+    healthreq: float = .2
 
 ABILITIES_BY_NAME = {
     'charge': AbilityCharge,
 }
 
-PABILITIES_BY_NAME = {i.name:i for i in PABILITIES}
+PABILITIES_BY_NAME = {
+    'rage': PabilityRage,
+    'speed_adr': PabilitySpeed_Adr,
+}
 
 def pability_by_name(name):
     return PABILITIES_BY_NAME[name]
@@ -160,29 +163,25 @@ def peep_acquire_abilities(src, lvl):
 
 def activate_pability(peep, pability):
     state = STATECLASSES_BY_NAME[pability.state]()
-    if peep.hp <= pability.healthreq * peep.maxhp:
+    if peep.hp <= pability.healthreq * peep.maxhp and peep.hp > 0:
         if peep.states:
             for s in peep.states:
                 if s.name == pability.state:
-                    if s.duration <= pability.duration:
-                        if s.compounded < s.maxcompounded:
-                            state.duration = pability.duration
-                            peep.speed = peep.speed - s.speedboost
-                            s.speedboost += state.speedboost
-                            s.dmgboost = s.dmgboost + (state.dmgboost - 1)
-                            peep.speed = peep.speed + s.speedboost
-                        else:
-                            state.duration = pability.duration
+                    if s.compounded < s.maxcompounded - 1:
+                        s.compounded += 1
+                        state.duration = pability.duration
+                        peep.speed = peep.speed - s.speedboost
+                        s.speedboost += state.speedboost
+                        s.dmgboost = s.dmgboost + (state.dmgboost - 1)
+                        peep.speed = peep.speed + s.speedboost
+                    else:
+                        s.duration = pability.duration
                 else:
-                    state.duration = pability.duration
-                    peep.states.append(state)
-                    peep.speed = peep.speed + state.speedboost
+                    s.duration = pability.duration
                     break
         else:
-            state.duration = pability.duration
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
-
 # todo: Make states into dictionary
 
 def activate_ability(peep, ability, cooldown_check=True):
