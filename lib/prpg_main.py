@@ -11,7 +11,7 @@ import sys
 import signal
 import copy
 from lib.calc import distance
-from lib.pclass import PABILITIES_BY_NAME, pability_by_name, activate_ability, check_line, AbilityCharge
+from lib.pclass import activate_ability, check_line
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -49,6 +49,7 @@ def do_player_turn(control, input_key):
     for a in player.aabilities:
         if a.name == 'charge':
             a.compound(player)
+
     if input_key in DIRECTION_KEYS:
         dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
         for s in player.states:
@@ -56,10 +57,18 @@ def do_player_turn(control, input_key):
                 if not check_line(player, dst_pos[0], dst_pos[1], s):
                     game.message(f"Your state, {s.name}, deactivated because you did not follow a straight path.")
         player.prev_pos = copy.copy(player.pos)
-        if mlib.move_peep(game, game.player, dst_pos):
+
+        if input_key == '.':
+            game.player._tics = game.player._tics - 1/game.player.speed
+            moved = True
+        else:
+            moved = mlib.move_peep(game, game.player, dst_pos)
+
+        if moved:
             post_player_move(control)
             return input_key
         # else didn't spend turn
+
     elif input_key == Key.CTRL_Q:
         return 'q'
 
@@ -136,7 +145,6 @@ def do_player_turn(control, input_key):
 
                 player.stuff.append(item)
                 game.banner([f'{item.name} removed'])
-
 
     elif input_key == 'g':
         on_items = mm.items_at(player.pos, False)
