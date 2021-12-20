@@ -406,10 +406,7 @@ def post_player_move(control):
         game.banner(['',''])
 
 
-def main(root_layout, game, get_key=None):
-    control = PrpgControl(root_layout, game)
-    if get_key is not None:
-        control.get_key = get_key
+def main(control):
     if sys.platform != "win32" and hasattr(control, 'resize_handler'):
         signal.signal(signal.SIGWINCH, control.resize_handler)
 

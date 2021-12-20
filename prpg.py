@@ -6,6 +6,7 @@ import lib.items.armor as armor
 from lib.items import weapons
 from lib.logger import Logger
 from lib.model import Size
+from lib.prpg_control import PrpgControl
 from lib.win_layout import RootLayout, Dim
 from lib.prpg_main import main
 from lib.peep_types import create_peep
@@ -37,7 +38,7 @@ def cb(scr):
 
     game.goto_level(1, placement='<')
 
-    main(root_layout, game)
+    main(PrpgControl(root_layout, game))
 
 
 curses.wrapper(cb)

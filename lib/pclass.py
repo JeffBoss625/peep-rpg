@@ -62,11 +62,14 @@ PCLASSES = [
 ]
 
 @dataclass
-class Pability:
+class PAbility:
     name: str = ''
     state: str = ''
     duration: int = 1
     healthreq: float = 1.0    #Percent health left required to activate
+
+    def activate(self, peep):
+        raise NotImplementedError('needs to be defined in subclass')
 
 @dataclass
 class PeepState:
@@ -97,13 +100,18 @@ class PeepEnraged (PeepState):
     path: bool = False
     num_mult: int = 0
 
-class PabilityRage (Pability):
+class PAbilityRage (PAbility):
     name: str = 'rage'
     state: str = 'enraged'
     duration: float = 3
     healthreq: float = .4
 
-class PabilitySpeed_Adr (Pability):
+    def activate(self, peep):
+        if peep.hp <= self.healthreq * peep.maxhp and peep.hp > 0:
+            print('hi')
+
+
+class PabilitySpeed_Adr (PAbility):
     name: str = 'speed_adr'
     state: str = 'adr_pump'
     duration: float = 10
@@ -114,12 +122,9 @@ ABILITIES_BY_NAME = {
 }
 
 PABILITIES_BY_NAME = {
-    'rage': PabilityRage,
+    'rage': PAbilityRage,
     'speed_adr': PabilitySpeed_Adr,
 }
-
-def pability_by_name(name):
-    return PABILITIES_BY_NAME[name]
 
 PCLASSES_BY_NAME = {m.name:m for m in PCLASSES}
 
@@ -169,16 +174,12 @@ def activate_pability(peep, pability):
                 if s.name == pability.state:
                     if s.compounded < s.maxcompounded - 1:
                         s.compounded += 1
-                        state.duration = pability.duration
                         peep.speed = peep.speed - s.speedboost
                         s.speedboost += state.speedboost
                         s.dmgboost = s.dmgboost + (state.dmgboost - 1)
                         peep.speed = peep.speed + s.speedboost
-                    else:
-                        s.duration = pability.duration
-                else:
-                    s.duration = pability.duration
-                    break
+
+                s.duration = pability.duration
         else:
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
