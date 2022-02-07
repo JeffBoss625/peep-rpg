@@ -261,7 +261,7 @@ def monster_turn(control, monster):
     if monster.type != 'projectile' \
             and ranged_attack is not None \
             and is_in_sight(monster, player.pos, mm.walls) \
-            and distance(monster.pos, player.pos) < ranged_attack.range:
+            and ranged_attack.range > distance(monster.pos, player.pos) > 3:
         path = list(line_points(monster.pos, player.pos))
         mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
         monster._tics = monster._tics - 1/monster.speed * 1/ranged_attack.speed
