@@ -1,8 +1,8 @@
 import random
 from dataclasses import dataclass
 import lib.calc
-from lib.constants import FACING, GAME_SETTINGS
-from lib.pclass import pability_by_name, remove_state, STATECLASSES_BY_NAME
+from lib.constants import FACING
+from lib.pclass import STATECLASSES_BY_NAME
 from lib.stats import calc_pct
 
 @dataclass

@@ -15,7 +15,7 @@ class WIN:
 
 #
 class PrpgControl:
-    def __init__(self, root_layout, game):
+    def __init__(self, root_layout, game, pack=False):
         self.root_layout = root_layout
         self.game_model = game
 
@@ -25,20 +25,29 @@ class PrpgControl:
         main_panel.window(WIN.TITLE, Con(40,3,0,3))
 
         # Center Row
-        maze_h = len(game.maze_model.walls.text) + 2
-        maze_w = len(game.maze_model.walls.text[0]) + 2
-        banner_h = 4
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        center_col1.window(WIN.PLAYER, Con(30,15,30,15))
-        center_col1.window(WIN.STATS, Con(30,20,30,0))
+        hmin = 7 if pack else 15
+        hmax = hmin
+        center_col1.window(WIN.PLAYER, Con(30,hmin,30,hmax))
+        hmin = 10 if pack else 20
+        hmax = hmin if pack else 0
+        center_col1.window(WIN.STATS, Con(30,hmin,30,hmax))
 
+        maze_h = len(game.maze_model.walls.text) + 2
+        maze_w = len(game.maze_model.walls.text[0]) + 2
+
+        banner_h = 4
         center_col2 = center.panel('center_col2', Orient.VERT, None)
         center_col2.window(WIN.BANNER, Con(maze_w,banner_h,0,banner_h))
-        center_col2.window(WIN.MAZE, Con(maze_w,maze_h,0,0))
+        hmin = maze_h
+        hmax = hmin if pack else 0
+        center_col2.window(WIN.MAZE, Con(maze_w,hmin,0,hmax))
 
-        center.window(WIN.EQUIP, Con(10,6,0,0))
+        hmin = 6
+        hmax = hmin if pack else 0
+        center.window(WIN.EQUIP, Con(10,6,0,hmax))
 
         # Bottom Row
         main_panel.window(WIN.MESSAGES, Con(30,6))

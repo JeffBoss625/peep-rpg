@@ -25,10 +25,10 @@ class Out:
     def log(self, *args):
         self.args.append(args)
 
-def assert_game(model, keys, paint=False):
-    root_layout = dummy_root(dim=Dim(110, 14), logger=Logger('dbg.py'))
+def assert_game(game, keys, paint=False):
+    root_layout = dummy_root(dim=Dim(110, 30), logger=Logger('dbg.py'))
 
-    control = PrpgControl(root_layout, model)
+    control = PrpgControl(root_layout, game, pack=True)
 
     def get_key():
         if paint:
@@ -36,7 +36,8 @@ def assert_game(model, keys, paint=False):
         ret = keys.pop(0)
         return ret
 
-    main(root_layout, model, get_key=get_key)
+    control.get_key = get_key
+    main(control)
 
 
 # def test_calc_deflection():
