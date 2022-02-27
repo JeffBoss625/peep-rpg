@@ -9,6 +9,7 @@ import lib.dungeons as dungeons
 from lib.constants import Key
 from lib.win_layout import Dim
 
+
 def assert_game(game, keys, paint=False):
     root_layout = dummy_root(dim=Dim(110, 21), logger=Logger('dbg.py'))
 
@@ -23,6 +24,7 @@ def assert_game(game, keys, paint=False):
     control.get_key = get_key
     main(control)
 
+
 def test_shoot_wall():
     random.seed = 1
     game = dungeons.create_game({
@@ -32,7 +34,7 @@ def test_shoot_wall():
             '%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1,1)),
+            create_peep('human', name='Super Dad', pos=(1, 1)),
         ]
     })
     assert_game(game, ['a', 'l', '.', '.', Key.CTRL_Q], paint=True)
@@ -40,45 +42,47 @@ def test_shoot_wall():
 
 def test_shoot_thru_monster():
     random.seed = 1
-    game =  dungeons.create_game({
+    game = dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%....%',
             '%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1,1)),
-            create_peep('dodger', name='Dummy', pos=(4,1))
+            create_peep('human', name='Super Dad', pos=(1, 1)),
+            create_peep('dodger', name='Dummy', pos=(4, 1))
         ]
     })
     assert_game(game, ['a', 'l', '.', '.', '.', '.', Key.CTRL_Q], paint=False)
 
+
 def test_shoot_monster():
     random.seed = 1
-    game =  dungeons.create_game({
+    game = dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%....%',
             '%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1,1)),
-            create_peep('goblin', name='Gark', pos=(4,1))
+            create_peep('human', name='Super Dad', pos=(1, 1)),
+            create_peep('goblin', name='Gark', pos=(4, 1))
         ]
     })
     assert_game(game, ['a', '*', 't', '.', '.', Key.CTRL_Q], paint=True)
 
+
 def test_shoot_monster_blocked():
     random.seed = 1
-    game =  dungeons.create_game({
+    game = dungeons.create_game({
         'walls': [
             '%%%%%%',
             '%..%.%',
             '%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1,1)),
-            create_peep('goblin', name='Gark', pos=(4,1))
+            create_peep('human', name='Super Dad', pos=(1, 1)),
+            create_peep('goblin', name='Gark', pos=(4, 1))
         ]
     })
     assert_game(game, ['a', '*', 't', '.', Key.CTRL_Q], paint=False)
@@ -93,8 +97,8 @@ def test_balrog_whip():
             '%%%%%%',
         ],
         'peeps': [
-            create_peep('human', name='Super Dad', pos=(1,1)),
-            create_peep('balrog', name='Gark', pos=(3,1))
+            create_peep('human', name='Super Dad', pos=(1, 1)),
+            create_peep('balrog', name='Gark', pos=(3, 1))
         ]
     })
     assert_game(game, ['.', '.', '.', Key.CTRL_Q], paint=False)
