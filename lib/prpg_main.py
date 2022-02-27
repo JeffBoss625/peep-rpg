@@ -50,6 +50,10 @@ def do_player_turn(control, input_key):
         if a.name == 'charge':
             a.compound(player)
 
+    if input_key in control.input_override:
+        control.input_override[input_key](control, input_key)
+        return input_key
+
     if input_key in DIRECTION_KEYS:
         dst_pos = mlib.adjacent_pos(game.player.pos, DIRECTION_KEYS[input_key])
         for s in player.states:
