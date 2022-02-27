@@ -66,6 +66,8 @@ class PrpgControl:
         self.root_win.curses.raw()
         self.root_win.curses.curs_set(0)
 
+        self.input_override = {}        # plug-in functions to execute for specific key events (for testing)
+
     def _win(self, name):
         return self.root_layout.info.comp_by_name[name].window
 
