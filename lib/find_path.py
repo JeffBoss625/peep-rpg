@@ -8,7 +8,7 @@ class FLog:
         self.game = control.game_model
 
     def is_wall (self, x, y):
-        sleep(0.2)
+        sleep(0.1)
         c = self.game.maze_model.walls.char_at(x, y)
         is_w = c == '%' or c == '&'
         item = clothes.belt(pos=(x, y))
@@ -29,7 +29,7 @@ class FLog:
         self.control.root_layout.window.paint()
 
 def find_rooms(control, input_key):
-    _find_rooms((1,1), {}, FLog(control))
+    _find_rooms(control.game_model.player.pos, (), FLog(control))
 
 def _find_rooms(src, tgt, flog):
     x = src[0]
