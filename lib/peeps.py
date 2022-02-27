@@ -92,7 +92,7 @@ class Peep(DataModel):
 
     pos: Tuple[int,int] = field(default_factory=tuple)
     prev_pos: Tuple[int,int] = field(default_factory=tuple)
-    attacks: Tuple[Attack,...] = field(default_factory=tuple)
+    attacks: List[Attack] = field(default_factory=list)
     inventory: Inventory = field(default_factory=Inventory)
     stuff: ModelList = field(default_factory=ModelList)
     gold: int = 10
@@ -113,7 +113,7 @@ class Peep(DataModel):
 
     def put_item(self, slot, item, game):
         self.stuff.remove(item)
-        if item.attack:
+        if hasattr(item, 'attack'):
             self.attacks = list(self.attacks)
             self.attacks.append(item.attack)
         prev = slot.put(item)
