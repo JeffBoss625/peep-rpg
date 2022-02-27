@@ -56,22 +56,6 @@ def test_find_rooms():
     })
     assert_game(game, ['a', '*', 't', '.', '.', Key.CTRL_Q], paint=True)
 
-def find_dir(maze, pos):
-    can = []
-    down = (pos[1]+1, pos[0])
-    up = (pos[1]-1, pos[0])
-    left = (pos[1], pos[0] - 1)
-    right = {pos[1], pos[0] + 1}
-    if maze[down] == ".":
-        can.append(down)
-    if maze[up] == '.':
-        can.append(up)
-    if maze[left] == '.':
-        can.append(left)
-    if maze[right] == ".":
-        can.append(right)
-    return(can)
-
 def find_rooms(maze, start):
     facing = None
     hall = []
