@@ -34,13 +34,17 @@ class FLog:
 
 @dataclass
 class Hall:
-    p1: Tuple[int, int] = field(default_factory=tuple)
+    p1: Tuple[int, int] = field(default_factory=tuple) #String is for direction
+    direct1: str = 'up'
     p2: Tuple[int, int] = field(default_factory=tuple)
+    direct2: str = 'up'
     dist: int = 0
 
 
 def find_rooms(control, input_key):
-    _find_rooms(control.game_model.player.pos, (), FLog(control))
+    halls = _find_rooms(control.game_model.player.pos, (), FLog(control))
+    for h in halls:
+        follow_hall(h, FLog(control))
 
 
 def nextdir(dir, turn):
@@ -89,7 +93,7 @@ def _find_rooms(src, tgt, flog):
                 point_of(pos, facing, 'back')[1]
             ) is False:
                 flog.mark_exit(pos[0], pos[1])
-                exit.append(list(pos))
+                exit.append(Hall(p1=(pos[0], pos[1]), direct1=facing))
                 pos[0] = point_of(pos, facing, 'back')[0]
                 pos[1] = point_of(pos, facing, 'back')[1]
                 facing = nextdir(facing, 'cw')
@@ -109,6 +113,55 @@ def _find_rooms(src, tgt, flog):
             facing = nextdir(facing, 'ccw')
             pos[0] = point_of(pos, facing, 'forward')[0]
             pos[1] = point_of(pos, facing, 'forward')[1]
+    return exit
+
+
+def follow_hall(hall, flog):
+    facing = hall.direct1
+    pos = []
+    been = []
+    pos.append(hall.p1[0])
+    pos.append(hall.p1[1])
+    distance = 0
+    while wall_around(pos, flog) == 2:
+        if flog.is_wall(point_of(pos, facing, 'forward')[0], point_of(pos, facing, 'forward')[1]) is False:
+            been.append(list(pos))
+            pos[0] = point_of(pos, facing, 'forward')[0]
+            pos[1] = point_of(pos, facing, 'forward')[1]
+            distance += 1
+        else:
+            if flog.is_wall(point_of(pos, facing, 'right')[0], point_of(pos, facing, 'right')[1]) is False:
+                been.append(list(pos))
+                pos[0] = point_of(pos, facing, 'right')[0]
+                pos[1] = point_of(pos, facing, 'right')[1]
+                facing = nextdir(facing, 'cw')
+                distance += 1
+            else:
+                been.append(list(pos))
+                pos[0] = point_of(pos, facing, 'left')[0]
+                pos[1] = point_of(pos, facing, 'left')[1]
+                facing = nextdir(facing, 'ccw')
+                distance += 1
+    final_pt = been[-1]
+    flog.mark_exit(final_pt[0], final_pt[1])
+    hall.p2 = final_pt
+    facing = nextdir(facing, 'cw')
+    facing = nextdir(facing, 'cw')
+    hall.direct2 = facing
+    hall.dist = distance
+
+
+def wall_around(pos, flog):
+    ret = 0
+    if flog.is_wall(point_of(pos, 'up', 'forward')[0], point_of(pos, 'up', 'forward')[1]):
+        ret += 1
+    if flog.is_wall(point_of(pos, 'up', 'right')[0], point_of(pos, 'up', 'right')[1]):
+        ret += 1
+    if flog.is_wall(point_of(pos, 'up', 'left')[0], point_of(pos, 'up', 'left')[1]):
+        ret += 1
+    if flog.is_wall(point_of(pos, 'up', 'back')[0], point_of(pos, 'up', 'back')[1]):
+        ret += 1
+    return ret
 
 
 def point_of(pos, facing, point):
