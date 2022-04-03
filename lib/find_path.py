@@ -1,6 +1,9 @@
+from dataclasses import dataclass, field
 from time import sleep
+from typing import Tuple
 
 from lib.items import clothes
+
 
 class FLog:
     def __init__(self, control):
@@ -28,8 +31,17 @@ class FLog:
         self.game.maze_model.items.append(item)
         self.control.root_layout.window.paint()
 
+
+@dataclass
+class Hall:
+    p1: Tuple[int, int] = field(default_factory=tuple)
+    p2: Tuple[int, int] = field(default_factory=tuple)
+    dist: int = 0
+
+
 def find_rooms(control, input_key):
     _find_rooms(control.game_model.player.pos, (), FLog(control))
+
 
 def nextdir(dir, turn):
     if turn == 'cw':
@@ -51,9 +63,10 @@ def nextdir(dir, turn):
         if dir == 'right':
             return 'up'
 
+
 def _find_rooms(src, tgt, flog):
     facing = None
-    hall = []
+    exit = []
     pos = list(src)
     been = []
     while flog.is_wall(pos[0] - 1, pos[1]) is False:
@@ -69,14 +82,17 @@ def _find_rooms(src, tgt, flog):
                 flog.is_wall(point_of(pos, facing, 'left')[0],
                              point_of(pos, facing, 'left')[1]):
             if flog.is_wall(
-                    point_of(pos, facing, 'right')[0],
-                    point_of(pos, facing, 'right')[1]):
+                point_of(pos, facing, 'right')[0],
+                point_of(pos, facing, 'right')[1]
+            ) is True and flog.is_wall(
+                point_of(pos, facing, 'back')[0],
+                point_of(pos, facing, 'back')[1]
+            ) is False:
                 flog.mark_exit(pos[0], pos[1])
-                hall.append(list(pos))
-                pos[0] = point_of(pos, facing, 'right')[0]
-                pos[1] = point_of(pos, facing, 'right')[1]
+                exit.append(list(pos))
                 pos[0] = point_of(pos, facing, 'back')[0]
-                pos[0] = point_of(pos, facing, 'back')[1]
+                pos[1] = point_of(pos, facing, 'back')[1]
+                facing = nextdir(facing, 'cw')
                 facing = nextdir(facing, 'cw')
                 break
             been.append(list(pos))
@@ -93,6 +109,7 @@ def _find_rooms(src, tgt, flog):
             facing = nextdir(facing, 'ccw')
             pos[0] = point_of(pos, facing, 'forward')[0]
             pos[1] = point_of(pos, facing, 'forward')[1]
+
 
 def point_of(pos, facing, point):
     if facing == 'up':
