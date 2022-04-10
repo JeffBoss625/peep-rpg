@@ -11,7 +11,6 @@ class FLog:
         self.game = control.game_model
 
     def is_wall(self, x, y):
-        sleep(0)
         c = self.game.maze_model.walls.char_at(x, y)
         is_w = c == '%' or c == '#'
         item = clothes.belt(pos=(x, y))
@@ -25,7 +24,6 @@ class FLog:
         return is_w
 
     def mark_exit(self, x, y):
-        sleep(0)
         item = clothes.belt(pos=(x, y))
         item.char = 'X'
         self.game.maze_model.items.append(item)
@@ -50,8 +48,10 @@ class Room:
 def find_rooms(control, input_key):
     room_by_exits = {}
     all_halls = {}
+    loop = True
     halls = _find_rooms(control.game_model.player.pos, FLog(control), all_halls, True, None)
     room = Room(exits=halls[0].room1)
+    # put all hall rooms into dictionary
     for p in halls[0].room1:
         room_by_exits[tuple(p)] = room
     for h in halls:
@@ -61,8 +61,30 @@ def find_rooms(control, input_key):
             all_halls[h.p1] = h
         if h.p2 not in all_halls:
             all_halls[h.p2] = h
-            if h.p2 not in room_by_exits:
+            loop = True
+            while loop is True:
                 halls = _find_rooms(h.p2, FLog(control), all_halls, False, h.direct2)
+                if halls is None:
+                    break
+                room = Room(exits=halls[0].room1)
+                for p in halls[0].room1:
+                    room_by_exits[tuple(p)] = room
+                for h in halls:
+                    if h.p1 not in all_halls:
+                        follow_hall(h, FLog(control))
+                    else:
+                        halls.remove(h)
+                        if len(halls) == 0:
+                            loop = False
+                            break
+                if loop is False:
+                    break
+                for h in halls:
+                    if h.p1 not in all_halls:
+                        all_halls[h.p1] = h
+                    if h.p2 not in all_halls:
+                        all_halls[h.p2] = h
+                        break
 
 
 def nextdir(dir, turn):
@@ -84,7 +106,6 @@ def nextdir(dir, turn):
             return 'right'
         if dir == 'right':
             return 'up'
-
 
 def _find_rooms(src, flog, halls, first, dir):
     facing = None
@@ -177,7 +198,7 @@ def follow_hall(hall, flog):
                 distance += 1
     final_pt = been[-1]
     flog.mark_exit(final_pt[0], final_pt[1])
-    hall.p2 = final_pt
+    hall.p2 = tuple(final_pt)
     facing = nextdir(facing, 'cw')
     facing = nextdir(facing, 'cw')
     hall.direct2 = facing
@@ -219,3 +240,21 @@ def point_of(pos, facing, point):
         if point == 'right':   ret = [-1 + pos[0], 0 + pos[1]]
         if point == 'left':    ret = [1 + pos[0], 0 + pos[1]]
     return ret
+
+
+# find paths algo
+
+# start with 2 empty dictionaries and a start_point
+#   all_rooms by exit points (dict of all rooms by every exit point of the room)
+#   all_hallways by exit points (dict of all hallways by the 2 exit points of the hallway)
+
+# create first room
+#   room.exits = find exit points for room
+#   convert exit points to halls (looking up in dictionary)
+#   do NOT follow hallways yet to find point2
+
+# finish hallways
+#   go through room hallways and find all end-points of hallways - point2 if missing
+
+
+#
