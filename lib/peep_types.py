@@ -132,7 +132,7 @@ MONSTERS = [
             AttackInfo('beak', '1d10'),
             AttackInfo('talons', '2d3'),
             AttackInfo('wing_blow', '5d1', speed=0.95,),
-            AttackInfo('air_strike', '3d1', speed=0.2, range=5, blowback=100)
+            AttackInfo('air_strike', '3d1', speed=0.2, range=7, blowback=100)
         )
     ),
 
