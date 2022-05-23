@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from time import sleep
 from typing import Tuple
 
+from lib.dijikstra_algo import Node, add_edge
 from lib.items import clothes
 
 
@@ -65,6 +66,7 @@ def find_rooms(control, input_key):
     direct = 'up'
     while True:
         if not loop(room_by_exits, halls_by_exits, all_halls, pos, FLog(control), direct):
+            node_graph(halls_by_exits, room_by_exits)
             break
         for h in all_halls:
             if h.p2 not in room_by_exits:
@@ -228,69 +230,6 @@ def find_exits(src, flog, dir):
     return exits
 
 
-# def _find_rooms(src, flog, halls, first, dir):
-#     facing = None
-#     exit = []
-#     pos = list(src)
-#     been = []
-#     room = []
-#     if first:
-#         while flog.is_wall(pos[0] - 1, pos[1]) is False:
-#             pos[0] = pos[0] - 1
-#         if flog.is_wall(pos[0], pos[1] - 1) is False:
-#             facing = 'up'
-#         else:
-#             facing = 'right'
-#     else:
-#         facing = dir
-#         facing = nextdir(facing, 'cw')
-#         facing = nextdir(facing, 'cw')
-#         pos[0] = point_of(pos, facing, 'forward')[0]
-#         pos[1] = point_of(pos, facing, 'forward')[1]
-#     while pos not in been:
-#         while flog.is_wall(
-#                 point_of(pos, facing, 'forward')[0],
-#                 point_of(pos, facing, 'forward')[1]) is False and \
-#                 flog.is_wall(point_of(pos, facing, 'left')[0],
-#                              point_of(pos, facing, 'left')[1]):
-#             if flog.is_wall(
-#                 point_of(pos, facing, 'right')[0],
-#                 point_of(pos, facing, 'right')[1]
-#             ) is True and flog.is_wall(
-#                 point_of(pos, facing, 'back')[0],
-#                 point_of(pos, facing, 'back')[1]
-#             ) is False:
-#                 if pos in been:
-#                     break
-#                 flog.mark_exit(pos[0], pos[1])
-#                 room.append(list(pos))
-#                 exit.append(Hall(p1=(pos[0], pos[1]), direct1=facing))
-#                 been.append(list(pos))
-#                 pos[0] = point_of(pos, facing, 'back')[0]
-#                 pos[1] = point_of(pos, facing, 'back')[1]
-#                 facing = nextdir(facing, 'cw')
-#                 facing = nextdir(facing, 'cw')
-#                 break
-#             been.append(list(pos))
-#             pos[0] = point_of(pos, facing, 'forward')[0]
-#             pos[1] = point_of(pos, facing, 'forward')[1]
-#
-#         if flog.is_wall(
-#                 point_of(pos, facing, 'left')[0],
-#                 point_of(pos, facing, 'left')[1]):
-#             facing = nextdir(facing, 'cw')
-#             # pos[0] = point_of(pos, facing, 'right')[0]
-#             # pos[1] = point_of(pos, facing, 'right')[1]
-#         else:
-#             facing = nextdir(facing, 'ccw')
-#             been.append(list(pos))
-#             pos[0] = point_of(pos, facing, 'forward')[0]
-#             pos[1] = point_of(pos, facing, 'forward')[1]
-#     for e in exit:
-#         e.room1 = room
-#     return exit
-
-
 def follow_hall_2(src, facing, hall, flog):
     pos = list(src)
     been = []
@@ -321,41 +260,6 @@ def follow_hall_2(src, facing, hall, flog):
     hall.p2 = final_pt
     hall.dist = distance - 1
     hall.direct2 = facing
-
-
-# def follow_hall(hall, flog):
-#     facing = hall.direct1
-#     pos = []
-#     been = []
-#     pos.append(hall.p1[0])
-#     pos.append(hall.p1[1])
-#     distance = 0
-#     while wall_around(pos, flog) == 2:
-#         if flog.is_wall(point_of(pos, facing, 'forward')[0], point_of(pos, facing, 'forward')[1]) is False:
-#             been.append(tuple(pos))
-#             pos[0] = point_of(pos, facing, 'forward')[0]
-#             pos[1] = point_of(pos, facing, 'forward')[1]
-#             distance += 1
-#         else:
-#             if flog.is_wall(point_of(pos, facing, 'right')[0], point_of(pos, facing, 'right')[1]) is False:
-#                 been.append(tuple(pos))
-#                 pos[0] = point_of(pos, facing, 'right')[0]
-#                 pos[1] = point_of(pos, facing, 'right')[1]
-#                 facing = nextdir(facing, 'cw')
-#                 distance += 1
-#             else:
-#                 been.append(tuple(pos))
-#                 pos[0] = point_of(pos, facing, 'left')[0]
-#                 pos[1] = point_of(pos, facing, 'left')[1]
-#                 facing = nextdir(facing, 'ccw')
-#                 distance += 1
-#     final_pt = been[-1]
-#     flog.mark_exit(final_pt[0], final_pt[1])
-#     hall.p2 = tuple(final_pt)
-#     facing = nextdir(facing, 'cw')
-#     facing = nextdir(facing, 'cw')
-#     hall.direct2 = facing
-#     hall.dist = distance - 1
 
 
 def wall_around(pos, flog):
@@ -395,6 +299,44 @@ def point_of(pos, facing, point):
     return ret
 
 
+def get_key(val, dict):
+    for key, v in dict.items():
+        for value in v:
+            if val == value:
+                return key
+
+    return "key doesn't exist"
+
+def node_graph(halls_by_pt, rooms_by_exits):
+    rooms = []
+    halls = []
+    rooms_by_id = {}
+
+    for h in halls_by_pt:
+        if halls_by_pt[h] not in halls:
+            halls.append(halls_by_pt[h])
+
+    for r in rooms_by_exits:
+        if rooms_by_exits[r] not in rooms:
+            rooms.append(rooms_by_exits[r])
+
+    nodes = {}
+    for id in range(1, len(rooms) + 1):
+        rooms_by_id[id] = rooms[id-1]
+        nodes[id] = Node(id, {}, [])
+
+    edges = {}
+    for id in rooms_by_id:
+        for e in rooms_by_id[id]:
+            if halls_by_pt[e].p1 == e:
+                for r in rooms_by_exits[halls_by_pt[e].p2]:
+                    id2 = get_key(r, rooms_by_id)
+                    add_edge(edges, id, id2, halls_by_pt[e].dist)
+            else:
+                for r in rooms_by_exits[halls_by_pt[e].p1]:
+                    id2 = get_key(r, rooms_by_id)
+                    add_edge(edges, id, id2, halls_by_pt[e].dist)
+
 # find paths algo
 
 # start with 2 empty dictionaries and a start_point
@@ -409,5 +351,3 @@ def point_of(pos, facing, point):
 # finish hallways
 #   go through room hallways and find all end-points of hallways - point2 if missing
 
-
-#
