@@ -122,7 +122,7 @@ def update_lengths(all_nodes, cur_path, edge, total_len):
     cur_path.pop()
 
 
-def dijkstra(all_nodes):
+def dijikstra(all_nodes):
     for id in all_nodes:  # nodes by id
         for e in all_nodes[id].edges:
             update_lengths(all_nodes, [all_nodes[id]], e, 0)
