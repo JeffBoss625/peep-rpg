@@ -1,5 +1,9 @@
-# weights from https://www.mojobob.com/roleplay/weight_chart.html
-# METAL (kg/m^3)
+weights from [here](https://www.mojobob.com/roleplay/weight_chart.html)
+======
+
+METAL (kg/m^3)
+----
+
                         
     Substance              kg/m3  lbs/ft3
     Aluminium              2,720    170
@@ -33,7 +37,8 @@
     Tungsten              19,280  1,205
     Zinc                   7,120    445
 
-# STONE
+STONE
+-----
 
 Substance  kg/m3  lbs/ft3
 Agate  2700  169
