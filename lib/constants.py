@@ -81,3 +81,4 @@ class GAME_SETTINGS:
     LEVEL_UP_FACTOR =     2.00   # Altered by other factors
     BASE_KILL_EXP =     1.00   # basic experience for killing a monster (before modifications)
     CHARS = ASCII_CHARS
+    NORMAL_HUMAN_HP = 100
