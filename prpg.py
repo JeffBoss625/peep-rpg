@@ -35,6 +35,7 @@ def cb(scr):
     game.player.body.wear(armor.helm(size=Size(1.15, 1.1, 1.1), thick=1.0))
     # game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))
     game.player.body.wear(weapons.sword(size=Size(1.0,1.0,1.0)))
+    game.player.body.wear(armor.Chestplate(size=Size(1.0, 1.0, 1.0)))
 
     game.goto_level(1, placement='<')
 

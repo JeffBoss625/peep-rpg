@@ -2,8 +2,11 @@ import random
 from dataclasses import dataclass
 import lib.calc
 from lib.constants import FACING
+from lib.items.item import Layer, Properties
+from lib.items.physics import striking_blow, Strike, Target
 from lib.pclass import STATECLASSES_BY_NAME
 from lib.stats import calc_pct
+
 
 @dataclass
 class AttackInfo:
@@ -60,17 +63,11 @@ def attack_dst(src, dst, src_attack, game):
     hit = (calc_hit(dst.ac, src.thaco))
     src._tics = src._tics - 1/src.speed * 1/src_attack.speed
     if hit:
-        dice_info = parse_dice(src_attack.damage)
-        tot_hp_loss = 0
-        for i in range(1, dice_info['num_dice'] + 1):
-            hp_loss = random.randint(1, dice_info['num_sides'])
-            tot_hp_loss += hp_loss
-        if shield_in_hand(dst) != 'None':
-            dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, shield_in_hand)
-        else:
-            dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
-        tot_hp_loss *= dmg_multiplier[0]
-        game.message(f'The {dst.name} was hit in the {dmg_multiplier[1]}')
+        #dice()
+        #if len(src.body.parts["torso"]) > 0:
+        tot_hp_loss = striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
+        # tot_hp_loss *= dmg_multiplier[0]
+        # game.message(f'The {dst.name} was hit in the {dmg_multiplier[1]}')
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         if src.states:
             for s in src.states:
@@ -151,6 +148,17 @@ def shield_in_hand(peep):
         if h == 'Shield':
             return h
     else: return 'None'
+    #def dice(),
+        # dice_info = parse_dice(src_attack.damage)
+        # tot_hp_loss = 0
+        # for i in range(1, dice_info['num_dice'] + 1):
+        #     hp_loss = random.randint(1, dice_info['num_sides'])
+        #     tot_hp_loss += hp_loss
+        # if shield_in_hand(dst) != 'None':
+        #     dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, shield_in_hand)
+        # else:
+        #     dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
+
 
 if __name__ == '__main__':
     print("HERE")

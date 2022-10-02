@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from lib.constants import GAME_SETTINGS
-from lib.items.item import Item, FitInfo
+from lib.items.item import Item, FitInfo, Properties, Layer
 from lib.model import register_yaml, Size
 
 # todo: add material and calculate weight
@@ -160,6 +160,7 @@ def chestplate(size=Size(1.0, 1.0, 1.0), thick=1.0, **params):
     vol = ret.size.h * ret.size.w * ret.thick  # todo: factor in curvature of shield (d)
     avol = AVERAGE_CHESTPLATE_THICK * AVERAGE_CHESTPLATE_SIZE.cover_area()
     ret.weight = AVERAGE_CHESTPLATE_WEIGHT * (vol / avol)
+    ret.properties = Properties([Layer(200, 2, 40, 100000, 90000, 0.3, .9), Layer(50, 2, 40, 500000, 500000, 0.6, 0.1)])  #using properties here
     return ret
 # if __name__ == '__main__':
 # s = Shield(layers=(Layer('iron', 'plate', 2), Layer('oak', 'plate', 10)))

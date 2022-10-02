@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Tuple
+from typing import Tuple, Any, List
 
 import yaml
 
@@ -64,6 +64,26 @@ class FitInfo:
     fit_pref: Tuple[str] = field(default_factory=tuple)  # other fit detail: dom(inant)/subdom(inant) for weapons/shields
 
 @dataclass
+class Layer:
+    elasticity: float = 1.0
+    thickness: float = 1.0
+    area: float = 1.0
+    breaking_pt: float = 1.0
+    plastic_region: float = 1.0
+    toughness: float = 1.0  # holds together and friction like felt
+    hardness: float = 1.0
+    durability: float = 1.0
+
+
+@dataclass
+class Properties:
+    layers: List[Layer] = field(default_factory=list)
+    pierce_area: float = 1.0
+    mass: float = 1.0
+    slash_sharpness: float = 1.0
+
+
+@dataclass
 class Item:
     name: str = 'thing'
     char: str = '?'
@@ -72,6 +92,7 @@ class Item:
     weight: float = 1.0
     pos: Tuple[int,int] = field(default_factory=tuple)
     amount: int = 1
+    properties: Properties = None
 
     fgcolor: str = COLOR.WHITE
     bgcolor: str = COLOR.BLACK

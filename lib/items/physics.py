@@ -24,15 +24,15 @@ class Layer:
     durability: float = 1.0
 
 @dataclass
-class Piece:
+class Properties:
     layer: List[Layer] = field(default_factory=list)
 
 @dataclass
 class Target:
-    armor: List[Piece] = field(default_factory=list)
+    properties: Properties = None
 
 
-person = Target([Piece([Layer(200, 2, 40, 100000, 90000, 0.3, .9), Layer(50, 2, 40, 500000, 500000, 0.6, 0.1)])])
+person = Target(Properties([Layer(200, 2, 40, 100000, 90000, 0.3, .9), Layer(50, 2, 40, 500000, 500000, 0.6, 0.1)]))
 hammer = Strike(velocity=40, area=5, mass= 50)
 
 force_theshold = 1000
@@ -58,25 +58,24 @@ def calc_damage(force, strike):
 
 def striking_blow(strike, target):
     """
-    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target([Piece([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])]))
+    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
 
-    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target([Piece([Layer(breaking_pt=10000, hardness=0.9, toughness = 0.2)])]))
+    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.9, toughness = 0.2)])))
 
-    >>> striking_blow(Strike(area=16, mass=0.1, velocity=50), Target([Piece([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])]))
+    >>> striking_blow(Strike(area=16, mass=0.1, velocity=50), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
 
     """
-    if len(target.armor) > 0:
-        for layer in target.armor[0].layer:
-            f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / layer.area
-            if strike.velocity <= 0:
-                break
-            pierce = pierceable(strike, layer)
-            if pierce == "pierce":
-                strike, layer = apply_pierce(strike, layer, f_per_cm)
-            elif pierce == "stop":
-                strike, layer = apply_crush(strike, layer, f_per_cm)
-            else:
-                strike.velocity = 0
+    for layer in target.properties.layers:
+        f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / layer.area
+        if strike.velocity <= 0:
+            break
+        pierce = pierceable(strike, layer)
+        if pierce == "pierce":
+            strike, layer = apply_pierce(strike, layer, f_per_cm)
+        elif pierce == "stop":
+            strike, layer = apply_crush(strike, layer, f_per_cm)
+        else:
+            strike.velocity = 0
     f = (strike.mass * (strike.velocity ** 2)) / 2
     f_per_cm = f/strike.area
     if f_per_cm > force_theshold:
