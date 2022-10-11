@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from time import sleep
 from typing import Tuple
 
-from lib.dijikstra_algo import Node, add_edge
+from lib.dijikstra_algo import Node, add_edge, dijikstra
 from lib.items import clothes
 
 # Find Logging Interface "Flog". Implements necessary interface to search
@@ -308,6 +308,10 @@ def get_key(val, dict):
 
     return "key doesn't exist"
 
+
+
+
+
 def node_graph(halls_by_pt, rooms_by_exits):
     rooms = []
     halls = []
@@ -333,10 +337,13 @@ def node_graph(halls_by_pt, rooms_by_exits):
                 for r in rooms_by_exits[halls_by_pt[e].p2]:
                     id2 = get_key(r, rooms_by_id)
                     add_edge(edges, id, id2, halls_by_pt[e].dist)
+                    nodes[id].edges.append(edges[(id, id2)])
             else:
                 for r in rooms_by_exits[halls_by_pt[e].p1]:
                     id2 = get_key(r, rooms_by_id)
                     add_edge(edges, id, id2, halls_by_pt[e].dist)
+                    nodes[id].edges.append(edges[(id, id2)])
+    dijikstra(nodes)
 
 # find paths algo
 
