@@ -107,7 +107,7 @@ def update_lengths(all_nodes, cur_path, edge, total_len):
     target_node = all_nodes[target_node_id]
 
     total_len = total_len + edge.length
-    print(f'update_lengths origin:{origin_node_id} current:{cur_node_id} targ:{target_node_id} total:{total_len}')
+    print(f'update_lengths origin:{origin_node_id} current:{cur_node_id} targ:{target_node_id} total:{total_len}\n')
     if origin_node_id in target_node.paths and target_node.paths[origin_node_id][1] < total_len:
         return  # better path already found
 

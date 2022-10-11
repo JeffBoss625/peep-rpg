@@ -5,7 +5,8 @@ from typing import Tuple
 from lib.dijikstra_algo import Node, add_edge, dijikstra
 from lib.items import clothes
 
-
+# Find Logging Interface "Flog". Implements necessary interface to search
+# walls and exits in a maze while marking progress for debugging.
 class FLog:
     def __init__(self, control):
         self.control = control
