@@ -58,21 +58,24 @@ def calc_damage(force, strike):
 
 def striking_blow(strike, target):
     """
-    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
+    # >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
+    #
+    # >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.9, toughness = 0.2)])))
+    #
+    # >>> striking_blow(Strike(area=16, mass=0.1, velocity=50), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
 
-    >>> striking_blow(Strike(area=.1, mass=0.015, velocity=100), Target(Properties([Layer(breaking_pt=10000, hardness=0.9, toughness = 0.2)])))
-
-    >>> striking_blow(Strike(area=16, mass=0.1, velocity=50), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
-
+    >>> striking_blow(Strike(velocity=40, area=5, mass= 50), Target(Properties([Layer(200, 2, 40, 100000, 90000, 0.3, .9), Layer(50, 2, 40, 500000, 500000, 0.6, 0.1)])))
     """
-    for layer in target.properties.layers:
+    for layer in target.properties.layer:
         f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / layer.area
         if strike.velocity <= 0:
-            break
+            return 0
         pierce = pierceable(strike, layer)
         if pierce == "pierce":
+            print("pierce")
             strike, layer = apply_pierce(strike, layer, f_per_cm)
         elif pierce == "stop":
+            print("no pierce")
             strike, layer = apply_crush(strike, layer, f_per_cm)
         else:
             strike.velocity = 0
@@ -91,14 +94,14 @@ def apply_pierce(strike, layer, f_per_cm):
 
 def pierceable(strike, layer):
     """
-    >>> pierceable(Strike(area=.1, mass=0.015, velocity=100), Layer(breaking_pt=10000, hardness=0.9))
-    "stop"
-    >>> pierceable(Strike(area=.1, mass=0.015, velocity=100), Layer(breaking_pt=10000, hardness=0.1))
-    "pierce"
-    >>> pierceable(Strike(area=16, mass=0.1, velocity=50), Layer(breaking_pt=10000, hardness=0.9))
-    "stop"
-    >>> pierceable(Strike(area=16, mass=0.1, velocity=50), Layer(breaking_pt=10000, hardness=0.1))
-    "pierce"
+    # >>> pierceable(Strike(area=.1, mass=0.015, velocity=100), Layer(breaking_pt=10000, hardness=0.9))
+    # "stop"
+    # >>> pierceable(Strike(area=.1, mass=0.015, velocity=100), Layer(breaking_pt=10000, hardness=0.1))
+    # "pierce"
+    # >>> pierceable(Strike(area=16, mass=0.1, velocity=50), Layer(breaking_pt=10000, hardness=0.9))
+    # "stop"
+    # >>> pierceable(Strike(area=16, mass=0.1, velocity=50), Layer(breaking_pt=10000, hardness=0.1))
+    # "pierce"
     """
     f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / strike.area ** 2
     print(f'f_per_cm: {f_per_cm}')
