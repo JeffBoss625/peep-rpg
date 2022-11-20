@@ -40,8 +40,10 @@ force_theshold = 1000
 def apply_crush(strike, layer, f_per_cm):
     if f_per_cm > layer.plastic_region:
         layer.durability = layer.durability - 0.1 * (f_per_cm/layer.breaking_pt)
-    strike.velocity = strike.velocity - layer.elasticity/250 * (strike.velocity * (2/3))
-    strike.area = strike.area + (layer.elasticity/250) * (layer.area/4)
+    strike.velocity = strike.velocity - layer.elasticity * (strike.velocity * (2/3))
+    strike.velocity = max(0, strike.velocity)
+    strike.area = strike.area + layer.elasticity * (layer.area/4)
+    strike.area = max(layer.area/4, strike.area)
     return strike, layer
 
 def calc_damage(force, strike):
@@ -64,9 +66,9 @@ def striking_blow(strike, target):
     #
     # >>> striking_blow(Strike(area=16, mass=0.1, velocity=50), Target(Properties([Layer(breaking_pt=10000, hardness=0.8, toughness = 0.2)])))
 
-    >>> striking_blow(Strike(velocity=40, area=5, mass= 50), Target(Properties([Layer(200, 2, 40, 100000, 90000, 0.3, .9), Layer(50, 2, 40, 500000, 500000, 0.6, 0.1)])))
+    >>> striking_blow(Strike(velocity=40, area=5, mass= 50), Target(Properties([Layer(.75, 2, 40, 100000, 90000, 0.3, .9)])))
     """
-    for layer in target.properties.layer:
+    for layer in target.properties.layers:
         f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / layer.area
         if strike.velocity <= 0:
             return 0
@@ -81,6 +83,7 @@ def striking_blow(strike, target):
             strike.velocity = 0
     f = (strike.mass * (strike.velocity ** 2)) / 2
     f_per_cm = f/strike.area
+    print(f"damage: {calc_damage(f_per_cm, strike)}")
     if f_per_cm > force_theshold:
         return calc_damage(f_per_cm, strike)
     else:
@@ -89,6 +92,7 @@ def striking_blow(strike, target):
 
 def apply_pierce(strike, layer, f_per_cm):
     strike.velocity = (strike.velocity * (strike.mass * 100)) - (layer.toughness * strike.velocity) / (1 / layer.thickness)
+    strike.velocity = max(0, strike.velocity)
     layer.durability -= .02
     return strike, layer
 
