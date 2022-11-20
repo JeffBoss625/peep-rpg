@@ -11,7 +11,7 @@ import sys
 import signal
 import copy
 from lib.calc import distance
-from lib.pclass import activate_ability, check_line
+from lib.pclass import activate_ability, check_line, check_states
 from lib.prpg_control import PrpgControl
 from lib.constants import GAME_SETTINGS
 from lib.target import line_points
@@ -64,6 +64,10 @@ def do_player_turn(control, input_key):
 
         if input_key == '.':
             game.player._tics = game.player._tics - 1/game.player.speed
+            for s in player.states:  # todo:Should subscribe to peep aging events
+                peeps = game.maze_model.peeps
+                inc = round(1 / peeps[0].speed, 5)
+                check_states(player, s, inc)
             moved = True
         else:
             moved = mlib.move_peep(game, game.player, dst_pos)
@@ -263,6 +267,10 @@ def player_aim(attack, control):
         mm.create_projectile(player, attack.name, path, (attack.projectile_attack(),))
         game.banner(['', '                TWANG!'])
         player._tics = player._tics - 1/player.speed * 1/attack.speed
+        for s in player.states:  # todo:Should subscribe to peep aging events
+            peeps = game.maze_model.peeps
+            inc = round(1 / peeps[0].speed, 5)
+            check_states(player, s, inc)
 
 
 def monster_turn(control, monster):

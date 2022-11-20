@@ -1,4 +1,5 @@
 from lib.attack import attack_dst, choose_attack
+from lib.pclass import check_states
 from lib.peep_types import create_peep
 
 # x and y modifiers for each directions on keypad
@@ -140,6 +141,10 @@ def move_peep(game, peep, dst_pos):
     # move
     peep.pos = dst_pos
     peep._tics = peep._tics - 1/peep.speed
+    for s in peep.states:      #todo:Should subscribe to peep aging events
+        peeps = game.maze_model.peeps
+        inc = round(1/peeps[0].speed, 5)
+        check_states(peep, s, inc)
     return True
 
 

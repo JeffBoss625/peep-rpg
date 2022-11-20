@@ -9,6 +9,7 @@ from lib.stats import roll_dice
 
 class PCLASSES:
     FIGHTER = 'FIGHTER'
+    THIEF = 'THIEF'
 
 
 @dataclass
@@ -25,6 +26,7 @@ class PClass:
 class Ability:
     name: str = ''
     isactive: bool = False
+    time_activated: float = -100
 
 
 @dataclass
@@ -44,6 +46,16 @@ class AbilityCharge(Ability):
                     if a.name == self.name:
                         activate_ability(peep, a, False)
 
+@dataclass
+class AbilityBypass(Ability):
+    name: str = 'bypass'
+    state: str = 'bypassing'
+    duration: float = 0.1
+    cooldown: int = 15
+    isactive: bool = True
+    time_activated: float = -100
+    halt_hit = False
+
     # todo: Refactor activate_ability into the abilities themselves.
 
 
@@ -58,6 +70,16 @@ PCLASSES = [
             [Ability(name='rage', isactive=False)],
         ],
         states=[],
+    ),
+    PClass(
+        name=PCLASSES.THIEF,
+        level_factor=1.0,
+        regen_factor=1.0,
+        hitdicefac=1.0,
+        abilitiesbylevel=[
+            [AbilityBypass()],
+            [Ability(name='backstab', isactive=False)]
+    ],
     )
 ]
 
@@ -110,6 +132,33 @@ class PAbilityRage (PAbility):
         if peep.hp <= self.healthreq * peep.maxhp and peep.hp > 0:
             print('hi')
 
+class PAbilityBackstab (PAbility):
+    name: str = 'backstab'
+    state: str = 'backstabbing'
+    duration: float = 10
+    healthreq: float = 1.0
+
+class PeepBackstabbing (PeepState):
+    name: str = 'backstabbing'
+    dmgboost: float = 1.0
+    hpboost: float = 1.0
+    speedboost: float = 0
+    maxcompounded: int = 1
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
+    backstab: bool = True
+
+@dataclass
+class PeepBypassing (PeepState):
+    name: str = 'bypassing'
+    dmgboost: float = 1.0
+    hpboost: float = 1.0
+    speedboost: float = 4.0
+    maxcompounded: int = 1
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
 
 class PabilitySpeed_Adr (PAbility):
     name: str = 'speed_adr'
@@ -119,11 +168,13 @@ class PabilitySpeed_Adr (PAbility):
 
 ABILITIES_BY_NAME = {
     'charge': AbilityCharge,
+    'bypass': AbilityBypass,
 }
 
 PABILITIES_BY_NAME = {
     'rage': PAbilityRage,
     'speed_adr': PabilitySpeed_Adr,
+    'backstab': PAbilityBackstab,
 }
 
 PCLASSES_BY_NAME = {m.name:m for m in PCLASSES}
@@ -131,6 +182,8 @@ PCLASSES_BY_NAME = {m.name:m for m in PCLASSES}
 STATECLASSES_BY_NAME = {
     'enraged': PeepEnraged,
     'charging': PeepCharging,
+    'backstabbing': PeepBackstabbing,
+    'bypassing': PeepBypassing,
 }
 
 def xptolevel_calc(level, factor, base):
@@ -204,19 +257,23 @@ def activate_ability(peep, ability, cooldown_check=True):
                         s.speedboost += state.speedboost
                         s.dmgboost = s.dmgboost + (state.dmgboost - 1)
                         peep.speed = peep.speed + s.speedboost
-                        ability.time_activated = peep._age
                     else:
                         state.duration = ability.duration
-                        ability.time_activated = peep._age
-            else:
-                state.duration = ability.duration
-                ability.time_activated = peep._age
-                break
+
+                    ability.time_activated = peep._age
+                    break
+                else:
+                    state.duration = ability.duration
+                    ability.time_activated = peep._age
+                    break
     else:
         state.duration = ability.duration
         ability.time_activated = peep._age
-        peep.states.append(state)
-        peep.speed = peep.speed + state.speedboost
+
+    state.duration = ability.duration
+    peep.states.append(state)
+    peep.speed = peep.speed + state.speedboost
+
     return True
 
 def check_states(peep, state, inc):

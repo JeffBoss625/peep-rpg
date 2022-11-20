@@ -32,7 +32,7 @@ class PType:
     regen_fac: float = 1.0
     skill: float = 1.0
     height: int = 5
-    pclass: str = 'FIGHTER'
+    pclass: str = 'THIEF'
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level
@@ -486,7 +486,7 @@ def create_attack(attack_info):
 
 def create_peep(
         ptype,
-        pclass="FIGHTER",
+        pclass="THIEF",
         name='',
         pos=(0, 0),
         height=1.0,
