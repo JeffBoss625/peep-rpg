@@ -83,6 +83,12 @@ class MazeModel(DataModel):
         if ret == '#' or ret == '%':
             return ret
 
+    def peep_at(self, pos):
+        for p in self.peeps:
+            if p.pos == pos and p.hp > 0:
+                return p
+        return None
+
     def char_at(self, x, y):
         return self.walls.char_at(x, y)
 

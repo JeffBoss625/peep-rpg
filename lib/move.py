@@ -87,7 +87,7 @@ def adjacent_pos(src_pos, direct):
 # Handle move and collisions with monsters. Return True if move or attack was executed, false, if the move
 # failed (hit a wall)
 def move_peep(game, peep, dst_pos):
-    tgt_peep = peep_at_pos(game.maze_model.peeps, dst_pos)
+    tgt_peep = game.maze_model.peep_at(dst_pos)
     # todo: separate projectile move from monster melee attack (speed and handling)
     # if peep.type == 'projectile':
     #   ...
@@ -126,19 +126,40 @@ def move_peep(game, peep, dst_pos):
             else:
                 return False # monster attacking monster
         else:
-            src_attack = choose_attack(peep, True)
-            if src_attack:
-                if attack_dst(peep, tgt_peep, src_attack, game):
-                    # hit!
-                    return True
-                else:
-                    # missed
-                    if peep.type != 'projectile':
-                        # used up move with miss
+            skip = False
+            if peep.states:
+                for s in peep.states:
+                    if s.handle_move_into_monster(peep, tgt_peep, game):
+                        skip = True
                         return True
-                    # else continue to move (below)
+                if skip is False:
+                    src_attack = choose_attack(peep, True)
+                    if src_attack:
+                        if attack_dst(peep, tgt_peep, src_attack, game):
+                            # hit!
+                            return True
+                        else:
+                            # missed
+                            if peep.type != 'projectile':
+                                # used up move with miss
+                                return True
+                            # else continue to move (below)
+            else:
+                src_attack = choose_attack(peep, True)
+                if src_attack:
+                    if attack_dst(peep, tgt_peep, src_attack, game):
+                        # hit!
+                        return True
+                    else:
+                        # missed
+                        if peep.type != 'projectile':
+                            # used up move with miss
+                            return True
+                        # else continue to move (below)
 
     # move
+    direct = direction_from_vector(peep.pos[0]-dst_pos[0], peep.pos[1]-dst_pos[1])
+    peep.direct = direct
     peep.pos = dst_pos
     peep._tics = peep._tics - 1/peep.speed
     for s in peep.states:      #todo:Should subscribe to peep aging events

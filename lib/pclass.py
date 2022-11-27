@@ -28,6 +28,9 @@ class Ability:
     isactive: bool = False
     time_activated: float = -100
 
+    def handle_move_into_monster(self, src, dst, game):
+        return False #continue to attack tgt
+
 
 @dataclass
 class AbilityCharge(Ability):
@@ -98,6 +101,9 @@ class PeepState:
     name: str = ''
     duration: float = 1.0
 
+    def handle_move_into_monster(self, src, dst, game):
+        return False #continue to attack tgt
+
 
 @dataclass
 class PeepCharging (PeepState):
@@ -154,11 +160,27 @@ class PeepBypassing (PeepState):
     name: str = 'bypassing'
     dmgboost: float = 1.0
     hpboost: float = 1.0
-    speedboost: float = 4.0
+    speedboost: float = 0
     maxcompounded: int = 1
     compounded: int = 0
     path: bool = False
     num_mult: int = 0
+
+    def handle_move_into_monster(self, src, dst, game):
+        x_mod = (dst.pos[0]-src.pos[0]) * 2
+        y_mod = (dst.pos[1]-src.pos[1]) * 2
+        target_pos = (src.pos[0]+x_mod, src.pos[1]+y_mod)
+        if game.maze_model.peep_at(target_pos):
+            target_pos = list(dst.pos)
+            dst.pos = src.pos
+            src.pos = target_pos[0]
+        elif game.maze_model.wall_at(target_pos):
+            target_pos = list(dst.pos)
+            dst.pos = src.pos
+            src.pos = target_pos[0]
+        else:
+            src.pos = target_pos
+        return True #no attacks
 
 class PabilitySpeed_Adr (PAbility):
     name: str = 'speed_adr'
