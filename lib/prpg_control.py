@@ -28,7 +28,7 @@ class PrpgControl:
         center = main_panel.panel('center_panel', Orient.HORI, None)
 
         center_col1 = center.panel('center_col1', Orient.VERT, None)
-        hmin = 7 if pack else 15
+        hmin = 7 if pack else 12
         hmax = hmin
         center_col1.window(WIN.PLAYER, Con(30,hmin,30,hmax))
         hmin = 10 if pack else 20

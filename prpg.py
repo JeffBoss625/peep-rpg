@@ -39,7 +39,7 @@ def cb(scr):
 
     game.goto_level(1, placement='<')
 
-    main(PrpgControl(root_layout, game))
+    main(PrpgControl(root_layout, game, pack=True))
 
 
 curses.wrapper(cb)

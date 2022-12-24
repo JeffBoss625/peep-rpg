@@ -32,7 +32,7 @@ class PType:
     regen_fac: float = 1.0
     skill: float = 1.0
     height: int = 5
-    pclass: str = 'THIEF'
+    pclass: str = 'FIGHTER'
 
     # todo: move this to level info to allow different rates and limit
     hp_inc: str = '1d1'     # incremental hp per level

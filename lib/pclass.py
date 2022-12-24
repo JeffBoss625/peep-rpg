@@ -4,6 +4,7 @@ from typing import Tuple, List
 from lib.constants import GAME_SETTINGS
 import math
 
+from lib.direction import direction_from_vector, direction_to_dxdy
 from lib.stats import roll_dice
 
 
@@ -101,7 +102,7 @@ class PeepState:
     name: str = ''
     duration: float = 1.0
 
-    def handle_move_into_monster(self, src, dst, game):
+    def handle_move_into_monster(self, src, dst, state, game):
         return False #continue to attack tgt
 
 
@@ -117,6 +118,28 @@ class PeepCharging (PeepState):
     path: bool = True
     num_mult: int = 0
 
+    def handle_move_into_monster(self, src, dst, state, game):
+        x_mod = (dst.pos[0] - src.pos[0])
+        y_mod = (dst.pos[1] - src.pos[1])
+        target_pos = (src.pos[0] + x_mod * 2, src.pos[1] + y_mod * 2)
+        if game.maze_model.peep_at(target_pos):
+            dst.pos = (target_pos[0], target_pos[1])
+            moving_peep = game.maze_model.peep_at(target_pos)
+            target_pos = (target_pos[0] + x_mod, target_pos[1] + y_mod)
+            while game.maze_model.peep_at(target_pos):
+                moving_peep.pos = (target_pos[0], target_pos[1])
+                target_pos = (target_pos[0] + x_mod, target_pos[1] + y_mod)
+                if game.maze_model.peep_at(target_pos):
+                    moving_peep = game.maze_model.peep_at(target_pos)
+                else:
+                    break
+
+        elif game.maze_model.wall_at(target_pos):
+            pass
+        else:
+            src.pos = target_pos
+        return False
+
 @dataclass
 class PeepEnraged (PeepState):
     name: str = 'enraged'
@@ -127,6 +150,9 @@ class PeepEnraged (PeepState):
     compounded: int = 0
     path: bool = False
     num_mult: int = 0
+
+    def handle_move_into_monster(self, src, dst, state, game):
+        return False
 
 class PAbilityRage (PAbility):
     name: str = 'rage'
@@ -155,6 +181,18 @@ class PeepBackstabbing (PeepState):
     num_mult: int = 0
     backstab: bool = True
 
+    def handle_move_into_monster(self, src, dst, state, game):
+        # todo: add in chance to not backstab
+        dst_facing = direction_to_dxdy(dst.direct)
+        src_facing = direction_to_dxdy(src.direct)
+        if dst_facing == src_facing:
+            state.dmgboost = 2.0
+        elif dst_facing[0] == src_facing[0]:
+            state.dmgboost = 1.5
+        elif dst_facing[1] == src_facing[1]:
+            state.dmgboost = 1.5
+        return False
+
 @dataclass
 class PeepBypassing (PeepState):
     name: str = 'bypassing'
@@ -166,20 +204,21 @@ class PeepBypassing (PeepState):
     path: bool = False
     num_mult: int = 0
 
-    def handle_move_into_monster(self, src, dst, game):
+    def handle_move_into_monster(self, src, dst, state, game):
         x_mod = (dst.pos[0]-src.pos[0]) * 2
         y_mod = (dst.pos[1]-src.pos[1]) * 2
         target_pos = (src.pos[0]+x_mod, src.pos[1]+y_mod)
         if game.maze_model.peep_at(target_pos):
             target_pos = list(dst.pos)
             dst.pos = src.pos
-            src.pos = target_pos[0]
+            src.pos = (target_pos[0], target_pos[1])
         elif game.maze_model.wall_at(target_pos):
             target_pos = list(dst.pos)
             dst.pos = src.pos
-            src.pos = target_pos[0]
+            src.pos = (target_pos[0], target_pos[1])
         else:
             src.pos = target_pos
+        src.states.remove(state)
         return True #no attacks
 
 class PabilitySpeed_Adr (PAbility):
@@ -288,13 +327,16 @@ def activate_ability(peep, ability, cooldown_check=True):
                     state.duration = ability.duration
                     ability.time_activated = peep._age
                     break
+            else:
+                state.duration = ability.duration
+                ability.time_activated = peep._age
+                peep.states.append(state)
+                peep.speed = peep.speed + state.speedboost
     else:
         state.duration = ability.duration
         ability.time_activated = peep._age
-
-    state.duration = ability.duration
-    peep.states.append(state)
-    peep.speed = peep.speed + state.speedboost
+        peep.states.append(state)
+        peep.speed = peep.speed + state.speedboost
 
     return True
 

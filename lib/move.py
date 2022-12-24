@@ -1,64 +1,8 @@
 from lib.attack import attack_dst, choose_attack
+from lib.direction import Direction, direction_to_dxdy, direction_from_vector
 from lib.pclass import check_states
 from lib.peep_types import create_peep
 
-# x and y modifiers for each directions on keypad
-# Direction constants match keypad layout 1-9
-#       7 8 9
-#       4 5 6
-#       1 2 3
-class Direction: DOWN_LEFT, DOWN, DOWN_RIGHT, LEFT, CENTER, RIGHT, UP_LEFT, UP, UP_RIGHT = range(1,10)
-
-
-X_MODIFIERS = {
-    Direction.UP_LEFT: -1,
-    Direction.LEFT: -1,
-    Direction.DOWN_LEFT: -1,
-    Direction.UP: 0,
-    Direction.CENTER: 0,
-    Direction.DOWN: 0,
-    Direction.UP_RIGHT: 1,
-    Direction.RIGHT: 1,
-    Direction.DOWN_RIGHT: 1,
-}
-
-Y_MODIFIERS = {
-    Direction.UP_LEFT: -1,
-    Direction.UP: -1,
-    Direction.UP_RIGHT: -1,
-    Direction.LEFT: 0,
-    Direction.CENTER: 0,
-    Direction.RIGHT: 0,
-    Direction.DOWN_LEFT: 1,
-    Direction.DOWN: 1,
-    Direction.DOWN_RIGHT: 1,
-}
-
-
-def direction_to_dxdy(direction):
-    return X_MODIFIERS[direction], Y_MODIFIERS[direction]
-
-
-def direction_from_vector(dx, dy):
-    ret = Direction.CENTER
-
-    if dx < 0 and dy < 0:
-        ret = Direction.UP_LEFT
-    if dx == 0 and dy < 0:
-        ret = Direction.UP
-    if dx > 0 and dy < 0:
-        ret = Direction.UP_RIGHT
-    if dx > 0 and dy == 0:
-        ret = Direction.RIGHT
-    if dx > 0 and dy > 0:
-        ret = Direction.DOWN_RIGHT
-    if dx == 0 and dy > 0:
-        ret = Direction.DOWN
-    if dx < 0 and dy > 0:
-        ret = Direction.DOWN_LEFT
-    if dx < 0 and dy == 0:
-        ret = Direction.LEFT
-    return ret
 
 # Direction constants match keypad layout
 #       7 8 9
@@ -88,6 +32,8 @@ def adjacent_pos(src_pos, direct):
 # failed (hit a wall)
 def move_peep(game, peep, dst_pos):
     tgt_peep = game.maze_model.peep_at(dst_pos)
+    direct = direction_from_vector(peep.pos[0]-dst_pos[0], peep.pos[1]-dst_pos[1])
+    peep.direct = direct
     # todo: separate projectile move from monster melee attack (speed and handling)
     # if peep.type == 'projectile':
     #   ...
@@ -129,7 +75,7 @@ def move_peep(game, peep, dst_pos):
             skip = False
             if peep.states:
                 for s in peep.states:
-                    if s.handle_move_into_monster(peep, tgt_peep, game):
+                    if s.handle_move_into_monster(peep, tgt_peep, s, game):
                         skip = True
                         return True
                 if skip is False:
@@ -158,8 +104,7 @@ def move_peep(game, peep, dst_pos):
                         # else continue to move (below)
 
     # move
-    direct = direction_from_vector(peep.pos[0]-dst_pos[0], peep.pos[1]-dst_pos[1])
-    peep.direct = direct
+
     peep.pos = dst_pos
     peep._tics = peep._tics - 1/peep.speed
     for s in peep.states:      #todo:Should subscribe to peep aging events
