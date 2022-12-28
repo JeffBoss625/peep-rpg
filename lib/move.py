@@ -143,7 +143,8 @@ def move_along_path(monster, game):
         monster.hp = 0  # todo: convert to item with chance of breaking
     return True
 
-def monster_hunt(monster, control, choose_monster_target):
+def monster_hunt(monster, player, control, choose_monster_target):
+    game = control.game_model
     if monster._hunt_target:
         if monster._hunt_target.hp <= 0:
             monster._hunt_target = choose_monster_target(monster, control)
@@ -151,4 +152,31 @@ def monster_hunt(monster, control, choose_monster_target):
         monster._hunt_target = choose_monster_target(monster, control)
     dx = monster._hunt_target.pos[0] - monster.pos[0]
     dy = monster._hunt_target.pos[1] - monster.pos[1]
-    return dx, dy
+    if player.hp <= 0:
+        control.player_died()
+        return False
+
+    if monster.hp / monster.maxhp < 0.2:
+        direct = direction_from_vector(-dx, -dy)  # If low health, run away
+    else:
+        direct = direction_from_vector(dx, dy)
+
+    dst_pos = adjacent_pos(monster.pos, direct)
+    if move_peep(game, monster, dst_pos):
+        return True
+
+    # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
+    rotation = 1
+    while rotation <= 4:
+        d2 = direction_relative(direct, rotation)
+        dst_pos = adjacent_pos(monster.pos, d2)
+        if move_peep(game, monster, dst_pos):
+            return True
+        d2 = direction_relative(direct, -rotation)
+        dst_pos = adjacent_pos(monster.pos, d2)
+        if move_peep(game, monster, dst_pos):
+            return True
+        rotation += 1
+        if abs(rotation) >= 5:
+            monster._tics = monster._tics - 1 / monster.speed
+            continue

@@ -287,35 +287,8 @@ def monster_turn(control, monster):
     if monster.move_tactic == 'pos_path':
         mlib.move_along_path(monster, game)
     elif monster.move_tactic == 'hunt':
-        dx, dy = mlib.monster_hunt(monster, control, choose_monster_target)
-        if player.hp <= 0:
-            control.player_died()
-            return False
+        mlib.monster_hunt(monster, player, control, choose_monster_target)
 
-        if monster.hp / monster.maxhp < 0.2:
-            direct = mlib.direction_from_vector(-dx, -dy)  # If low health, run away
-        else:
-            direct = mlib.direction_from_vector(dx, dy)
-
-        dst_pos = mlib.adjacent_pos(monster.pos, direct)
-        if mlib.move_peep(game, monster, dst_pos):
-            return True
-
-        # failed to move, try other directions (rotation 1,-1,2,-2,3,-3,4,-4)
-        rotation = 1
-        while rotation <= 4:
-            d2 = mlib.direction_relative(direct, rotation)
-            dst_pos = mlib.adjacent_pos(monster.pos, d2)
-            if mlib.move_peep(game, monster, dst_pos):
-                return True
-            d2 = mlib.direction_relative(direct, -rotation)
-            dst_pos = mlib.adjacent_pos(monster.pos, d2)
-            if mlib.move_peep(game, monster, dst_pos):
-                return True
-            rotation += 1
-            if abs(rotation) >= 5:
-                monster._tics = monster._tics - 1 / monster.speed
-                continue
 
     return True
 
