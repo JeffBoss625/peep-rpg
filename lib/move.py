@@ -132,3 +132,23 @@ def create_wally(maze, pos):
     maze.walls.replace_region(pos[0], pos[1], ['.'])
     maze.peeps.append(wall)
     return wall
+
+def move_along_path(monster, game):
+    if monster.pos_i < len(monster.pos_path) - 1:
+        monster.pos_i += 1
+        dst_pos = monster.pos_path[monster.pos_i]
+        move_peep(game, monster, dst_pos)
+    else:
+        game.message(f'{monster.name} hits the ground')
+        monster.hp = 0  # todo: convert to item with chance of breaking
+    return True
+
+def monster_hunt(monster, control, choose_monster_target):
+    if monster._hunt_target:
+        if monster._hunt_target.hp <= 0:
+            monster._hunt_target = choose_monster_target(monster, control)
+    else:
+        monster._hunt_target = choose_monster_target(monster, control)
+    dx = monster._hunt_target.pos[0] - monster.pos[0]
+    dy = monster._hunt_target.pos[1] - monster.pos[1]
+    return dx, dy

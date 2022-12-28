@@ -160,6 +160,12 @@ def shield_in_hand(peep):
         # else:
         #     dmg_multiplier = lib.calc.calc_dmg_multiplier(dst, 'None')
 
+def fire_projectile(monster, player, line_points, mm, ranged_attack):
+    path = list(line_points(monster.pos, player.pos))
+    mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
+    monster._tics = monster._tics - 1 / monster.speed * 1 / ranged_attack.speed
+    return True
+
 
 if __name__ == '__main__':
     print("HERE")

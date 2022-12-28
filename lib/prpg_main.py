@@ -1,6 +1,6 @@
 import lib.move as mlib
 from lib import dungeons
-from lib.attack import choose_attack
+from lib.attack import choose_attack, fire_projectile
 from lib.calc import target_list
 from lib.constants import Key
 from lib.items import clothes
@@ -282,27 +282,12 @@ def monster_turn(control, monster):
             and ranged_attack is not None \
             and is_in_sight(monster, player.pos, mm.walls) \
             and ranged_attack.range > distance(monster.pos, player.pos) > 3:
-        path = list(line_points(monster.pos, player.pos))
-        mm.create_projectile(monster, ranged_attack.name, path, (ranged_attack.projectile_attack(),))
-        monster._tics = monster._tics - 1/monster.speed * 1/ranged_attack.speed
-    if monster.hp > monster.maxhp: monster.hp = monster.maxhp
+        fire_projectile(monster, player, line_points, mm, ranged_attack)
+    if monster.hp > monster.maxhp: monster.hp = monster.maxhp # todo: move this max check to attack function
     if monster.move_tactic == 'pos_path':
-        if monster.pos_i < len(monster.pos_path) - 1:
-            monster.pos_i += 1
-            dst_pos = monster.pos_path[monster.pos_i]
-            mlib.move_peep(game, monster, dst_pos)
-        else:
-            game.message(f'{monster.name} hits the ground')
-            monster.hp = 0  # todo: convert to item with chance of breaking
-        return True
+        mlib.move_along_path(monster, game)
     elif monster.move_tactic == 'hunt':
-        if monster._hunt_target:
-            if monster._hunt_target.hp <= 0:
-                monster._hunt_target = choose_monster_target(monster, control)
-        else:
-            monster._hunt_target = choose_monster_target(monster, control)
-        dx = monster._hunt_target.pos[0] - monster.pos[0]
-        dy = monster._hunt_target.pos[1] - monster.pos[1]
+        dx, dy = mlib.monster_hunt(monster, control, choose_monster_target)
         if player.hp <= 0:
             control.player_died()
             return False
