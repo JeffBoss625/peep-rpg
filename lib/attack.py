@@ -26,11 +26,13 @@ def parse_dice(dstring):
         'num_sides': int(parts[1])
     }
 
-def choose_attack(src, mtrue): #mtrue means melee True or False, False is ranged
-    if mtrue:
+def choose_attack(src, att_type): #mtrue means melee True or False, False is ranged
+    if att_type == 'melee':
         attacks = list(a for a in src.attacks if a.range == 0)
-    else:
+    elif att_type == 'ranged':
         attacks = list(a for a in src.attacks if a.range > 0)
+    else:
+        raise ValueError(f'unknown attack type: {att_type}')
     a_dmg = 0
     attack = None
     for a in attacks:

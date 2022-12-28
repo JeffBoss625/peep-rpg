@@ -172,9 +172,9 @@ def test_choose_melee_attack():
     m1 = Peep(name='m1', hp=5, attacks=(Attack('kick', damage='1d3'), Attack('shoot', damage='17d17', range=5), Attack('bite', damage='1d2'),), body=create_body('humanoid'))
     out = Out()
     # attack_dst(p1, m1, choose_melee_attack(p1), out)
-    attack = choose_attack(p1, True)
+    attack = choose_attack(p1, 'melee')
     assert attack.name == 'stab'
-    attack2 = choose_attack(m1, True)
+    attack2 = choose_attack(m1, 'melee')
     assert attack2.name == 'kick'
 
 def test_choose_ranged_attack():
@@ -184,5 +184,5 @@ def test_choose_ranged_attack():
     # attack_dst(p1, m1, choose_melee_attack(p1), out)
     # attack = choose_attack(p1, False)
     # assert attack is None
-    attack2 = choose_attack(m1, False)
+    attack2 = choose_attack(m1, 'ranged')
     assert attack2.name == 'shoot'

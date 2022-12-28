@@ -51,14 +51,14 @@ def move_peep(game, peep, dst_pos):
 
     if tgt_peep:
         if peep.type == 'projectile':
-            src_attack = choose_attack(peep, True)
+            src_attack = choose_attack(peep, 'melee')
             if src_attack:
                 if attack_dst(peep, tgt_peep, src_attack, game):
                     # hit!
                     return True
         if peep != game.player:
             if tgt_peep == game.player:
-                src_attack = choose_attack(peep, True)
+                src_attack = choose_attack(peep, 'melee')
                 if src_attack:
                     if attack_dst(peep, tgt_peep, src_attack, game):
                         # hit!
@@ -79,7 +79,7 @@ def move_peep(game, peep, dst_pos):
                         skip = True
                         return True
                 if skip is False:
-                    src_attack = choose_attack(peep, True)
+                    src_attack = choose_attack(peep, 'melee')
                     if src_attack:
                         if attack_dst(peep, tgt_peep, src_attack, game):
                             # hit!
@@ -91,7 +91,7 @@ def move_peep(game, peep, dst_pos):
                                 return True
                             # else continue to move (below)
             else:
-                src_attack = choose_attack(peep, True)
+                src_attack = choose_attack(peep, 'melee')
                 if src_attack:
                     if attack_dst(peep, tgt_peep, src_attack, game):
                         # hit!

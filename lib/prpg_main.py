@@ -101,7 +101,7 @@ def do_player_turn(control, input_key):
             game.message('No ability to activate')
 
     elif input_key == 'a':
-        attack = choose_attack(player, False)
+        attack = choose_attack(player, 'ranged')
         if attack:
             player_aim(attack, control)
         else:
@@ -277,7 +277,7 @@ def monster_turn(control, monster):
     game = control.game_model
     mm = game.maze_model
     player = game.player
-    ranged_attack = choose_attack(monster, False)
+    ranged_attack = choose_attack(monster, 'ranged')
     if monster.type != 'projectile' \
             and ranged_attack is not None \
             and is_in_sight(monster, player.pos, mm.walls) \
