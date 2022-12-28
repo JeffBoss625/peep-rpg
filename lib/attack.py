@@ -71,9 +71,10 @@ def attack_dst(src, dst, src_attack, game):
         game.message(f'{src.name} attacks {dst.name} with {src_attack.name}! ({tot_hp_loss} damage)')
         if src.states:
             for s in src.states:
-                if s.dmgboost:
+                if s.dmgboost and s.dmgboost != 1.0:
                     tot_hp_loss *= s.dmgboost
-                    game.message(f'You have attacked with {s.dmgboost}x multiplied damage because of your {s.name} ability')
+                    if src == game.player:
+                        game.message(f'You have attacked with {s.dmgboost}x multiplied damage because of your {s.name} ability')
         dst.hp = dst.hp - tot_hp_loss
         if src.aabilities:
             for a in src.aabilities:

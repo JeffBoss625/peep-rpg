@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from random import randint
 from typing import Tuple, List
 
 from lib.constants import GAME_SETTINGS
@@ -133,7 +134,6 @@ class PeepCharging (PeepState):
                     moving_peep = game.maze_model.peep_at(target_pos)
                 else:
                     break
-
         elif game.maze_model.wall_at(target_pos):
             pass
         else:
@@ -182,16 +182,34 @@ class PeepBackstabbing (PeepState):
     backstab: bool = True
 
     def handle_move_into_monster(self, src, dst, state, game):
-        # todo: add in chance to not backstab
         dst_facing = direction_to_dxdy(dst.direct)
         src_facing = direction_to_dxdy(src.direct)
         if dst_facing == src_facing:
-            state.dmgboost = 2.0
+            random = randint(0, 1)  # chance to not backstab
+            if random == 0:
+                state.dmgboost = 2.0
+            else:
+                state.dmgboost = 1.0
+                if src == game.player:
+                    game.message("Your backstab missed! Your attack does normal damage.")
         elif dst_facing[0] == src_facing[0]:
-            state.dmgboost = 1.5
+            random = randint(0, 1)  # chance to not backstab
+            if random == 0:
+                state.dmgboost = 1.5
+            else:
+                state.dmgboost = 1.0
+                if src == game.player:
+                    game.message("Your backstab missed! Your attack does normal damage.")
         elif dst_facing[1] == src_facing[1]:
-            state.dmgboost = 1.5
+            random = randint(0, 1)  # chance to not backstab
+            if random == 0:
+                state.dmgboost = 1.5
+            else:
+                state.dmgboost = 1.0
+                if src == game.player:
+                    game.message("Your backstab missed! Your attack does normal damage.")
         return False
+
 
 @dataclass
 class PeepBypassing (PeepState):
