@@ -283,7 +283,6 @@ def monster_turn(control, monster):
             and is_in_sight(monster, player.pos, mm.walls) \
             and ranged_attack.range > distance(monster.pos, player.pos) > 3:
         fire_projectile(monster, player, line_points, mm, ranged_attack)
-    if monster.hp > monster.maxhp: monster.hp = monster.maxhp # todo: move this max check to attack function
     if monster.move_tactic == 'pos_path':
         mlib.move_along_path(monster, game)
     elif monster.move_tactic == 'hunt':

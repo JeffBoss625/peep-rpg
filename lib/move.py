@@ -134,7 +134,7 @@ def create_wally(maze, pos):
     return wall
 
 def move_along_path(monster, game):
-    if monster.pos_i < len(monster.pos_path) - 1:
+    if monster.pos_i < len(monster.pos_path) + 1:
         monster.pos_i += 1
         dst_pos = monster.pos_path[monster.pos_i]
         move_peep(game, monster, dst_pos)
