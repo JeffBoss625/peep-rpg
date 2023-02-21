@@ -16,16 +16,18 @@ class MazeWindow(Window):
         for it in self.model.items:
             self.write_str(it.pos[0], it.pos[1], it.char, **{**params, **{'fg': it.fgcolor, 'bg': it.bgcolor}})
 
-        for p in self.model.peeps:
-            if p.hp > 0:
-                self.write_str(p.pos[0], p.pos[1], p.char, **{**params, **{'fg': p.fgcolor, 'bg': p.bgcolor}})
-
         path = self.model.target_path
         if len(path):
             for p in path[1:-1]:
                 self.write_str(p[0], p[1], '*', **{**params, **{'fg': COLOR.GREEN, 'bg': COLOR.BLACK}})
             last = path[-1]
             self.change_attr(last[0], last[1], 1, TEXTA.REVERSE, **params)
+
+        for p in self.model.peeps:
+            if p.hp > 0:
+                self.write_str(p.pos[0], p.pos[1], p.char, **{**params, **{'fg': p.fgcolor, 'bg': p.bgcolor}})
+
+
 
         if self.model.cursorvis:
             # todo: cursor does not print
