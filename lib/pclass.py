@@ -210,6 +210,40 @@ class PeepBackstabbing (PeepState):
                     game.message("Your backstab missed! Your attack does normal damage.")
         return False
 
+@dataclass
+class PeepSleeping (PeepState):
+    name: str = 'sleeping'
+    dmgboost: float = 1.0
+    hpboost: float = 1.0
+    speedboost: float = 0
+    maxcompounded: int = 1
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
+
+    sleepiness: int = 1
+    max_sleepiness: int = 500
+    age_checked: int = 0
+
+    def handle_sound_processed(self, peep, sound):
+        sound_threshold = self.sleepiness * 0.1
+        if sound >= sound_threshold:
+            self.sleepiness -= sound
+            if self.sleepiness <= 0:
+                peep.states.remove(self)
+        else:
+            pass
+
+    def handle_elapse_time(self, control):
+        time_passed = control.player.age - self.age_checked
+        self.sleepiness += 25 * time_passed
+        if self.sleepiness >= 500: self.sleepiness = 500
+        self.age_checked = control.player.age
+
+    def handle_hit(self, peep):
+        self.sleepiness -= 500
+        if self.sleepiness <= 0:
+            peep.states.remove(self)
 
 @dataclass
 class PeepBypassing (PeepState):

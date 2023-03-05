@@ -283,12 +283,19 @@ def monster_turn(control, monster):
             and is_in_sight(monster, player.pos, mm.walls) \
             and ranged_attack.range > distance(monster.pos, player.pos) > 3:
         fire_projectile(monster, player, line_points, mm, ranged_attack)
-    if monster.move_tactic == 'pos_path':
-        mlib.move_along_path(monster, game)
-    elif monster.move_tactic == 'hunt':
-        mlib.monster_hunt(monster, player, control, choose_monster_target)
+    if can_move(monster):
+        if monster.move_tactic == 'pos_path':
+            mlib.move_along_path(monster, game)
+        elif monster.move_tactic == 'hunt':
+            mlib.monster_hunt(monster, player, control, choose_monster_target)
+    else:
+        monster._tics = 0
+    return True
 
-
+def can_move(peep):
+    for s in peep.states:
+        if s.name == "sleeping":
+            return False
     return True
 
 def choose_monster_target(monster, control):
@@ -382,6 +389,7 @@ def main(control):
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
         control.game_model.maze_model.elapse_time()
+        control.game_model.message(f"player age: {control.game_model.player._age}")
         res = execute_turn_seq(control)
         if res == 'quit' or res == 'player_died':
             return 0
