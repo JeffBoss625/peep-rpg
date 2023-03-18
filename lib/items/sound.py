@@ -1,4 +1,6 @@
 import math
+from dataclasses import dataclass, field
+from typing import List, Any
 
 from lib.prpg_main import is_in_sight
 
@@ -51,10 +53,61 @@ def sound_made(peep, control):
                 if 1 < s[1] - time_heard:   #todo: Make a function for updating event window
                     p.process_sound.remove(s)
 
+@dataclass
+class PeepSleeping:
+    sleepiness: float = 0
+    limit: int = 1
+    age_checked: int = 0
+    timer: List[Any] = field(default_factory=list)
+    target: float = 0.2
+    cycles: int = 0
+
+def handle_sound(time, sleep):
+    time_passed = time - sleep.age_checked
+    sleep.age_checked = time
+
+    if sleep.timer[0] is True and sleep.timer[1] <= 0:
+        if sleep.target == sleep.limit:
+            sleep.cycles += 1
+            if sleep.cycles > 5: sleep.cycles = 5
+            sleep.target = 0.2 * sleep.limit
+            sleep.timer[0] = False
+        else:
+            sleep.target = sleep.limit
+            sleep.timer[0] = False
+
+    if sleep.sleepiness < sleep.target:
+        sleep.sleepiness += 0.05 * time_passed * ((sleep.cycles * 0.1) + 1)
+        if sleep.sleepiness >= sleep.target:
+            sleep.sleepiness = sleep.target
+            sleep.timer[0] = True
+            if sleep.target == sleep.limit:
+                sleep.timer[1] = 20 * (1 - (sleep.cycles * 0.1))
+            else:
+                sleep.timer[1] = 10 * (1 - (sleep.cycles * 0.1))
+    elif sleep.sleepiness > sleep.target:
+        sleep.sleepiness -= 0.05 * time_passed * ((sleep.cycles * 0.1) + 1)
+        if sleep.sleepiness <= sleep.target:
+            sleep.sleepiness = sleep.target
+            sleep.timer[0] = True
+            if sleep.target == sleep.limit:
+                sleep.timer[1] = 10 * (1 - (sleep.cycles * 0.1))
+            else:
+                sleep.timer[1] = 20 * (1 - (sleep.cycles * 0.1))
+    else:
+        sleep.timer[1] -= time_passed
+
+    return time, sleep.sleepiness
+
+
 
 
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-
+    # import doctest
+    # doctest.testmod()
+    sleep = PeepSleeping(0, 1, 0, [False, 0], 0.2, 0)
+    i = 0
+    while i <= 400:
+        print(handle_sound(i, sleep))
+        i += 0.25
 
