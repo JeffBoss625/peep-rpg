@@ -97,6 +97,10 @@ def do_player_turn(control, input_key):
                 game.message(f'Ability on cooldown')
             else:
                 game.message(f'Used ability')
+                for s in player.states:
+                    if hasattr(s, "handle_activated"):
+                        s.handle_activated(None, player)
+                        pass
         else:
             game.message('No ability to activate')
 

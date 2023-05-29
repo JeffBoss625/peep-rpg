@@ -12,6 +12,7 @@ from lib.stats import roll_dice
 class PCLASSES:
     FIGHTER = 'FIGHTER'
     THIEF = 'THIEF'
+    RANGER = 'RANGER'
 
 
 @dataclass
@@ -56,10 +57,21 @@ class AbilityBypass(Ability):
     name: str = 'bypass'
     state: str = 'bypassing'
     duration: float = 0.1
+    cooldown: int = 5
+    isactive: bool = True
+    time_activated: float = -100
+    halt_hit = False
+
+@dataclass
+class AbilityQuickshot:
+    name: str = 'quickshot'
+    state: str = 'quickshooting'
+    duration: float = 5
     cooldown: int = 15
     isactive: bool = True
     time_activated: float = -100
     halt_hit = False
+
 
     # todo: Refactor activate_ability into the abilities themselves.
 
@@ -83,6 +95,16 @@ PCLASSES = [
         hitdicefac=1.0,
         abilitiesbylevel=[
             [AbilityBypass()],
+            [Ability(name='backstab', isactive=False)]
+    ],
+    ),
+    PClass(
+        name=PCLASSES.RANGER,
+        level_factor=1.0,
+        regen_factor=1.0,
+        hitdicefac=1.0,
+        abilitiesbylevel=[
+            [AbilityQuickshot()],
             [Ability(name='backstab', isactive=False)]
     ],
     )
@@ -140,20 +162,6 @@ class PeepCharging (PeepState):
             src.pos = target_pos
         return False
 
-@dataclass
-class PeepEnraged (PeepState):
-    name: str = 'enraged'
-    dmgboost: float = 1.3     #Percent dmg boost
-    hpboost: float = 1.0      #Percent hp boost
-    speedboost: float = 0.1   #Percent speed boost
-    maxcompounded: int = 3
-    compounded: int = 0
-    path: bool = False
-    num_mult: int = 0
-
-    def handle_move_into_monster(self, src, dst, state, game):
-        return False
-
 class PAbilityRage (PAbility):
     name: str = 'rage'
     state: str = 'enraged'
@@ -164,12 +172,50 @@ class PAbilityRage (PAbility):
         if peep.hp <= self.healthreq * peep.maxhp and peep.hp > 0:
             print('hi')
 
+
 class PAbilityBackstab (PAbility):
     name: str = 'backstab'
     state: str = 'backstabbing'
     duration: float = 10
     healthreq: float = 1.0
 
+
+class PabilitySpeed_Adr (PAbility):
+    name: str = 'speed_adr'
+    state: str = 'adr_pump'
+    duration: float = 10
+    healthreq: float = .2
+
+
+@dataclass
+class PeepBypassing (PeepState):
+    name: str = 'bypassing'
+    dmgboost: float = 1.0
+    hpboost: float = 1.0
+    speedboost: float = 0
+    maxcompounded: int = 1
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
+
+    def handle_move_into_monster(self, src, dst, state, game):
+        x_mod = (dst.pos[0]-src.pos[0]) * 2
+        y_mod = (dst.pos[1]-src.pos[1]) * 2
+        target_pos = (src.pos[0]+x_mod, src.pos[1]+y_mod)
+        if game.maze_model.peep_at(target_pos):
+            target_pos = list(dst.pos)
+            dst.pos = src.pos
+            src.pos = (target_pos[0], target_pos[1])
+        elif game.maze_model.wall_at(target_pos):
+            target_pos = list(dst.pos)
+            dst.pos = src.pos
+            src.pos = (target_pos[0], target_pos[1])
+        else:
+            src.pos = target_pos
+        src.states.remove(state)
+        return True #no attacks
+
+@dataclass
 class PeepBackstabbing (PeepState):
     name: str = 'backstabbing'
     dmgboost: float = 1.0
@@ -211,6 +257,56 @@ class PeepBackstabbing (PeepState):
         return False
 
 @dataclass
+class PeepEnraged (PeepState):
+    name: str = 'enraged'
+    dmgboost: float = 1.3     #Percent dmg boost
+    hpboost: float = 1.0      #Percent hp boost
+    speedboost: float = 0.1   #Percent speed boost
+    maxcompounded: int = 3
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
+
+    def handle_move_into_monster(self, src, dst, state, game):
+        return False
+
+class PeepQuickshooting (PeepState):
+    def __init__(self):
+        self.data = []
+    name: str = 'quickshooting'
+    dmgboost: float = 1.3     #Percent dmg boost
+    hpboost: float = 1.0      #Percent hp boost
+    speedboost: float = 0   #Percent speed boost
+    maxcompounded: int = 3
+    compounded: int = 0
+    path: bool = False
+    num_mult: int = 0
+    _duration: int = 5
+
+    @property
+    def duration(self):
+        return self._duration
+
+    @duration.setter
+    def duration(self, v):
+        self._duration = v
+
+    def handle_move_into_monster(self, src, dst, state, game):
+        return False
+
+    @staticmethod
+    def handle_activated(self, peep):
+        for attack in peep.attacks:
+            if attack.range > 0:
+                attack.speed *= 2
+
+    @staticmethod
+    def handle_deactivated(self, peep):
+        for attack in peep.attacks:
+            if attack.range > 0:
+                attack.speed *= 2
+
+@dataclass
 class PeepSleeping (PeepState):
     name: str = 'sleeping'
     dmgboost: float = 1.0
@@ -245,43 +341,12 @@ class PeepSleeping (PeepState):
         if self.sleepiness <= 0:
             peep.states.remove(self)
 
-@dataclass
-class PeepBypassing (PeepState):
-    name: str = 'bypassing'
-    dmgboost: float = 1.0
-    hpboost: float = 1.0
-    speedboost: float = 0
-    maxcompounded: int = 1
-    compounded: int = 0
-    path: bool = False
-    num_mult: int = 0
 
-    def handle_move_into_monster(self, src, dst, state, game):
-        x_mod = (dst.pos[0]-src.pos[0]) * 2
-        y_mod = (dst.pos[1]-src.pos[1]) * 2
-        target_pos = (src.pos[0]+x_mod, src.pos[1]+y_mod)
-        if game.maze_model.peep_at(target_pos):
-            target_pos = list(dst.pos)
-            dst.pos = src.pos
-            src.pos = (target_pos[0], target_pos[1])
-        elif game.maze_model.wall_at(target_pos):
-            target_pos = list(dst.pos)
-            dst.pos = src.pos
-            src.pos = (target_pos[0], target_pos[1])
-        else:
-            src.pos = target_pos
-        src.states.remove(state)
-        return True #no attacks
-
-class PabilitySpeed_Adr (PAbility):
-    name: str = 'speed_adr'
-    state: str = 'adr_pump'
-    duration: float = 10
-    healthreq: float = .2
 
 ABILITIES_BY_NAME = {
     'charge': AbilityCharge,
     'bypass': AbilityBypass,
+    'quickshot': AbilityQuickshot
 }
 
 PABILITIES_BY_NAME = {
@@ -297,6 +362,7 @@ STATECLASSES_BY_NAME = {
     'charging': PeepCharging,
     'backstabbing': PeepBackstabbing,
     'bypassing': PeepBypassing,
+    'quickshooting': PeepQuickshooting,
 }
 
 def xptolevel_calc(level, factor, base):
@@ -345,7 +411,7 @@ def activate_pability(peep, pability):
                         s.dmgboost = s.dmgboost + (state.dmgboost - 1)
                         peep.speed = peep.speed + s.speedboost
 
-                s.duration = pability.duration
+                    s.duration = pability.duration
         else:
             peep.states.append(state)
             peep.speed = peep.speed + state.speedboost
@@ -395,6 +461,9 @@ def activate_ability(peep, ability, cooldown_check=True):
 def check_states(peep, state, inc):
     state.duration -= inc
     if state.duration <= 0:
+        if hasattr(state, 'handle_deactivate'):
+            state.handle_deactivate(None, peep)
+            pass
         remove_state(peep, state)
 
 def remove_state(peep, state):
@@ -407,5 +476,7 @@ def check_line(peep, x, y, state):
     if x - peep.pos[0] == change_x and y - peep.pos[1] == change_y:
         return True
     else:
+        if hasattr(state, 'handle_deactivate'):
+            state.handle_deactivate(None, peep)
         remove_state(peep, state)
         return False
