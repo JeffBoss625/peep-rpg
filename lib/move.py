@@ -110,7 +110,7 @@ def move_peep(game, peep, dst_pos):
     for s in peep.states:      #todo:Should subscribe to peep aging events
         peeps = game.maze_model.peeps
         inc = round(1/peeps[0].speed, 5)
-        check_states(peep, s, inc)
+        check_states(peep, s, 0)
     return True
 
 

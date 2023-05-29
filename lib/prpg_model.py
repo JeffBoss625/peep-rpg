@@ -170,6 +170,8 @@ def _elapse_time(peeps, add_tics):
             if add_tics:
                 p._tics = round(p._tics + inc, 5)
                 p._age += inc
+                for s in p.states:
+                    check_states(p, s, inc)
             thresh = 1/p.speed
             if p._tics >= thresh:
                 ret.append(p)
@@ -179,8 +181,6 @@ def _elapse_time(peeps, add_tics):
 def handle_passing_time(peep, inc):
     for p in peep.pabilities:
         activate_pability(peep, p)
-    for s in peep.states:
-        check_states(peep, s, inc)
     if peep.maxhp > peep.hp > 0:
         amount_heal = peep.maxhp * peep.regen_fac * GAME_SETTINGS.REGEN_RATE
         hp = peep.hp + amount_heal * inc

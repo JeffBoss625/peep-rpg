@@ -67,7 +67,7 @@ def do_player_turn(control, input_key):
             for s in player.states:  # todo:Should subscribe to peep aging events
                 peeps = game.maze_model.peeps
                 inc = round(1 / peeps[0].speed, 5)
-                check_states(player, s, inc)
+                check_states(player, s, 0)
             moved = True
         else:
             moved = mlib.move_peep(game, game.player, dst_pos)
@@ -96,7 +96,7 @@ def do_player_turn(control, input_key):
             if not activate_ability(player, ability):
                 game.message(f'Ability on cooldown')
             else:
-                game.message(f'Used ability')
+                game.message(f'Used ability:', ability)
                 for s in player.states:
                     if hasattr(s, "handle_activated"):
                         s.handle_activated(None, player)
@@ -274,7 +274,7 @@ def player_aim(attack, control):
         for s in player.states:  # todo:Should subscribe to peep aging events
             peeps = game.maze_model.peeps
             inc = round(1 / peeps[0].speed, 5)
-            check_states(player, s, inc)
+            check_states(player, s, 0)
 
 
 def monster_turn(control, monster):
