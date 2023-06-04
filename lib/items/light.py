@@ -1,6 +1,11 @@
+from dataclasses import field
 from math import sqrt
 import doctest
+from typing import Tuple
+
 # todo: give peeps and items brightness
+
+
 class Lightsource:
     def __init__(self, name, brightness, pos):
         self.name = name
@@ -9,7 +14,7 @@ class Lightsource:
         self.data = []
     name: str = ''
     brightness: float = 5
-    pos: int = 1
+    pos: Tuple[int,int] = field(default_factory=tuple)
     def __str__(self):
         return f"light(name: {self.name}, brightness: {self.brightness}, position: {self.pos})"
 
