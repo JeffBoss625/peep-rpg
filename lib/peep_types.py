@@ -486,7 +486,7 @@ def create_attack(attack_info):
 
 def create_peep(
         ptype,
-        pclass="RANGER",
+        pclass="THIEF",
         name='',
         pos=(0, 0),
         height=1.0,

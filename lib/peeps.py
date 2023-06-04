@@ -76,7 +76,7 @@ class Peep(DataModel):
     _hunt_target: any = None
     direct: int = -1
     pos_path: Tuple[Tuple[int, int]] = field(default_factory=tuple)
-    pos_i = 0
+    pos_i = 0  #todo: should be called path_i: index for how far along a projectile is along a path
     pabilities: List[Any] = field(default_factory=list)
     aabilities:List[Any] = field(default_factory=list)
     states: List[Any] = field(default_factory=list)

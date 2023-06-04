@@ -393,7 +393,7 @@ def main(control):
     # GET PLAYER AND MONSTER TURNS (move_sequence)
     while True:
         control.game_model.maze_model.elapse_time()
-        control.game_model.message(f"player age: {control.game_model.player._age}")
+        # control.game_model.message(f"player age: {control.game_model.player._age}")
         res = execute_turn_seq(control)
         if res == 'quit' or res == 'player_died':
             return 0
