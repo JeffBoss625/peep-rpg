@@ -69,7 +69,7 @@ def striking_blow(strike, target):
     >>> striking_blow(Strike(velocity=40, area=5, mass= 50), Target(Properties([Layer(.75, 2, 40, 100000, 90000, 0.3, .9)])))
     """
     for layer in target.properties.layers:
-        f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / layer.area
+        f_per_cm = ((strike.mass * (strike.velocity ** 2)) / 2) / strike.area
         if strike.velocity <= 0:
             return 0
         pierce = pierceable(strike, layer)

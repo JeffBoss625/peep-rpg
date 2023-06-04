@@ -34,6 +34,9 @@ class Ability:
     def handle_move_into_monster(self, src, dst, game):
         return False #continue to attack tgt
 
+    def __str__(self):
+        return self.name[0].upper() + self.name[1:]
+
 
 @dataclass
 class AbilityCharge(Ability):
@@ -63,7 +66,7 @@ class AbilityBypass(Ability):
     halt_hit = False
 
 @dataclass
-class AbilityQuickshot:
+class AbilityQuickshot(Ability):
     name: str = 'quickshot'
     state: str = 'quickshooting'
     duration: float = 5
@@ -304,7 +307,7 @@ class PeepQuickshooting (PeepState):
     def handle_deactivated(self, peep):
         for attack in peep.attacks:
             if attack.range > 0:
-                attack.speed *= 2
+                attack.speed *= 0.5
 
 @dataclass
 class PeepSleeping (PeepState):
@@ -461,8 +464,8 @@ def activate_ability(peep, ability, cooldown_check=True):
 def check_states(peep, state, inc):
     state.duration -= inc
     if state.duration <= 0:
-        if hasattr(state, 'handle_deactivate'):
-            state.handle_deactivate(None, peep)
+        if hasattr(state, 'handle_deactivated'):
+            state.handle_deactivated(None, peep)
             pass
         remove_state(peep, state)
 
@@ -476,7 +479,7 @@ def check_line(peep, x, y, state):
     if x - peep.pos[0] == change_x and y - peep.pos[1] == change_y:
         return True
     else:
-        if hasattr(state, 'handle_deactivate'):
-            state.handle_deactivate(None, peep)
+        if hasattr(state, 'handle_deactivated'):
+            state.handle_deactivated(None, peep)
         remove_state(peep, state)
         return False
