@@ -12,7 +12,7 @@ class MazeWindow(Window):
         text_w = len(self.model.walls.text[0])
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
 
-        lm = self.model.lightmodel
+        # lm = self.model.lightmodel
 
         # need to update self.write_lines to draw only lit cells (passing the lightmodel into the function)
         self.write_lines(self.model.walls.text, **params)
