@@ -55,6 +55,7 @@ class PType:
     direct: int = -1
     shooter: Peep = None
     gold: str = '1d1'
+    brightness: int = 0
 
     body_stats: Dict[str,Any] = None
     stuff: List[Any] = field(default_factory=list)
@@ -304,6 +305,7 @@ MONSTERS = [
         thaco=19,
         speed=2,
         ac=10,
+        brightness=5,
         attacks=(
             AttackInfo('karate-chop', '3d5'),
             AttackInfo('head-butt', '1d9'),
@@ -504,6 +506,7 @@ def create_peep(
     regen_fac = pt.regen_fac
     attacks = attacks if len(attacks) else pt.attacks # todo: combine type and passed in?
     gold = roll_dice(pt.gold)
+    brightness = pt.brightness
 
     ret = Peep(
         name=name if name else 'a ' + ptype,
@@ -536,6 +539,7 @@ def create_peep(
         shooter=shooter,
         gold=gold,
         pclass=pc,
+        brightness=brightness
     )
     if pt.stuff:
         ret.stuff.extend(pt.stuff)

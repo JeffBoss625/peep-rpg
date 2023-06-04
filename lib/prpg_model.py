@@ -8,7 +8,7 @@
 # the state of the game. It eschew's traditional object encapsulation of internal state for a transparent model
 # that will be costly to change, but easier to work with and understand.
 from dataclasses import dataclass
-
+from math import sqrt
 from lib import dungeons
 from lib.constants import GAME_SETTINGS
 from lib.items.item import Item
@@ -147,6 +147,22 @@ class MazeModel(DataModel):
 
     def max_y(self):
         return len(self.walls.text)
+
+    def brightness_at(self, pos):
+        lightsources = self.peeps
+        pos_x = pos[0]
+        pos_y = pos[1]
+        brightness = []
+        for light in lightsources:
+            distance_x = abs(light.pos[0] - pos_x)
+            distance_y = abs(light.pos[1] - pos_y)
+            tot_distance = sqrt(distance_x ** 2 + distance_y ** 2)
+            if tot_distance == 0:
+                brightness.append(light.brightness)
+            else:
+                brightness.append(light.brightness / (tot_distance ** 2))
+
+        return brightness
 
 # NEW
 # Add the smallest increment of time (the fastest peep) to all peep stored movement (tics). Wrap around

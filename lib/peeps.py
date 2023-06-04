@@ -97,6 +97,7 @@ class Peep(DataModel):
     stuff: ModelList = field(default_factory=ModelList)
     gold: int = 10
     shooter: Any = None
+    brightness: int = 0
 
     body: Body = None
 

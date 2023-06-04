@@ -28,9 +28,9 @@ light_3 = Lightsource(name='john', brightness=2, pos=[4,0])
 lightsources = [light_1, light_2, light_3]
 
 
-def light_at(lightsources, pos):
+def brightness_at(lightsources, pos):
     """
-    >>> light_at(lightsources, [0,0])
+    >>> brightness_at(lightsources, [0,0])
     [0.24390243902439024, 0.14423076923076925, 0.125]
 
     """
@@ -41,7 +41,10 @@ def light_at(lightsources, pos):
         distance_x = abs(light.pos[0] - pos_x)
         distance_y = abs(light.pos[1] - pos_y)
         tot_distance = sqrt(distance_x ** 2 + distance_y ** 2)
-        brightness.append(light.brightness / (tot_distance ** 2))
+        if tot_distance == 0:
+            brightness.append(light.brightness)
+        else:
+            brightness.append(light.brightness / (tot_distance ** 2))
 
     return brightness
 
