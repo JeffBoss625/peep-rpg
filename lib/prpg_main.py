@@ -77,7 +77,7 @@ def do_player_turn(control, input_key):
             return input_key
         # else didn't spend turn
 
-    elif input_key == Key.CTRL_Q:
+    elif input_key == Key.CTRL_Q or input_key == Key.CTRL_C:
         return 'q'
 
     elif input_key == 'm':

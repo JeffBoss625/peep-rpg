@@ -137,6 +137,7 @@ class Window:
         align_x = params.get('align_x', SIDE.LEFT)
         align_y = params.get('align_y', SIDE.TOP)
         text_w = params.get('text_w', 0)    # if set, use this as the fixed text width for alignment and truncation
+        filter_line = params.get('filter_line', lambda xoff, yoff, line: line)
 
         if not len(lines):
             return
@@ -146,21 +147,25 @@ class Window:
         trunc_w = min0(text_w, max_w)
 
         nlines = len(lines)
+        yoff = 0
         if nlines > max_h:
             if trunc_y == SIDE.BOTTOM:
                 lines = lines[:max_h]
             else: # Side.TOP
-                lines = lines[nlines - max_h:]
+                yoff = nlines - max_h
+                lines = lines[yoff:]
 
         y = align_y_offset(align_y, self.y_margin, len(lines), max_h)
 
         scr = self.scr
+        xoff = 0
         for i, line in enumerate(lines):
             if len(line) > trunc_w:
                 if trunc_x == SIDE.RIGHT:
                     line = line[0:trunc_w - 1]
                 else: # Side.LEFT
-                    line = line[len(line) - max_w:]
+                    xoff = len(line) - max_w
+                    line = line[xoff:]
 
             if len(line) >= max_w:
                 x = self.x_margin
@@ -168,7 +173,9 @@ class Window:
                 x = align_x_offset(align_x, self.x_margin, len(line), max_w)
 
             # self.log(f'addstr({y+i}, {x}, {len(line)})')
+            line = filter_line(xoff, yoff+i, line)
             scr.addstr(y+i, x, line)
+            
 
     # curses.window.refresh() calls curses.window.noutrefresh() and curses.doupate() and is not efficient for
     # calling on all subwindows.

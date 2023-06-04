@@ -15,6 +15,16 @@ class MazeWindow(Window):
         # lm = self.model.lightmodel
 
         # need to update self.write_lines to draw only lit cells (passing the lightmodel into the function)
+        def filter_line (xoff, yoff, line):
+            ret = ''
+            for i, c in enumerate(line):
+                if sum(self.model.brightness_at([xoff + i, yoff])) > 0.2:
+                    ret += c
+                else:
+                    ret += ' '
+            return ret
+        
+        params['filter_line'] = filter_line
         self.write_lines(self.model.walls.text, **params)
         for it in self.model.items:
             x, y = it.pos
