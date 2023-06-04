@@ -11,10 +11,16 @@ class MazeWindow(Window):
         text_h = len(self.model.walls.text)
         text_w = len(self.model.walls.text[0])
         params = {**self.params, **{'text_w': text_w, 'text_h': text_h}}
+
+        lm = self.model.lightmodel
+
+        # need to update self.write_lines to draw only lit cells (passing the lightmodel into the function)
         self.write_lines(self.model.walls.text, **params)
 
         for it in self.model.items:
-            self.write_str(it.pos[0], it.pos[1], it.char, **{**params, **{'fg': it.fgcolor, 'bg': it.bgcolor}})
+            x, y = it.pos
+            # if lm.brightness(x, y)  > 0.2
+            self.write_str(x, y, it.char, **{**params, **{'fg': it.fgcolor, 'bg': it.bgcolor}})
 
         path = self.model.target_path
         if len(path):
@@ -25,7 +31,9 @@ class MazeWindow(Window):
 
         for p in self.model.peeps:
             if p.hp > 0:
-                self.write_str(p.pos[0], p.pos[1], p.char, **{**params, **{'fg': p.fgcolor, 'bg': p.bgcolor}})
+                x, y = p.pos
+                # if lm.brightness(x, y)  > 0.2
+                self.write_str(x, y, p.char, **{**params, **{'fg': p.fgcolor, 'bg': p.bgcolor}})
 
 
 
