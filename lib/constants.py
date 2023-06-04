@@ -72,7 +72,8 @@ class FACING:
     BACK = 'BACK'
 
 class Key:
-    CTRL_Q = '\x11'
+    CTRL_C = '\x11'
+    CTRL_Q = '\x03'
     # ESC = '\x1b'
 
 class GAME_SETTINGS:
