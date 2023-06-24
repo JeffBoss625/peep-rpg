@@ -268,7 +268,32 @@ MONSTERS = [
         ac=2,
         gold="0d1",
         attacks=(
-            AttackInfo('little slurp', '1d2', blowback=-1),
+            AttackInfo("lil' slurp", '1d2', blowback=-1),
+        ),
+    ),
+    PType(
+        name='chest',
+        char='=',
+        type='monster',
+        hitdice='1d1',
+        thaco=0,
+        speed=0,
+        ac=0,
+        gold="100d5",
+        attacks=(
+        ),
+    ),
+    PType(
+        name='Pat (Mimic)',
+        char='=',
+        type='monster',
+        hitdice='1d1',
+        thaco=17,
+        speed=4,
+        ac=5,
+        gold="300d5",
+        attacks=(
+            AttackInfo("bite", '25d1', blowback=0),
         ),
     ),
     PType(
@@ -376,6 +401,7 @@ MONSTERS = [
         speed=10.0,
         ac=-10,
         gold='0d1',
+        brightness=5,
         attacks=(
         ),
         move_tactic='pos_path',

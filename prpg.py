@@ -30,7 +30,7 @@ from lib.prpg_model import GameModel
 w, h = os.get_terminal_size()
 def cb(scr):
     root_layout = RootLayout(dim=Dim(w,h), border=0, logger=Logger(__file__), scr=scr, curses=curses)
-    game = GameModel(create_peep('human', name='Super Dad'))
+    game = GameModel(create_peep('human', name='Bobo, The Mighty'))
     game.player.body.wear(clothes.cloak(size=Size(1.1, 1.1, 1.1), thick=1.0))
     game.player.body.wear(armor.helm(size=Size(1.15, 1.1, 1.1), thick=1.0))
     # game.player.body.wear(armor.shield(size=Size(1.4, 1.1, 1.0), thick=1.1))

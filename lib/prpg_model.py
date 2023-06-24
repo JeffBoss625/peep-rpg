@@ -139,6 +139,9 @@ class MazeModel(DataModel):
             self.logger.log(s)
 
     def elapse_time(self):
+        for peep in self.peeps:
+            if peep.hp <=-0:
+                self.peeps.remove(peep)
         self.turn_seq = elapse_time(self.peeps)
         self.ti = 0
 
@@ -158,7 +161,7 @@ class MazeModel(DataModel):
             distance_y = abs(light.pos[1] - pos_y)
             tot_distance = sqrt(distance_x ** 2 + distance_y ** 2)
             if tot_distance == 0:
-                brightness.append(light.brightness)
+                brightness.append(light.brightness * 5)
             else:
                 brightness.append(light.brightness / (tot_distance ** 2))
 
