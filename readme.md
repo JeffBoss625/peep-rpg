@@ -16,7 +16,7 @@
 ## Sleep Cycles
 Sleep cycles are implemented for the monsters to simulate real life sleeping patterns. The cycle that was used to model this is the 4 stage REM sleep cycle. This is used to make a calculation on how easily a monster will wake up due to noise: In the deeper stages of sleep like REM and NREM 3 the monster will respond less to sound and will not get up until a large amount of noise is made. However, when the monster is in NREM 1 and NREM 2, they will be easily awakened by any sound that the player makes. To demonstrate this idea here I graphed out the function for calculating the “deepness” of sleep:
 ![sleep_cycles](sleepcycles.png)
-Here is a part of the function for getting this result (more found in ____.py):
+Here is a part of the function for getting this result (more found in [sound.py](https://github.com/JeffBoss625/peep-rpg/blob/b81cc95dd393fc92573ab17a1129d4c1545f70ae/lib/items/sound.py#L67)):
 ```
 def handle_sound(time, sleep):
    time_passed = time - sleep.age_checked
@@ -48,8 +48,6 @@ One of the key aspects of peep-rpg is the use of physics models and calculations
 ### Light and Sound
 Inverse Square Law Equation: k/x
 This equation helps represent the dissipation of light and sound within the dungeon by having x equal to the distance away from source of the light or sound, and k be the coefficient that will represent how quickly the sound/light dissipates. In the case of peep-rpg, light dissipates faster than sound because the dungeon echos sound. To represent this, the coefficient k is greater for sound than it is for light. 
-
-
 ```
 def brightness_at(lightsources, pos):
    pos_x = pos[0]
@@ -67,42 +65,16 @@ def brightness_at(lightsources, pos):
 
 
 Light determines how far or what the player is able to see in the dungeon:
-Ssc of light in a dungeon
+![](light_peep-rpg.png)
 Sound is in early implementation. Its only function is for waking monsters from their natural sleep cycles. The future idea for sound is to develop the AI of monsters to track the sounds that the player makes throughout the dungeon until the player is in sight.
 
 ### Items
-Items play a large role in this game because of how physics is utilized in calculations. There are many variables that go into these calculations that are shown below:
-```
-class Layer:
-   elasticity: float = 1.0
-   thickness: float = 1.0
-   area: float = 1.0
-   breaking_pt: float = 1.0
-   plastic_region: float = 1.0
-   toughness: float = 1.0
-   hardness: float = 1.0
-   durability: float = 1.0
+Items play a large role in this game because of how physics is utilized in calculations. Each layer of armor has 8 qualities that change how damage is caluclated: elasticity, thickness, area, breaking_pt, plastic_region, toughness, hardness, and durability. Each attack has three qualities: velocity, area, and mass.
 
+In order to calculate the force that a strike lands onto a target it will go through the function striking_blow(). The first step of this function is to calculate if the strike will pierce the armor based on how much pressure the attack has as well as the qualities of the layer of armor. If the attack pierces the layer of armor it will go onto the next layer of armor until reaching the body of the target. If the projectile/attack has enough force to continue piercing through the target it will do a maximum of 1/3 of their max health. However if the attack does not pierce 
 
-class Strike:
-   velocity: float = 1.0
-   area: float = 1.0
-   mass: float = 1.0
-
-pierceable
-f_per_cm = ((strike.mass*(strike.velocity**2))/2)/strike.area
-print(f'f_per_cm: {f_per_cm}')
-print(f'piercable: {layer.breaking_pt*(layer.hardness**2)}')
-if f_per_cm > layer.breaking_pt * (layer.hardness ** 2):
-   return "pierce"
-return "stop"
-
-def apply_pierce(strike, layer, f_per_cm):
-   strike.velocity = (strike.velocity*(strike.mass*100)-(layer.toughness*strike.velocity) / (1 / layer.thickness))
-   strike.velocity = max(0, strike.velocity)
-   layer.durability -= .02
-   return strike, layer
-```
 Then this force is converted into damage 
+
+ (The calculations can be found in the [physics.py](https://github.com/JeffBoss625/peep-rpg/blob/c0fceb824f74b2340e7d783eba5b350063767049/lib/items/physics.py#L1C1-L1C1) file). 
 
 *Note that some creatures and monsters that have thicker or unique skin will have their skin added in as an extra layer of armor in calculations.**
