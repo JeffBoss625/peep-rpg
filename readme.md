@@ -9,9 +9,14 @@
 
 ## Classes and Abilities
 
-## World Building
-## Monsters and AI
 
+## World Building
+
+
+## Monster AI
+The monster AI in peep-rpg is still in early implementation. As of now it uses [Dijkstra's Algorithm](https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/) to find the quickest path to the player. The algorithm itself was not a difficult feature to add to the project, it was simply a matter of finding a good implementation on the internet. However, the difficult issue was differenciating a room from a hallway and different exits and entrances to the dungeon. To do this I wrote an algorithm that works its way around the dungeon marking rooms and hallways, mapping out nodes and their weighted pathways between the nodes. This is found in the [find_path.py](https://github.com/JeffBoss625/peep-rpg/blob/a9f028137b327e69b7c45360a1f78ef452945327/lib/find_path.py#L1) file.
+
+The future idea for AI of enemies, is that they will react to sound and light throughout the dungeon to add more depth to the game. Also, there will be monsters that aren't always hostile, or hostile to specific other monsters. This will add depth and greater story telling for the player.
 
 ## Sleep Cycles
 Sleep cycles are implemented for the monsters to simulate real life sleeping patterns. The cycle that was used to model this is the 4 stage REM sleep cycle. This is used to make a calculation on how easily a monster will wake up due to noise: In the deeper stages of sleep like REM and NREM 3 the monster will respond less to sound and will not get up until a large amount of noise is made. However, when the monster is in NREM 1 and NREM 2, they will be easily awakened by any sound that the player makes. To demonstrate this idea here I graphed out the function for calculating the “deepness” of sleep:
@@ -71,10 +76,9 @@ Sound is in early implementation. Its only function is for waking monsters from 
 ### Items
 Items play a large role in this game because of how physics is utilized in calculations. Each layer of armor has 8 qualities that change how damage is caluclated: elasticity, thickness, area, breaking_pt, plastic_region, toughness, hardness, and durability. Each attack has three qualities: velocity, area, and mass.
 
-In order to calculate the force that a strike lands onto a target it will go through the function striking_blow(). The first step of this function is to calculate if the strike will pierce the armor based on how much pressure the attack has as well as the qualities of the layer of armor. If the attack pierces the layer of armor it will go onto the next layer of armor until reaching the body of the target. If the projectile/attack has enough force to continue piercing through the target it will do a maximum of 1/3 of their max health. However if the attack does not pierce 
-
-Then this force is converted into damage 
+In order to calculate the force that a strike lands onto a target it will go through the function striking_blow(). The first step of this function is to calculate if the strike will pierce the armor based on how much pressure the attack has as well as the qualities of the layer of armor. If the attack pierces the layer of armor it will go onto the next layer of armor until reaching the body of the target. If the projectile/attack has enough force to continue piercing through the target it will do a maximum of 1/3 of their max health. However if the attack does not pierce it is calculated as a crushing attack in which the force is spread out before hitting the target. This force is converted into damage. Some examples of the results of these fucntions:
+![](outputs_physics.PNG)
 
  (The calculations can be found in the [physics.py](https://github.com/JeffBoss625/peep-rpg/blob/c0fceb824f74b2340e7d783eba5b350063767049/lib/items/physics.py#L1C1-L1C1) file). 
 
-*Note that some creatures and monsters that have thicker or unique skin will have their skin added in as an extra layer of armor in calculations.**
+**Note that some creatures and monsters that have thicker or unique skin will have their skin added in as an extra layer of armor in calculations.*
