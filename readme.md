@@ -8,7 +8,13 @@
 - Command “python peep-rpg”
 
 ## Classes and Abilities
-
+There are three classes in the game so far each with one passive and on active ability.
+### Warrior
+The warrior class is based on melee combat and close quarters engagements. The passive ability for the warrior is "rage". Rage is activated autimatically once the player falls below 40% of their maximum health. When activated, rage will cause attacks to do more damage to opponents as well as have the player move faster. The activated ability, called "charge" will continuously increase the speed and damage of the player until the player stops moving in one continuous direction or hits an enemy.
+### Ranger
+The ranger class is a ranged class that specializes in ranged combat. The passive ability "speed adrenaline," allows for a large speed boost once the player reaches 20% of their maximum health. This can allow for a quick escape to disengage from close quarters combat back to the safety of long ranged combat. The activated ability "quickshot" allows for the player to rapid fire multiple ranged attacks in quick succession in the time span that would normally take up the time to shoot just one shot.
+### Theif
+The theif class is a close range specialist that relies on speed and trickery to fight. The theif's passive ability is "backstab." Backstab will deal extra damage if the target is facing a different direction than where you are, the further 
 
 ## World Building
 
