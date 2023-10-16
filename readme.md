@@ -8,13 +8,13 @@
 - Command “python peep-rpg”
 
 ## Classes and Abilities
-There are three classes in the game so far each with one passive and on active ability.
+There are three classes in the game so far each with one passive and on active ability. All classes and abilites found here: [pclass.py](https://github.com/JeffBoss625/peep-rpg/blob/36c75792de6a4603c3c7b58e216c2eb666a0f46a/lib/pclass.py#L1)
 ### Warrior
 The warrior class is based on melee combat and close quarters engagements. The passive ability for the warrior is "rage". Rage is activated autimatically once the player falls below 40% of their maximum health. When activated, rage will cause attacks to do more damage to opponents as well as have the player move faster. The activated ability, called "charge" will continuously increase the speed and damage of the player until the player stops moving in one continuous direction or hits an enemy.
 ### Ranger
 The ranger class is a ranged class that specializes in ranged combat. The passive ability "speed adrenaline," allows for a large speed boost once the player reaches 20% of their maximum health. This can allow for a quick escape to disengage from close quarters combat back to the safety of long ranged combat. The activated ability "quickshot" allows for the player to rapid fire multiple ranged attacks in quick succession in the time span that would normally take up the time to shoot just one shot.
-### Theif
-The theif class is a close range specialist that relies on speed and trickery to fight. The theif's passive ability is "backstab." Backstab will deal extra damage if the target is facing a different direction than where you are, the further 
+### Thief
+The thief class is a close range specialist that relies on speed and trickery to fight. The thief's passive ability is "backstab." Backstab will deal extra damage if the target is facing the same direction as you: you are attacking them from behind. This allows the thief to capatalize on quick movements and trickery to deal more damage. The activated ability for the thief is "bypass" which allows the thief to quickly teleport past an enemy that is right next to the player. This can be used to get more damage with backstab by teleporting behind an enemy and stabbing them in the back. This can also be used as a quick escape if the player is cornered
 
 ## World Building
 
@@ -82,7 +82,7 @@ Sound is in early implementation. Its only function is for waking monsters from 
 ### Items
 Items play a large role in this game because of how physics is utilized in calculations. Each layer of armor has 8 qualities that change how damage is caluclated: elasticity, thickness, area, breaking_pt, plastic_region, toughness, hardness, and durability. Each attack has three qualities: velocity, area, and mass.
 
-In order to calculate the force that a strike lands onto a target it will go through the function striking_blow(). The first step of this function is to calculate if the strike will pierce the armor based on how much pressure the attack has as well as the qualities of the layer of armor. If the attack pierces the layer of armor it will go onto the next layer of armor until reaching the body of the target. If the projectile/attack has enough force to continue piercing through the target it will do a maximum of 1/3 of their max health. However if the attack does not pierce it is calculated as a crushing attack in which the force is spread out before hitting the target. This force is converted into damage. Some examples of the results of these fucntions:
+In order to calculate the force that a strike lands onto a target it will go through the function striking_blow(). The first step of this function is to calculate if the strike will pierce the armor based on how much pressure the attack has as well as the qualities of the layer of armor. If the attack pierces the layer of armor it will go onto the next layer of armor until reaching the body of the target. If the projectile/attack has enough force to continue piercing through the target it will do a maximum of 1/3 of their max health. However if the attack does not pierce it is calculated as a crushing attack in which the force is spread out before hitting the target. This force is converted into damage. Some examples of the results of these functions:
 ![](outputs_physics.PNG)
 
  (The calculations can be found in the [physics.py](https://github.com/JeffBoss625/peep-rpg/blob/c0fceb824f74b2340e7d783eba5b350063767049/lib/items/physics.py#L1C1-L1C1) file). 
