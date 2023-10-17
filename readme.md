@@ -1,4 +1,7 @@
 # Peep-RPG
+A rogue-style ascii/terminal RPG game that runs on your local computer. Utilizes realistic physics for calculations to make interactions more realistic and interesting. 
+
+This is my first programming project, so making this game was a learning process. My dad helped in the beginning to create an environment and things like displays and graphics of the game, but as time went on, he contributed less and I contributed more. The proceeding features mentioned in this document will be features that I have made/designed with little to know assistance.
 ## Requirements to Run Peep-RPG
 - Python 3 installed on terminal
 - Any computer with a terminal available for use
